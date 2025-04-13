@@ -21,12 +21,12 @@ export const AVAILABLE_GAMES: Game[] = [
   {
     id: 'soulcalibur6',
     name: 'Soul Calibur VI',
-    dbPath: '/DatabaseMan/SoulCalibur6/SoulCalibur6.db'
+    dbPath: '/SoulCalibur6/framedata.db'
   },
   {
     id: 'tekken8',
     name: 'Tekken 8',
-    dbPath: '/DatabaseMan/Tekken8/Tekken8.db'
+    dbPath: '/Tekken8/framedata.db'
   }
 ];
 

@@ -219,7 +219,7 @@ export const FrameDataTable: React.FC = () => {
 
             const movesData: Move[] = values.map((row: unknown[]) => {
               const moveObject: Record<string, unknown> = {};
-              columns.forEach((colName, index) => {
+              columns.forEach((colName: string, index: number) => {
                 moveObject[colName] = row[index];
               });
 

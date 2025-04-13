@@ -1,0 +1,35 @@
+/* tailwind.css */
+
+/*
+@import "tailwindcss";
+*/
+
+@layer base, components, utilities;
+
+/* Custom styles */
+@layer components {
+  .table-container {
+    @apply w-full overflow-x-auto;
+  }
+
+  .data-table {
+    @apply w-full border-collapse my-4;
+  }
+
+  .data-table th,
+  .data-table td {
+    @apply px-4 py-3 text-left border-b border-gray-200;
+  }
+
+  .data-table th {
+    @apply bg-gray-50 font-medium text-xs uppercase text-gray-500;
+  }
+
+  .data-table tbody tr:hover {
+    @apply bg-gray-50;
+  }
+
+  .data-table td {
+    @apply whitespace-nowrap text-sm text-gray-500;
+  }
+} 

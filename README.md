@@ -20,7 +20,7 @@ This is a web application designed to display frame data for characters in the g
 
 1.  **Clone the repository:**
     ```bash
-    git clone <your-repository-url>
+    git clone https://github.com/Raevhaal/FrameData.git
     cd FrameData
     ```
 2.  **Install dependencies:**

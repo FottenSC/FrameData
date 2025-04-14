@@ -34,7 +34,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20 # Or the Node.js version specified in your project/package.json
-          cache: 'npm'
+          # cache: 'npm' # Disable cache to ensure fresh build
       - name: Install dependencies
         run: npm ci
       - name: Build

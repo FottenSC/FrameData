@@ -115,34 +115,34 @@ export default function DataTable() {
             
             // Query moves for 2B
             const result = db.exec(`
-            SELECT m.* 
-            FROM moves m
-            JOIN characters c ON m.character_id = c.id
-            WHERE c.name = '2B'
+                SELECT m.* 
+                FROM moves m
+                JOIN characters c ON m.character_id = c.id
+                WHERE c.name = '2B'
             `);
             
             if (result.length > 0) {
-            const rows = result[0].values.map((row: any[]) => ({
-                id: row[0],
-                character_id: row[1],
-                command: row[2],
-                stance: row[3],
-                hit_level: row[4],
-                impact: row[5],
-                damage: row[6],
-                block: row[7],
-                hit: row[8],
-                counter_hit: row[9],
-                guard_burst: row[10],
-                notes: row[11],
-            }));
-            setData(rows);
+                const rows = result[0].values.map((row: any[]) => ({
+                    id: row[0],
+                    character_id: row[1],
+                    command: row[2],
+                    stance: row[3],
+                    hit_level: row[4],
+                    impact: row[5],
+                    damage: row[6],
+                    block: row[7],
+                    hit: row[8],
+                    counter_hit: row[9],
+                    guard_burst: row[10],
+                    notes: row[11],
+                }));
+                setData(rows);
             } else {
-            console.log("No moves found for 2B");
+                console.log("No moves found for 2B");
             }
         }
         } else {
-        setError("Failed to initialize database schema");
+            setError("Failed to initialize database schema");
         }
 
       } catch (err) {

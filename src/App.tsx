@@ -19,8 +19,8 @@ function App() {
               <Routes>
                 <Route path="/" element={<Navigate to="/games" replace />} />
                 <Route path="/games" element={<GameSelectionPage />} />
-                <Route path="/game/:gameId" element={<FrameDataTable />} />
-                <Route path="/game/:gameId/character/:characterName" element={<FrameDataTable />} />
+                <Route path="/:gameId" element={<FrameDataTable />} />
+                <Route path="/:gameId/:characterName" element={<FrameDataTable />} />
               </Routes>
             </main>
           </div>

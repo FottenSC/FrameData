@@ -19,12 +19,12 @@ export interface Character {
 // Define AVAILABLE_GAMES here
 export const AVAILABLE_GAMES: Game[] = [
   {
-    id: 'soulcalibur6',
+    id: 'SoulCalibur6',
     name: 'SoulCalibur VI',
     dbPath: '/SoulCalibur6/framedata.db'
   },
   {
-    id: 'tekken8',
+    id: 'Tekken8',
     name: 'Tekken 8',
     dbPath: '/Tekken8/framedata.db'
   }
@@ -92,7 +92,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     setSelectedCharacterId(null);
     
     // Update URL to reflect game selection
-    navigate(`/game/${game.id}`);
+    navigate(`/${game.id}`);
     
     // Simulate a short loading period when changing games
     setTimeout(() => setIsLoading(false), 300);
@@ -102,11 +102,17 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const handleSetSelectedCharacterId = (id: number | null) => {
     setSelectedCharacterId(id);
     
-    // Update URL to reflect character selection
+    // Update URL to reflect character selection - removed /character/
     if (id !== null) {
-      navigate(`/game/${selectedGame.id}/character/${id}`);
+      const character = characters.find(c => c.id === id);
+      if (character) {
+        navigate(`/${selectedGame.id}/${encodeURIComponent(character.name)}`); 
+      } else {
+        // Fallback if character not found (shouldn't usually happen)
+        navigate(`/${selectedGame.id}`);
+      }
     } else {
-      navigate(`/game/${selectedGame.id}`);
+      navigate(`/${selectedGame.id}`);
     }
   };
 

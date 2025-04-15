@@ -76,9 +76,9 @@ export const FrameDataTable: React.FC = () => {
         const expectedUrlName = encodeURIComponent(selectedChar.name);
         const currentUrlName = characterName ? encodeURIComponent(decodeURIComponent(characterName)) : undefined;
         
-        // If URL doesn't match the selected character, update it
+        // If URL doesn't match the selected character, update it - removed /character/
         if (expectedUrlName !== currentUrlName) {
-           navigate(`/game/${selectedGame.id}/character/${expectedUrlName}`, { replace: true });
+           navigate(`/${selectedGame.id}/${expectedUrlName}`, { replace: true }); 
         }
       }
       // Optional: Handle case where selectedCharacterId is not in the current characters list (maybe clear it?)

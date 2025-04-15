@@ -35,7 +35,7 @@ export const Navbar: React.FC = () => {
   const handleGameClick = (event: React.MouseEvent) => {
     if (selectedCharacterId !== null) {
       setSelectedCharacterId(null);
-      navigate(`/game/${selectedGame.id}`);
+      navigate(`/${selectedGame.id}`);
     }
   };
   
@@ -43,7 +43,7 @@ export const Navbar: React.FC = () => {
     if (!value) {
       // Handle case where selection is cleared (empty value)
       setSelectedCharacterId(null);
-      navigate(`/game/${selectedGame.id}`);
+      navigate(`/${selectedGame.id}`);
       return;
     }
 
@@ -54,12 +54,12 @@ export const Navbar: React.FC = () => {
     if (!isNaN(selectedId) && name) {
       setSelectedCharacterId(selectedId); // Set the ID in context
       // Navigate using the name directly from the parsed value
-      navigate(`/game/${selectedGame.id}/character/${encodeURIComponent(name)}`);
+      navigate(`/${selectedGame.id}/${encodeURIComponent(name)}`);
     } else {
       // Fallback if parsing fails (shouldn't happen)
       console.error("Failed to parse character selection value:", value);
       setSelectedCharacterId(null);
-      navigate(`/game/${selectedGame.id}`);
+      navigate(`/${selectedGame.id}`);
     }
   };
 

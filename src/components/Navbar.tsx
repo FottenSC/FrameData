@@ -68,36 +68,18 @@ export const Navbar: React.FC = () => {
       <div className="container flex h-14 max-w-screen-2xl items-center px-4 sm:px-6 lg:px-8">
         <div className="mr-4 hidden md:flex items-center">
           <Link to="/games" className="mr-6 flex items-center space-x-2">
-            <span className="font-bold sm:inline-block">
-              Frame Data Explorer
-            </span>
+            <img src="/Horseface.png" alt="Horseface Logo" className="h-8 inline-block rounded-md" />
           </Link>
           
           <Breadcrumb className="hidden md:flex items-center">
             <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link
-                    to="/games"
-                    className={cn(
-                      "transition-colors hover:text-foreground/80 flex items-center",
-                      isActive('/games') ? "text-foreground" : "text-foreground/60"
-                    )}
-                  >
-                    <Gamepad2 className="h-4 w-4 mr-1.5" />
-                    Games
-                  </Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
               {selectedGame && (
                 <>
-                  <BreadcrumbSeparator />
                   <BreadcrumbItem>
                     <BreadcrumbLink asChild>
                       <Link 
-                        to={`/game/${selectedGame.id}`} 
+                        to="/games"
                         className="flex items-center hover:text-foreground/80 transition-colors"
-                        onClick={handleGameClick}
                       >
                         {gameIcons[selectedGame.id] || <Gamepad2 className="h-4 w-4 mr-1.5 opacity-70" />}
                         <span className="font-medium">{selectedGame.name}</span>

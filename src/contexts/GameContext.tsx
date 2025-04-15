@@ -20,7 +20,7 @@ export interface Character {
 export const AVAILABLE_GAMES: Game[] = [
   {
     id: 'soulcalibur6',
-    name: 'Soul Calibur VI',
+    name: 'SoulCalibur VI',
     dbPath: '/SoulCalibur6/framedata.db'
   },
   {

@@ -336,7 +336,7 @@ export const FrameDataTable: React.FC = () => {
     : null;
 
   return (
-    <div className="space-y-6 h-full flex flex-col p-4">
+    <div className="space-y-6 h-full flex flex-col p-4 flex-grow">
       {selectedCharacterId ? (
         <Card className="h-full flex flex-col overflow-hidden border border-card-border">
           <CardHeader className="pb-2 flex-shrink-0">
@@ -348,8 +348,8 @@ export const FrameDataTable: React.FC = () => {
               Total Moves: {moves.length}
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex-grow p-0 overflow-hidden">
-            <div className="h-full overflow-auto">
+          <CardContent className="flex-grow p-0 flex flex-col h-[800px]">
+            <div className="overflow-y-auto flex-grow">
               <Table>
                 <TableHeader className="sticky top-0 bg-card">
                   <TableRow  className="border-b-card-border">

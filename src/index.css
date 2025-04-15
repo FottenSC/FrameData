@@ -1,102 +1,119 @@
 @import "tailwindcss";
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-  }
+:root {
+  --background: hsl(0 0% 100%);
+  --foreground: hsl(222.2 84% 4.9%);
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(222.2 84% 4.9%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(222.2 84% 4.9%);
+  --primary: hsl(222.2 47.4% 11.2%);
+  --primary-foreground: hsl(210 40% 98%);
+  --secondary: hsl(210 40% 96.1%);
+  --secondary-foreground: hsl(222.2 47.4% 11.2%);
+  --muted: hsl(210 40% 96.1%);
+  --muted-foreground: hsl(215.4 16.3% 46.9%);
+  --accent: hsl(210 40% 96.1%);
+  --accent-foreground: hsl(222.2 47.4% 11.2%);
+  --destructive: hsl(0 84.2% 60.2%);
+  --destructive-foreground: hsl(210 40% 98%);
+  --border: hsl(214.3 31.8% 91.4%);
+  --input: hsl(214.3 31.8% 91.4%);
+  --ring: hsl(222.2 84% 4.9%);
+  --radius: 0.5rem;
+  --card-border: var(--border);
 }
 
-@layer base {
-  * {
-    @apply border-[hsl(var(--border))];
-  }
-  
-  body {
-    @apply bg-[hsl(var(--background))] text-[hsl(var(--foreground))];
-    transition: color 0.3s ease, background-color 0.3s ease;
-  }
+.dark {
+  --background: hsl(0, 0%, 12%);
+  --foreground: hsl(0, 0%, 83%); /* header */
+  --card: hsl(0, 0%, 15%); /* datatable  */
+  --card-foreground: hsl(0, 0%, 83%);
+  --card-border: hsl(0, 0.00%, 30.60%);
+  --popover: hsl(0, 0%, 15%);
+  --popover-foreground: hsl(0, 0%, 83%);
+  --primary: hsl(204, 85%, 33%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(0, 0%, 20%);
+  --secondary-foreground: hsl(0, 0%, 83%);
+  --muted: hsl(0, 0%, 24%);
+  --muted-foreground: hsl(0, 0%, 60%);
+  --accent: hsl(204, 85%, 33%);
+  --accent-foreground: hsl(0, 0%, 100%);
+  --destructive: hsl(0, 90%, 62%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --border: hsl(0, 0%, 27%);
+  --input: hsl(0, 0%, 24%);
+  --ring: hsl(205, 100%, 41%);
 }
 
-@layer components {
-  .table-container {
-    width: 100%;
-    overflow-x: auto;
-  }
+@theme inline {
+  --radius: var(--radius);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
 
-  .data-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-  }
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
 
-  .data-table th,
-  .data-table td {
-    padding-left: 1rem;
-    padding-right: 1rem;
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
-    text-align: left;
-    border-bottom-width: 1px;
-    border-color: hsl(var(--border));
-  }
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
 
-  .data-table th {
-    background-color: hsl(var(--muted));
-    font-weight: 500;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    color: hsl(var(--muted-foreground));
-  }
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
 
-  .data-table tbody tr:hover {
-    background-color: hsl(var(--accent) / 0.1);
-  }
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
 
-  .data-table td {
-    white-space: nowrap;
-    font-size: 0.875rem;
-    color: hsl(var(--foreground));
-  }
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-card-border: var(--card-border);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+
+  /* Add other theme variables if needed, e.g., animations */
+}
+
+/* Optional: Base body styles (can often be handled by Tailwind defaults now) */
+/* You might not need the @layer base { body { ... } } anymore */
+body {
+  @apply bg-background text-foreground;
+  /* transition: color 0.3s ease, background-color 0.3s ease; */ /* Optional */
+}
+
+/* WebKit Scrollbar Styling for Dark Mode */
+.dark ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: hsl(0, 0%, 20%); /* Darker gray track */
+  border-radius: 10px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background-color: hsl(0, 0%, 50%); /* Lighter gray thumb */
+  border-radius: 10px;
+  border: 2px solid hsl(0, 0%, 20%); /* Match track color for padding */
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(0, 0%, 65%); /* Slightly lighter thumb on hover */
+}
+
+/* Basic Firefox scrollbar styling */
+.dark {
+  scrollbar-color: hsl(0, 0%, 50%) hsl(0, 0%, 20%); /* thumb track */
+  scrollbar-width: thin;
 }

@@ -89,43 +89,47 @@ export const Navbar: React.FC = () => {
                   </Link>
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link 
-                    to={`/game/${selectedGame.id}`} 
-                    className="flex items-center hover:text-foreground/80 transition-colors"
-                    onClick={handleGameClick}
-                  >
-                    {gameIcons[selectedGame.id] || <Gamepad2 className="h-4 w-4 mr-1.5 opacity-70" />}
-                    <span className="font-medium">{selectedGame.name}</span>
-                  </Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              {characters.length > 0 && (
-                 <>
-                   <BreadcrumbSeparator />
-                   <BreadcrumbItem>
-                     <Select
-                       value={selectedCharacterId ? `${selectedCharacterId}|${characters.find(c => c.id === selectedCharacterId)?.name || ''}` : ""}
-                       onValueChange={handleCharacterSelect}
-                     >
-                       <SelectTrigger className="h-auto py-0 px-1.5 text-sm font-medium border-none shadow-none bg-transparent focus:ring-0 focus:ring-offset-0 w-auto min-w-[150px] text-foreground/80 hover:text-foreground transition-colors [&>span]:line-clamp-1">
-                         <SelectValue placeholder="Select Character" />
-                       </SelectTrigger>
-                       <SelectContent>
-                         {characters.map((character) => (
-                           <SelectItem
-                             key={character.id}
-                             value={`${character.id}|${character.name}`}
-                           >
-                             {character.name}
-                           </SelectItem>
-                         ))}
-                       </SelectContent>
-                     </Select>
-                   </BreadcrumbItem>
-                 </>
+              {selectedGame && (
+                <>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbLink asChild>
+                      <Link 
+                        to={`/game/${selectedGame.id}`} 
+                        className="flex items-center hover:text-foreground/80 transition-colors"
+                        onClick={handleGameClick}
+                      >
+                        {gameIcons[selectedGame.id] || <Gamepad2 className="h-4 w-4 mr-1.5 opacity-70" />}
+                        <span className="font-medium">{selectedGame.name}</span>
+                      </Link>
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                  {characters.length > 0 && (
+                    <>
+                      <BreadcrumbSeparator />
+                      <BreadcrumbItem>
+                        <Select
+                          value={selectedCharacterId ? `${selectedCharacterId}|${characters.find(c => c.id === selectedCharacterId)?.name || ''}` : ""}
+                          onValueChange={handleCharacterSelect}
+                        >
+                          <SelectTrigger className="h-auto py-0 px-1.5 text-sm font-medium border-none shadow-none bg-transparent focus:ring-0 focus:ring-offset-0 w-auto min-w-[150px] text-foreground/80 hover:text-foreground transition-colors [&>span]:line-clamp-1">
+                            <SelectValue placeholder="Select Character" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {characters.map((character) => (
+                              <SelectItem
+                                key={character.id}
+                                value={`${character.id}|${character.name}`}
+                              >
+                                {character.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </BreadcrumbItem>
+                    </>
+                  )}
+                </>
               )}
             </BreadcrumbList>
           </Breadcrumb>

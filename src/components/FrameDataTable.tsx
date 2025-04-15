@@ -38,7 +38,8 @@ interface Move {
   Stance: string | null;
   HitLevel: string; // From schema (TEXT)
   Impact: number; // From schema (REAL)
-  Damage: string | null; // From schema (TEXT) - Displaying original text representation
+  Damage: string | null; // Original string representation
+  DamageDec: number | null; // Decimal representation for display
   Block: number | null; // For badge rendering, mapped from BlockDec
   Hit: number | null; // For badge rendering, mapped from HitDec
   CounterHit: number | null; // For badge rendering, mapped from CounterHitDeci
@@ -207,7 +208,7 @@ export const FrameDataTable: React.FC = () => {
           const movesQuery = `
             SELECT 
               ID, Command, Stance, HitLevel, Impact, Damage, 
-              BlockDec, HitDec, CounterHitDeci, GuardBurst, Notes 
+              BlockDec, HitDec, CounterHitDeci, GuardBurst, Notes, DamageDec 
             FROM Moves 
             WHERE CharacterID = ?
           `;
@@ -230,6 +231,7 @@ export const FrameDataTable: React.FC = () => {
                 HitLevel: String(moveObject.HitLevel),
                 Impact: Number(moveObject.Impact),
                 Damage: moveObject.Damage ? String(moveObject.Damage) : null,
+                DamageDec: moveObject.DamageDec !== null && moveObject.DamageDec !== undefined ? Number(moveObject.DamageDec) : null,
                 Block: moveObject.BlockDec !== null && moveObject.BlockDec !== undefined ? Number(moveObject.BlockDec) : null,
                 Hit: moveObject.HitDec !== null && moveObject.HitDec !== undefined ? Number(moveObject.HitDec) : null,
                 CounterHit: moveObject.CounterHitDeci !== null && moveObject.CounterHitDeci !== undefined ? Number(moveObject.CounterHitDeci) : null,
@@ -329,7 +331,7 @@ export const FrameDataTable: React.FC = () => {
   return (
     <div className="space-y-6 h-full flex flex-col p-4">
       {selectedCharacterId ? (
-        <Card className="h-full flex flex-col overflow-hidden">
+        <Card className="h-full flex flex-col overflow-hidden border border-card-border">
           <CardHeader className="pb-2 flex-shrink-0">
             <CardTitle>
               {/* Use name derived from context ID */}
@@ -343,7 +345,7 @@ export const FrameDataTable: React.FC = () => {
             <div className="h-full overflow-auto">
               <Table>
                 <TableHeader className="sticky top-0 bg-card">
-                  <TableRow>
+                  <TableRow  className="border-b-card-border">
                     <TableHead>Stance</TableHead>
                     <TableHead className="w-[200px]">Command</TableHead>
                     <TableHead>Hit Level</TableHead>
@@ -374,12 +376,12 @@ export const FrameDataTable: React.FC = () => {
                     </TableRow>
                   ) : (
                     moves.map((move) => (
-                      <TableRow key={move.ID}>
+                      <TableRow key={move.ID} className="border-b-card-border">
                         <TableCell>{move.Stance || '—'}</TableCell>
                         <TableCell className="font-mono">{move.Command}</TableCell>
                         <TableCell>{move.HitLevel || '—'}</TableCell>
                         <TableCell>{move.Impact ?? '—'}</TableCell>
-                        <TableCell>{move.Damage || '—'}</TableCell>
+                        <TableCell>{move.DamageDec ?? '—'}</TableCell>
                         <TableCell>{renderFrameAdvantageBadge(move.Block)}</TableCell>
                         <TableCell>{renderFrameAdvantageBadge(move.Hit)}</TableCell>
                         <TableCell>{renderFrameAdvantageBadge(move.CounterHit)}</TableCell>

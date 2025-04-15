@@ -2,9 +2,9 @@ DELETE FROM Moves;
 
 -- Move data into production table
 Insert INTO Moves
-    (ID, Command, Character, MoveCategory, MoveName, Stance, HitLevel, Impact, Damage, DamageDec, [Block], BlockDec, Hit, HitDec, CounterHit, CounterHitDeci, GuardBurst, Notes)
+    (ID, Command, Character, MoveCategory, MoveName, Stance, HitLevel, Impact, Damage, DamageDec, [Block], BlockDec, Hit, HitDec, CounterHit, CounterHitDec, GuardBurst, Notes)
 SELECT 
-    ID, Command, [Character], [Move Category], [Move Name], Stance, [Hit Level], Impact, Damage, DamageDec, [Block], BlockDec, Hit, HitDec, [Counter Hit], CounterHitDeci, [Guard Burst], Notes
+    ID, Command, [Character], [Move Category], [Move Name], Stance, [Hit Level], Impact, Damage, DamageDec, [Block], BlockDec, Hit, HitDec, [Counter Hit], CounterHitDec, [Guard Burst], Notes
 FROM UnicornData AS UD;
 
 INSERT INTO Characters (Name)

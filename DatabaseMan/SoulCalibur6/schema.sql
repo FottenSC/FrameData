@@ -31,7 +31,7 @@ CREATE TABLE Moves (
 	Hit	TEXT,
 	HitDec	INTEGER,
 	CounterHit	TEXT,
-	CounterHitDeci	INTEGER,
+	CounterHitDec	INTEGER,
 	GuardBurst	INTEGER,
 	Notes	TEXT,
 	isGI	INTEGER NOT NULL DEFAULT 0,

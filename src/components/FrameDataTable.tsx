@@ -17,7 +17,7 @@ import {
 } from './ui/select';
 import { Button } from './ui/button';
 import { initializeDatabase } from '../utils/initializeDatabase';
-import { Download, Loader2, Search } from 'lucide-react';
+import { Download, Loader2, Search, Shield } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { Badge } from './ui/badge';
@@ -36,12 +36,14 @@ interface Move {
   ID: number;
   Command: string;
   Stance: string | null;
-  HitLevel: string; // From schema (TEXT)
+  HitLevel: string | null; // From schema (TEXT)
   Impact: number; // From schema (REAL)
   Damage: string | null; // Original string representation
   DamageDec: number | null; // Decimal representation for display
   Block: number | null; // For badge rendering, mapped from BlockDec
+  HitString: string | null; // Original Hit text
   Hit: number | null; // For badge rendering, mapped from HitDec
+  CounterHitString: string | null; // Original Counter Hit text
   CounterHit: number | null; // For badge rendering, mapped from CounterHitDeci
   GuardBurst: number | null; // From schema (INTEGER)
   Notes: string | null; // From schema
@@ -196,7 +198,7 @@ export const FrameDataTable: React.FC = () => {
   // --- Effect 4: Load Moves (based on selectedCharacterId and db) --- 
   useEffect(() => {
     // Clear moves and set loading state when character changes or DB becomes available
-    setMoves([]); 
+    setMoves([]);
     if (db && selectedCharacterId !== null) { // Check for non-null ID
       setMovesLoading(true); // Start loading moves
       setError(null); // Clear previous move errors
@@ -206,17 +208,20 @@ export const FrameDataTable: React.FC = () => {
       const timer = setTimeout(() => {
         try {
           const movesQuery = `
-            SELECT 
-              ID, Command, Stance, HitLevel, Impact, Damage, 
-              BlockDec, HitDec, CounterHitDeci, GuardBurst, Notes, DamageDec 
-            FROM Moves 
+            SELECT
+              ID, Command, Stance, HitLevel, Impact, Damage,
+              Hit, -- Select the original Hit text column
+              CounterHit, -- Select the original Counter Hit text column
+              BlockDec, HitDec, CounterHitDec, -- Use CounterHitDec instead of CounterHitDeci
+              GuardBurst, Notes, DamageDec
+            FROM Moves
             WHERE CharacterID = ?
           `;
           const movesResult = db.exec(movesQuery, [selectedCharacterId]);
-          
+
           if (movesResult.length > 0 && movesResult[0].values.length > 0) {
-            const columns = movesResult[0].columns; 
-            const values = movesResult[0].values; 
+            const columns = movesResult[0].columns;
+            const values = movesResult[0].values;
 
             const movesData: Move[] = values.map((row: unknown[]) => {
               const moveObject: Record<string, unknown> = {};
@@ -228,24 +233,26 @@ export const FrameDataTable: React.FC = () => {
                 ID: Number(moveObject.ID),
                 Command: String(moveObject.Command),
                 Stance: moveObject.Stance ? String(moveObject.Stance) : null,
-                HitLevel: String(moveObject.HitLevel),
+                HitLevel: moveObject.HitLevel ? String(moveObject.HitLevel) : null,
                 Impact: Number(moveObject.Impact),
                 Damage: moveObject.Damage ? String(moveObject.Damage) : null,
                 DamageDec: moveObject.DamageDec !== null && moveObject.DamageDec !== undefined ? Number(moveObject.DamageDec) : null,
                 Block: moveObject.BlockDec !== null && moveObject.BlockDec !== undefined ? Number(moveObject.BlockDec) : null,
-                Hit: moveObject.HitDec !== null && moveObject.HitDec !== undefined ? Number(moveObject.HitDec) : null,
-                CounterHit: moveObject.CounterHitDeci !== null && moveObject.CounterHitDeci !== undefined ? Number(moveObject.CounterHitDeci) : null,
+                HitString: moveObject.Hit ? String(moveObject.Hit) : null, // Map original Hit text
+                Hit: moveObject.HitDec !== null && moveObject.HitDec !== undefined ? Number(moveObject.HitDec) : null, // Numeric value for badge
+                CounterHitString: moveObject.CounterHit ? String(moveObject.CounterHit) : null, // Map original Counter Hit text
+                CounterHit: moveObject.CounterHitDec !== null && moveObject.CounterHitDec !== undefined ? Number(moveObject.CounterHitDec) : null, // Numeric value for badge (from CounterHitDec)
                 GuardBurst: moveObject.GuardBurst !== null && moveObject.GuardBurst !== undefined ? Number(moveObject.GuardBurst) : null,
                 Notes: moveObject.Notes ? String(moveObject.Notes) : null
               };
             });
             setMoves(movesData);
           } else {
-            setMoves([]); 
+            setMoves([]);
           }
         } catch (error) {
           setError(error instanceof Error ? error.message : `Unknown error loading moves for character ID ${selectedCharacterId}`);
-          setMoves([]); 
+          setMoves([]);
         } finally {
           setMovesLoading(false); // Finish loading moves
         }
@@ -346,16 +353,18 @@ export const FrameDataTable: React.FC = () => {
               <Table>
                 <TableHeader className="sticky top-0 bg-card">
                   <TableRow  className="border-b-card-border">
-                    <TableHead>Stance</TableHead>
+                    <TableHead className="w-[100px]">Stance</TableHead>
                     <TableHead className="w-[200px]">Command</TableHead>
-                    <TableHead>Hit Level</TableHead>
-                    <TableHead>Impact</TableHead>
-                    <TableHead>Damage</TableHead>
-                    <TableHead>Block</TableHead>
-                    <TableHead>Hit</TableHead>
-                    <TableHead>Counter Hit</TableHead>
-                    <TableHead>Guard Burst</TableHead>
-                    <TableHead className="w-[200px]">Notes</TableHead>
+                    <TableHead className="w-[100px]">Hit Level</TableHead>
+                    <TableHead className="w-[50px]">Impact</TableHead>
+                    <TableHead className="w-[50px]">Damage</TableHead>
+                    <TableHead className="w-[50px]">
+                      <span title="Block"><Shield size={16} /></span>
+                    </TableHead>
+                    <TableHead className="w-[50px]">Hit</TableHead>
+                    <TableHead title="Counter Hit" className="w-[50px]">CH</TableHead>
+                    <TableHead title="Guard Burst" className="w-[50px]">GB</TableHead>
+                    <TableHead>Notes</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -377,14 +386,45 @@ export const FrameDataTable: React.FC = () => {
                   ) : (
                     moves.map((move) => (
                       <TableRow key={move.ID} className="border-b-card-border">
-                        <TableCell>{move.Stance || '—'}</TableCell>
+                        <TableCell className="text-right">{move.Stance || '—'}</TableCell>
                         <TableCell className="font-mono">{move.Command}</TableCell>
                         <TableCell>{move.HitLevel || '—'}</TableCell>
                         <TableCell>{move.Impact ?? '—'}</TableCell>
                         <TableCell>{move.DamageDec ?? '—'}</TableCell>
                         <TableCell>{renderFrameAdvantageBadge(move.Block)}</TableCell>
-                        <TableCell>{renderFrameAdvantageBadge(move.Hit)}</TableCell>
-                        <TableCell>{renderFrameAdvantageBadge(move.CounterHit)}</TableCell>
+                        <TableCell>
+                          {(() => {
+                            const text = move.HitString ?? '—';
+                            const value = move.Hit; // Numeric value from HitDec
+                            let variant: "success" | "destructive" | "secondary" = "secondary";
+                            if (value !== null && value !== undefined) {
+                              if (value >= 0) {
+                                variant = "success";
+                              } else {
+                                variant = "destructive";
+                              }
+                            }
+                            return <Badge variant={variant}>{text}</Badge>;
+                          })()}
+                        </TableCell>
+                        <TableCell>
+                          {(() => {
+                            const text = move.CounterHitString ?? '—';
+                            const value = move.CounterHit; // Numeric value from CounterHitDeci
+                            // Temporarily display the numeric value instead of the string
+                            const displayText = value !== null && value !== undefined ? String(value) : '—'; 
+                            let variant: "success" | "destructive" | "secondary" = "secondary";
+                            if (value !== null && value !== undefined) {
+                              if (value >= 0) {
+                                variant = "success";
+                              } else {
+                                variant = "destructive";
+                              }
+                            }
+                            // Display displayText (numeric value) in the badge
+                            return <Badge variant={variant}>{displayText}</Badge>; 
+                          })()}
+                        </TableCell>
                         <TableCell>{renderFrameAdvantageBadge(move.GuardBurst)}</TableCell>
                         <TableCell className="max-w-[300px] truncate">
                           {move.Notes || '—'}

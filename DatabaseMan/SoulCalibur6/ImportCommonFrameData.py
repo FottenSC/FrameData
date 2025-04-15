@@ -5,7 +5,7 @@ import sqlite3
 import sys
 import re
 
-dbName = "SoulCalibur6.db"
+dbName = "FrameData.db"
 con = sqlite3.connect(sys.path[0] + "\\" + dbName)
 cur = con.cursor()
 
@@ -92,7 +92,7 @@ frameData["HitDec"] = frameData["Hit"].apply(
 
 # Create CounterHit decimal
 def cleanUpCounterHit(ch):
-    if(str(ch) in ("LNC, STN (2nd)")):
+    if(str(ch) in ["LNC, STN (2nd)"]):
         return None
     
 
@@ -102,7 +102,7 @@ def cleanUpCounterHit(ch):
     else:
         return int(chClean[0])
 
-frameData["CounterHitDeci"] = frameData["Counter Hit"].apply(
+frameData["CounterHitDec"] = frameData["Counter Hit"].apply(
     lambda x: cleanUpCounterHit(x)
 )
 

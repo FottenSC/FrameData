@@ -410,9 +410,7 @@ export const FrameDataTable: React.FC = () => {
                         <TableCell>
                           {(() => {
                             const text = move.CounterHitString ?? '—';
-                            const value = move.CounterHit; // Numeric value from CounterHitDeci
-                            // Temporarily display the numeric value instead of the string
-                            const displayText = value !== null && value !== undefined ? String(value) : '—'; 
+                            const value = move.CounterHit; // Numeric value from CounterHitDec
                             let variant: "success" | "destructive" | "secondary" = "secondary";
                             if (value !== null && value !== undefined) {
                               if (value >= 0) {
@@ -421,8 +419,8 @@ export const FrameDataTable: React.FC = () => {
                                 variant = "destructive";
                               }
                             }
-                            // Display displayText (numeric value) in the badge
-                            return <Badge variant={variant}>{displayText}</Badge>; 
+                            // Display text (original string) in the badge
+                            return <Badge variant={variant}>{text}</Badge>; 
                           })()}
                         </TableCell>
                         <TableCell>{renderFrameAdvantageBadge(move.GuardBurst)}</TableCell>

@@ -42,7 +42,7 @@ SET isBA = 1
 WHERE
 	M.Notes like '%:BA:%'
 	AND M.ID not in (
-		2852 -- Raphael 214B
+		2852 -- Raphael 214B LH
 	)
 ;
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { FrameDataTable } from './components/FrameDataTable';
 import { PreloadWasm } from './PreloadWasm';
 import { ThemeProvider } from './components/theme-provider';

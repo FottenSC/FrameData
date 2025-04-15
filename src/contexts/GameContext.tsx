@@ -48,88 +48,83 @@ interface GameProviderProps {
 
 export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const navigate = useNavigate();
-  const params = useParams<{ gameId?: string; characterId?: string }>();
+  const params = useParams<{ gameId?: string; characterName?: string }>();
   const location = useLocation();
   
   const [selectedGame, setSelectedGame] = useState<Game>(() => {
     const gameFromUrl = params.gameId ? AVAILABLE_GAMES.find(g => g.id === params.gameId) : null;
-    return gameFromUrl || AVAILABLE_GAMES[0];
+    const savedGameId = !gameFromUrl ? localStorage.getItem('selectedGameId') : null;
+    const gameFromStorage = savedGameId ? AVAILABLE_GAMES.find(g => g.id === savedGameId) : null;
+    return gameFromUrl || gameFromStorage || AVAILABLE_GAMES[0];
   });
   
   const [isLoading, setIsLoading] = useState(false);
   const [characters, setCharacters] = useState<Character[]>([]);
-  const [selectedCharacterId, setSelectedCharacterId] = useState<number | null>(() => {
-    return params.characterId ? parseInt(params.characterId, 10) : null;
-  });
+  const [selectedCharacterId, setSelectedCharacterId] = useState<number | null>(null);
 
-  // Effect to update state when URL params change
   useEffect(() => {
-    if (params.gameId) {
-      const game = AVAILABLE_GAMES.find(g => g.id === params.gameId);
-      if (game && game.id !== selectedGame.id) {
-        setSelectedGame(game);
+    let gameChanged = false;
+    if (params.gameId && params.gameId !== selectedGame.id) {
+      const gameFromUrl = AVAILABLE_GAMES.find(g => g.id === params.gameId);
+      if (gameFromUrl) {
+        setSelectedGame(gameFromUrl);
+        setCharacters([]);
+        setSelectedCharacterId(null);
+        gameChanged = true;
       }
     }
-    
-    if (params.characterId) {
-      const characterId = parseInt(params.characterId, 10);
-      if (characterId !== selectedCharacterId) {
-        setSelectedCharacterId(characterId);
-      }
-    } else if (location.pathname.includes('/game/') && !location.pathname.includes('/character/')) {
-      // If we're on a game route without a character, reset character selection
-      setSelectedCharacterId(null);
-    }
-  }, [params, location.pathname]);
 
-  const handleSetSelectedGameById = (gameId: string) => {
-    setIsLoading(true);
-    const game = AVAILABLE_GAMES.find(g => g.id === gameId) || AVAILABLE_GAMES[0];
-    setSelectedGame(game);
-    
-    // Reset character state when game changes
-    setCharacters([]);
-    setSelectedCharacterId(null);
-    
-    // Update URL to reflect game selection
-    navigate(`/${game.id}`);
-    
-    // Simulate a short loading period when changing games
-    setTimeout(() => setIsLoading(false), 300);
-  };
-
-  // Handler for setting selected character with URL update
-  const handleSetSelectedCharacterId = (id: number | null) => {
-    setSelectedCharacterId(id);
-    
-    // Update URL to reflect character selection - removed /character/
-    if (id !== null) {
-      const character = characters.find(c => c.id === id);
-      if (character) {
-        navigate(`/${selectedGame.id}/${encodeURIComponent(character.name)}`); 
+    if (!gameChanged && selectedGame.id && characters.length > 0) {
+      if (params.characterName) {
+        const decodedName = decodeURIComponent(params.characterName);
+        const characterFromUrl = characters.find(c => c.name.toLowerCase() === decodedName.toLowerCase());
+        const characterIdFromUrl = characterFromUrl?.id ?? null;
+        
+        if (characterIdFromUrl !== selectedCharacterId) {
+           setSelectedCharacterId(characterIdFromUrl);
+        }
       } else {
-        // Fallback if character not found (shouldn't usually happen)
-        navigate(`/${selectedGame.id}`);
-      }
-    } else {
-      navigate(`/${selectedGame.id}`);
-    }
-  };
-
-  // Use local storage to remember the last selected game (if URL doesn't have a game)
-  useEffect(() => {
-    if (!params.gameId) {
-      const savedGameId = localStorage.getItem('selectedGameId');
-      if (savedGameId) {
-        // Use the internal handler to avoid double loading state
-        handleSetSelectedGameById(savedGameId);
+        if (selectedCharacterId !== null) {
+          setSelectedCharacterId(null);
+        }
       }
     }
-  }, []);
+  }, [params.gameId, params.characterName, characters, selectedGame.id]);
 
   useEffect(() => {
     localStorage.setItem('selectedGameId', selectedGame.id);
   }, [selectedGame]);
+
+  const handleSetSelectedGameById = (gameId: string) => {
+    setIsLoading(true);
+    const game = AVAILABLE_GAMES.find(g => g.id === gameId) || AVAILABLE_GAMES[0];
+    if (game.id !== selectedGame.id) {
+        setSelectedGame(game);
+        setCharacters([]);
+        setSelectedCharacterId(null);
+        navigate(`/${game.id}`);
+    } else {
+        setSelectedCharacterId(null); 
+        navigate(`/${game.id}`);
+    }
+    setIsLoading(false);
+  };
+
+  const handleSetSelectedCharacterId = (id: number | null) => {
+    if (id !== selectedCharacterId) {
+      setSelectedCharacterId(id);
+      if (id !== null) {
+        const character = characters.find(c => c.id === id);
+        if (character) {
+          navigate(`/${selectedGame.id}/${encodeURIComponent(character.name)}`);
+        } else {
+          navigate(`/${selectedGame.id}`);
+        }
+      } else {
+        navigate(`/${selectedGame.id}`);
+      }
+    }
+  };
 
   return (
     <GameContext.Provider value={{

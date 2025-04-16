@@ -2,7 +2,7 @@
 # Todo list
 - [ ] create indexes on soulcalibur db 
 - [ ] hitlevel minwidth
-- [ ] 
+- [ ] Build icons in source data
     
     63214
         6

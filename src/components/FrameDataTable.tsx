@@ -17,7 +17,7 @@ import {
 } from './ui/select';
 import { Button } from './ui/button';
 import { initializeDatabase } from '../utils/initializeDatabase';
-import { Download, Loader2, Search, Shield, ArrowUp, ArrowDown } from 'lucide-react';
+import { Download, Loader2, Search, Shield, ArrowUp, ArrowDown, ChevronDown } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { Badge } from './ui/badge';
@@ -77,6 +77,11 @@ export const FrameDataTable: React.FC = () => {
   // --- Sorting State ---
   const [sortColumn, setSortColumn] = useState<SortableColumn | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
+  // --- State for Expanded Hit Levels ---
+  const [expandedHitLevels, setExpandedHitLevels] = useState<Set<number>>(new Set());
+  // Track previous expanded state to detect animation direction
+  const [previouslyExpanded, setPreviouslyExpanded] = useState<Map<number, boolean>>(new Map());
 
   // --- Effect 1: Sync URL with selectedCharacterId from Context --- 
   useEffect(() => {
@@ -364,6 +369,103 @@ export const FrameDataTable: React.FC = () => {
 
   }, [originalMoves, sortColumn, sortDirection]);
 
+  // --- Define a self-contained hit level icon component ---
+  const HitLevelIcon = React.memo(({ level }: { level: string }) => {
+    let bgColor = 'bg-gray-400';
+    let textColor = 'text-white';
+
+    switch (level.toUpperCase()) {
+      case 'M': bgColor = 'bg-yellow-500'; break;
+      case 'L': bgColor = 'bg-cyan-500'; break;
+      case 'H': bgColor = 'bg-pink-500'; break;
+      case 'SM': bgColor = 'bg-purple-500'; break;
+      case 'SL': bgColor = 'bg-cyan-500'; break; 
+      case 'SH': bgColor = 'bg-orange-500'; break;
+      default:
+        console.error(`Unknown hit level encountered: ${level}`);
+        break;
+    }
+
+    return (
+      <div
+        className="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center p-px ring-1 ring-black"
+        title={level}
+      >
+        <div className="w-full h-full rounded-full bg-white flex items-center justify-center p-px">
+          <div className={`w-full h-full rounded-full flex items-center justify-center text-xs font-bold ${bgColor} ${textColor}`}>
+            {level.length > 1 && ['SL', 'SH', 'SM'].includes(level.toUpperCase()) 
+              ? level.toUpperCase() 
+              : level.charAt(0).toUpperCase()} 
+          </div>
+        </div>
+      </div>
+    );
+  });
+
+  // --- Self-contained component for expandable hit levels ---
+  const ExpandableHitLevels = React.memo(({ 
+    hitLevelString, 
+    maxIconsToShow = 3 // Default remains 3 for the 5+ case
+  }: { 
+    hitLevelString: string | null, 
+    maxIconsToShow?: number 
+  }) => {
+    // Local state for this specific instance
+    const [isExpanded, setIsExpanded] = React.useState(false);
+    
+    // Parse hit levels
+    const levels = React.useMemo(() => {
+      if (!hitLevelString) return [];
+      return hitLevelString.split(/:+/).map(level => level.trim()).filter(Boolean);
+    }, [hitLevelString]);
+    
+    // --- Updated Expansion Logic ---
+    // Expand only if there are more levels than maxIconsToShow + 1
+    const canExpand = levels.length > maxIconsToShow + 1;
+    
+    // Handle toggle expansion
+    const handleToggle = React.useCallback(() => {
+      if (!canExpand) return;
+      setIsExpanded(prev => !prev);
+    }, [canExpand]);
+    
+    // If no levels, show placeholder
+    if (levels.length === 0) {
+      return <span className="text-muted-foreground">—</span>;
+    }
+    
+    // Determine how many icons to show based on expanded state and total count
+    let iconsToShow: number;
+    if (levels.length <= maxIconsToShow + 1) {
+      // Show all icons if the count is within the threshold (maxIconsToShow + 1)
+      iconsToShow = levels.length;
+    } else {
+      // If more than the threshold, show maxIconsToShow initially, or all if expanded
+      iconsToShow = isExpanded ? levels.length : maxIconsToShow;
+    }
+    
+    // Show ellipsis only when it can expand and is not expanded
+    const showEllipsis = canExpand && !isExpanded;
+    // --- End Updated Expansion Logic ---
+    
+    return (
+      <div 
+        className={`flex flex-wrap items-center gap-1 ${canExpand ? 'cursor-pointer' : ''}`}
+        onClick={canExpand ? handleToggle : undefined}
+      >
+        {levels.slice(0, iconsToShow).map((level, index) => (
+          <div key={`level-${index}`}>
+            <HitLevelIcon level={level} />
+          </div>
+        ))}
+        
+        {showEllipsis && (
+          <ChevronDown size={16} className="text-muted-foreground ml-1" />
+        )}
+      </div>
+    );
+  });
+
   // --- Handler for Sort Click ---
   const handleSort = (column: SortableColumn) => {
     if (sortColumn === column) {
@@ -377,13 +479,14 @@ export const FrameDataTable: React.FC = () => {
   };
 
   // Combined badge rendering function
-  const renderBadge = (value: number | null, text: string | null) => {
+  const renderBadge = (value: number | null, text: string | null, forceNoSign: boolean = false) => {
     // Determine display text: Use text if available, otherwise format value, fallback to '—'
     let displayText: string;
     if (text !== null && text !== undefined) {
       displayText = text;
     } else if (value !== null && value !== undefined) {
-      displayText = (value > 0 ? '+' : '') + value;
+      // Only add '+' if value > 0 AND forceNoSign is false
+      displayText = (!forceNoSign && value > 0 ? '+' : '') + value; 
     } else {
       displayText = '—';
     }
@@ -409,7 +512,7 @@ export const FrameDataTable: React.FC = () => {
     if (value >= 0) { // Includes 0
       return <Badge className="bg-green-700 text-white w-12 inline-flex items-center justify-center">{displayText}</Badge>;
     } else { // value < 0
-      return <Badge className="bg-red-700 text-white w-12 inline-flex items-center justify-center">{displayText}</Badge>;
+      return <Badge className="bg-rose-700 text-white w-12 inline-flex items-center justify-center">{displayText}</Badge>;
     }
   };
 
@@ -481,7 +584,7 @@ export const FrameDataTable: React.FC = () => {
           </CardHeader>
           <CardContent className="flex-grow p-0 flex flex-col overflow-hidden">
             <div className="overflow-y-auto flex-grow">
-              <Table>
+              <Table className="table-layout-fixed">
                 <TableHeader className="sticky top-0 bg-card z-10">
                   <TableRow  className="border-b-card-border">
                     <TableHead className="w-[100px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Stance')}>
@@ -490,13 +593,13 @@ export const FrameDataTable: React.FC = () => {
                         {sortColumn === 'Stance' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
                       </div>
                     </TableHead>
-                    <TableHead className="w-[200px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Command')}>
+                    <TableHead className="w-[200px] max-w-[300px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Command')}>
                        <div className="flex items-center justify-between gap-1">
                         <span>Command</span>
                         {sortColumn === 'Command' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
                       </div>
                     </TableHead>
-                    <TableHead className="w-[100px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('HitLevel')}>
+                    <TableHead className="w-[135px] max-w-[150px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('HitLevel')}>
                        <div className="flex items-center justify-between gap-1">
                         <span>Hit Level</span>
                         {sortColumn === 'HitLevel' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
@@ -564,10 +667,18 @@ export const FrameDataTable: React.FC = () => {
                     </TableRow>
                   ) : (
                     displayedMoves.map((move) => (
-                      <TableRow key={move.ID} className="border-b-card-border">
+                      <TableRow 
+                        key={move.ID} 
+                        className="border-b-card-border"
+                      >
                         <TableCell className="text-right p-2">{move.Stance || '—'}</TableCell>
-                        <TableCell className="font-mono p-2">{move.Command}</TableCell>
-                        <TableCell className="p-2">{move.HitLevel || '—'}</TableCell>
+                        <TableCell className="font-mono p-2 max-w-[300px] break-words">{move.Command}</TableCell>
+                        <TableCell className="p-2 max-w-[150px] align-top">
+                          <ExpandableHitLevels 
+                            hitLevelString={move.HitLevel} 
+                            maxIconsToShow={3}
+                          />
+                        </TableCell>
                         <TableCell className="p-2">{move.Impact ?? '—'}</TableCell>
                         <TableCell className="p-2">{move.DamageDec ?? '—'}</TableCell>
                         <TableCell className="p-2">{renderBadge(move.Block, null)}</TableCell>
@@ -579,7 +690,7 @@ export const FrameDataTable: React.FC = () => {
                           {/* Use combined renderBadge function */}
                           {renderBadge(move.CounterHit, move.CounterHitString)}
                         </TableCell>
-                        <TableCell className="p-2">{renderBadge(move.GuardBurst, null)}</TableCell>
+                        <TableCell className="p-2">{renderBadge(move.GuardBurst, null, true)}</TableCell>
                         <TableCell className="max-w-[300px] truncate p-2">
                           {move.Notes || '—'}
                         </TableCell>

@@ -50,6 +50,25 @@ export default {
       spacing: {
         '4': '1rem',
       },
+      keyframes: {
+        "fade-in": {
+          "0%": { opacity: 0 },
+          "100%": { opacity: 1 }
+        },
+        fadeIn: {
+          from: { opacity: 0 },
+          to: { opacity: 1 }
+        },
+      },
+      animation: {
+        "fade-in": "fade-in 0.4s ease-in-out forwards",
+        "fade-in-1": "fade-in 0.4s ease-in-out 0.1s forwards",
+        "fade-in-2": "fade-in 0.4s ease-in-out 0.2s forwards",
+        "fade-in-3": "fade-in 0.4s ease-in-out 0.3s forwards",
+        "fade-in-4": "fade-in 0.4s ease-in-out 0.4s forwards",
+        "fade-in-5": "fade-in 0.4s ease-in-out 0.5s forwards",
+        "fade-in-6": "fade-in 0.4s ease-in-out 0.6s forwards",
+      }
     },
   },
   plugins: [],

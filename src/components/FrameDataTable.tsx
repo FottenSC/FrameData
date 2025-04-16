@@ -17,7 +17,7 @@ import {
 } from './ui/select';
 import { Button } from './ui/button';
 import { initializeDatabase } from '../utils/initializeDatabase';
-import { Download, Loader2, Search, Shield } from 'lucide-react';
+import { Download, Loader2, Search, Shield, ArrowUp, ArrowDown } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { Badge } from './ui/badge';
@@ -49,6 +49,9 @@ interface Move {
   Notes: string | null; // From schema
 }
 
+// Define sortable columns (using Move interface keys for type safety)
+type SortableColumn = keyof Move | 'Damage' | 'Hit' | 'CounterHit'; // Allow specific strings if needed for clarity/mapping
+
 export const FrameDataTable: React.FC = () => {
   const params = useParams<{ gameId?: string; characterName?: string }>();
   const { gameId, characterName } = params;
@@ -65,10 +68,15 @@ export const FrameDataTable: React.FC = () => {
   } = useGame();
   
   const [db, setDb] = useState<any | null>(null);
-  const [moves, setMoves] = useState<Move[]>([]);
+  const [originalMoves, setOriginalMoves] = useState<Move[]>([]); // Store the original, unsorted moves
+  const [displayedMoves, setDisplayedMoves] = useState<Move[]>([]); // Moves to display (sorted)
   const [loading, setLoading] = useState(true);
   const [movesLoading, setMovesLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // --- Sorting State ---
+  const [sortColumn, setSortColumn] = useState<SortableColumn | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   // --- Effect 1: Sync URL with selectedCharacterId from Context --- 
   useEffect(() => {
@@ -133,7 +141,7 @@ export const FrameDataTable: React.FC = () => {
   // --- Effect 3: Load Database and Characters (based on selectedGame) --- 
   useEffect(() => {
     // Reset state when game changes
-    setMoves([]);
+    setOriginalMoves([]);
     setDb(null);
     setLoading(true);
     setError(null);
@@ -198,7 +206,7 @@ export const FrameDataTable: React.FC = () => {
   // --- Effect 4: Load Moves (based on selectedCharacterId and db) --- 
   useEffect(() => {
     // Clear moves and set loading state when character changes or DB becomes available
-    setMoves([]);
+    setOriginalMoves([]);
     if (db && selectedCharacterId !== null) { // Check for non-null ID
       setMovesLoading(true); // Start loading moves
       setError(null); // Clear previous move errors
@@ -246,13 +254,13 @@ export const FrameDataTable: React.FC = () => {
                 Notes: moveObject.Notes ? String(moveObject.Notes) : null
               };
             });
-            setMoves(movesData);
+            setOriginalMoves(movesData);
           } else {
-            setMoves([]);
+            setOriginalMoves([]);
           }
         } catch (error) {
           setError(error instanceof Error ? error.message : `Unknown error loading moves for character ID ${selectedCharacterId}`);
-          setMoves([]);
+          setOriginalMoves([]);
         } finally {
           setMovesLoading(false); // Finish loading moves
         }
@@ -263,22 +271,145 @@ export const FrameDataTable: React.FC = () => {
 
     } else {
        // If no DB or character selected, ensure moves are empty and not loading
-       setMoves([]);
+       setOriginalMoves([]); // Clear original moves
        setMovesLoading(false);
     }
   }, [db, selectedCharacterId]); // Removed setError from dependencies
 
-  const renderFrameAdvantageBadge = (value: number | null) => {
-    if (value === null || value === undefined) return '—'; // Handle undefined as well
-    
-    const formatted = (value > 0 ? '+' : '') + value;
-    
-    if (value >= 0) {
-      return <Badge variant="success">{formatted}</Badge>;
-    } else if (value < 0) {
-      return <Badge variant="destructive">{formatted}</Badge>;
+  // --- Effect 5: Apply Sorting whenever originalMoves, sortColumn, or sortDirection changes ---
+  useEffect(() => {
+    if (!sortColumn) {
+      setDisplayedMoves(originalMoves); // No sorting, display original order
+      return;
+    }
+
+    const sorted = [...originalMoves].sort((a, b) => {
+      let valA: any;
+      let valB: any;
+
+      // Get values based on the sort column
+      // Handle special cases like Damage, Hit, CounterHit which sort by numeric value
+      switch (sortColumn) {
+        case 'Damage':
+          valA = a.DamageDec;
+          valB = b.DamageDec;
+          break;
+        case 'Block':
+          valA = a.Block;
+          valB = b.Block;
+          break;
+        case 'Hit':
+          valA = a.Hit; // Sort by numeric Hit
+          valB = b.Hit;
+          break;
+        case 'CounterHit':
+          valA = a.CounterHit; // Sort by numeric CounterHit
+          valB = b.CounterHit;
+          break;
+        case 'GuardBurst':
+            valA = a.GuardBurst;
+            valB = b.GuardBurst;
+            break;
+        // Ensure Impact is treated as a number if it exists
+        case 'Impact':
+            valA = a.Impact;
+            valB = b.Impact;
+            break;
+        // Default case for other keys directly on the Move object
+        default:
+          // Check if the key exists on the Move type before accessing
+          if (sortColumn in a && sortColumn in b) {
+            valA = a[sortColumn as keyof Move];
+            valB = b[sortColumn as keyof Move];
+          } else {
+            // Handle cases where the column might not be a direct key (shouldn't happen with SortableColumn type)
+            valA = undefined;
+            valB = undefined;
+          }
+          break;
+      }
+
+      // --- Revised Null/Undefined Handling: Always push to bottom --- 
+      const aIsNull = valA === null || valA === undefined;
+      const bIsNull = valB === null || valB === undefined;
+
+      if (aIsNull && !bIsNull) {
+        return 1; // a (null) goes after b (non-null)
+      }
+      if (!aIsNull && bIsNull) {
+        return -1; // b (null) goes after a (non-null)
+      }
+      if (aIsNull && bIsNull) {
+        return 0; // Both null, order doesn't matter
+      }
+      // --- End Revised Null Handling ---
+
+      // Now both valA and valB are non-null, proceed with comparison
+      const order = sortDirection === 'asc' ? 1 : -1;
+
+      // Comparison logic for non-null values
+      if (typeof valA === 'number' && typeof valB === 'number') {
+        return (valA - valB) * order;
+      } else if (typeof valA === 'string' && typeof valB === 'string') {
+        // Optional: Add case-insensitive string sort if desired
+        // return valA.toLowerCase().localeCompare(valB.toLowerCase()) * order;
+        return valA.localeCompare(valB) * order;
+      } else {
+        // Fallback for mixed types or other types (treat as equal)
+        return 0;
+      }
+    });
+
+    setDisplayedMoves(sorted);
+
+  }, [originalMoves, sortColumn, sortDirection]);
+
+  // --- Handler for Sort Click ---
+  const handleSort = (column: SortableColumn) => {
+    if (sortColumn === column) {
+      // If clicking the same column, toggle direction
+      setSortDirection(prev => (prev === 'asc' ? 'desc' : 'asc'));
     } else {
-      return <Badge variant="secondary">{formatted}</Badge>;
+      // If clicking a new column, set it and default to ascending
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
+
+  // Combined badge rendering function
+  const renderBadge = (value: number | null, text: string | null) => {
+    // Determine display text: Use text if available, otherwise format value, fallback to '—'
+    let displayText: string;
+    if (text !== null && text !== undefined) {
+      displayText = text;
+    } else if (value !== null && value !== undefined) {
+      displayText = (value > 0 ? '+' : '') + value;
+    } else {
+      displayText = '—';
+    }
+
+    // Check for special strings first
+    if (text === 'KND') {
+      return <Badge className="bg-fuchsia-700 text-white w-12 inline-flex items-center justify-center">{displayText}</Badge>;
+    }
+    if (text === 'STN') {
+      return <Badge className="bg-pink-700 text-white w-12 inline-flex items-center justify-center">{displayText}</Badge>;
+    }
+    if (text === 'LNC') {
+      return <Badge className="bg-rose-700 text-white w-12 inline-flex items-center justify-center">{displayText}</Badge>;
+    }
+
+    // Fallback to frame advantage logic based on the numeric value
+    if (value === null || value === undefined) {
+      // Use neutral Tailwind classes for unknown/null state
+      return <Badge className="bg-gray-500 hover:bg-gray-600 text-white w-12 inline-flex items-center justify-center">{displayText}</Badge>; 
+    }
+
+    // Use Tailwind classes based on numeric value
+    if (value >= 0) { // Includes 0
+      return <Badge className="bg-green-700 text-white w-12 inline-flex items-center justify-center">{displayText}</Badge>;
+    } else { // value < 0
+      return <Badge className="bg-red-700 text-white w-12 inline-flex items-center justify-center">{displayText}</Badge>;
     }
   };
 
@@ -345,86 +476,111 @@ export const FrameDataTable: React.FC = () => {
               {selectedCharacterNameFromContext || 'Character'} Frame Data 
             </CardTitle>
             <CardDescription>
-              Total Moves: {moves.length}
+              Total Moves: {displayedMoves.length}
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex-grow p-0 flex flex-col h-[800px]">
+          <CardContent className="flex-grow p-0 flex flex-col overflow-hidden">
             <div className="overflow-y-auto flex-grow">
               <Table>
-                <TableHeader className="sticky top-0 bg-card">
+                <TableHeader className="sticky top-0 bg-card z-10">
                   <TableRow  className="border-b-card-border">
-                    <TableHead className="w-[100px]">Stance</TableHead>
-                    <TableHead className="w-[200px]">Command</TableHead>
-                    <TableHead className="w-[100px]">Hit Level</TableHead>
-                    <TableHead className="w-[50px]">Impact</TableHead>
-                    <TableHead className="w-[50px]">Damage</TableHead>
-                    <TableHead className="w-[50px]">
-                      <span title="Block"><Shield size={16} /></span>
+                    <TableHead className="w-[100px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Stance')}>
+                      <div className="flex items-center justify-between gap-1">
+                        <span>Stance</span>
+                        {sortColumn === 'Stance' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+                      </div>
                     </TableHead>
-                    <TableHead className="w-[50px]">Hit</TableHead>
-                    <TableHead title="Counter Hit" className="w-[50px]">CH</TableHead>
-                    <TableHead title="Guard Burst" className="w-[50px]">GB</TableHead>
-                    <TableHead>Notes</TableHead>
+                    <TableHead className="w-[200px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Command')}>
+                       <div className="flex items-center justify-between gap-1">
+                        <span>Command</span>
+                        {sortColumn === 'Command' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+                      </div>
+                    </TableHead>
+                    <TableHead className="w-[100px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('HitLevel')}>
+                       <div className="flex items-center justify-between gap-1">
+                        <span>Hit Level</span>
+                        {sortColumn === 'HitLevel' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+                      </div>
+                    </TableHead>
+                    <TableHead className="w-[50px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Impact')}>
+                       <div className="flex items-center justify-between gap-1">
+                        <span>Impact</span>
+                        {sortColumn === 'Impact' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+                      </div>
+                    </TableHead>
+                    <TableHead className="w-[50px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Damage')}>
+                       <div className="flex items-center justify-between gap-1">
+                        <span>Damage</span>
+                        {sortColumn === 'Damage' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+                      </div>
+                    </TableHead>
+                    <TableHead className="w-[70px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Block')}>
+                      <div className="flex items-center justify-between gap-1" title="Block">
+                        <Shield size={16} />
+                        {sortColumn === 'Block' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+                      </div>
+                    </TableHead>
+                    <TableHead className="w-[60px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Hit')}>
+                       <div className="flex items-center justify-between gap-1">
+                        <span>Hit</span>
+                        {sortColumn === 'Hit' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+                      </div>
+                    </TableHead>
+                    <TableHead title="Counter Hit" className="w-[50px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('CounterHit')}>
+                       <div className="flex items-center justify-between gap-1">
+                        <span>CH</span>
+                        {sortColumn === 'CounterHit' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+                      </div>
+                    </TableHead>
+                    <TableHead title="Guard Burst" className="w-[50px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('GuardBurst')}>
+                       <div className="flex items-center justify-between gap-1">
+                        <span>GB</span>
+                        {sortColumn === 'GuardBurst' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+                      </div>
+                    </TableHead>
+                    <TableHead className="p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Notes')}>
+                      <div className="flex items-center justify-between gap-1">
+                        <span>Notes</span>
+                        {sortColumn === 'Notes' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+                      </div>
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
-                <TableBody>
+                <TableBody className="w-[50px]">
                   {movesLoading ? (
                      <TableRow>
-                       <TableCell colSpan={10} className="text-center h-24">
+                       <TableCell colSpan={10} className="text-center h-24 p-2">
                          <div className="flex justify-center items-center">
                            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground mr-2" />
                            Loading moves...
                          </div>
                        </TableCell>
                      </TableRow>
-                  ) : moves.length === 0 ? (
+                  ) : displayedMoves.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={10} className="text-center h-24">
+                      <TableCell colSpan={10} className="text-center h-24 p-2">
                         {!loading ? "No moves found for this character." : "Character data loaded, select moves."} 
                       </TableCell>
                     </TableRow>
                   ) : (
-                    moves.map((move) => (
+                    displayedMoves.map((move) => (
                       <TableRow key={move.ID} className="border-b-card-border">
-                        <TableCell className="text-right">{move.Stance || '—'}</TableCell>
-                        <TableCell className="font-mono">{move.Command}</TableCell>
-                        <TableCell>{move.HitLevel || '—'}</TableCell>
-                        <TableCell>{move.Impact ?? '—'}</TableCell>
-                        <TableCell>{move.DamageDec ?? '—'}</TableCell>
-                        <TableCell>{renderFrameAdvantageBadge(move.Block)}</TableCell>
-                        <TableCell>
-                          {(() => {
-                            const text = move.HitString ?? '—';
-                            const value = move.Hit; // Numeric value from HitDec
-                            let variant: "success" | "destructive" | "secondary" = "secondary";
-                            if (value !== null && value !== undefined) {
-                              if (value >= 0) {
-                                variant = "success";
-                              } else {
-                                variant = "destructive";
-                              }
-                            }
-                            return <Badge variant={variant}>{text}</Badge>;
-                          })()}
+                        <TableCell className="text-right p-2">{move.Stance || '—'}</TableCell>
+                        <TableCell className="font-mono p-2">{move.Command}</TableCell>
+                        <TableCell className="p-2">{move.HitLevel || '—'}</TableCell>
+                        <TableCell className="p-2">{move.Impact ?? '—'}</TableCell>
+                        <TableCell className="p-2">{move.DamageDec ?? '—'}</TableCell>
+                        <TableCell className="p-2">{renderBadge(move.Block, null)}</TableCell>
+                        <TableCell className="p-2">
+                          {/* Use combined renderBadge function */}
+                          {renderBadge(move.Hit, move.HitString)}
                         </TableCell>
-                        <TableCell>
-                          {(() => {
-                            const text = move.CounterHitString ?? '—';
-                            const value = move.CounterHit; // Numeric value from CounterHitDec
-                            let variant: "success" | "destructive" | "secondary" = "secondary";
-                            if (value !== null && value !== undefined) {
-                              if (value >= 0) {
-                                variant = "success";
-                              } else {
-                                variant = "destructive";
-                              }
-                            }
-                            // Display text (original string) in the badge
-                            return <Badge variant={variant}>{text}</Badge>; 
-                          })()}
+                        <TableCell className="p-2">
+                          {/* Use combined renderBadge function */}
+                          {renderBadge(move.CounterHit, move.CounterHitString)}
                         </TableCell>
-                        <TableCell>{renderFrameAdvantageBadge(move.GuardBurst)}</TableCell>
-                        <TableCell className="max-w-[300px] truncate">
+                        <TableCell className="p-2">{renderBadge(move.GuardBurst, null)}</TableCell>
+                        <TableCell className="max-w-[300px] truncate p-2">
                           {move.Notes || '—'}
                         </TableCell>
                       </TableRow>

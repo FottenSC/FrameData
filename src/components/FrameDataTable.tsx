@@ -702,7 +702,7 @@ export const FrameDataTable: React.FC = () => {
             </div>
           </CardContent>
           <CardFooter className="text-xs text-muted-foreground flex-shrink-0">
-            Data last updated: April 2024 
+            Website last deployed
           </CardFooter>
         </Card>
       ) : (

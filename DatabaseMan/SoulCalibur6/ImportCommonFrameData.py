@@ -178,9 +178,8 @@ if(1 == 1):
 # Create schema
 with open('DatabaseMan/SoulCalibur6/schema.sql', 'r') as schemaFile:
     schemaSQL = schemaFile.read()
-print("Started schema creation")
 cur.executescript(schemaSQL)
-print("Finished schema creation")
+print("Created database schema")
 
 
 

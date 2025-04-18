@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { cn } from '../lib/utils';
 import { Gamepad2, Sword } from 'lucide-react';
 import { ThemeToggle } from './theme-toggle';
 import { useGame } from '../contexts/GameContext';
@@ -32,13 +31,6 @@ export const Navbar: React.FC = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  const handleGameClick = (event: React.MouseEvent) => {
-    if (selectedCharacterId !== null) {
-      setSelectedCharacterId(null);
-      navigate(`/${selectedGame.id}`);
-    }
-  };
-  
   const handleCharacterSelect = (value: string) => {
     if (!value) {
       // Handle case where selection is cleared (empty value)
@@ -78,7 +70,7 @@ export const Navbar: React.FC = () => {
                   <BreadcrumbItem>
                     <BreadcrumbLink asChild>
                       <Link 
-                        to="/games"
+                        to={`/${selectedGame.id}`}
                         className="flex items-center hover:text-foreground/80 transition-colors"
                       >
                         {gameIcons[selectedGame.id] || <Gamepad2 className="h-4 w-4 mr-1.5 opacity-70" />}

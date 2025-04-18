@@ -8,20 +8,11 @@ import {
   TableHeader,
   TableRow,
 } from './ui/table';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from './ui/select';
 import { Button } from './ui/button';
 import { initializeDatabase } from '../utils/initializeDatabase';
 import { Download, Loader2, Search, Shield, ArrowUp, ArrowDown, ChevronDown } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
-import { Input } from './ui/input';
 import { Badge } from './ui/badge';
-import { ThemeToggle } from './theme-toggle';
 import { useGame, Character, AVAILABLE_GAMES } from '../contexts/GameContext';
 
 // Using the SQL.js loaded via CDN
@@ -702,7 +693,7 @@ export const FrameDataTable: React.FC = () => {
             </div>
           </CardContent>
           <CardFooter className="text-xs text-muted-foreground flex-shrink-0">
-            Website last deployed
+            Website last deployed: April 18, 2025 at 12:56 PM GMT+2
           </CardFooter>
         </Card>
       ) : (

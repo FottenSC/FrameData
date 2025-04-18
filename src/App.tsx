@@ -6,6 +6,7 @@ import { ThemeProvider } from './components/theme-provider';
 import { GameProvider } from './contexts/GameContext';
 import { Navbar } from './components/Navbar';
 import { GameSelectionPage } from './components/GameSelectionPage';
+import { CharacterSelectionPage } from './components/CharacterSelectionPage';
 
 function App() {
   return (
@@ -19,7 +20,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<Navigate to="/games" replace />} />
                 <Route path="/games" element={<GameSelectionPage />} />
-                <Route path="/:gameId" element={<FrameDataTable />} />
+                <Route path="/:gameId" element={<CharacterSelectionPage />} />
                 <Route path="/:gameId/:characterName" element={<FrameDataTable />} />
               </Routes>
             </main>

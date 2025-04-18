@@ -51,7 +51,10 @@ ABCDEFG
 
 So for calibur its simple 
 * 8 way run stays
-* A=A B=B K=C G=D
+* A=A 
+* B=B 
+* K=C 
+* G=D
 
 In the frontend everything will be translated to the format users expect
 so tekken players can keep their wonderful inputs system :)

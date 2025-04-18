@@ -84,3 +84,28 @@ WHERE
 
 
 
+-- Translate to universal command format
+PRAGMA case_sensitive_like = ON;
+UPDATE Moves
+SET Command = REPLACE(Command, 'K', 'C')
+;
+
+UPDATE Moves
+SET Command = REPLACE(Command, 'k', 'c')
+;
+
+UPDATE Moves
+SET Command = REPLACE(Command, 'G', 'D')
+;
+
+UPDATE Moves
+SET Command = REPLACE(Command, 'g', 'd')
+;
+
+
+
+
+
+
+
+

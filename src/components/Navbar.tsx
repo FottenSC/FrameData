@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Gamepad2, Sword } from 'lucide-react';
+import { Gamepad2, Sword, Command } from 'lucide-react';
 import { ThemeToggle } from './theme-toggle';
 import { useGame } from '../contexts/GameContext';
+import { useCommand } from '../contexts/CommandContext';
 import {
   Select,
   SelectContent,
@@ -18,6 +19,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator
 } from './ui/breadcrumb';
+import { Button } from './ui/button';
 
 const gameIcons: Record<string, React.ReactNode> = {
   soulcalibur6: <Sword className="h-4 w-4 mr-1.5" />,
@@ -28,6 +30,7 @@ export const Navbar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { selectedGame, characters, selectedCharacterId, setSelectedCharacterId } = useGame();
+  const { setOpen } = useCommand();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -110,6 +113,15 @@ export const Navbar: React.FC = () => {
         </div>
         
         <div className="flex items-center justify-end space-x-4">
+          <Button 
+            variant="outline" 
+            size="icon" 
+            onClick={() => setOpen(true)}
+            title="Command Menu (Ctrl+K)"
+          >
+            <Command className="h-[1.2rem] w-[1.2rem]" />
+            <span className="sr-only">Open Command Menu</span>
+          </Button>
           <ThemeToggle />
         </div>
       </div>

@@ -10,7 +10,7 @@ import {
 } from './ui/table';
 import { Button } from './ui/button';
 import { initializeDatabase } from '../utils/initializeDatabase';
-import { Download, Loader2, Search, Shield, ArrowUp, ArrowDown, ChevronDown } from 'lucide-react';
+import { Loader2, Shield, ArrowUp, ArrowDown, ChevronDown } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { useGame, Character, AVAILABLE_GAMES } from '../contexts/GameContext';

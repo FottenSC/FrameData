@@ -2,15 +2,16 @@ const fs = require('fs');
 const path = require('path');
 
 const filePath = path.join(__dirname, 'src', 'components', 'FrameDataTable.tsx');
-const placeholder = 'Website last deployed'; // Keep the base placeholder text
-const timestamp = new Date().toLocaleString('en-US', {
+const placeholder = 'Website last deployed';
+const timestamp = new Date().toLocaleString('en-GB', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
     timeZoneName: 'short',
-}); // Example: "April 30, 2024, 02:30 PM PST" - Adjust format as needed
+    hour12: false,
+}); 
 const newText = `Website last deployed: ${timestamp}`; // Define the full text to insert
 
 try {

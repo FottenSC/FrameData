@@ -547,7 +547,7 @@ export const FrameDataTable: React.FC = () => {
     : null;
 
   return (
-    <div className="space-y-6 h-full flex flex-col p-4 flex-grow">
+    <div className="space-y-6 h-full flex flex-col pl-4 pr-4 flex-grow">
       {selectedCharacterId ? (
         <Card className="h-full flex flex-col overflow-hidden border border-card-border">
           <CardHeader className="pb-2 flex-shrink-0">
@@ -678,7 +678,7 @@ export const FrameDataTable: React.FC = () => {
             </div>
           </CardContent>
           <CardFooter className="text-xs text-muted-foreground flex-shrink-0">
-            Website last deployed: 19 April 2025 at 14:48 CEST
+            Website last deployed: 19 April 2025 at 15:50 CEST
           </CardFooter>
         </Card>
       ) : (

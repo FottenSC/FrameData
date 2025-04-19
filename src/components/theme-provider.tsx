@@ -27,10 +27,18 @@ export function ThemeProvider({
   storageKey = "vite-ui-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    // Check localStorage first, then fall back to defaultTheme
-    const storedTheme = localStorage.getItem(storageKey) as Theme
-    return storedTheme || defaultTheme
+  const [theme, setThemeState] = useState<Theme>(() => {
+    if (typeof window === 'undefined') return defaultTheme;
+    let stored: Theme | null = null;
+    try {
+      stored = localStorage.getItem(storageKey) as Theme;
+    } catch {
+      stored = null;
+    }
+    if (stored === 'light' || stored === 'dark') {
+      return stored;
+    }
+    return defaultTheme;
   })
 
   useEffect(() => {
@@ -39,12 +47,18 @@ export function ThemeProvider({
     root.classList.add(theme)
   }, [theme])
 
+  const setTheme = (value: Theme) => {
+    try {
+      localStorage.setItem(storageKey, value)
+    } catch {
+      // ignore errors (e.g. Safari private mode)
+    }
+    setThemeState(value)
+  }
+
   const value = {
     theme,
-    setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme)
-      setTheme(theme)
-    },
+    setTheme,
   }
 
   return (

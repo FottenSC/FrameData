@@ -59,7 +59,6 @@ export const FrameDataTable: React.FC = () => {
   
   const [db, setDb] = useState<any | null>(null);
   const [originalMoves, setOriginalMoves] = useState<Move[]>([]); // Store the original, unsorted moves
-  const [displayedMoves, setDisplayedMoves] = useState<Move[]>([]); // Moves to display (sorted)
   const [loading, setLoading] = useState(true);
   const [movesLoading, setMovesLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -259,94 +258,6 @@ export const FrameDataTable: React.FC = () => {
     }
   }, [db, selectedCharacterId]); // Removed setError from dependencies
 
-  // --- Effect 5: Apply Sorting whenever originalMoves, sortColumn, or sortDirection changes ---
-  useEffect(() => {
-    if (!sortColumn) {
-      setDisplayedMoves(originalMoves); // No sorting, display original order
-      return;
-    }
-
-    const sorted = [...originalMoves].sort((a, b) => {
-      let valA: any;
-      let valB: any;
-
-      // Get values based on the sort column
-      // Handle special cases like Damage, Hit, CounterHit which sort by numeric value
-      switch (sortColumn) {
-        case 'Damage':
-          valA = a.DamageDec;
-          valB = b.DamageDec;
-          break;
-        case 'Block':
-          valA = a.Block;
-          valB = b.Block;
-          break;
-        case 'Hit':
-          valA = a.Hit; // Sort by numeric Hit
-          valB = b.Hit;
-          break;
-        case 'CounterHit':
-          valA = a.CounterHit; // Sort by numeric CounterHit
-          valB = b.CounterHit;
-          break;
-        case 'GuardBurst':
-            valA = a.GuardBurst;
-            valB = b.GuardBurst;
-            break;
-        // Ensure Impact is treated as a number if it exists
-        case 'Impact':
-            valA = a.Impact;
-            valB = b.Impact;
-            break;
-        // Default case for other keys directly on the Move object
-        default:
-          // Check if the key exists on the Move type before accessing
-          if (sortColumn in a && sortColumn in b) {
-            valA = a[sortColumn as keyof Move];
-            valB = b[sortColumn as keyof Move];
-          } else {
-            // Handle cases where the column might not be a direct key (shouldn't happen with SortableColumn type)
-            valA = undefined;
-            valB = undefined;
-          }
-          break;
-      }
-
-      // --- Revised Null/Undefined Handling: Always push to bottom --- 
-      const aIsNull = valA === null || valA === undefined;
-      const bIsNull = valB === null || valB === undefined;
-
-      if (aIsNull && !bIsNull) {
-        return 1; // a (null) goes after b (non-null)
-      }
-      if (!aIsNull && bIsNull) {
-        return -1; // b (null) goes after a (non-null)
-      }
-      if (aIsNull && bIsNull) {
-        return 0; // Both null, order doesn't matter
-      }
-      // --- End Revised Null Handling ---
-
-      // Now both valA and valB are non-null, proceed with comparison
-      const order = sortDirection === 'asc' ? 1 : -1;
-
-      // Comparison logic for non-null values
-      if (typeof valA === 'number' && typeof valB === 'number') {
-        return (valA - valB) * order;
-      } else if (typeof valA === 'string' && typeof valB === 'string') {
-        // Optional: Add case-insensitive string sort if desired
-        // return valA.toLowerCase().localeCompare(valB.toLowerCase()) * order;
-        return valA.localeCompare(valB) * order;
-      } else {
-        // Fallback for mixed types or other types (treat as equal)
-        return 0;
-      }
-    });
-
-    setDisplayedMoves(sorted);
-
-  }, [originalMoves, sortColumn, sortDirection]);
-
   // --- Define a self-contained hit level icon component ---
   const HitLevelIcon = React.memo(({ level }: { level: string }) => {
     let bgColor = 'bg-gray-400';
@@ -506,6 +417,39 @@ export const FrameDataTable: React.FC = () => {
         setDeployTimestamp("Unknown");
       });
   }, []);
+
+  // compute displayedMoves via memoization instead of state
+  const displayedMoves = React.useMemo(() => {
+    if (!sortColumn) return originalMoves;
+    const sorted = [...originalMoves].sort((a, b) => {
+      let valA: any;
+      let valB: any;
+      switch (sortColumn) {
+        case 'Damage':
+          valA = a.DamageDec; valB = b.DamageDec; break;
+        case 'Block':
+          valA = a.Block; valB = b.Block; break;
+        case 'Hit':
+          valA = a.Hit; valB = b.Hit; break;
+        case 'CounterHit':
+          valA = a.CounterHit; valB = b.CounterHit; break;
+        default:
+          valA = a[sortColumn as keyof Move];
+          valB = b[sortColumn as keyof Move];
+      }
+      // Push null/undefined to bottom
+      const aNull = valA == null;
+      const bNull = valB == null;
+      if (aNull && !bNull) return 1;
+      if (!aNull && bNull) return -1;
+      if (aNull && bNull) return 0;
+      const order = sortDirection === 'asc' ? 1 : -1;
+      if (typeof valA === 'number' && typeof valB === 'number') return (valA - valB) * order;
+      if (typeof valA === 'string' && typeof valB === 'string') return valA.localeCompare(valB) * order;
+      return 0;
+    });
+    return sorted;
+  }, [originalMoves, sortColumn, sortDirection]);
 
   if (loading) {
     return (

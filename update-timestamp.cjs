@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const filePath = path.join(__dirname, 'src', 'components', 'FrameDataTable.tsx');
-const placeholder = 'Website last deployed'; // Make sure this exactly matches the text in the component
+const placeholder = 'Website last deployed'; // Keep the base placeholder text
 const timestamp = new Date().toLocaleString('en-US', {
     year: 'numeric',
     month: 'long',
@@ -11,16 +11,22 @@ const timestamp = new Date().toLocaleString('en-US', {
     minute: '2-digit',
     timeZoneName: 'short',
 }); // Example: "April 30, 2024, 02:30 PM PST" - Adjust format as needed
+const newText = `Website last deployed: ${timestamp}`; // Define the full text to insert
 
 try {
     let content = fs.readFileSync(filePath, 'utf8');
 
-    if (content.includes(placeholder)) {
-        content = content.replace(placeholder, `Website last deployed: ${timestamp}`);
+    // Regex to find the placeholder, optionally followed by ": <timestamp>"
+    const regex = new RegExp(`${placeholder}(:.*)?`);
+
+    if (content.match(regex)) {
+        // Replace the entire match (placeholder + optional old timestamp) with the new text
+        content = content.replace(regex, newText);
         fs.writeFileSync(filePath, content, 'utf8');
         console.log(`Updated timestamp in ${filePath}`);
     } else {
-        console.warn(`Placeholder "${placeholder}" not found in ${filePath}. Skipping update.`);
+        // If the pattern isn't found at all (neither placeholder nor placeholder + timestamp)
+        console.warn(`Pattern matching "${placeholder}(:.*)?" not found in ${filePath}. Cannot update timestamp.`);
     }
 } catch (error) {
     console.error(`Error updating timestamp in ${filePath}:`, error);

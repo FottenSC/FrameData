@@ -51,7 +51,6 @@ export const FrameDataTable: React.FC = () => {
   const {
     selectedGame,
     setSelectedGameById,
-    isLoading: gameLoading,
     characters,
     setCharacters,
     selectedCharacterId,
@@ -494,7 +493,7 @@ export const FrameDataTable: React.FC = () => {
     }
   };
 
-  if (gameLoading || loading) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center h-[50vh]">
         <div className="flex flex-col items-center gap-2">
@@ -553,7 +552,6 @@ export const FrameDataTable: React.FC = () => {
         <Card className="h-full flex flex-col overflow-hidden border border-card-border">
           <CardHeader className="pb-2 flex-shrink-0">
             <CardTitle>
-              {/* Use name derived from context ID */}
               {selectedCharacterNameFromContext || 'Character'} Frame Data 
             </CardTitle>
             <CardDescription>
@@ -577,7 +575,7 @@ export const FrameDataTable: React.FC = () => {
                         {sortColumn === 'Command' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
                       </div>
                     </TableHead>
-                    <TableHead className="w-[135px] max-w-[150px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('HitLevel')}>
+                    <TableHead className="w-[135px] min-w-[135px] max-w-[150px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('HitLevel')}>
                        <div className="flex items-center justify-between gap-1">
                         <span>Hit Level</span>
                         {sortColumn === 'HitLevel' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
@@ -651,7 +649,7 @@ export const FrameDataTable: React.FC = () => {
                       >
                         <TableCell className="text-right p-2">{move.Stance || '—'}</TableCell>
                         <TableCell className="font-mono p-2 max-w-[300px] break-words">{move.Command}</TableCell>
-                        <TableCell className="p-2 max-w-[150px] align-top">
+                        <TableCell className="p-2 min-w-[135px] max-w-[150px] align-top">
                           <ExpandableHitLevels 
                             hitLevelString={move.HitLevel} 
                             maxIconsToShow={3}
@@ -680,7 +678,7 @@ export const FrameDataTable: React.FC = () => {
             </div>
           </CardContent>
           <CardFooter className="text-xs text-muted-foreground flex-shrink-0">
-            Website last deployed: April 19, 2025 at 10:09 AM GMT+2: April 18, 2025 at 07:12 PM GMT+2: April 18, 2025 at 12:56 PM GMT+2
+            Website last deployed: April 19, 2025 at 12:20 PM GMT+2: April 19, 2025 at 10:09 AM GMT+2: April 18, 2025 at 07:12 PM GMT+2: April 18, 2025 at 12:56 PM GMT+2
           </CardFooter>
         </Card>
       ) : (

@@ -63,7 +63,7 @@ export const Navbar: React.FC = () => {
             <img src="/Horseface.png" alt="Horseface Logo" className="h-8 inline-block rounded-md" />
           </Link>
           
-          <Breadcrumb className="hidden md:flex items-center">
+          <Breadcrumb className="items-center">
             <BreadcrumbList>
               {selectedGame && (
                 <>

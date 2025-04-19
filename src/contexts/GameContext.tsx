@@ -121,35 +121,6 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   }, [selectedGame?.id]);
 
   useEffect(() => {
-    let gameChanged = false;
-    if (params.gameId && params.gameId !== selectedGame.id) {
-      const gameFromUrl = AVAILABLE_GAMES.find(g => g.id === params.gameId);
-      if (gameFromUrl) {
-        console.log(`Context: Game changed via URL to ${gameFromUrl.id}`);
-        setSelectedGame(gameFromUrl);
-        setSelectedCharacterId(null);
-        gameChanged = true;
-      } else {
-        console.warn(`Context: Invalid game ID in URL: ${params.gameId}`);
-      }
-    }
-
-    if (!gameChanged && !isCharactersLoading && characters.length > 0) {
-      const currentUrlName = params.characterName ? decodeURIComponent(params.characterName).toLowerCase() : null;
-      const characterFromUrl = currentUrlName ? characters.find(c => c.name.toLowerCase() === currentUrlName) : null;
-      const characterIdFromUrl = characterFromUrl?.id ?? null;
-
-      if (characterIdFromUrl !== selectedCharacterId) {
-          console.log(`Context: Setting character ID from URL: ${characterIdFromUrl} (Name: ${params.characterName})`);
-          setSelectedCharacterId(characterIdFromUrl);
-      }
-    } else if (!gameChanged && !isCharactersLoading && !params.characterName && selectedCharacterId !== null) {
-       console.log(`Context: Clearing character ID because URL has no character name.`);
-       setSelectedCharacterId(null);
-    }
-  }, [params.gameId, params.characterName, isCharactersLoading, characters, selectedGame.id]);
-
-  useEffect(() => {
     if (selectedGame) {
       localStorage.setItem('selectedGameId', selectedGame.id);
     }
@@ -171,20 +142,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
   const handleSetSelectedCharacterId = (id: number | null) => {
     if (id !== selectedCharacterId) {
+      console.log(`Context: Setting selected character ID to: ${id}`);
       setSelectedCharacterId(id);
-      if (id !== null) {
-        const character = characters.find(c => c.id === id);
-        if (character) {
-          console.log(`Context: Navigating to character ${character.name}`);
-          navigate(`/${selectedGame.id}/${encodeURIComponent(character.name)}`);
-        } else {
-          console.warn(`Context: Selected character ID ${id} not found in list, navigating to game root.`);
-          navigate(`/${selectedGame.id}`); 
-        }
-      } else {
-        console.log(`Context: Navigating to character select page for ${selectedGame.id}`);
-        navigate(`/${selectedGame.id}`);
-      }
     }
   };
 

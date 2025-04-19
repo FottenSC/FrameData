@@ -12,16 +12,9 @@ import {
   CommandShortcut,
 } from "@/components/ui/command"
 import {
-  Calculator,
-  Calendar,
-  CreditCard,
-  Settings,
-  Smile,
-  User,
   Gamepad2,
   Users,
-  ChevronLeft,
-  Home,
+  ChevronLeft
 } from "lucide-react"
 import { useGame } from "@/contexts/GameContext"
 import { useCommand } from "@/contexts/CommandContext"
@@ -118,10 +111,6 @@ export function CommandPalette() {
               <CommandItem onSelect={() => { navigate(`/${selectedGame.id}`); setOpen(false); }}>
                 <Users className="mr-2 h-4 w-4" />
                 <span>Character Selection</span>
-              </CommandItem>
-              <CommandItem onSelect={() => { navigate("/"); setOpen(false); }}>
-                <Home className="mr-2 h-4 w-4" />
-                <span>Home</span>
               </CommandItem>
             </CommandGroup>
           </>

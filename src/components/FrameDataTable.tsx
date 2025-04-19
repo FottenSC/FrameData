@@ -673,11 +673,9 @@ export const FrameDataTable: React.FC = () => {
                         <TableCell className="p-2">{move.DamageDec ?? '—'}</TableCell>
                         <TableCell className="p-2">{renderBadge(move.Block, null)}</TableCell>
                         <TableCell className="p-2">
-                          {/* Use combined renderBadge function */}
                           {renderBadge(move.Hit, move.HitString)}
                         </TableCell>
                         <TableCell className="p-2">
-                          {/* Use combined renderBadge function */}
                           {renderBadge(move.CounterHit, move.CounterHitString)}
                         </TableCell>
                         <TableCell className="p-2">{renderBadge(move.GuardBurst, null, true)}</TableCell>

@@ -63,6 +63,7 @@ export const FrameDataTable: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [movesLoading, setMovesLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [deployTimestamp, setDeployTimestamp] = useState<string>("Loading...");
 
   // --- Sorting State ---
   const [sortColumn, setSortColumn] = useState<SortableColumn | null>(null);
@@ -493,6 +494,19 @@ export const FrameDataTable: React.FC = () => {
     }
   };
 
+  // New useEffect to fetch the timestamp
+  useEffect(() => {
+    fetch('/timestamp.json')
+      .then(res => res.json())
+      .then(data => {
+        setDeployTimestamp(data.timestamp);
+      })
+      .catch(err => {
+        console.error("Failed to load timestamp:", err);
+        setDeployTimestamp("Unknown");
+      });
+  }, []);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[50vh]">
@@ -678,7 +692,7 @@ export const FrameDataTable: React.FC = () => {
             </div>
           </CardContent>
           <CardFooter className="text-xs text-muted-foreground flex-shrink-0">
-            Website last deployed: 19 April 2025 at 15:50 CEST
+            Website last deployed: {deployTimestamp}
           </CardFooter>
         </Card>
       ) : (

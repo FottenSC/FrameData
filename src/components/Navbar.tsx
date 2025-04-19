@@ -62,8 +62,12 @@ export const Navbar: React.FC = () => {
     <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-14 items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center">
-          <Link to="/games" className="mr-6 flex items-center space-x-2">
-            <img src="/Horseface.png" alt="Horseface Logo" className="h-8 inline-block rounded-md" />
+          <Link to="/games" className="mr-4 flex items-center">
+            <img 
+              src="/Horseface.png" 
+              alt="Horseface Logo" 
+              className="h-6 object-contain rounded-md"
+            />
           </Link>
           
           <Breadcrumb className="items-center">

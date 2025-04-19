@@ -1,19 +1,21 @@
-# Soul Calibur VI Frame Data Viewer
+# Fighting Game Frame Data Viewer
 
-This is a web application designed to display frame data for characters in the game Soul Calibur VI. It uses React, Vite, TypeScript, and SQL.js to load and display move lists from an SQLite database file directly in the browser.
+This is a web application designed to display frame data for characters in fighting games like Soul Calibur VI and Tekken 8. It uses React, Vite, TypeScript, and SQL.js to load and display move lists from SQLite database files directly in the browser.
 
 ## Features
 
-*   Displays character move lists in a sortable, filterable table.
-*   Loads data from a local `Framedata.db` file using SQL.js.
+*   Displays character move lists for multiple supported games (Soul Calibur VI, Tekken 8).
+*   Sortable and filterable frame data tables.
+*   Loads data from local game-specific `.db` files using SQL.js.
 *   Built with modern web technologies for a fast and responsive experience.
 
 ## Tech Stack
 
 *   **Frontend:** React, TypeScript
+*   **Routing:** React Router
+*   **State Management:** React Context API
 *   **Build Tool:** Vite
 *   **Styling:** Tailwind CSS, shadcn/ui
-*   **Table:** TanStack Table
 *   **Database:** SQL.js (running SQLite in the browser)
 
 ## Setup and Installation
@@ -28,7 +30,7 @@ This is a web application designed to display frame data for characters in the g
     npm install
     ```
 3.  **Database:**
-    *   Ensure you have the `Framedata.db` file in the `public/` directory of the project. This file contains the character move data.
+    *   Ensure you have the required database files in the `public/` directory, organized by game ID (e.g., `public/SoulCalibur6/FrameData.db`, `public/Tekken8/FrameData.db`).
     *   The application expects `sql-wasm.wasm` to be available. It's usually loaded via CDN or should be placed in the `public/` directory if self-hosted.
 
 ## Available Scripts
@@ -41,20 +43,17 @@ This is a web application designed to display frame data for characters in the g
 
 ## How it Works
 
-The application initializes SQL.js in the browser, fetches the `Framedata.db` file, and loads it into the SQL.js engine. React components then query this in-browser database to display the frame data using TanStack Table. 
+The application initializes SQL.js in the browser, fetches the appropriate `<GameID>/FrameData.db` file based on the selected game, and loads it into the SQL.js engine. React components then query this in-browser database to display the frame data.
 
 
-## Moves are stored with the industry standard move language 
-Each direction has a number based on the numpad
-Each button is mapped to 
-ABCDEFG
+## Internal Move Notation
 
-So for calibur its simple 
-* 8 way run stays
-* A=A 
-* B=B 
-* K=C 
-* G=D
+Moves are stored internally using a generalized notation:
+*   Directions use the standard numpad notation (1-9).
+*   Buttons are mapped generically (A, B, C, D, ...).
 
-In the frontend everything will be translated to the format users expect
-so tekken players can keep their wonderful inputs system :)
+### Example Mappings (Internal -> Game):
+*   **SoulCalibur VI:** 8-way run directions, A=A, B=B, K=C, G=D
+*   **Tekken 8:** (Define mapping as needed)
+
+The goal is to translate this internal notation to the familiar format for each game within the frontend components, allowing players to see inputs as they expect (e.g., Tekken's 1, 2, 3, 4).

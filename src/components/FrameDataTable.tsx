@@ -134,70 +134,57 @@ export const FrameDataTable: React.FC = () => {
   }, [gameId, characterName, selectedGame.id, characters, selectedCharacterId, setSelectedGameById, setSelectedCharacterId]); 
 
 
-  // --- Effect 3: Load Database and Characters (based on selectedGame) --- 
+  // --- Effect 3: Load Database (based on selectedGame) --- 
   useEffect(() => {
     // Reset state when game changes
-    setOriginalMoves([]);
-    setDb(null);
-    setLoading(true);
-    setError(null);
-    // Don't reset characters here if we want Effect 1 to potentially use them briefly
-    // setCharacters([]); 
+    setOriginalMoves([]); // Keep resetting moves
+    setDb(null); // Reset DB
+    setLoading(true); // Use loading state for DB loading
+    setError(null); // Reset errors
+    // setCharacters([]); // REMOVE: Characters are handled by CharacterSelectionPage now
 
-    const loadDatabaseAndCharacters = async () => {
+    const loadDatabase = async () => {
       if (!selectedGame.dbPath) {
         setError("No database path configured for the selected game.");
         setLoading(false);
         return;
       }
       try {
-        setLoading(true); // Set loading true here
+        setLoading(true); 
         const SQL = await window.initSqlJs();
         const response = await fetch(selectedGame.dbPath);
         if (!response.ok) throw new Error(`Failed to fetch database: ${response.statusText}`);
         const arrayBuffer = await response.arrayBuffer();
         const uint8Array = new Uint8Array(arrayBuffer);
         const database = new SQL.Database(uint8Array);
-        setDb(database); // Set DB state
+        setDb(database); // Set DB state for move loading
 
-        // --- Fetch Characters --- 
-        try {
-          // Optional: Check schema initialization if needed
-          // const tableCheck = database.exec("SELECT name FROM sqlite_master WHERE type='table' AND name='Characters'");
-          // ...
-          
-          const charactersResult = database.exec('SELECT ID, Name FROM Characters');
-          if (charactersResult.length > 0 && charactersResult[0].values.length > 0) {
-            const charactersData: Character[] = charactersResult[0].values.map((row: unknown[]) => ({
-              id: Number(row[0]), // Map ID from schema
-              name: String(row[1]) // Map Name from schema
-            }));
-            setCharacters(charactersData); // Set Characters state
-          } else {
-            setCharacters([]); // No characters found
-          }
-        } catch (charError) {
-           setCharacters([]);
-           // Consider setting a specific error state for characters if needed
-        }
-        // --- End Fetch Characters ---
+        // --- REMOVE Character Fetching --- 
+        // try {
+        //   const charactersResult = database.exec('SELECT ID, Name FROM Characters');
+        //   ...
+        //   setCharacters(charactersData); 
+        // } catch (charError) {
+        //    setCharacters([]);
+        // }
+        // --- End REMOVE Character Fetching ---
 
       } catch (error) {
-        setError(error instanceof Error ? error.message : `Error loading data for ${selectedGame.name}`);
+        setError(error instanceof Error ? error.message : `Error loading database for ${selectedGame.name}`);
         setDb(null); // Clear DB on error
-        setCharacters([]); // Clear characters on error
+        // setCharacters([]); // REMOVE
       } finally {
-        setLoading(false); // Set loading false after all attempts
+        setLoading(false); // DB loading finished (or failed)
       }
     };
 
-    loadDatabaseAndCharacters();
+    loadDatabase();
     
-    // Cleanup function is good practice but omitted for brevity here
+    // Cleanup function could close DB if needed, but FrameDataTable might still use it
+    // return () => { db?.close(); }; // Consider cleanup implications
 
-  // This effect should run ONLY when the selected game's dbPath changes.
-  // setCharacters is included because it's used, but it's stable.
-  }, [selectedGame.dbPath, setCharacters]);
+  // Dependency only on dbPath. setCharacters removed.
+  }, [selectedGame.dbPath]); // REMOVE setCharacters dependency
   
   // --- Effect 4: Load Moves (based on selectedCharacterId and db) --- 
   useEffect(() => {
@@ -693,7 +680,7 @@ export const FrameDataTable: React.FC = () => {
             </div>
           </CardContent>
           <CardFooter className="text-xs text-muted-foreground flex-shrink-0">
-            Website last deployed: April 18, 2025 at 12:56 PM GMT+2
+            Website last deployed: April 19, 2025 at 10:09 AM GMT+2: April 18, 2025 at 07:12 PM GMT+2: April 18, 2025 at 12:56 PM GMT+2
           </CardFooter>
         </Card>
       ) : (

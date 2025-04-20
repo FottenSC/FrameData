@@ -35,6 +35,7 @@ export const AVAILABLE_GAMES: Game[] = [
     name: 'SoulCalibur VI',
     dbPath: '/SoulCalibur6/FrameData.db',
     icons: [
+      // 2x1 icons
       { code: 'UA', title: 'Unblockable', className: 'h-4 w-8' },
       { code: 'UC', title: 'Universal Cancel', className: 'h-4 w-8' },
       { code: 'SS', title: 'Stance Switch', className: 'h-4 w-8' },
@@ -46,10 +47,6 @@ export const AVAILABLE_GAMES: Game[] = [
       { code: 'LH', title: 'Lethal hit', className: 'h-4 w-8' },
       { code: 'SC', title: 'Soulcharge', className: 'h-4 w-8' },
       { code: 'RE', title: 'Reversal edge', className: 'h-4 w-8' },
-      
-
-      { code: 'AT', title: 'Attack Throw???', className: 'h-4 w-8' },
-
 
       // 1x1 icons
       { code: 'H', title: 'Guard Crush' },
@@ -57,6 +54,9 @@ export const AVAILABLE_GAMES: Game[] = [
       { code: 'L', title: 'Guard Crush' },
       { code: 'SM', title: 'Guard Crush' },
       { code: 'GC', title: 'Guard Crush' },
+
+      // Icons im unsure about
+      { code: 'AT', title: 'Attack Throw???', className: 'h-4 w-8' },
     ],
   },
   {

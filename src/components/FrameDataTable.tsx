@@ -15,6 +15,7 @@ import { Loader2, Shield, ArrowUp, ArrowDown, ChevronDown } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { useGame, Character, AVAILABLE_GAMES } from '../contexts/GameContext';
+import { cn } from "@/lib/utils";
 
 // Using the SQL.js loaded via CDN
 declare global {
@@ -423,9 +424,12 @@ export const FrameDataTable: React.FC = () => {
 
   // Helper to render Notes text with inline icons for codes like :UA:
   const renderNotes = (note: string | null) => {
-    if (!note) return '—';
+    if (!note) { return '—'; }
+
     const parts: React.ReactNode[] = [];
-    const regex = /:([A-Za-z0-9_]+):/g;
+    // Build regex to match only configured icon codes
+    const codes = availableIcons.map(ic => ic.code).join('|');
+    const regex = new RegExp(`:(${codes}):`, 'g');
     let lastIndex = 0;
     let match: RegExpExecArray | null;
     while ((match = regex.exec(note))) {
@@ -434,15 +438,22 @@ export const FrameDataTable: React.FC = () => {
       if (start > lastIndex) {
         parts.push(note.slice(lastIndex, start));
       }
-      // Find alt text from config
-      const iconConfig = availableIcons.find(ic => ic.code === iconName);
-      const altText = iconConfig?.alt || iconName;
+      // iconName is guaranteed to be in availableIcons
+      const iconConfig = availableIcons.find(ic => ic.code === iconName)!;
+      const titleText = iconConfig.title;
+      // Merge default and custom classes for sizing
+      const classes = cn(
+        "inline object-contain align-text-bottom h-4 w-4",
+        iconConfig.className
+      );
+      // Wrap in a hover group to show tooltip
       parts.push(
         <img
           key={`${iconName}-${start}`}
           src={getIconUrl(iconName)}
-          alt={altText}
-          className="inline h-4 w-4 mx-0.5 object-contain align-text-bottom"
+          alt={iconName}
+          title={titleText}
+          className={cn(classes, 'mx-0.5')}
         />
       );
       lastIndex = regex.lastIndex;
@@ -551,7 +562,7 @@ export const FrameDataTable: React.FC = () => {
               Total Moves: {displayedMoves.length}
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex-grow p-0 flex flex-col overflow-hidden">
+          <CardContent className="flex-grow p-0 flex flex-col overflow-visible">
             <div className="overflow-y-auto flex-grow">
               <Table className="table-layout-fixed">
                 <TableHeader className="sticky top-0 bg-card z-10">
@@ -658,8 +669,10 @@ export const FrameDataTable: React.FC = () => {
                           {renderBadge(move.CounterHit, move.CounterHitString)}
                         </TableCell>
                         <TableCell className="p-2">{renderBadge(move.GuardBurst, null, true)}</TableCell>
-                        <TableCell className="max-w-[300px] truncate p-2">
-                          {renderNotes(move.Notes)}
+                        <TableCell className="max-w-[300px] p-2 overflow-visible">
+                          <div className="max-w-full truncate overflow-x-hidden overflow-y-visible">
+                            {renderNotes(move.Notes)}
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))

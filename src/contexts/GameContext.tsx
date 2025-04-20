@@ -7,8 +7,10 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 export interface IconConfig {
   /** icon code used in Notes strings, e.g. 'UA' */
   code: string;
-  /** descriptive alt text for accessibility */
-  alt: string;
+  /** descriptive title/tooltip text for accessibility */
+  title: string;
+  /** optional Tailwind classes for icon sizing/aspect ratio */
+  className?: string;
 }
 
 // Define Game interface here
@@ -33,9 +35,28 @@ export const AVAILABLE_GAMES: Game[] = [
     name: 'SoulCalibur VI',
     dbPath: '/SoulCalibur6/FrameData.db',
     icons: [
-      { code: 'UA', alt: 'Universal Attack' },
-      { code: 'UB', alt: 'Universal Block' },
-      { code: 'UC', alt: 'Universal Cancel' },
+      { code: 'UA', title: 'Unblockable', className: 'h-4 w-8' },
+      { code: 'UC', title: 'Universal Cancel', className: 'h-4 w-8' },
+      { code: 'SS', title: 'Stance Switch', className: 'h-4 w-8' },
+      { code: 'GC', title: 'Guard Crush', className: 'h-4 w-8' },
+      { code: 'TH', title: 'Throw', className: 'h-4 w-8' },
+      { code: 'CE', title: 'Critical Edge', className: 'h-4 w-8' },
+      { code: 'BA', title: 'Break Attack', className: 'h-4 w-8' },
+      { code: 'GI', title: 'Guard impact', className: 'h-4 w-8' },
+      { code: 'LH', title: 'Lethal hit', className: 'h-4 w-8' },
+      { code: 'SC', title: 'Soulcharge', className: 'h-4 w-8' },
+      { code: 'RE', title: 'Reversal edge', className: 'h-4 w-8' },
+      
+
+      { code: 'AT', title: 'Attack Throw???', className: 'h-4 w-8' },
+
+
+      // 1x1 icons
+      { code: 'H', title: 'Guard Crush' },
+      { code: 'M', title: 'Guard Crush' },
+      { code: 'L', title: 'Guard Crush' },
+      { code: 'SM', title: 'Guard Crush' },
+      { code: 'GC', title: 'Guard Crush' },
     ],
   },
   {
@@ -43,8 +64,10 @@ export const AVAILABLE_GAMES: Game[] = [
     name: 'Tekken 8',
     dbPath: '/Tekken8/FrameData.db',
     icons: [
-      { code: 'LP', alt: 'Light Punch' },
-      { code: 'RP', alt: 'Right Punch' },
+      { code: 'LP', title: 'Light Punch' },
+      { code: 'RP', title: 'Right Punch' },
+      { code: 'LK', title: 'Light Kick' },
+      { code: 'RK', title: 'Right Kick' },
     ],
   },
 ];

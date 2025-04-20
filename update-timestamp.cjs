@@ -3,15 +3,27 @@ const path = require('path');
 
 const filePath = path.join(__dirname, 'src', 'components', 'FrameDataTable.tsx');
 const placeholder = 'Website last deployed';
-const timestamp = new Date().toLocaleString('en-GB', {
+
+// Compute local date-time and UTC offset for timestamp
+const now = new Date();
+const dateTimeString = now.toLocaleString('en-GB', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-    timeZoneName: 'short',
     hour12: false,
-}); 
+});
+const offsetMinutes = now.getTimezoneOffset();
+const offsetSign = offsetMinutes <= 0 ? '+' : '-';
+const absOffset = Math.abs(offsetMinutes);
+const offsetHours = Math.floor(absOffset / 60);
+const offsetMinutesRemainder = absOffset % 60;
+const offsetHoursStr = String(offsetHours).padStart(2, '0');
+const offsetMinutesStr = String(offsetMinutesRemainder).padStart(2, '0');
+const offsetString = `${offsetSign}${offsetHoursStr}:${offsetMinutesStr}`;
+const timestamp = `${dateTimeString} UTC${offsetString}`;
+
 const newText = `Website last deployed: ${timestamp}`; // Define the full text to insert
 
 try {

@@ -1,6 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <script>
+      (function() {
+        try {
+          const theme = localStorage.getItem('vite-ui-theme');
+          if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.add('light');
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <meta name="color-scheme" content="light dark" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Cross-Origin-Embedder-Policy" content="require-corp" />
@@ -9,8 +22,8 @@
     <!-- SQL.js from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
     <!-- Our SQL.js loader -->
-    <script type="module" crossorigin src="./assets/index-CVyljO9O.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-C3J4CpnE.css">
+    <script type="module" crossorigin src="./assets/index-Db5R2dkH.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BwEQFugB.css">
   </head>
   <body>
     <div id="root"></div>

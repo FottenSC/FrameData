@@ -38,6 +38,9 @@ export function ThemeProvider({
     if (stored === 'light' || stored === 'dark') {
       return stored;
     }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark';
+    }
     return defaultTheme;
   })
 
@@ -46,6 +49,18 @@ export function ThemeProvider({
     root.classList.remove("light", "dark")
     root.classList.add(theme)
   }, [theme])
+
+  useEffect(() => {
+    if (!window.matchMedia) return;
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => {
+      setThemeState(e.matches ? 'dark' : 'light');
+    };
+    mediaQuery.addEventListener('change', handleChange);
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange);
+    };
+  }, []);
 
   const setTheme = (value: Theme) => {
     try {

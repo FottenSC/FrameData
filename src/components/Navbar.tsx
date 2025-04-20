@@ -51,8 +51,7 @@ export const Navbar: React.FC = () => {
       // Navigate using the name directly from the parsed value
       navigate(`/${selectedGame.id}/${encodeURIComponent(name)}`);
     } else {
-      // Fallback if parsing fails (shouldn't happen)
-      console.error("Failed to parse character selection value:", value);
+      // Failed to parse selection, no debug logging
       setSelectedCharacterId(null);
       navigate(`/${selectedGame.id}`);
     }

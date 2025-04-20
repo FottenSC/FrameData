@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import ReactDOM from 'react-dom';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Table,
@@ -54,7 +55,9 @@ export const FrameDataTable: React.FC = () => {
     characters,
     setCharacters,
     selectedCharacterId,
-    setSelectedCharacterId
+    setSelectedCharacterId,
+    availableIcons,
+    getIconUrl
   } = useGame();
   
   const [db, setDb] = useState<any | null>(null);
@@ -271,7 +274,7 @@ export const FrameDataTable: React.FC = () => {
       case 'SL': bgColor = 'bg-cyan-500'; break; 
       case 'SH': bgColor = 'bg-orange-500'; break;
       default:
-        console.error(`Unknown hit level encountered: ${level}`);
+        // Unknown hit level, no debug logging
         break;
     }
 
@@ -413,10 +416,42 @@ export const FrameDataTable: React.FC = () => {
         setDeployTimestamp(data.timestamp);
       })
       .catch(err => {
-        console.error("Failed to load timestamp:", err);
+        // Failed to load timestamp, no debug logging
         setDeployTimestamp("Unknown");
       });
   }, []);
+
+  // Helper to render Notes text with inline icons for codes like :UA:
+  const renderNotes = (note: string | null) => {
+    if (!note) return '—';
+    const parts: React.ReactNode[] = [];
+    const regex = /:([A-Za-z0-9_]+):/g;
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+    while ((match = regex.exec(note))) {
+      const [full, iconName] = match;
+      const start = match.index;
+      if (start > lastIndex) {
+        parts.push(note.slice(lastIndex, start));
+      }
+      // Find alt text from config
+      const iconConfig = availableIcons.find(ic => ic.code === iconName);
+      const altText = iconConfig?.alt || iconName;
+      parts.push(
+        <img
+          key={`${iconName}-${start}`}
+          src={getIconUrl(iconName)}
+          alt={altText}
+          className="inline h-4 w-4 mx-0.5 object-contain align-text-bottom"
+        />
+      );
+      lastIndex = regex.lastIndex;
+    }
+    if (lastIndex < note.length) {
+      parts.push(note.slice(lastIndex));
+    }
+    return parts;
+  };
 
   // compute displayedMoves via memoization instead of state
   const displayedMoves = React.useMemo(() => {
@@ -624,7 +659,7 @@ export const FrameDataTable: React.FC = () => {
                         </TableCell>
                         <TableCell className="p-2">{renderBadge(move.GuardBurst, null, true)}</TableCell>
                         <TableCell className="max-w-[300px] truncate p-2">
-                          {move.Notes || '—'}
+                          {renderNotes(move.Notes)}
                         </TableCell>
                       </TableRow>
                     ))

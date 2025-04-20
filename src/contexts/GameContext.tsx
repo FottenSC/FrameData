@@ -3,11 +3,21 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 // Remove the old import
 // import { AVAILABLE_GAMES, Game } from '../components/GameSelector';
 
+// Define configuration for a game-specific icon with its alt text
+export interface IconConfig {
+  /** icon code used in Notes strings, e.g. 'UA' */
+  code: string;
+  /** descriptive alt text for accessibility */
+  alt: string;
+}
+
 // Define Game interface here
 export interface Game {
   id: string;
   name: string;
   dbPath: string;
+  /** List of available icon configurations for this game */
+  icons: IconConfig[];
 }
 
 // Define Character interface here
@@ -21,13 +31,22 @@ export const AVAILABLE_GAMES: Game[] = [
   {
     id: 'SoulCalibur6',
     name: 'SoulCalibur VI',
-    dbPath: '/SoulCalibur6/FrameData.db'
+    dbPath: '/SoulCalibur6/FrameData.db',
+    icons: [
+      { code: 'UA', alt: 'Universal Attack' },
+      { code: 'UB', alt: 'Universal Block' },
+      { code: 'UC', alt: 'Universal Cancel' },
+    ],
   },
   {
     id: 'Tekken8',
     name: 'Tekken 8',
-    dbPath: '/Tekken8/FrameData.db'
-  }
+    dbPath: '/Tekken8/FrameData.db',
+    icons: [
+      { code: 'LP', alt: 'Light Punch' },
+      { code: 'RP', alt: 'Right Punch' },
+    ],
+  },
 ];
 
 // Declare initSqlJs globally
@@ -46,6 +65,10 @@ interface GameContextType {
   setCharacters: (chars: Character[]) => void;
   selectedCharacterId: number | null;
   setSelectedCharacterId: (id: number | null) => void;
+  /** Icon configurations available for the current game */
+  availableIcons: IconConfig[];
+  /** Return the URL for a named icon in the current game */
+  getIconUrl: (iconName: string) => string;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -80,7 +103,6 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
         return;
       }
 
-      console.log(`Context: Loading characters for ${selectedGame.id}`);
       setIsCharactersLoading(true);
       setCharacterError(null);
       setCharacters([]);
@@ -101,19 +123,15 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
             name: String(row[1])
           }));
           setCharacters(charactersData);
-          console.log(`Context: Loaded ${charactersData.length} characters for ${selectedGame.id}`);
         } else {
-          console.log(`Context: No characters found in DB for ${selectedGame.id}`);
           setCharacters([]);
         }
       } catch (err) {
-        console.error(`Context: Error loading characters for ${selectedGame.id}:`, err);
         setCharacterError(err instanceof Error ? err.message : `Unknown error loading characters.`);
         setCharacters([]);
       } finally {
         database?.close();
         setIsCharactersLoading(false);
-        console.log(`Context: Finished loading characters for ${selectedGame.id}`);
       }
     };
 
@@ -129,12 +147,10 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const handleSetSelectedGameById = (gameId: string) => {
     const game = AVAILABLE_GAMES.find(g => g.id === gameId);
     if (game && game.id !== selectedGame?.id) {
-      console.log(`Context: Setting game via handler to ${game.id}`);
       setSelectedGame(game);
       setSelectedCharacterId(null);
       navigate(`/${game.id}`);
     } else if (game && game.id === selectedGame?.id) {
-      console.log(`Context: Re-selecting same game ${game.id}, navigating to char select`);
       setSelectedCharacterId(null);
       navigate(`/${game.id}`);
     }
@@ -142,7 +158,6 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
   const handleSetSelectedCharacterId = (id: number | null) => {
     if (id !== selectedCharacterId) {
-      console.log(`Context: Setting selected character ID to: ${id}`);
       setSelectedCharacterId(id);
     }
   };
@@ -155,7 +170,9 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     characters,
     setCharacters,
     selectedCharacterId,
-    setSelectedCharacterId: handleSetSelectedCharacterId
+    setSelectedCharacterId: handleSetSelectedCharacterId,
+    availableIcons: selectedGame.icons || [],
+    getIconUrl: (iconName: string) => `/${selectedGame.id}/Icons/${iconName}.svg`,
   };
 
   return (

@@ -45,7 +45,7 @@ export const AVAILABLE_GAMES: Game[] = [
       { code: 'BA', title: 'Break Attack', className: 'h-4 w-8' },
       { code: 'GI', title: 'Guard impact', className: 'h-4 w-8' },
       { code: 'LH', title: 'Lethal hit', className: 'h-4 w-8' },
-      { code: 'SC', title: 'Soulcharge', className: 'h-4 w-8' },
+      { code: 'SC', title: 'Costs Soulcharge', className: 'h-4 w-8' },
       { code: 'RE', title: 'Reversal edge', className: 'h-4 w-8' },
 
       // 1x1 icons

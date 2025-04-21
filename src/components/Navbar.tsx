@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Gamepad2, Sword, Command } from 'lucide-react';
-import { ThemeToggle } from './theme-toggle';
 import { useGame } from '../contexts/GameContext';
 import { useCommand } from '../contexts/CommandContext';
 import {
@@ -125,7 +124,6 @@ export const Navbar: React.FC = () => {
             <Command className="h-[1.2rem] w-[1.2rem]" />
             <span className="sr-only">Open Command Menu</span>
           </Button>
-          <ThemeToggle />
         </div>
       </div>
     </nav>

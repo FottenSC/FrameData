@@ -27,7 +27,7 @@ declare global {
 // Updated Move interface based on schema.sql and component usage
 interface Move {
   ID: number;
-  Command: string;
+  Command: string; // This will store the *translated* command
   Stance: string | null;
   HitLevel: string | null; // From schema (TEXT)
   Impact: number; // From schema (REAL)
@@ -44,6 +44,124 @@ interface Move {
 
 // Define sortable columns (using Move interface keys for type safety)
 type SortableColumn = keyof Move | 'Damage' | 'Hit' | 'CounterHit'; // Allow specific strings if needed for clarity/mapping
+
+// --- Translation Layer ---
+type TranslationMap = Record<string, string>;
+
+const soulCaliburButtonMappings: TranslationMap = {
+    ':(B+C):': ':(B+K):',
+    ':(B+D):': ':(B+G):',
+    ':(C+D):': ':(K+G):',
+    ':A+B+C:': ':A+B+K:',
+    ':A+D:': ':A+G:',
+    ':A+C:': ':A+K:',
+    ':B+C:': ':B+K:',
+    ':B+D:': ':B+G:',
+    ':C+D:': ':K+G:',
+    '(C)': '(K)',
+    ':C:': ':K:',
+    ':c:': ':k:',
+    '(D)': '(G)',
+    ':D:': ':G:',
+    ':d:': ':g:',
+};
+
+// Potentially add other reusable sets like:
+const tekkenButtonMappings: TranslationMap = {
+    ':2::3::6:': ':qcf:',     // Quarter Circle Forward
+    ':2::1::4:': ':qcb:',     // Quarter Circle Back
+    ':6::2::3:': ':dp:',      // Dragon Punch motion
+    ':4::1::2::3::6:': ':hcf:',   // Half Circle Forward
+    ':6::3::2::1::4:': ':hcb:',   // Half Circle Back
+
+    // Buttons
+    ':1:': ':LP:', // Left Punch
+    '2': 'RP', // Right Punch
+    '3': 'LK', // Left Kick
+    '4': 'RK', // Right Kick
+    '1+2': 'LP+RP',
+    '3+4': 'LK+RK',
+};
+
+// Define which maps each game uses, plus game-specific additions
+type GameMappingConfig = {
+  extends?: string[]; // List of module names to inherit from
+  specific?: TranslationMap; // Game-unique mappings
+};
+
+const gameMappingConfigurations: Record<string, GameMappingConfig> = {
+  'SoulCalibur6': {
+    extends: ['soulCaliburButtons'], // Use these modules - removed numpadMotions
+    specific: {}
+  },
+  // Example for another game:
+  'Tekken8': {
+    extends: ['tekkenButtonMappings'], // Use Tekken buttons - removed numpadMotions
+    specific: {} 
+  },
+  'default': { // Fallback configuration
+    extends: [],
+    specific: {}
+  }
+};
+
+// Helper map to access modules by name
+const availableMappingModules: Record<string, TranslationMap> = {
+  soulCaliburButtons: soulCaliburButtonMappings,
+  tekkenButtonMappings: tekkenButtonMappings,
+};
+
+// Helper function to build the final map for a game
+const getEffectiveTranslationMap = (gameId: string): TranslationMap => {
+  const config = gameMappingConfigurations[gameId] ?? gameMappingConfigurations.default;
+  let effectiveMap: TranslationMap = {};
+
+  // Add mappings from extended modules
+  if (config.extends) {
+    config.extends.forEach(moduleName => {
+      const moduleMap = availableMappingModules[moduleName];
+      if (moduleMap) {
+        effectiveMap = { ...effectiveMap, ...moduleMap };
+      }
+    });
+  }
+
+  // Add/override with game-specific mappings
+  if (config.specific) {
+    effectiveMap = { ...effectiveMap, ...config.specific };
+  }
+
+  return effectiveMap;
+};
+
+// Helper function to apply translations (Revised replacement logic)
+const translateString = (text: string | null, map: TranslationMap): string | null => {
+  if (text === null) {
+    return null;
+  }
+  let translatedText = text;
+  // Sort keys by length descending to replace longer sequences first (e.g., ':A+B+C:' before ':C:').
+  const sortedKeys = Object.keys(map).sort((a, b) => b.length - a.length);
+
+  for (const key of sortedKeys) {
+    // Escape the key for use in a regex
+    const escapedKey = key.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    // Create a global regex for the exact key string
+    const regex = new RegExp(escapedKey, 'g');
+    // Replace all global occurrences of the exact key
+    translatedText = translatedText.replace(regex, map[key]);
+  }
+
+  // Debug check for remaining 'C' or 'D'
+  /* if (translatedText && (translatedText.includes('C') || translatedText.includes('D'))) {
+    // Consider if this check should be game-specific, e.g., only for SoulCalibur
+    console.log(`Potential translation issue: Translated text still contains 'C' or 'D'. Original: "${text}", Translated: "${translatedText}"`);
+  } */
+
+
+  return translatedText;
+};
+// --- End Translation Layer ---
 
 export const FrameDataTable: React.FC = () => {
   const params = useParams<{ gameId?: string; characterName?: string }>();
@@ -90,9 +208,9 @@ export const FrameDataTable: React.FC = () => {
            navigate(`/${selectedGame.id}/${expectedUrlName}`, { replace: true }); 
         }
       }
-      // Optional: Handle case where selectedCharacterId is not in the current characters list (maybe clear it?)
     }
   }, [selectedCharacterId, characters, selectedGame.id, navigate, characterName]); // Include characterName to re-check after potential navigation
+
 
   // --- Effect 2: Handle Initial Load / URL Parameters -> State --- 
   useEffect(() => {
@@ -161,17 +279,6 @@ export const FrameDataTable: React.FC = () => {
         const uint8Array = new Uint8Array(arrayBuffer);
         const database = new SQL.Database(uint8Array);
         setDb(database); // Set DB state for move loading
-
-        // --- REMOVE Character Fetching --- 
-        // try {
-        //   const charactersResult = database.exec('SELECT ID, Name FROM Characters');
-        //   ...
-        //   setCharacters(charactersData); 
-        // } catch (charError) {
-        //    setCharacters([]);
-        // }
-        // --- End REMOVE Character Fetching ---
-
       } catch (error) {
         setError(error instanceof Error ? error.message : `Error loading database for ${selectedGame.name}`);
         setDb(null); // Clear DB on error
@@ -182,11 +289,7 @@ export const FrameDataTable: React.FC = () => {
     };
 
     loadDatabase();
-    
-    // Cleanup function could close DB if needed, but FrameDataTable might still use it
-    // return () => { db?.close(); }; // Consider cleanup implications
 
-  // Dependency only on dbPath. setCharacters removed.
   }, [selectedGame.dbPath]); // REMOVE setCharacters dependency
   
   // --- Effect 4: Load Moves (based on selectedCharacterId and db) --- 
@@ -217,15 +320,23 @@ export const FrameDataTable: React.FC = () => {
             const columns = movesResult[0].columns;
             const values = movesResult[0].values;
 
+            // Select the appropriate translation map based on the selected game
+            const currentTranslationMap = getEffectiveTranslationMap(selectedGame.id);
+
             const movesData: Move[] = values.map((row: unknown[]) => {
               const moveObject: Record<string, unknown> = {};
               columns.forEach((colName: string, index: number) => {
                 moveObject[colName] = row[index];
               });
 
+              const originalCommand = String(moveObject.Command);
+
+              // Apply translations ONLY to Command column using the selected map
+              const translatedCommand = translateString(originalCommand, currentTranslationMap);
+
               return {
                 ID: Number(moveObject.ID),
-                Command: String(moveObject.Command),
+                Command: translatedCommand, // Use translated command
                 Stance: moveObject.Stance ? String(moveObject.Stance) : null,
                 HitLevel: moveObject.HitLevel ? String(moveObject.HitLevel) : null,
                 Impact: Number(moveObject.Impact),
@@ -237,7 +348,7 @@ export const FrameDataTable: React.FC = () => {
                 CounterHitString: moveObject.CounterHit ? String(moveObject.CounterHit) : null, // Map original Counter Hit text
                 CounterHit: moveObject.CounterHitDec !== null && moveObject.CounterHitDec !== undefined ? Number(moveObject.CounterHitDec) : null, // Numeric value for badge (from CounterHitDec)
                 GuardBurst: moveObject.GuardBurst !== null && moveObject.GuardBurst !== undefined ? Number(moveObject.GuardBurst) : null,
-                Notes: moveObject.Notes ? String(moveObject.Notes) : null
+                Notes: moveObject.Notes ? String(moveObject.Notes) : null // Use original notes
               };
             });
             setOriginalMoves(movesData);

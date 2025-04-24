@@ -94,7 +94,7 @@ export const Navbar: React.FC = () => {
                           <SelectTrigger className="h-auto py-0 px-1.5 text-sm font-medium border-none shadow-none bg-transparent focus:ring-0 focus:ring-offset-0 w-auto min-w-[150px] text-foreground/80 hover:text-foreground transition-colors [&>span]:line-clamp-1">
                             <SelectValue placeholder="Select Character" />
                           </SelectTrigger>
-                          <SelectContent style={{ backgroundColor: 'hsl(0, 0%, 20%)' }}>
+                          <SelectContent>
                             {characters.map((character) => (
                               <SelectItem
                                 key={character.id}

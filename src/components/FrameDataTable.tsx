@@ -424,7 +424,7 @@ const DataTableContent: React.FC<DataTableContentProps> = ({
             </div>
           </TableHead>
           {/* Command Header */}
-          <TableHead className="min-w-[210px] max-w-[300px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Command')}>
+          <TableHead className="w-[200px] min-w-[210px] max-w-[300px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Command')}>
             <div className="flex items-center justify-between gap-1">
               <span>Command</span>
               {sortColumn === 'Command' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}

@@ -11,11 +11,12 @@ import {
 } from './ui/table';
 import { Button } from './ui/button';
 import { initializeDatabase } from '../utils/initializeDatabase';
-import { Loader2, Shield, ArrowUp, ArrowDown, ChevronDown } from 'lucide-react';
+import { Loader2, Shield, ArrowUp, ArrowDown, ChevronDown, ChevronRight } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { useGame, Character, AVAILABLE_GAMES } from '../contexts/GameContext';
 import { cn } from "@/lib/utils";
+import { FilterBuilder, ActiveFiltersBadge, FilterCondition } from './FilterBuilder';
 
 // Using the SQL.js loaded via CDN
 declare global {
@@ -194,6 +195,17 @@ export const FrameDataTable: React.FC = () => {
   const [expandedHitLevels, setExpandedHitLevels] = useState<Set<number>>(new Set());
   // Track previous expanded state to detect animation direction
   const [previouslyExpanded, setPreviouslyExpanded] = useState<Map<number, boolean>>(new Map());
+
+  // Add state for filters
+  const [activeFilters, setActiveFilters] = useState<FilterCondition[]>([]);
+
+  // Add state for filters visibility
+  const [filtersVisible, setFiltersVisible] = useState<boolean>(true);
+  
+  // Toggle filters visibility
+  const toggleFiltersVisibility = () => {
+    setFiltersVisible(prev => !prev);
+  };
 
   // --- Effect 1: Sync URL with selectedCharacterId from Context --- 
   useEffect(() => {
@@ -464,7 +476,7 @@ export const FrameDataTable: React.FC = () => {
         ))}
         
         {showEllipsis && (
-          <ChevronDown size={16} className="text-muted-foreground ml-1" />
+          <ChevronRight size={16} className="text-muted-foreground ml-1" />
         )}
       </div>
     );
@@ -575,10 +587,75 @@ export const FrameDataTable: React.FC = () => {
     return parts;
   };
 
+  // Helper function to get field value based on field name
+  const getFieldValue = (move: Move, fieldName: string): any => {
+    switch (fieldName) {
+      case 'Damage':
+        return move.DamageDec;
+      case 'Hit':
+        return move.Hit;
+      case 'CounterHit':
+        return move.CounterHit;
+      default:
+        return move[fieldName as keyof Move];
+    }
+  };
+
   // compute displayedMoves via memoization instead of state
   const displayedMoves = React.useMemo(() => {
-    if (!sortColumn) return originalMoves;
-    const sorted = [...originalMoves].sort((a, b) => {
+    // First, apply filters
+    let filteredMoves = [...originalMoves];
+    
+    if (activeFilters.length > 0) {
+      filteredMoves = filteredMoves.filter(move => {
+        // All filters must match (AND logic)
+        return activeFilters.every(filter => {
+          const fieldValue = getFieldValue(move, filter.field);
+          if (fieldValue === null || fieldValue === undefined) return false;
+          
+          const fieldValueStr = String(fieldValue).toLowerCase();
+          const filterValueLower = filter.value.toLowerCase();
+          
+          switch (filter.condition) {
+            case 'equals':
+              return fieldValueStr === filterValueLower;
+            case 'notEquals':
+              return fieldValueStr !== filterValueLower;
+            case 'greaterThan':
+              return !isNaN(Number(fieldValue)) && !isNaN(Number(filter.value)) && 
+                     Number(fieldValue) > Number(filter.value);
+            case 'lessThan':
+              return !isNaN(Number(fieldValue)) && !isNaN(Number(filter.value)) && 
+                     Number(fieldValue) < Number(filter.value);
+            case 'between':
+              if (!filter.value2) return false;
+              const min = Number(filter.value);
+              const max = Number(filter.value2);
+              const val = Number(fieldValue);
+              return !isNaN(min) && !isNaN(max) && !isNaN(val) && 
+                     val >= min && val <= max;
+            case 'notBetween':
+              if (!filter.value2) return false;
+              const notMin = Number(filter.value);
+              const notMax = Number(filter.value2);
+              const notVal = Number(fieldValue);
+              return !isNaN(notMin) && !isNaN(notMax) && !isNaN(notVal) && 
+                     (notVal < notMin || notVal > notMax);
+            case 'contains':
+              return fieldValueStr.includes(filterValueLower);
+            case 'startsWith':
+              return fieldValueStr.startsWith(filterValueLower);
+            default:
+              return true;
+          }
+        });
+      });
+    }
+    
+    // Then apply sorting
+    if (!sortColumn) return filteredMoves;
+    
+    const sorted = [...filteredMoves].sort((a, b) => {
       let valA: any;
       let valB: any;
       switch (sortColumn) {
@@ -606,7 +683,72 @@ export const FrameDataTable: React.FC = () => {
       return 0;
     });
     return sorted;
-  }, [originalMoves, sortColumn, sortDirection]);
+  }, [originalMoves, sortColumn, sortDirection, activeFilters]);
+
+  // Handle filter changes
+  const handleFiltersChange = (filters: FilterCondition[]) => {
+    setActiveFilters(filters);
+  };
+
+  // Inject CSS styles for transitions
+  useEffect(() => {
+    const styleEl = document.createElement('style');
+    styleEl.innerHTML = `
+      .filter-container {
+        transition: all 0.25s ease-in-out;
+        transform-origin: top center;
+      }
+      
+      .filter-container.visible {
+        opacity: 1;
+        transform: scaleY(1);
+        margin-top: 12px;
+        pointer-events: all;
+      }
+      
+      .filter-container.hidden {
+        opacity: 0;
+        transform: scaleY(0);
+        margin-top: 0;
+        max-height: 0;
+        pointer-events: none;
+      }
+      
+      /* Special case for empty filters */
+      .filter-container.empty.visible {
+        transition: all 0.1s ease-out;
+      }
+      
+      .filter-container.empty.hidden {
+        transition: all 0.1s ease-in;
+      }
+      
+      .title-interactive {
+        position: relative;
+        padding: 6px 10px;
+        margin: -6px -10px;
+        border-radius: 4px;
+        transition: background-color 0.2s ease;
+      }
+      
+      .title-interactive:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+      
+      .title-interactive:active {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+    `;
+    
+    document.head.appendChild(styleEl);
+    
+    // Return cleanup function
+    return () => {
+      if (styleEl && document.head.contains(styleEl)) {
+        document.head.removeChild(styleEl);
+      }
+    };
+  }, []);
 
   if (loading) {
     return (
@@ -666,12 +808,35 @@ export const FrameDataTable: React.FC = () => {
       {selectedCharacterId ? (
         <Card className="h-full flex flex-col overflow-hidden border border-card-border">
           <CardHeader className="pb-2 flex-shrink-0">
-            <CardTitle>
-              {selectedCharacterNameFromContext || 'Character'} Frame Data 
-            </CardTitle>
-            <CardDescription>
-              Total Moves: {displayedMoves.length}
-            </CardDescription>
+            <div className="flex justify-between items-center">
+              <div 
+                className="flex items-center cursor-pointer group title-interactive" 
+                onClick={toggleFiltersVisibility}
+                title={filtersVisible ? "Click to hide filters" : "Click to show filters"}
+              >
+                <CardTitle className="flex items-center">
+                  {selectedCharacterNameFromContext || 'Character'} Frame Data
+                  <ChevronRight 
+                    className={cn(
+                      "ml-2 h-4 w-4 text-muted-foreground transition-transform duration-200 group-hover:text-foreground",
+                      filtersVisible ? "transform rotate-90" : ""
+                    )} 
+                  />
+                </CardTitle>
+                <ActiveFiltersBadge count={activeFilters.length} />
+              </div>
+              <CardDescription className="m-0">
+                Total Moves: {displayedMoves.length} {originalMoves.length !== displayedMoves.length ? 
+                  `(filtered from ${originalMoves.length})` : ''}
+              </CardDescription>
+            </div>
+            
+            <div className={`filter-container ${filtersVisible ? 'visible' : 'hidden'} ${activeFilters.length === 0 ? 'empty' : ''}`}>
+              <FilterBuilder 
+                onFiltersChange={handleFiltersChange} 
+                moves={originalMoves}
+              />
+            </div>
           </CardHeader>
           <CardContent className="flex-grow p-0 flex flex-col overflow-visible">
             <div className="overflow-y-auto flex-grow">

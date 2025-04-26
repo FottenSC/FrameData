@@ -213,7 +213,7 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.length]); // Dependency on addFilter removed as it's memoized now
 
-  // Add a new empty filter (memoized)
+  // --- Memoized Callbacks for filter manipulation ---
   const addFilter = useCallback(() => {
     const newFilter: FilterCondition = {
       id: `filter-${Date.now()}`,
@@ -225,7 +225,6 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(({
     setFilters(prevFilters => [...prevFilters, newFilter]);
   }, []); // No dependencies
 
-  // Remove a filter (memoized)
   const removeFilter = useCallback((id: string) => {
     setFilters(currentFilters => {
         if (currentFilters.length === 1) {
@@ -238,32 +237,48 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(({
     });
   }, []); // No dependencies
 
-  // Update a filter property (memoized)
+  // updateFilter depends on helpers
   const updateFilter = useCallback((id: string, property: keyof FilterCondition, value: string) => {
-    setFilters(prevFilters => 
+    setFilters(prevFilters =>
       prevFilters.map(filter => {
         if (filter.id === id) {
           const updatedFilter = { ...filter, [property]: value };
-          
-          if (property === 'field') {
-            const availableConditions = getAvailableConditions(value);
-            if (!availableConditions.some(c => c.value === filter.condition)) {
-              updatedFilter.condition = availableConditions[0]?.value || 'equals';
-            }
-            updatedFilter.value = '';
-            updatedFilter.value2 = '';
-          }
-          
-          if (property === 'condition' && !isRangeCondition(value) && isRangeCondition(filter.condition)) {
-             updatedFilter.value2 = '';
-          }
+          const checkIsRange = (cond: string) => cond === 'between' || cond === 'notBetween';
 
+          if (property === 'field') {
+            // Get types of old and new fields
+            const oldFieldType = getFieldType(filter.field); 
+            const newFieldType = getFieldType(value);      
+
+            // Check and update condition if needed for the new field type
+            const available = conditionOptions.filter(c => c.appliesTo.includes(newFieldType));
+            if (!available.some(c => c.value === filter.condition)) {
+              updatedFilter.condition = available[0]?.value || 'equals';
+            }
+
+            // Reset values ONLY if field types are incompatible
+            if (oldFieldType !== newFieldType) {
+              updatedFilter.value = '';
+              updatedFilter.value2 = '';
+            } 
+            // If types match, existing values in updatedFilter remain untouched
+
+          } else if (property === 'condition') {
+            // Clear value2 if switching away from a range condition
+            if (!checkIsRange(value) && checkIsRange(filter.condition)) {
+               updatedFilter.value2 = '';
+            }
+          }
+          // No special logic needed when just 'value' or 'value2' changes
+          
           return updatedFilter;
         }
         return filter;
       })
     );
-  }, [getAvailableConditions, isRangeCondition]); // Dependencies added
+  // Depend only on stable getFieldType
+  }, [getFieldType]); 
+  // --- End Memoized Callbacks ---
 
   // Memoize the active filter count based on the *memoized* active filters array
   const activeFilterCount = useMemo(() => {

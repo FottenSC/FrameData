@@ -57,6 +57,12 @@ export const AVAILABLE_GAMES: Game[] = [
 
       // Icons im unsure about
       { code: 'AT', title: 'Attack Throw???', className: 'h-4 w-8' },
+      
+      // Game Buttons (assuming 1x1 size, adjust className if needed)
+      { code: 'A', title: 'A Button' },
+      { code: 'B', title: 'B Button' },
+      { code: 'K', title: 'K Button' }, 
+      { code: 'G', title: 'G Button' },
     ],
   },
   {
@@ -70,6 +76,13 @@ export const AVAILABLE_GAMES: Game[] = [
       { code: 'RK', title: 'Right Kick' },
     ],
   },
+];
+
+// Define universally available directional icons (without titles)
+const DIRECTIONAL_ICONS: Pick<IconConfig, 'code' | 'className'>[] = [
+  { code: '1' }, { code: '2' }, { code: '3' }, 
+  { code: '4' }, { code: '5' }, { code: '6' }, 
+  { code: '7' }, { code: '8' }, { code: '9' },
 ];
 
 // Declare initSqlJs globally
@@ -90,8 +103,8 @@ interface GameContextType {
   setSelectedCharacterId: (id: number | null) => void;
   /** Icon configurations available for the current game */
   availableIcons: IconConfig[];
-  /** Return the URL for a named icon in the current game */
-  getIconUrl: (iconName: string) => string;
+  /** Return the URL for a named icon in the current game, accounting for held state */
+  getIconUrl: (iconName: string, isHeld?: boolean) => string;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -185,6 +198,30 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     }
   };
 
+  // Combine game-specific icons with universal directional icons
+  // Use a Map to handle potential duplicates, giving priority to game-specific icons
+  const combinedIconsMap = new Map<string, IconConfig>();
+  DIRECTIONAL_ICONS.forEach(icon => combinedIconsMap.set(icon.code, icon as IconConfig)); // Add directionals first
+  (selectedGame.icons || []).forEach(icon => combinedIconsMap.set(icon.code, icon)); // Game-specific override/add
+  
+  const combinedIcons = Array.from(combinedIconsMap.values());
+
+  const getIconUrl = (iconName: string, isHeld: boolean = false): string => {
+    const upperIconName = iconName.toUpperCase();
+    // Check if the code exists in our DIRECTIONAL_ICONS array
+    const isDirectional = DIRECTIONAL_ICONS.some(icon => icon.code.toUpperCase() === upperIconName);
+    
+    if (isDirectional) {
+      // Use the shared /Icons/ path for all directionals
+      const baseFilename = upperIconName;
+      const filename = isHeld ? `(${baseFilename}).svg` : `${baseFilename}.svg`;
+      return `/Icons/${filename}`;
+    } else {
+      // Otherwise, use the game-specific path (assuming non-directionals don't have held versions)
+      return `/${selectedGame.id}/Icons/${upperIconName}.svg`;
+    }
+  };
+
   const contextValue: GameContextType = {
     selectedGame,
     setSelectedGameById: handleSetSelectedGameById,
@@ -194,8 +231,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     setCharacters,
     selectedCharacterId,
     setSelectedCharacterId: handleSetSelectedCharacterId,
-    availableIcons: selectedGame.icons || [],
-    getIconUrl: (iconName: string) => `/${selectedGame.id}/Icons/${iconName}.svg`,
+    availableIcons: combinedIcons, // Use the combined list
+    getIconUrl: getIconUrl, // Use the updated function
   };
 
   return (

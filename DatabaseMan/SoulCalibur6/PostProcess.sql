@@ -82,7 +82,7 @@ WHERE
 	M.Notes like '%:LH:%'
 ;
 
-
+-- #TODO: 236 icons todo
 
 -- Translate to universal command format
 PRAGMA case_sensitive_like = ON;

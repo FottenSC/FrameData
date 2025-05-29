@@ -49,11 +49,10 @@ export const AVAILABLE_GAMES: Game[] = [
       { code: 'RE', title: 'Reversal edge', className: 'h-4 w-8' },
 
       // 1x1 icons
-      { code: 'H', title: 'Guard Crush' },
-      { code: 'M', title: 'Guard Crush' },
-      { code: 'L', title: 'Guard Crush' },
-      { code: 'SM', title: 'Guard Crush' },
-      { code: 'GC', title: 'Guard Crush' },
+      { code: 'H', title: 'H' },
+      { code: 'M', title: 'M' },
+      { code: 'L', title: 'L' },
+      { code: 'SM', title: 'SM' },
 
       // Icons im unsure about
       { code: 'AT', title: 'Attack Throw???', className: 'h-4 w-8' },
@@ -208,18 +207,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
   const getIconUrl = (iconName: string, isHeld: boolean = false): string => {
     const upperIconName = iconName.toUpperCase();
-    // Check if the code exists in our DIRECTIONAL_ICONS array
-    const isDirectional = DIRECTIONAL_ICONS.some(icon => icon.code.toUpperCase() === upperIconName);
-    
-    if (isDirectional) {
-      // Use the shared /Icons/ path for all directionals
-      const baseFilename = upperIconName;
-      const filename = isHeld ? `(${baseFilename}).svg` : `${baseFilename}.svg`;
-      return `/Icons/${filename}`;
-    } else {
-      // Otherwise, use the game-specific path (assuming non-directionals don't have held versions)
-      return `/${selectedGame.id}/Icons/${upperIconName}.svg`;
-    }
+    return `/${selectedGame.id}/Icons/${upperIconName}.svg`;
   };
 
   const contextValue: GameContextType = {

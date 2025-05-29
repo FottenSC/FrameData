@@ -17,6 +17,7 @@ import { Badge } from './ui/badge';
 import { useGame, Character, AVAILABLE_GAMES, IconConfig } from '../contexts/GameContext';
 import { cn } from "@/lib/utils";
 import { FilterBuilder, ActiveFiltersBadge, FilterCondition } from './FilterBuilder';
+import { CommandIcon } from '@/components/ui/CommandIcon';
 
 // Using the SQL.js loaded via CDN
 declare global {
@@ -336,42 +337,6 @@ const ExpandableHitLevels = React.memo(({
   );
 });
 
-// Define a self-contained button icon component
-const ButtonIcon = React.memo(({ code, isHeld, isSlide }: { 
-  code: string, 
-  isHeld: boolean, 
-  isSlide: boolean 
-}) => {
-  const letter = code.toUpperCase();
-  
-  // Base styles
-  let baseClasses = "border border-black bg-white text-black rounded";
-  // Held styles override base
-  let heldClasses = "bg-black text-white border-white"; // Use white border for held for contrast
-
-  // Size classes based on slide input
-  const sizeClasses = isSlide ? "w-3 h-3 text-[10px]" : "w-5 h-5 text-sm";
-  // Margin classes based on slide input
-  const marginClasses = isSlide ? "" : "mx-0.25"; // Remove margin for slide input
-
-  return (
-    <div
-      className={cn(
-        "inline-flex items-center justify-center font-bold align-middle", // Base layout, kept align-middle for internal centering
-        sizeClasses, // Size based on case
-        marginClasses, // Margin based on case
-        isSlide ? "self-end" : "", // Align slide icons to bottom
-        "button-icon",
-        "relative z-10",
-        isHeld ? heldClasses : baseClasses
-      )}
-      title={`${letter} Button${isHeld ? ' (Held)' : ''}`}
-    >
-      {letter}
-    </div>
-  );
-});
-
 // --- End Standalone UI Components ---
 
 // --- Memoized Table Content Component ---
@@ -427,6 +392,13 @@ const DataTableContent: React.FC<DataTableContentProps> = ({
           <TableHead className="w-[200px] min-w-[210px] max-w-[300px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Command')}>
             <div className="flex items-center justify-between gap-1">
               <span>Command</span>
+              {sortColumn === 'Command' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+            </div>
+          </TableHead>
+          {/* Raw Command Header */}
+          <TableHead className="w-[200px] min-w-[210px] max-w-[300px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('OriginalCommand')}>
+            <div className="flex items-center justify-between gap-1">
+              <span>Raw Command</span>
               {sortColumn === 'Command' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
             </div>
           </TableHead>
@@ -491,7 +463,7 @@ const DataTableContent: React.FC<DataTableContentProps> = ({
       <TableBody>
         {movesLoading ? (
           <TableRow>
-            <TableCell colSpan={10} className="text-center h-24 p-2">
+            <TableCell colSpan={11} className="text-center h-24 p-2">
               <div className="flex justify-center items-center">
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground mr-2" />
                 Loading moves...
@@ -500,7 +472,7 @@ const DataTableContent: React.FC<DataTableContentProps> = ({
           </TableRow>
         ) : moves.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={10} className="text-center h-24 p-2">
+            <TableCell colSpan={11} className="text-center h-24 p-2">
               No moves found for this character or filter criteria.
             </TableCell>
           </TableRow>
@@ -513,6 +485,9 @@ const DataTableContent: React.FC<DataTableContentProps> = ({
               <TableCell className="text-right p-2">{move.Stance || '—'}</TableCell>
               <TableCell className="font-mono p-2 max-w-[300px] break-words">
                 {renderCommand(move.Command)}
+              </TableCell>
+              <TableCell className="font-mono p-2 max-w-[300px] break-words">
+                {move.Command || '—'}
               </TableCell>
               <TableCell className="p-2 min-w-[135px] max-w-[150px] align-top">
                 {/* Use the passed component */}
@@ -781,136 +756,39 @@ export const FrameDataTable: React.FC = () => {
   const renderCommand = useCallback((command: string | null) => {
     if (!command) { return '—'; }
 
+    ///let test = ":2::1::4::A::A::A::A::A+B:"
     const parts: React.ReactNode[] = [];
-    // Build regex dynamically based on ALL available game icons from context
-    const allIconCodes = availableIcons.map(ic => ic.code);
+    const commandArray = command.match(/(?<=:)[^:]+(?=:)/g) || [];
+    for (let i = 0; i < commandArray.length; i++) {
+        let isSlide = false;
+        let isHeld = false;
+        const buttons = commandArray[i];
+        for (let button of buttons.split("+")) {
+            if(button[0] === "(") {
+                isHeld = true;
+                button = button.replace(/[()]/g, '');
+            } 
 
-    if (allIconCodes.length === 0) { 
-      return command; // No icons configured, return original text
-    }
-
-    // Define which codes should use the ButtonIcon component
-    const buttonCodes = new Set(['A', 'B', 'K', 'G']); // Add more if needed
-
-    // General pattern for allowed characters in codes (adjust if needed)
-    const codeCharPattern = '[A-Z0-9]+'; 
-    // Regex to match sequences like :A:, :B+K:, :(A+B+K):, :UA:, etc.
-    // Captures: 1=optional '(', 2=code sequence (e.g., "A", "B+K", "UA"), 3=optional ')'
-    const regex = new RegExp(`:(\\()?(${codeCharPattern}(?:[+]${codeCharPattern})*)(\\))?:`, 'gi'); 
-
-    let lastIndex = 0;
-    let match: RegExpExecArray | null;
-
-    while ((match = regex.exec(command))) {
-      const [fullMatch, openParen, codeSequence, closeParen] = match;
-      const start = match.index;
-
-      // Push text before the current match
-      if (start > lastIndex) {
-        parts.push(command.slice(lastIndex, start));
-      }
-
-      // Check if codeSequence was captured (valid match)
-      if (codeSequence !== undefined) {
-        const isHeld = !!(openParen && closeParen);
-        
-        // Check if it contains a plus sign for combined buttons
-        if (codeSequence.includes('+')) {
-          const combinedCodes = codeSequence.split('+');
-          combinedCodes.forEach((code, index) => {
-            // Check original case to determine if it's a slide input
-            const isSlide = code !== code.toUpperCase(); // Check original case, renamed variable
-            // Ensure the individual code part is a known button code
-            if (buttonCodes.has(code.toUpperCase())) {
-              parts.push(<ButtonIcon key={`${code}-${start}-${index}-${isHeld}-${isSlide}`} code={code} isHeld={isHeld} isSlide={isSlide} />); // Pass isSlide
-              if (index < combinedCodes.length - 1) {
-                // Add styled '+' separator circle that overlaps
-                parts.push(
-                  <span 
-                    key={`plus-${start}-${index}`} 
-                    className="inline-flex items-center justify-center w-3 h-3 rounded-full bg-white text-black border border-black text-xs font-bold z-20 -ml-1.5 -mr-1.5 plus-separator relative" // Reverted to w-3 h-3, adjusted margins
-                  >
-                    +
-                  </span>
-                );
-              }
-            } else {
-              // If part of a combined sequence isn't a button, render the original text part
-              console.warn('renderCommand: Non-button code found in combined sequence:', code, codeSequence);
-              // Render the problematic code part as text, potentially with surrounding separators?
-              // For now, just pushing the original full match might be safest fallback
-              // To avoid duplication, check if already pushed
-              if (parts[parts.length - 1] !== fullMatch) { 
-                 parts.push(fullMatch);
-              }
-              // Bail out of processing this specific combined sequence
-              return; // Exit forEach early
+            if(button === "_") {
+                parts.push(<span className="inline-flex items-center flex-wrap ml-[-3px] mr-[-3px]">|</span>);
             }
-          });
-        } else { 
-          // --- Process Single Code (no plus sign) ---
-          const singleCode = codeSequence; 
-          // Check original case to determine if it's a slide input
-          const isSlide = singleCode !== singleCode.toUpperCase(); // Check original case, renamed variable
-          // Check if it's a button code to render ButtonIcon
-          if (buttonCodes.has(singleCode.toUpperCase())) {
-            parts.push(<ButtonIcon key={`${singleCode}-${start}-${isHeld}-${isSlide}`} code={singleCode} isHeld={isHeld} isSlide={isSlide} />); // Pass isSlide
-          } else {
-            // Otherwise, check if it's a known SVG icon code from context
-            const iconConfig = availableIcons.find(ic => ic.code.toUpperCase() === singleCode.toUpperCase());
-            if (iconConfig) {
-              // Render as an SVG image using context config
-              const titleText = getIconTooltip(singleCode, availableIcons);
-              // Determine size based on slide input and icon type
-              let svgSizeClass = "h-4 w-4"; // Default size
-              if (isSlide) {
-                svgSizeClass = "h-2 w-2"; // Slide size
-              } else if (/^[1-9]$/.test(singleCode)) {
-                svgSizeClass = "h-5 w-5"; // Directional icon size matches ButtonIcon
-              }
-              // Determine margin based on slide input or if it's a directional icon
-              const svgMarginClass = (isSlide || /^[1-9]$/.test(singleCode)) ? "" : "mx-0.5"; // Remove margin for slide OR directional
-              const classes = cn(
-                "inline object-contain align-middle", // Base layout for SVGs
-                svgSizeClass, // Size based on case
-                isSlide ? "self-end" : "", // Align slide icons to bottom
-                iconConfig.className, // Game-specific overrides from context
-                svgMarginClass // Margin based on case
-              );
-              parts.push(
-                <img
-                  key={`${singleCode}-${start}-${isSlide}-${isHeld}`}
-                  src={getIconUrl(singleCode, isHeld)} // Pass isHeld to getIconUrl
-                  alt={singleCode}
-                  title={titleText}
-                  className={cn(classes, svgMarginClass)}
-                />
-              );
+            else if(!isNaN(button[0] as any)) { // Is direction
+                let icon: string;
+                icon = `/Icons/${isHeld ? "Held" : ""}${button}.svg`
+                parts.push(<img src={icon} alt={icon} className="inline object-contain align-text-bottom h-4 w-4" />);
             } else {
-              // Fallback: Code not recognized as button or SVG icon, render original text.
-              console.warn('renderCommand: Unrecognized single code sequence:', singleCode);
-              parts.push(fullMatch);
+                if(button[0] === button[0].toLowerCase()) {
+                    isSlide = true;
+                }
+                parts.push(<CommandIcon input={button} isHeld={isHeld} isSlide={isSlide} />);
             }
-          }
-          // --- End Process Single Code ---
+
         }
-      } else {
-        // Invalid match structure (should be rare with the new regex) - Treat as literal text
-        console.warn('renderCommand: Regex matched invalid sequence structure. Treating as text:', { fullMatch, command });
-        parts.push(fullMatch); 
-      }
-      
-      // Update lastIndex for the next iteration
-      lastIndex = regex.lastIndex;
     }
-    // Push any remaining text after the last match
-    if (lastIndex < command.length) {
-      parts.push(command.slice(lastIndex));
-    }
-    
-    // Wrap the entire sequence in a flex container, aligning items to the center vertically
+
     return <span className="inline-flex items-center flex-wrap">{parts}</span>;
-  }, [availableIcons, getIconUrl]); // Dependencies: availableIcons, getIconUrl
+  }, []);
+
 
   // Helper to render Notes text with inline icons (Memoized)
   const renderNotes = useCallback((note: string | null) => {
@@ -1067,10 +945,7 @@ export const FrameDataTable: React.FC = () => {
       .then(data => {
         setDeployTimestamp(data.timestamp);
       })
-      .catch(err => {
-        // Failed to load timestamp, no debug logging
-        setDeployTimestamp("Unknown");
-      });
+      .catch(err => {setDeployTimestamp("Unknown");});
   }, []);
 
   // Inject CSS styles for transitions

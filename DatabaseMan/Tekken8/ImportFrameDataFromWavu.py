@@ -11,13 +11,10 @@ import sys
 BASE_URL = "https://wavu.wiki/w/api.php"
 # List based on Wavu Wiki T8 page, adjust if roster changes/needs refinement
 CHARACTERS = [
-    "Alisa", "Asuka", "Azucena", "Bryan", "Claudio", "Devil_Jin", "Dragunov",
-    "Feng", "Hwoarang", "Jack-8", "Jin", "Jun", "Kazuya", "King", "Kuma",
-    "Lars", "Law", "Lee", "Leo", "Leroy", "Lili", "Nina", "Panda", "Paul",
-    "Raven", "Reina", "Shaheen", "Steve", "Victor", "Xiaoyu", "Yoshimitsu",
-    "Zafina",
-    # Add confirmed DLC characters here when available on Wavu
-    # "Anna", "Eddy", "Lidia" - Check if pages exist and are T8 versions
+    "Alisa", "Anna", "Asuka", "Azucena", "Bryan", "Claudio", "Clive", "Devil_Jin", "Dragunov",
+    "Eddy", "Feng", "Heihachi", "Hwoarang", "Jack-8", "Jin", "Jun", "Kazuya", "King", "Kuma",
+    "Lars", "Law", "Lee", "Leo", "Leroy", "Lidia", "Lili", "Nina", "Panda", "Paul",
+    "Raven", "Reina", "Shaheen", "Steve", "Victor", "Xiaoyu", "Yoshimitsu", "Zafina"
 ]
 
 # Standard Tekken frame data headers (used as fallback if detection fails)

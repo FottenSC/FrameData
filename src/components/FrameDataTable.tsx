@@ -15,6 +15,7 @@ import { Loader2, Shield, ArrowUp, ArrowDown, ChevronDown, ChevronRight } from '
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { useGame, Character, AVAILABLE_GAMES, IconConfig } from '../contexts/GameContext';
+import { useTableConfig } from '../contexts/TableConfigContext';
 import { cn } from "@/lib/utils";
 import { FilterBuilder, ActiveFiltersBadge, FilterCondition } from './FilterBuilder';
 import { CommandIcon } from '@/components/ui/CommandIcon';
@@ -29,23 +30,23 @@ declare global {
 // Updated Move interface based on schema.sql and component usage
 interface Move {
   ID: number;
-  Command: string; // This will store the *translated* command
+  Command: string; // Translated command
   Stance: string | null;
-  HitLevel: string | null; // From schema (TEXT)
-  Impact: number; // From schema (REAL)
-  Damage: string | null; // Original string representation
-  DamageDec: number | null; // Decimal representation for display
-  Block: number | null; // For badge rendering, mapped from BlockDec
-  HitString: string | null; // Original Hit text
-  Hit: number | null; // For badge rendering, mapped from HitDec
-  CounterHitString: string | null; // Original Counter Hit text
-  CounterHit: number | null; // For badge rendering, mapped from CounterHitDeci
-  GuardBurst: number | null; // From schema (INTEGER)
-  Notes: string | null; // From schema
+  HitLevel: string | null;
+  Impact: number;
+  Damage: string | null;
+  DamageDec: number | null;
+  Block: number | null;
+  HitString: string | null;
+  Hit: number | null;
+  CounterHitString: string | null;
+  CounterHit: number | null;
+  GuardBurst: number | null;
+  Notes: string | null;
 }
 
 // Define sortable columns (using Move interface keys for type safety)
-type SortableColumn = keyof Move | 'Damage' | 'Hit' | 'CounterHit' | 'OriginalCommand'; // Allow specific strings if needed for clarity/mapping
+type SortableColumn = keyof Move | 'Damage' | 'Hit' | 'CounterHit' | 'OriginalCommand';
 
 // --- Translation Layer ---
 type TranslationMap = Record<string, string>;
@@ -142,24 +143,14 @@ const translateString = (text: string | null, map: TranslationMap): string | nul
     return null;
   }
   let translatedText = text;
-  // Sort keys by length descending to replace longer sequences first (e.g., ':A+B+C:' before ':C:').
+  // Sort keys by length descending to replace longer sequences first
   const sortedKeys = Object.keys(map).sort((a, b) => b.length - a.length);
 
   for (const key of sortedKeys) {
-    // Escape the key for use in a regex
     const escapedKey = key.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-    // Create a global regex for the exact key string
     const regex = new RegExp(escapedKey, 'g');
-    // Replace all global occurrences of the exact key
     translatedText = translatedText.replace(regex, map[key]);
   }
-
-  // Debug check for remaining 'C' or 'D'
-  /* if (translatedText && (translatedText.includes('C') || translatedText.includes('D'))) {
-    // Consider if this check should be game-specific, e.g., only for SoulCalibur
-    console.log(`Potential translation issue: Translated text still contains 'C' or 'D'. Original: "${text}", Translated: "${translatedText}"`);
-  } */
-
 
   return translatedText;
 };
@@ -183,35 +174,30 @@ const getIconTooltip = (iconCode: string, availableIcons: IconConfig[]): string 
 
   const upperCode = iconCode.toUpperCase();
 
-  // Check directional tooltips first
   if (directionTooltips[upperCode]) {
     return directionTooltips[upperCode];
   }
 
-  // Then, try to find the icon in the context for game-specific tooltips
   const iconConfig = availableIcons.find(icon => icon.code.toUpperCase() === upperCode);
   if (iconConfig && iconConfig.title) {
     return iconConfig.title;
   }
 
-  // Fallback to the code itself if no tooltip is found
   return upperCode;
 };
 
 // Combined badge rendering function (Moved outside component)
 const renderBadge = (value: number | null, text: string | null, forceNoSign: boolean = false): React.ReactNode => {
-  // Determine display text: Use text if available, otherwise format value, fallback to '—'
   let displayText: string;
   if (text !== null && text !== undefined) {
     displayText = text;
   } else if (value !== null && value !== undefined) {
-    // Only add '+' if value > 0 AND forceNoSign is false
     displayText = (!forceNoSign && value > 0 ? '+' : '') + value; 
   } else {
     displayText = '—';
   }
 
-  // Check for special strings first
+  // Special status strings
   if (text === 'KND') {
     return <Badge className="bg-fuchsia-700 text-white w-12 inline-flex items-center justify-center">{displayText}</Badge>;
   }
@@ -222,16 +208,14 @@ const renderBadge = (value: number | null, text: string | null, forceNoSign: boo
     return <Badge className="bg-rose-700 text-white w-12 inline-flex items-center justify-center">{displayText}</Badge>;
   }
 
-  // Fallback to frame advantage logic based on the numeric value
   if (value === null || value === undefined) {
-    // Use neutral Tailwind classes for unknown/null state
     return <Badge className="bg-gray-500 hover:bg-gray-600 text-white w-12 inline-flex items-center justify-center">{displayText}</Badge>; 
   }
 
-  // Use Tailwind classes based on numeric value
-  if (value >= 0) { // Includes 0
+  // Frame advantage coloring
+  if (value >= 0) {
     return <Badge className="bg-green-700 text-white w-12 inline-flex items-center justify-center">{displayText}</Badge>;
-  } else { // value < 0
+  } else {
     return <Badge className="bg-rose-700 text-white w-12 inline-flex items-center justify-center">{displayText}</Badge>;
   }
 };
@@ -252,9 +236,6 @@ const HitLevelIcon = React.memo(({ level }: { level: string }) => {
     case 'SM': bgColor = 'bg-purple-500'; break;
     case 'SL': bgColor = 'bg-cyan-500'; break; 
     case 'SH': bgColor = 'bg-orange-500'; break;
-    default:
-      // Unknown hit level, no debug logging
-      break;
   }
 
   return (
@@ -276,48 +257,37 @@ const HitLevelIcon = React.memo(({ level }: { level: string }) => {
 // Define a self-contained component for expandable hit levels
 const ExpandableHitLevels = React.memo(({ 
   hitLevelString, 
-  maxIconsToShow = 3 // Default remains 3 for the 5+ case
+  maxIconsToShow = 3
 }: { 
   hitLevelString: string | null, 
   maxIconsToShow?: number 
 }) => {
-  // Local state for this specific instance
   const [isExpanded, setIsExpanded] = React.useState(false);
   
-  // Parse hit levels
   const levels = React.useMemo(() => {
     if (!hitLevelString) return [];
     return hitLevelString.split(/:+/).map(level => level.trim()).filter(Boolean);
   }, [hitLevelString]);
   
-  // --- Updated Expansion Logic ---
-  // Expand only if there are more levels than maxIconsToShow + 1
   const canExpand = levels.length > maxIconsToShow + 1;
   
-  // Handle toggle expansion
   const handleToggle = React.useCallback(() => {
     if (!canExpand) return;
     setIsExpanded(prev => !prev);
   }, [canExpand]);
   
-  // If no levels, show placeholder
   if (levels.length === 0) {
     return <span className="text-muted-foreground">—</span>;
   }
   
-  // Determine how many icons to show based on expanded state and total count
   let iconsToShow: number;
   if (levels.length <= maxIconsToShow + 1) {
-    // Show all icons if the count is within the threshold (maxIconsToShow + 1)
     iconsToShow = levels.length;
   } else {
-    // If more than the threshold, show maxIconsToShow initially, or all if expanded
     iconsToShow = isExpanded ? levels.length : maxIconsToShow;
   }
   
-  // Show ellipsis only when it can expand and is not expanded
   const showEllipsis = canExpand && !isExpanded;
-  // --- End Updated Expansion Logic ---
   
   return (
     <div 
@@ -348,12 +318,9 @@ interface DataTableContentProps {
   handleSort: (column: SortableColumn) => void;
   renderCommand: (command: string | null) => React.ReactNode;
   renderNotes: (note: string | null) => React.ReactNode;
-  // Pass the component type for ExpandableHitLevels
   ExpandableHitLevelsComponent: typeof ExpandableHitLevels; 
+  visibleColumns: any[];
 }
-
-// Define ExpandableHitLevels outside or ensure it's memoized where defined
-// Assuming ExpandableHitLevels is already defined and memoized within FrameDataTable or imported
 
 const DataTableContent: React.FC<DataTableContentProps> = ({ 
   moves, 
@@ -363,107 +330,195 @@ const DataTableContent: React.FC<DataTableContentProps> = ({
   handleSort, 
   renderCommand, 
   renderNotes,
-  ExpandableHitLevelsComponent
+  ExpandableHitLevelsComponent,
+  visibleColumns
 }) => {
-  // Assuming ExpandableHitLevels is accessible in this scope
-  // If not, it needs to be passed as a prop or defined/imported here
-  
-  // Reference the standalone renderBadge function
   const badgeRenderer = renderBadge;
-  
-  // Access memoized ExpandableHitLevels (assuming it's defined in the outer scope)
-  // This pattern isn't ideal, passing components as props is better, but works if defined above
-  // const ExpandableLevelsComponent = ExpandableHitLevels;
 
-  console.log("Rendering DataTableContent..."); // Debug log
+  const getColumnHeader = (columnId: string) => {
+    switch (columnId) {
+      case 'stance': return 'Stance';
+      case 'command': return 'Command';
+      case 'rawCommand': return 'Raw Command';
+      case 'hitLevel': return 'Hit Level';
+      case 'impact': return 'Impact';
+      case 'damage': return 'Damage';
+      case 'block': return <><Shield size={16} /></>;
+      case 'hit': return 'Hit';
+      case 'counterHit': return 'CH';
+      case 'guardBurst': return 'GB';
+      case 'notes': return 'Notes';
+      default: return columnId;
+    }
+  };
+
+  const getSortKey = (columnId: string): SortableColumn => {
+    switch (columnId) {
+      case 'stance': return 'Stance';
+      case 'command': return 'Command';
+      case 'rawCommand': return 'OriginalCommand';
+      case 'hitLevel': return 'HitLevel';
+      case 'impact': return 'Impact';
+      case 'damage': return 'Damage';
+      case 'block': return 'Block';
+      case 'hit': return 'Hit';
+      case 'counterHit': return 'CounterHit';
+      case 'guardBurst': return 'GuardBurst';
+      case 'notes': return 'Notes';
+      default: return columnId as SortableColumn;
+    }
+  };
+
+  const renderCellContent = (move: Move, columnId: string) => {
+    switch (columnId) {
+      case 'stance':
+        return move.Stance || '—';
+      case 'command':
+        return renderCommand(move.Command);
+      case 'rawCommand':
+        return move.Command || '—';
+      case 'hitLevel':
+        return (
+          <ExpandableHitLevelsComponent 
+            hitLevelString={move.HitLevel} 
+            maxIconsToShow={3}
+          />
+        );
+      case 'impact':
+        return move.Impact ?? '—';
+      case 'damage':
+        return move.DamageDec ?? '—';
+      case 'block':
+        return badgeRenderer(move.Block, null);
+      case 'hit':
+        return badgeRenderer(move.Hit, move.HitString);
+      case 'counterHit':
+        return badgeRenderer(move.CounterHit, move.CounterHitString);
+      case 'guardBurst':
+        return badgeRenderer(move.GuardBurst, null, true);
+      case 'notes':
+        return (
+          <div className="max-w-full truncate overflow-x-hidden overflow-y-visible">
+            {renderNotes(move.Notes)}
+          </div>
+        );
+      default:
+        return '—';
+    }
+  };
+
+  const getColumnClasses = (columnId: string) => {
+    const baseClasses = "p-2 cursor-pointer hover:bg-muted/50";
+    
+    switch (columnId) {
+      case 'stance':
+        return {
+          className: `${baseClasses} w-[100px] text-right`,
+          style: {}
+        };
+      case 'command':
+        return {
+          className: `${baseClasses} w-[200px] min-w-[210px] max-w-[300px]`,
+          style: {}
+        };
+      case 'rawCommand':
+        return {
+          className: `${baseClasses} w-[200px] min-w-[210px] max-w-[300px]`,
+          style: {}
+        };
+      case 'hitLevel':
+        return {
+          className: `${baseClasses} w-[135px] min-w-[135px] max-w-[150px]`,
+          style: {}
+        };
+      case 'impact':
+        return {
+          className: `${baseClasses} w-[50px]`,
+          style: {}
+        };
+      case 'damage':
+        return {
+          className: `${baseClasses} w-[50px]`,
+          style: {}
+        };
+      case 'block':
+        return {
+          className: `${baseClasses} w-[70px]`,
+          style: {}
+        };
+      case 'hit':
+        return {
+          className: `${baseClasses} w-[60px]`,
+          style: {}
+        };
+      case 'counterHit':
+        return {
+          className: `${baseClasses} w-[50px]`,
+          style: {}
+        };
+      case 'guardBurst':
+        return {
+          className: `${baseClasses} w-[50px]`,
+          style: {}
+        };
+      case 'notes':
+        return {
+          className: `${baseClasses} overflow-visible`,
+          style: {}
+        };
+      default:
+        return {
+          className: baseClasses,
+          style: {}
+        };
+    }
+  };
+
+  const getCellClasses = (columnId: string) => {
+    switch (columnId) {
+      case 'command':
+      case 'rawCommand':
+        return "font-mono p-2 max-w-[300px] break-words";
+      case 'hitLevel':
+        return "p-2 min-w-[135px] max-w-[150px] align-top";
+      case 'notes':
+        return "max-w-[300px] p-2 overflow-visible";
+      case 'stance':
+        return "text-right p-2";
+      default:
+        return "p-2";
+    }
+  };
 
   return (
     <Table className="table-layout-fixed">
       <TableHeader className="sticky top-0 bg-card z-10">
         <TableRow className="border-b-card-border">
-          {/* Stance Header */}
-          <TableHead className="w-[100px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Stance')}>
-            <div className="flex items-center justify-between gap-1">
-              <span>Stance</span>
-              {sortColumn === 'Stance' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
-            </div>
-          </TableHead>
-          {/* Command Header */}
-          <TableHead className="w-[200px] min-w-[210px] max-w-[300px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Command')}>
-            <div className="flex items-center justify-between gap-1">
-              <span>Command</span>
-              {sortColumn === 'Command' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
-            </div>
-          </TableHead>
-          {/* Raw Command Header */}
-          <TableHead className="w-[200px] min-w-[210px] max-w-[300px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('OriginalCommand')}>
-            <div className="flex items-center justify-between gap-1">
-              <span>Raw Command</span>
-              {sortColumn === 'Command' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
-            </div>
-          </TableHead>
-          {/* Hit Level Header */}
-          <TableHead className="w-[135px] min-w-[135px] max-w-[150px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('HitLevel')}>
-            <div className="flex items-center justify-between gap-1">
-              <span>Hit Level</span>
-              {sortColumn === 'HitLevel' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
-            </div>
-          </TableHead>
-          {/* Impact Header */}
-          <TableHead className="w-[50px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Impact')}>
-            <div className="flex items-center justify-between gap-1">
-              <span>Impact</span>
-              {sortColumn === 'Impact' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
-            </div>
-          </TableHead>
-          {/* Damage Header */}
-          <TableHead className="w-[50px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Damage')}>
-            <div className="flex items-center justify-between gap-1">
-              <span>Damage</span>
-              {sortColumn === 'Damage' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
-            </div>
-          </TableHead>
-          {/* Block Header */}
-          <TableHead className="w-[70px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Block')}>
-            <div className="flex items-center justify-between gap-1" title="Block">
-              <Shield size={16} />
-              {sortColumn === 'Block' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
-            </div>
-          </TableHead>
-          {/* Hit Header */}
-          <TableHead className="w-[60px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Hit')}>
-            <div className="flex items-center justify-between gap-1">
-              <span>Hit</span>
-              {sortColumn === 'Hit' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
-            </div>
-          </TableHead>
-          {/* CH Header */}
-          <TableHead title="Counter Hit" className="w-[50px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('CounterHit')}>
-            <div className="flex items-center justify-between gap-1">
-              <span>CH</span>
-              {sortColumn === 'CounterHit' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
-            </div>
-          </TableHead>
-          {/* GB Header */}
-          <TableHead title="Guard Burst" className="w-[50px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('GuardBurst')}>
-            <div className="flex items-center justify-between gap-1">
-              <span>GB</span>
-              {sortColumn === 'GuardBurst' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
-            </div>
-          </TableHead>
-          {/* Notes Header */}
-          <TableHead className="p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Notes')}>
-            <div className="flex items-center justify-between gap-1">
-              <span>Notes</span>
-              {sortColumn === 'Notes' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
-            </div>
-          </TableHead>
+          {visibleColumns.map((column) => {
+            const sortKey = getSortKey(column.id);
+            const { className, style } = getColumnClasses(column.id);
+            
+            return (
+              <TableHead 
+                key={column.id}
+                className={className}
+                style={style}
+                onClick={() => handleSort(sortKey)}
+                title={column.id === 'block' ? 'Block' : column.id === 'counterHit' ? 'Counter Hit' : column.id === 'guardBurst' ? 'Guard Burst' : undefined}
+              >
+                <div className="flex items-center justify-between gap-1">
+                  <span>{getColumnHeader(column.id)}</span>
+                  {sortColumn === sortKey && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
+                </div>
+              </TableHead>
+            );
+          })}
         </TableRow>
       </TableHeader>
       <TableBody>
         {movesLoading ? (
           <TableRow>
-            <TableCell colSpan={11} className="text-center h-24 p-2">
+            <TableCell colSpan={visibleColumns.length} className="text-center h-24 p-2">
               <div className="flex justify-center items-center">
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground mr-2" />
                 Loading moves...
@@ -472,7 +527,7 @@ const DataTableContent: React.FC<DataTableContentProps> = ({
           </TableRow>
         ) : moves.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={11} className="text-center h-24 p-2">
+            <TableCell colSpan={visibleColumns.length} className="text-center h-24 p-2">
               No moves found for this character or filter criteria.
             </TableCell>
           </TableRow>
@@ -482,35 +537,14 @@ const DataTableContent: React.FC<DataTableContentProps> = ({
               key={move.ID} 
               className="border-b-card-border"
             >
-              <TableCell className="text-right p-2">{move.Stance || '—'}</TableCell>
-              <TableCell className="font-mono p-2 max-w-[300px] break-words">
-                {renderCommand(move.Command)}
-              </TableCell>
-              <TableCell className="font-mono p-2 max-w-[300px] break-words">
-                {move.Command || '—'}
-              </TableCell>
-              <TableCell className="p-2 min-w-[135px] max-w-[150px] align-top">
-                {/* Use the passed component */}
-                <ExpandableHitLevelsComponent 
-                  hitLevelString={move.HitLevel} 
-                  maxIconsToShow={3}
-                />
-              </TableCell>
-              <TableCell className="p-2">{move.Impact ?? '—'}</TableCell>
-              <TableCell className="p-2">{move.DamageDec ?? '—'}</TableCell>
-              <TableCell className="p-2">{badgeRenderer(move.Block, null)}</TableCell>
-              <TableCell className="p-2">
-                {badgeRenderer(move.Hit, move.HitString)}
-              </TableCell>
-              <TableCell className="p-2">
-                {badgeRenderer(move.CounterHit, move.CounterHitString)}
-              </TableCell>
-              <TableCell className="p-2">{badgeRenderer(move.GuardBurst, null, true)}</TableCell>
-              <TableCell className="max-w-[300px] p-2 overflow-visible">
-                <div className="max-w-full truncate overflow-x-hidden overflow-y-visible">
-                  {renderNotes(move.Notes)}
-                </div>
-              </TableCell>
+              {visibleColumns.map((column) => (
+                <TableCell 
+                  key={`${move.ID}-${column.id}`}
+                  className={getCellClasses(column.id)}
+                >
+                  {renderCellContent(move, column.id)}
+                </TableCell>
+              ))}
             </TableRow>
           ))
         )}
@@ -539,6 +573,9 @@ export const FrameDataTable: React.FC = () => {
     getIconUrl
   } = useGame();
   
+  // Add table configuration context
+  const { getVisibleColumns } = useTableConfig();
+  
   const [db, setDb] = useState<any | null>(null);
   const [originalMoves, setOriginalMoves] = useState<Move[]>([]); // Store the original, unsorted moves
   const [loading, setLoading] = useState(true);
@@ -556,12 +593,15 @@ export const FrameDataTable: React.FC = () => {
   // Add state for filters visibility
   const [filtersVisible, setFiltersVisible] = useState<boolean>(true);
   
+  // Get visible columns from table configuration
+  const visibleColumns = getVisibleColumns();
+  
   // Toggle filters visibility (Memoized)
   const toggleFiltersVisibility = useCallback(() => {
     setFiltersVisible(prev => !prev);
-  }, []); // No dependencies
+  }, []);
 
-  // --- Effect 1: Sync URL with selectedCharacterId from Context --- 
+  // Sync URL with selected character
   useEffect(() => {
     if (selectedCharacterId !== null && characters.length > 0 && selectedGame.id) {
       const selectedChar = characters.find(c => c.id === selectedCharacterId);
@@ -569,29 +609,25 @@ export const FrameDataTable: React.FC = () => {
         const expectedUrlName = encodeURIComponent(selectedChar.name);
         const currentUrlName = characterName ? encodeURIComponent(decodeURIComponent(characterName)) : undefined;
         
-        // If URL doesn't match the selected character, update it - removed /character/
         if (expectedUrlName !== currentUrlName) {
            navigate(`/${selectedGame.id}/${expectedUrlName}`, { replace: true }); 
         }
       }
     }
-  }, [selectedCharacterId, characters, selectedGame.id, navigate, characterName]); // Include characterName to re-check after potential navigation
+  }, [selectedCharacterId, characters, selectedGame.id, navigate, characterName]);
 
-
-  // --- Effect 2: Handle Initial Load / URL Parameters -> State --- 
+  // Handle URL parameters and initial character selection
   useEffect(() => {
-    if (!selectedGame.id) return; // Wait for game context
+    if (!selectedGame.id) return;
 
-    // Handle Game ID change from URL
     if (gameId && gameId !== selectedGame.id) {
       const game = AVAILABLE_GAMES.find(g => g.id === gameId);
       if (game) {
         setSelectedGameById(gameId);
-        return; // Let game change propagate
+        return;
       }
     }
 
-    // Handle Character from URL *only if* characters are loaded and context doesn't have a valid selection yet
     if (characterName && characters.length > 0 && (selectedCharacterId === null || !characters.some(c => c.id === selectedCharacterId))) {
       const decodedName = decodeURIComponent(characterName);
       const characterFromName = characters.find(c => c.name.toLowerCase() === decodedName.toLowerCase());
@@ -599,36 +635,27 @@ export const FrameDataTable: React.FC = () => {
       if (characterFromName) {
         setSelectedCharacterId(characterFromName.id);
       } else {
-        // Invalid name in URL, and no valid selection in context -> default to first
         const firstCharacter = characters[0];
         if (firstCharacter) {
           setSelectedCharacterId(firstCharacter.id);
-          // Let Effect 1 handle correcting the URL
         } else {
           setSelectedCharacterId(null);
         }
       }
     } else if (!characterName && characters.length > 0 && (selectedCharacterId === null || !characters.some(c => c.id === selectedCharacterId))) {
-        // No character name in URL, no valid selection in context -> default to first
         const firstCharacter = characters[0];
         if (firstCharacter) {
           setSelectedCharacterId(firstCharacter.id);
-          // Let Effect 1 handle correcting the URL
         }
     }
-
-  // Dependencies focused on initial load conditions
   }, [gameId, characterName, selectedGame.id, characters, selectedCharacterId, setSelectedGameById, setSelectedCharacterId]); 
 
-
-  // --- Effect 3: Load Database (based on selectedGame) --- 
+  // Load database when game changes
   useEffect(() => {
-    // Reset state when game changes
-    setOriginalMoves([]); // Keep resetting moves
-    setDb(null); // Reset DB
-    setLoading(true); // Use loading state for DB loading
-    setError(null); // Reset errors
-    // setCharacters([]); // REMOVE: Characters are handled by CharacterSelectionPage now
+    setOriginalMoves([]);
+    setDb(null);
+    setLoading(true);
+    setError(null);
 
     const loadDatabase = async () => {
       if (!selectedGame.dbPath) {
@@ -644,38 +671,32 @@ export const FrameDataTable: React.FC = () => {
         const arrayBuffer = await response.arrayBuffer();
         const uint8Array = new Uint8Array(arrayBuffer);
         const database = new SQL.Database(uint8Array);
-        setDb(database); // Set DB state for move loading
+        setDb(database);
       } catch (error) {
         setError(error instanceof Error ? error.message : `Error loading database for ${selectedGame.name}`);
-        setDb(null); // Clear DB on error
-        // setCharacters([]); // REMOVE
+        setDb(null);
       } finally {
-        setLoading(false); // DB loading finished (or failed)
+        setLoading(false);
       }
     };
 
     loadDatabase();
-
-  }, [selectedGame.dbPath]); // REMOVE setCharacters dependency
+  }, [selectedGame.dbPath]);
   
-  // --- Effect 4: Load Moves (based on selectedCharacterId and db) --- 
+  // Load moves when character or database changes
   useEffect(() => {
-    // Clear moves and set loading state when character changes or DB becomes available
     setOriginalMoves([]);
-    if (db && selectedCharacterId !== null) { // Check for non-null ID
-      setMovesLoading(true); // Start loading moves
-      setError(null); // Clear previous move errors
+    if (db && selectedCharacterId !== null) {
+      setMovesLoading(true);
+      setError(null);
 
-      // Use setTimeout to ensure state update happens before query
-      // This helps avoid race conditions with state updates
+      // Use setTimeout to avoid race conditions with state updates
       const timer = setTimeout(() => {
         try {
           const movesQuery = `
             SELECT
               ID, Command, Stance, HitLevel, Impact, Damage,
-              Hit, -- Select the original Hit text column
-              CounterHit, -- Select the original Counter Hit text column
-              BlockDec, HitDec, CounterHitDec, -- Use CounterHitDec instead of CounterHitDeci
+              Hit, CounterHit, BlockDec, HitDec, CounterHitDec,
               GuardBurst, Notes, DamageDec
             FROM Moves
             WHERE CharacterID = ?
@@ -685,8 +706,6 @@ export const FrameDataTable: React.FC = () => {
           if (movesResult.length > 0 && movesResult[0].values.length > 0) {
             const columns = movesResult[0].columns;
             const values = movesResult[0].values;
-
-            // Select the appropriate translation map based on the selected game
             const currentTranslationMap = getEffectiveTranslationMap(selectedGame.id);
 
             const movesData: Move[] = values.map((row: unknown[]) => {
@@ -696,25 +715,23 @@ export const FrameDataTable: React.FC = () => {
               });
 
               const originalCommand = String(moveObject.Command);
-
-              // Apply translations ONLY to Command column using the selected map
               const translatedCommand = translateString(originalCommand, currentTranslationMap);
 
               return {
                 ID: Number(moveObject.ID),
-                Command: translatedCommand, // Use translated command
+                Command: translatedCommand,
                 Stance: moveObject.Stance ? String(moveObject.Stance) : null,
                 HitLevel: moveObject.HitLevel ? String(moveObject.HitLevel) : null,
                 Impact: Number(moveObject.Impact),
                 Damage: moveObject.Damage ? String(moveObject.Damage) : null,
                 DamageDec: moveObject.DamageDec !== null && moveObject.DamageDec !== undefined ? Number(moveObject.DamageDec) : null,
                 Block: moveObject.BlockDec !== null && moveObject.BlockDec !== undefined ? Number(moveObject.BlockDec) : null,
-                HitString: moveObject.Hit ? String(moveObject.Hit) : null, // Map original Hit text
-                Hit: moveObject.HitDec !== null && moveObject.HitDec !== undefined ? Number(moveObject.HitDec) : null, // Numeric value for badge
-                CounterHitString: moveObject.CounterHit ? String(moveObject.CounterHit) : null, // Map original Counter Hit text
-                CounterHit: moveObject.CounterHitDec !== null && moveObject.CounterHitDec !== undefined ? Number(moveObject.CounterHitDec) : null, // Numeric value for badge (from CounterHitDec)
+                HitString: moveObject.Hit ? String(moveObject.Hit) : null,
+                Hit: moveObject.HitDec !== null && moveObject.HitDec !== undefined ? Number(moveObject.HitDec) : null,
+                CounterHitString: moveObject.CounterHit ? String(moveObject.CounterHit) : null,
+                CounterHit: moveObject.CounterHitDec !== null && moveObject.CounterHitDec !== undefined ? Number(moveObject.CounterHitDec) : null,
                 GuardBurst: moveObject.GuardBurst !== null && moveObject.GuardBurst !== undefined ? Number(moveObject.GuardBurst) : null,
-                Notes: moveObject.Notes ? String(moveObject.Notes) : null // Use original notes
+                Notes: moveObject.Notes ? String(moveObject.Notes) : null
               };
             });
             setOriginalMoves(movesData);
@@ -725,97 +742,87 @@ export const FrameDataTable: React.FC = () => {
           setError(error instanceof Error ? error.message : `Unknown error loading moves for character ID ${selectedCharacterId}`);
           setOriginalMoves([]);
         } finally {
-          setMovesLoading(false); // Finish loading moves
+          setMovesLoading(false);
         }
-      }, 0); // Execute async query shortly after state update
+      }, 0);
 
-      // Cleanup timeout if effect re-runs before timeout completes
       return () => clearTimeout(timer);
-
     } else {
-       // If no DB or character selected, ensure moves are empty and not loading
-       setOriginalMoves([]); // Clear original moves
+       setOriginalMoves([]);
        setMovesLoading(false);
     }
-  }, [db, selectedCharacterId]); // Removed setError from dependencies
+  }, [db, selectedCharacterId]);
 
-  // --- Handler for Sort Click ---
   const handleSort = useCallback((column: SortableColumn) => {
-    setSortColumn(prevColumn => {
-      if (prevColumn === column) {
-        setSortDirection(prevDir => (prevDir === 'asc' ? 'desc' : 'asc'));
-        return prevColumn; // No change to column
-      } else {
-        setSortDirection('asc'); // Reset direction for new column
-        return column; // Set new column
-      }
-    });
-  }, []); // No dependencies
+    if (sortColumn === column) {
+      setSortDirection(prevDir => (prevDir === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  }, [sortColumn]);
 
   // Helper to render Command text with inline icons (Memoized)
   const renderCommand = useCallback((command: string | null) => {
     if (!command) { return '—'; }
 
-    ///let test = ":2::1::4::A::A::A::A::A+B:"
     const parts: React.ReactNode[] = [];
     const commandArray = command.match(/(?<=:)[^:]+(?=:)/g) || [];
     for (let i = 0; i < commandArray.length; i++) {
         let isSlide = false;
         let isHeld = false;
         const buttons = commandArray[i];
+        let buttonIndex = 0;
         for (let button of buttons.split("+")) {
             if(button[0] === "(") {
                 isHeld = true;
                 button = button.replace(/[()]/g, '');
-            } 
+            }
 
             if(button === "_") {
-                parts.push(<span className="inline-flex items-center flex-wrap ml-[-3px] mr-[-3px]">|</span>);
+                parts.push(<span key={`separator-${i}-${buttonIndex}`} className="inline-flex items-center flex-wrap ml-[-1px] mr-[-1px]">|</span>);
             }
-            else if(!isNaN(button[0] as any)) { // Is direction
+            else if(!isNaN(button[0] as any)) {
                 let icon: string;
                 icon = `/Icons/${isHeld ? "Held" : ""}${button}.svg`
-                parts.push(<img src={icon} alt={icon} className="inline object-contain align-text-bottom h-4 w-4" />);
+                parts.push(<img key={`direction-${i}-${buttonIndex}-${button}`} src={icon} alt={icon} className="inline object-contain align-text-bottom h-4 w-4" />);
             } else {
                 if(button[0] === button[0].toLowerCase()) {
                     isSlide = true;
                 }
-                parts.push(<CommandIcon input={button} isHeld={isHeld} isSlide={isSlide} />);
+                parts.push(<CommandIcon key={`command-${i}-${buttonIndex}-${button}`} input={button} isHeld={isHeld} isSlide={isSlide} />);
             }
-
+            buttonIndex++;
         }
     }
 
     return <span className="inline-flex items-center flex-wrap">{parts}</span>;
   }, []);
 
-
   // Helper to render Notes text with inline icons (Memoized)
   const renderNotes = useCallback((note: string | null) => {
     if (!note) { return '—'; }
 
     const parts: React.ReactNode[] = [];
-    // Build regex to match only configured icon codes
     const codes = availableIcons.map(ic => ic.code).join('|');
     const regex = new RegExp(`:(${codes}):`, 'g');
     let lastIndex = 0;
     let match: RegExpExecArray | null;
+    let partIndex = 0;
     while ((match = regex.exec(note))) {
       const [full, iconName] = match;
       const start = match.index;
       if (start > lastIndex) {
-        parts.push(note.slice(lastIndex, start));
+        parts.push(<span key={`text-${partIndex}`}>{note.slice(lastIndex, start)}</span>);
+        partIndex++;
       }
-      // iconName is guaranteed to be in availableIcons
       const iconConfig = availableIcons.find(ic => ic.code === iconName);
       if (iconConfig) {
-        // Pass availableIcons to the moved helper function
         const titleText = getIconTooltip(iconName, availableIcons);
         const classes = cn(
           "inline object-contain align-text-bottom h-4 w-4",
           iconConfig.className
         );
-        // Wrap in a hover group to show tooltip
         parts.push(
           <img
             key={`${iconName}-${start}`}
@@ -829,10 +836,10 @@ export const FrameDataTable: React.FC = () => {
       lastIndex = regex.lastIndex;
     }
     if (lastIndex < note.length) {
-      parts.push(note.slice(lastIndex));
+      parts.push(<span key={`text-${partIndex}`}>{note.slice(lastIndex)}</span>);
     }
     return parts;
-  }, [availableIcons, getIconUrl]); // Dependencies: availableIcons, getIconUrl
+  }, [availableIcons, getIconUrl]);
 
   // Helper function to get field value based on field name
   const getFieldValue = (move: Move, fieldName: string): any => {
@@ -850,12 +857,10 @@ export const FrameDataTable: React.FC = () => {
 
   // compute displayedMoves via memoization instead of state
   const displayedMoves = React.useMemo(() => {
-    // First, apply filters
     let filteredMoves = [...originalMoves];
     
     if (activeFilters.length > 0) {
       filteredMoves = filteredMoves.filter(move => {
-        // All filters must match (AND logic)
         return activeFilters.every(filter => {
           const fieldValue = getFieldValue(move, filter.field);
           if (fieldValue === null || fieldValue === undefined) return false;
@@ -899,7 +904,6 @@ export const FrameDataTable: React.FC = () => {
       });
     }
     
-    // Then apply sorting
     if (!sortColumn) return filteredMoves;
     
     const sorted = [...filteredMoves].sort((a, b) => {
@@ -915,11 +919,10 @@ export const FrameDataTable: React.FC = () => {
         case 'CounterHit':
           valA = a.CounterHit; valB = b.CounterHit; break;
         default:
-          // Use getFieldValue to handle potential mapped columns like OriginalCommand
           valA = getFieldValue(a, sortColumn);
           valB = getFieldValue(b, sortColumn);
       }
-      // Push null/undefined to bottom
+      
       const aNull = valA == null;
       const bNull = valB == null;
       if (aNull && !bNull) return 1;
@@ -936,7 +939,7 @@ export const FrameDataTable: React.FC = () => {
   // Handle filter changes (Memoized)
   const handleFiltersChange = useCallback((filters: FilterCondition[]) => {
     setActiveFilters(filters);
-  }, []); // No dependencies
+  }, []);
 
   // New useEffect to fetch the timestamp
   useEffect(() => {
@@ -1141,6 +1144,7 @@ export const FrameDataTable: React.FC = () => {
                 renderCommand={renderCommand}
                 renderNotes={renderNotes}
                 ExpandableHitLevelsComponent={ExpandableHitLevels}
+                visibleColumns={visibleColumns}
               />
             </div>
           </CardContent>

@@ -10,8 +10,90 @@ export interface IconConfig {
   /** descriptive title/tooltip text for accessibility */
   title: string;
   /** optional Tailwind classes for icon sizing/aspect ratio */
-  className?: string;
+  iconClasses?: string;
 }
+
+// --- Translation Layer ---
+export type TranslationMap = Record<string, string>;
+
+// Define reusable translation mappings
+export const TRANSLATION_MAPPINGS: Record<string, TranslationMap> = {
+  soulCaliburButtons: {
+    ':(B+C):': ':(B+K):',
+    ':(B+D):': ':(B+G):',
+    ':(C+D):': ':(K+G):',
+    ':A+B+C:': ':A+B+K:',
+    ':A+D:': ':A+G:',
+    ':A+C:': ':A+K:',
+    ':B+C:': ':B+K:',
+    ':B+D:': ':B+G:',
+    ':C+D:': ':K+G:',
+    '(C)': '(K)',
+    ':C:': ':K:',
+    ':c:': ':k:',
+    '(D)': '(G)',
+    ':D:': ':G:',
+    ':d:': ':g:',
+  },
+  weirdTekken: {
+    ':2::3::6:': ':qcf:',     // Quarter Circle Forward
+    ':2::1::4:': ':qcb:',     // Quarter Circle Back
+    ':6::2::3:': ':dp:',      // Dragon Punch motion
+    ':4::1::2::3::6:': ':hcf:',   // Half Circle Forward
+    ':6::3::2::1::4:': ':hcb:',   // Half Circle Back
+
+    ':A:': ':LP:',
+    ':B:': ':RP:', 
+    ':C:': ':LK:', 
+    ':D:': ':RK:', 
+  },
+};
+
+// Define translation configuration for games
+export type GameTranslationConfig = {
+  extends?: string[]; // List of mapping names to inherit from
+  specific?: TranslationMap; // Game-unique mappings
+};
+
+// Helper function to build the final translation map for a game
+export const buildTranslationMap = (config: GameTranslationConfig): TranslationMap => {
+  let effectiveMap: TranslationMap = {};
+
+  // Add mappings from extended modules
+  if (config.extends) {
+    config.extends.forEach(mappingName => {
+      const mapping = TRANSLATION_MAPPINGS[mappingName];
+      if (mapping) {
+        effectiveMap = { ...effectiveMap, ...mapping };
+      }
+    });
+  }
+
+  // Add/override with game-specific mappings
+  if (config.specific) {
+    effectiveMap = { ...effectiveMap, ...config.specific };
+  }
+
+  return effectiveMap;
+};
+
+// Helper function to apply translations
+export const translateString = (text: string | null, map: TranslationMap): string | null => {
+  if (text === null) {
+    return null;
+  }
+  let translatedText = text;
+  // Sort keys by length descending to replace longer sequences first
+  const sortedKeys = Object.keys(map).sort((a, b) => b.length - a.length);
+
+  for (const key of sortedKeys) {
+    const escapedKey = key.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    const regex = new RegExp(escapedKey, 'g');
+    translatedText = translatedText.replace(regex, map[key]);
+  }
+
+  return translatedText;
+};
 
 // Define Game interface here
 export interface Game {
@@ -20,6 +102,8 @@ export interface Game {
   dbPath: string;
   /** List of available icon configurations for this game */
   icons: IconConfig[];
+  /** Translation configuration for command and note text */
+  translations: GameTranslationConfig;
 }
 
 // Define Character interface here
@@ -34,19 +118,23 @@ export const AVAILABLE_GAMES: Game[] = [
     id: 'SoulCalibur6',
     name: 'SoulCalibur VI',
     dbPath: '/SoulCalibur6/FrameData.db',
+    translations: {
+      extends: ['soulCaliburButtons'],
+      specific: {}
+    },
     icons: [
       // 2x1 icons
-      { code: 'UA', title: 'Unblockable', className: 'h-4 w-8' },
-      { code: 'UC', title: 'Universal Cancel', className: 'h-4 w-8' },
-      { code: 'SS', title: 'Stance Switch', className: 'h-4 w-8' },
-      { code: 'GC', title: 'Guard Crush', className: 'h-4 w-8' },
-      { code: 'TH', title: 'Throw', className: 'h-4 w-8' },
-      { code: 'CE', title: 'Critical Edge', className: 'h-4 w-8' },
-      { code: 'BA', title: 'Break Attack', className: 'h-4 w-8' },
-      { code: 'GI', title: 'Guard impact', className: 'h-4 w-8' },
-      { code: 'LH', title: 'Lethal hit', className: 'h-4 w-8' },
-      { code: 'SC', title: 'Costs Soulcharge', className: 'h-4 w-8' },
-      { code: 'RE', title: 'Reversal edge', className: 'h-4 w-8' },
+      { code: 'UA', title: 'Unblockable', iconClasses: 'h-4 w-8' },
+      { code: 'UC', title: 'Universal Cancel', iconClasses: 'h-4 w-8' },
+      { code: 'SS', title: 'Stance Switch', iconClasses: 'h-4 w-8' },
+      { code: 'GC', title: 'Guard Crush', iconClasses: 'h-4 w-8' },
+      { code: 'TH', title: 'Throw', iconClasses: 'h-4 w-8' },
+      { code: 'CE', title: 'Critical Edge', iconClasses: 'h-4 w-8' },
+      { code: 'BA', title: 'Break Attack', iconClasses: 'h-4 w-8' },
+      { code: 'GI', title: 'Guard impact', iconClasses: 'h-4 w-8' },
+      { code: 'LH', title: 'Lethal hit', iconClasses: 'h-4 w-8' },
+      { code: 'SC', title: 'Costs Soulcharge', iconClasses: 'h-4 w-8' },
+      { code: 'RE', title: 'Reversal edge', iconClasses: 'h-4 w-8' },
 
       // 1x1 icons
       { code: 'H', title: 'H' },
@@ -55,19 +143,24 @@ export const AVAILABLE_GAMES: Game[] = [
       { code: 'SM', title: 'SM' },
 
       // Icons im unsure about
-      { code: 'AT', title: 'Attack Throw???', className: 'h-4 w-8' },
+      { code: 'AT', title: 'Attack Throw???', iconClasses: 'h-4 w-8' },
       
       // Game Buttons (assuming 1x1 size, adjust className if needed)
-      { code: 'A', title: 'A Button' },
-      { code: 'B', title: 'B Button' },
-      { code: 'K', title: 'K Button' }, 
-      { code: 'G', title: 'G Button' },
+      { code: 'A', title: 'A' },
+      { code: 'B', title: 'B' },
+      { code: 'K', title: 'K' }, 
+      { code: 'G', title: 'G' },
     ],
   },
+
   {
     id: 'Tekken8',
     name: 'Tekken 8',
     dbPath: '/Tekken8/FrameData.db',
+    translations: {
+      extends: ['weirdTekken'],
+      specific: {}
+    },
     icons: [
       { code: 'LP', title: 'Light Punch' },
       { code: 'RP', title: 'Right Punch' },
@@ -78,7 +171,7 @@ export const AVAILABLE_GAMES: Game[] = [
 ];
 
 // Define universally available directional icons (without titles)
-const DIRECTIONAL_ICONS: Pick<IconConfig, 'code' | 'className'>[] = [
+const DIRECTIONAL_ICONS: Pick<IconConfig, 'code' | 'iconClasses'>[] = [
   { code: '1' }, { code: '2' }, { code: '3' }, 
   { code: '4' }, { code: '5' }, { code: '6' }, 
   { code: '7' }, { code: '8' }, { code: '9' },
@@ -100,10 +193,10 @@ interface GameContextType {
   setCharacters: (chars: Character[]) => void;
   selectedCharacterId: number | null;
   setSelectedCharacterId: (id: number | null) => void;
-  /** Icon configurations available for the current game */
   availableIcons: IconConfig[];
-  /** Return the URL for a named icon in the current game, accounting for held state */
   getIconUrl: (iconName: string, isHeld?: boolean) => string;
+  getTranslationMap: () => TranslationMap;
+  translateText: (text: string | null) => string | null;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -210,6 +303,15 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     return `/${selectedGame.id}/Icons/${upperIconName}.svg`;
   };
 
+  const getTranslationMap = (): TranslationMap => {
+    return buildTranslationMap(selectedGame.translations);
+  };
+
+  const translateText = (text: string | null): string | null => {
+    const translationMap = getTranslationMap();
+    return translateString(text, translationMap);
+  };
+
   const contextValue: GameContextType = {
     selectedGame,
     setSelectedGameById: handleSetSelectedGameById,
@@ -221,6 +323,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     setSelectedCharacterId: handleSetSelectedCharacterId,
     availableIcons: combinedIcons, // Use the combined list
     getIconUrl: getIconUrl, // Use the updated function
+    getTranslationMap,
+    translateText,
   };
 
   return (

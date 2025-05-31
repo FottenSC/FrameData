@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import ReactDOM from 'react-dom';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Table,
@@ -11,10 +10,10 @@ import {
 } from './ui/table';
 import { Button } from './ui/button';
 import { initializeDatabase } from '../utils/initializeDatabase';
-import { Loader2, Shield, ArrowUp, ArrowDown, ChevronDown, ChevronRight, Plus } from 'lucide-react';
+import { Loader2, Shield, ArrowUp, ArrowDown, ChevronRight } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
-import { useGame, Character, AVAILABLE_GAMES, IconConfig } from '../contexts/GameContext';
+import { useGame, AVAILABLE_GAMES, IconConfig } from '../contexts/GameContext';
 import { useTableConfig } from '../contexts/TableConfigContext';
 import { cn } from "@/lib/utils";
 import { FilterBuilder, ActiveFiltersBadge, FilterCondition } from './FilterBuilder';
@@ -48,116 +47,8 @@ interface Move {
 // Define sortable columns (using Move interface keys for type safety)
 type SortableColumn = keyof Move | 'Damage' | 'Hit' | 'CounterHit' | 'OriginalCommand';
 
-// --- Translation Layer ---
-type TranslationMap = Record<string, string>;
-
-const soulCaliburButtonMappings: TranslationMap = {
-    ':(B+C):': ':(B+K):',
-    ':(B+D):': ':(B+G):',
-    ':(C+D):': ':(K+G):',
-    ':A+B+C:': ':A+B+K:',
-    ':A+D:': ':A+G:',
-    ':A+C:': ':A+K:',
-    ':B+C:': ':B+K:',
-    ':B+D:': ':B+G:',
-    ':C+D:': ':K+G:',
-    '(C)': '(K)',
-    ':C:': ':K:',
-    ':c:': ':k:',
-    '(D)': '(G)',
-    ':D:': ':G:',
-    ':d:': ':g:',
-};
-
-// Potentially add other reusable sets like:
-const tekkenButtonMappings: TranslationMap = {
-    ':2::3::6:': ':qcf:',     // Quarter Circle Forward
-    ':2::1::4:': ':qcb:',     // Quarter Circle Back
-    ':6::2::3:': ':dp:',      // Dragon Punch motion
-    ':4::1::2::3::6:': ':hcf:',   // Half Circle Forward
-    ':6::3::2::1::4:': ':hcb:',   // Half Circle Back
-
-    // Buttons
-    ':1:': ':LP:', // Left Punch
-    '2': 'RP', // Right Punch
-    '3': 'LK', // Left Kick
-    '4': 'RK', // Right Kick
-    '1+2': 'LP+RP',
-    '3+4': 'LK+RK',
-};
-
-// Define which maps each game uses, plus game-specific additions
-type GameMappingConfig = {
-  extends?: string[]; // List of module names to inherit from
-  specific?: TranslationMap; // Game-unique mappings
-};
-
-const gameMappingConfigurations: Record<string, GameMappingConfig> = {
-  'SoulCalibur6': {
-    extends: ['soulCaliburButtons'], // Use these modules - removed numpadMotions
-    specific: {}
-  },
-  // Example for another game:
-  'Tekken8': {
-    extends: ['tekkenButtonMappings'], // Use Tekken buttons - removed numpadMotions
-    specific: {} 
-  },
-  'default': { // Fallback configuration
-    extends: [],
-    specific: {}
-  }
-};
-
-// Helper map to access modules by name
-const availableMappingModules: Record<string, TranslationMap> = {
-  soulCaliburButtons: soulCaliburButtonMappings,
-  tekkenButtonMappings: tekkenButtonMappings,
-};
-
-// Helper function to build the final map for a game
-const getEffectiveTranslationMap = (gameId: string): TranslationMap => {
-  const config = gameMappingConfigurations[gameId] ?? gameMappingConfigurations.default;
-  let effectiveMap: TranslationMap = {};
-
-  // Add mappings from extended modules
-  if (config.extends) {
-    config.extends.forEach(moduleName => {
-      const moduleMap = availableMappingModules[moduleName];
-      if (moduleMap) {
-        effectiveMap = { ...effectiveMap, ...moduleMap };
-      }
-    });
-  }
-
-  // Add/override with game-specific mappings
-  if (config.specific) {
-    effectiveMap = { ...effectiveMap, ...config.specific };
-  }
-
-  return effectiveMap;
-};
-
-// Helper function to apply translations (Revised replacement logic)
-const translateString = (text: string | null, map: TranslationMap): string | null => {
-  if (text === null) {
-    return null;
-  }
-  let translatedText = text;
-  // Sort keys by length descending to replace longer sequences first
-  const sortedKeys = Object.keys(map).sort((a, b) => b.length - a.length);
-
-  for (const key of sortedKeys) {
-    const escapedKey = key.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-    const regex = new RegExp(escapedKey, 'g');
-    translatedText = translatedText.replace(regex, map[key]);
-  }
-
-  return translatedText;
-};
-// --- End Translation Layer ---
 
 // --- Helper Functions (Moved outside component) ---
-
 // Helper to get tooltip text for icons (can be expanded for i18n)
 const getIconTooltip = (iconCode: string, availableIcons: IconConfig[]): string => {
   const directionTooltips: Record<string, string> = {
@@ -295,7 +186,7 @@ const ExpandableHitLevels = React.memo(({
       onClick={canExpand ? handleToggle : undefined}
     >
       {levels.slice(0, iconsToShow).map((level, index) => (
-        <div key={`level-${index}`}>
+        <div key={`${level}-${index}`}>
           <HitLevelIcon level={level} />
         </div>
       ))}
@@ -446,25 +337,33 @@ const DataTableContent: React.FC<DataTableContentProps> = ({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {movesLoading ? (
-          <TableRow>
-            <TableCell colSpan={visibleColumns.length} className="text-center h-24 p-2">
-              <div className="flex justify-center items-center">
-                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground mr-2" />
-                Loading moves...
-              </div>
-            </TableCell>
-          </TableRow>
-        ) : moves.length === 0 ? (
-          <TableRow>
-            <TableCell colSpan={visibleColumns.length} className="text-center h-24 p-2">
-              No moves found for this character or filter criteria.
-            </TableCell>
-          </TableRow>
-        ) : (
-          moves.map((move) => (
+        {(() => {
+          if (movesLoading) {
+            return (
+              <TableRow>
+                <TableCell colSpan={visibleColumns.length} className="text-center h-24 p-2">
+                  <div className="flex justify-center items-center">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground mr-2" />
+                    Loading moves...
+                  </div>
+                </TableCell>
+              </TableRow>
+            );
+          }
+          
+          else if (moves.length === 0) {
+            return (
+              <TableRow>
+                <TableCell colSpan={visibleColumns.length} className="text-center h-24 p-2">
+                  No moves found for this character or filter criteria.
+                </TableCell>
+              </TableRow>
+            );
+          }
+          
+          return moves.map((move) => (
             <TableRow 
-              key={move.ID} 
+              key={move.ID}
               className="border-b-card-border"
             >
               {visibleColumns.map((column) => (
@@ -476,8 +375,8 @@ const DataTableContent: React.FC<DataTableContentProps> = ({
                 </TableCell>
               ))}
             </TableRow>
-          ))
-        )}
+          ));
+        })()}
       </TableBody>
     </Table>
   );
@@ -500,7 +399,8 @@ export const FrameDataTable: React.FC = () => {
     selectedCharacterId,
     setSelectedCharacterId,
     availableIcons,
-    getIconUrl
+    getIconUrl,
+    translateText
   } = useGame();
   
   // Add table configuration context
@@ -636,7 +536,6 @@ export const FrameDataTable: React.FC = () => {
           if (movesResult.length > 0 && movesResult[0].values.length > 0) {
             const columns = movesResult[0].columns;
             const values = movesResult[0].values;
-            const currentTranslationMap = getEffectiveTranslationMap(selectedGame.id);
 
             const movesData: Move[] = values.map((row: unknown[]) => {
               const moveObject: Record<string, unknown> = {};
@@ -645,7 +544,7 @@ export const FrameDataTable: React.FC = () => {
               });
 
               const originalCommand = String(moveObject.Command);
-              const translatedCommand = translateString(originalCommand, currentTranslationMap);
+              const translatedCommand = translateText(originalCommand);
 
               return {
                 ID: Number(moveObject.ID),
@@ -681,7 +580,7 @@ export const FrameDataTable: React.FC = () => {
        setOriginalMoves([]);
        setMovesLoading(false);
     }
-  }, [db, selectedCharacterId]);
+  }, [db, selectedCharacterId, translateText]);
 
   const handleSort = useCallback((column: SortableColumn) => {
     if (sortColumn === column) {
@@ -706,7 +605,7 @@ export const FrameDataTable: React.FC = () => {
         for (let button of buttons.split("+")) {
             if (buttonIndex > 0) {
                 parts.push(
-                    <div className="inline-flex items-center justify-center w-3 h-3 text-sm border border-black bg-white text-black rounded-full mx-[-5px] z-20" >
+                    <div key={`plus-${i}-${buttonIndex}`} className="inline-flex items-center justify-center w-3 h-3 text-sm border border-black bg-white text-black rounded-full mx-[-5px] z-20" >
                         <img src={"/Icons/+.svg"} alt="+" className="inline object-contain align-text-bottom h-4 w-4" />
                     </div>
                 );
@@ -723,7 +622,7 @@ export const FrameDataTable: React.FC = () => {
             else if(!isNaN(button[0] as any)) {
                 let icon: string; // is direction
                 icon = `/Icons/${isHeld ? "Held" : ""}${button}.svg`
-                parts.push(<img src={icon} alt={button} className="inline object-contain align-text-bottom h-4 w-4" />);
+                parts.push(<img key={`direction-${i}-${buttonIndex}-${button}`} src={icon} alt={button} className="inline object-contain align-text-bottom h-4 w-4" />);
             } else {
                 if(button[0] === button[0].toLowerCase()) {
                     isSlide = true;
@@ -759,7 +658,7 @@ export const FrameDataTable: React.FC = () => {
         const titleText = getIconTooltip(iconName, availableIcons);
         const classes = cn(
           "inline object-contain align-text-bottom h-4 w-4",
-          iconConfig.className
+          iconConfig.iconClasses
         );
         parts.push(
           <img

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 
 // Define the column configuration interface
 export interface ColumnConfig {
@@ -132,6 +132,7 @@ export const TableConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           return defaultCol;
         }).sort((a, b) => a.order - b.order);
       }
+      
       return DEFAULT_COLUMNS;
     } catch {
       return DEFAULT_COLUMNS;
@@ -152,38 +153,53 @@ export const TableConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   }, [columnConfigs]);
 
-  const updateColumnVisibility = (columnId: string, visible: boolean) => {
+  // Memoized function to update column visibility - only recreates when necessary
+  const updateColumnVisibility = useCallback((columnId: string, visible: boolean) => {
     setColumnConfigs(prev => 
       prev.map(col => 
         col.id === columnId ? { ...col, visible } : col
       )
     );
-  };
+  }, []);
 
-  const reorderColumns = (fromIndex: number, toIndex: number) => {
+  // Optimized reorderColumns - only updates objects that actually change
+  const reorderColumns = useCallback((fromIndex: number, toIndex: number) => {
     setColumnConfigs(prev => {
       const newConfigs = [...prev];
       const [movedColumn] = newConfigs.splice(fromIndex, 1);
       newConfigs.splice(toIndex, 0, movedColumn);
       
-      // Update order values
-      return newConfigs.map((col, index) => ({ ...col, order: index }));
+      // Only update order values for columns whose order actually changed
+      const minIndex = Math.min(fromIndex, toIndex);
+      const maxIndex = Math.max(fromIndex, toIndex);
+      
+      return newConfigs.map((col, index) => {
+        // Only recreate objects for columns whose order changed
+        if (index >= minIndex && index <= maxIndex) {
+          return { ...col, order: index };
+        }
+        // Keep original object reference if order didn't change
+        return col.order === index ? col : { ...col, order: index };
+      });
     });
-  };
+  }, []);
 
-  const restoreDefaults = () => {
+  // Memoized function to restore defaults
+  const restoreDefaults = useCallback(() => {
     setColumnConfigs(DEFAULT_COLUMNS);
-  };
+  }, []);
 
-  const getVisibleColumns = () => {
-    return columnConfigs.filter(col => col.visible).sort((a, b) => a.order - b.order);
-  };
+  // Memoized getters to prevent unnecessary recalculations
+  const getVisibleColumns = useMemo(() => {
+    return () => columnConfigs.filter(col => col.visible).sort((a, b) => a.order - b.order);
+  }, [columnConfigs]);
 
-  const getSortedColumns = () => {
-    return [...columnConfigs].sort((a, b) => a.order - b.order);
-  };
+  const getSortedColumns = useMemo(() => {
+    return () => [...columnConfigs].sort((a, b) => a.order - b.order);
+  }, [columnConfigs]);
 
-  const value: TableConfigContextType = {
+  // Memoize the context value to prevent unnecessary re-renders
+  const value: TableConfigContextType = useMemo(() => ({
     columnConfigs,
     setColumnConfigs,
     updateColumnVisibility,
@@ -191,7 +207,7 @@ export const TableConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
     restoreDefaults,
     getVisibleColumns,
     getSortedColumns
-  };
+  }), [columnConfigs, updateColumnVisibility, reorderColumns, restoreDefaults, getVisibleColumns, getSortedColumns]);
 
   return (
     <TableConfigContext.Provider value={value}>

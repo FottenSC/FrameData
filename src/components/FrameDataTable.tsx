@@ -427,17 +427,14 @@ const DataTableContent: React.FC<DataTableContentProps> = ({
     <Table className="table-layout-fixed">
       <TableHeader className="sticky top-0 bg-card z-10">
         <TableRow className="border-b-card-border">
-<<<<<<< HEAD
           {visibleColumns.map((column) => {
             const sortKey = getSortKey(column.id);
-            
+
             return (
               <TableHead 
                 key={column.id}
-                className={column.className || 'p-2 cursor-pointer hover:bg-muted/50'}
-                style={column.style || {}}
+                className={column.colClasses}
                 onClick={() => handleSort(sortKey)}
-                title={column.friendlyLabel ? column.friendlyLabel : column.label}
               >
                 <div className="flex items-center justify-between gap-1">
                   <span>{getColumnHeader(column.label)}</span>
@@ -446,78 +443,6 @@ const DataTableContent: React.FC<DataTableContentProps> = ({
               </TableHead>
             );
           })}
-=======
-          {/* Stance Header */}
-          <TableHead className="w-[100px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Stance')}>
-            <div className="flex items-center justify-between gap-1">
-              <span>Stance</span>
-              {sortColumn === 'Stance' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
-            </div>
-          </TableHead>
-          {/* Command Header */}
-          <TableHead className="w-[200px] min-w-[210px] max-w-[300px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Command')}>
-            <div className="flex items-center justify-between gap-1">
-              <span>Command</span>
-              {sortColumn === 'Command' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
-            </div>
-          </TableHead>
-          {/* Hit Level Header */}
-          <TableHead className="w-[135px] min-w-[135px] max-w-[150px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('HitLevel')}>
-            <div className="flex items-center justify-between gap-1">
-              <span>Hit Level</span>
-              {sortColumn === 'HitLevel' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
-            </div>
-          </TableHead>
-          {/* Impact Header */}
-          <TableHead className="w-[50px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Impact')}>
-            <div className="flex items-center justify-between gap-1">
-              <span>Impact</span>
-              {sortColumn === 'Impact' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
-            </div>
-          </TableHead>
-          {/* Damage Header */}
-          <TableHead className="w-[50px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Damage')}>
-            <div className="flex items-center justify-between gap-1">
-              <span>Damage</span>
-              {sortColumn === 'Damage' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
-            </div>
-          </TableHead>
-          {/* Block Header */}
-          <TableHead className="w-[70px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Block')}>
-            <div className="flex items-center justify-between gap-1" title="Block">
-              <Shield size={16} />
-              {sortColumn === 'Block' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
-            </div>
-          </TableHead>
-          {/* Hit Header */}
-          <TableHead className="w-[60px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Hit')}>
-            <div className="flex items-center justify-between gap-1">
-              <span>Hit</span>
-              {sortColumn === 'Hit' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
-            </div>
-          </TableHead>
-          {/* CH Header */}
-          <TableHead title="Counter Hit" className="w-[50px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('CounterHit')}>
-            <div className="flex items-center justify-between gap-1">
-              <span>CH</span>
-              {sortColumn === 'CounterHit' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
-            </div>
-          </TableHead>
-          {/* GB Header */}
-          <TableHead title="Guard Burst" className="w-[50px] p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('GuardBurst')}>
-            <div className="flex items-center justify-between gap-1">
-              <span>GB</span>
-              {sortColumn === 'GuardBurst' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
-            </div>
-          </TableHead>
-          {/* Notes Header */}
-          <TableHead className="p-2 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('Notes')}>
-            <div className="flex items-center justify-between gap-1">
-              <span>Notes</span>
-              {sortColumn === 'Notes' && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
-            </div>
-          </TableHead>
->>>>>>> c660b26583a580718497255a768f553618ad3c40
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -545,7 +470,7 @@ const DataTableContent: React.FC<DataTableContentProps> = ({
               {visibleColumns.map((column) => (
                 <TableCell 
                   key={`${move.ID}-${column.id}`}
-                  className={getCellClasses(column.id)}
+                  className={column.colClasses}
                 >
                   {renderCellContent(move, column.id)}
                 </TableCell>

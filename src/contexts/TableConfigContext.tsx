@@ -17,7 +17,7 @@ export const DEFAULT_COLUMNS: ColumnConfig[] = [
     label: 'Stance', 
     visible: true, 
     order: 0,
-    colClasses: 'pt-2 px-2 cursor-pointer min-w-[100px] max-w-[100px] text-right'
+    colClasses: 'pt-2 px-2 cursor-pointer min-w-[150px] max-w-[150px] text-right'
   },
   { 
     id: 'command', 

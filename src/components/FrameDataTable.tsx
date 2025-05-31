@@ -11,7 +11,7 @@ import {
 } from './ui/table';
 import { Button } from './ui/button';
 import { initializeDatabase } from '../utils/initializeDatabase';
-import { Loader2, Shield, ArrowUp, ArrowDown, ChevronDown, ChevronRight } from 'lucide-react';
+import { Loader2, Shield, ArrowUp, ArrowDown, ChevronDown, ChevronRight, Plus } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { useGame, Character, AVAILABLE_GAMES, IconConfig } from '../contexts/GameContext';
@@ -407,73 +407,6 @@ const DataTableContent: React.FC<DataTableContentProps> = ({
     }
   };
 
-  const getColumnClasses = (columnId: string) => {
-    const baseClasses = "p-2 cursor-pointer hover:bg-muted/50";
-    
-    switch (columnId) {
-      case 'stance':
-        return {
-          className: `${baseClasses} w-[100px] text-right`,
-          style: {}
-        };
-      case 'command':
-        return {
-          className: `${baseClasses} w-[200px] min-w-[210px] max-w-[300px]`,
-          style: {}
-        };
-      case 'rawCommand':
-        return {
-          className: `${baseClasses} w-[200px] min-w-[210px] max-w-[300px]`,
-          style: {}
-        };
-      case 'hitLevel':
-        return {
-          className: `${baseClasses} w-[135px] min-w-[135px] max-w-[150px]`,
-          style: {}
-        };
-      case 'impact':
-        return {
-          className: `${baseClasses} w-[50px]`,
-          style: {}
-        };
-      case 'damage':
-        return {
-          className: `${baseClasses} w-[50px]`,
-          style: {}
-        };
-      case 'block':
-        return {
-          className: `${baseClasses} w-[70px]`,
-          style: {}
-        };
-      case 'hit':
-        return {
-          className: `${baseClasses} w-[60px]`,
-          style: {}
-        };
-      case 'counterHit':
-        return {
-          className: `${baseClasses} w-[50px]`,
-          style: {}
-        };
-      case 'guardBurst':
-        return {
-          className: `${baseClasses} w-[50px]`,
-          style: {}
-        };
-      case 'notes':
-        return {
-          className: `${baseClasses} overflow-visible`,
-          style: {}
-        };
-      default:
-        return {
-          className: baseClasses,
-          style: {}
-        };
-    }
-  };
-
   const getCellClasses = (columnId: string) => {
     switch (columnId) {
       case 'command':
@@ -496,18 +429,17 @@ const DataTableContent: React.FC<DataTableContentProps> = ({
         <TableRow className="border-b-card-border">
           {visibleColumns.map((column) => {
             const sortKey = getSortKey(column.id);
-            const { className, style } = getColumnClasses(column.id);
             
             return (
               <TableHead 
                 key={column.id}
-                className={className}
-                style={style}
+                className={column.className || 'p-2 cursor-pointer hover:bg-muted/50'}
+                style={column.style || {}}
                 onClick={() => handleSort(sortKey)}
-                title={column.id === 'block' ? 'Block' : column.id === 'counterHit' ? 'Counter Hit' : column.id === 'guardBurst' ? 'Guard Burst' : undefined}
+                title={column.friendlyLabel ? column.friendlyLabel : column.label}
               >
                 <div className="flex items-center justify-between gap-1">
-                  <span>{getColumnHeader(column.id)}</span>
+                  <span>{getColumnHeader(column.label)}</span>
                   {sortColumn === sortKey && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
                 </div>
               </TableHead>
@@ -774,6 +706,14 @@ export const FrameDataTable: React.FC = () => {
         const buttons = commandArray[i];
         let buttonIndex = 0;
         for (let button of buttons.split("+")) {
+            if (buttonIndex > 0) {
+                parts.push(
+                    <div className="inline-flex items-center justify-center w-3 h-3 text-sm border border-black bg-white text-black rounded-full mx-[-5px] z-20" >
+                        <img src={"/Icons/+.svg"} alt="+" className="inline object-contain align-text-bottom h-4 w-4" />
+                    </div>
+                );
+            }
+            
             if(button[0] === "(") {
                 isHeld = true;
                 button = button.replace(/[()]/g, '');
@@ -783,9 +723,9 @@ export const FrameDataTable: React.FC = () => {
                 parts.push(<span key={`separator-${i}-${buttonIndex}`} className="inline-flex items-center flex-wrap ml-[-1px] mr-[-1px]">|</span>);
             }
             else if(!isNaN(button[0] as any)) {
-                let icon: string;
+                let icon: string; // is direction
                 icon = `/Icons/${isHeld ? "Held" : ""}${button}.svg`
-                parts.push(<img key={`direction-${i}-${buttonIndex}-${button}`} src={icon} alt={icon} className="inline object-contain align-text-bottom h-4 w-4" />);
+                parts.push(<img src={icon} alt={button} className="inline object-contain align-text-bottom h-4 w-4" />);
             } else {
                 if(button[0] === button[0].toLowerCase()) {
                     isSlide = true;

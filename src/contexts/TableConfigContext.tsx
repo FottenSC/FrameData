@@ -6,22 +6,99 @@ export interface ColumnConfig {
   label: string;
   visible: boolean;
   order: number;
+  friendlyLabel?: string;
+  colClasses: string;
 }
 
 // Default column configuration
 export const DEFAULT_COLUMNS: ColumnConfig[] = [
-  { id: 'stance', label: 'Stance', visible: true, order: 0 },
-  { id: 'command', label: 'Command', visible: true, order: 1 },
-  { id: 'rawCommand', label: 'Raw Command', visible: false, order: 2 },
-  { id: 'hitLevel', label: 'Hit Level', visible: true, order: 3 },
-  { id: 'impact', label: 'Impact', visible: true, order: 4 },
-  { id: 'damage', label: 'Damage', visible: true, order: 5 },
-  { id: 'block', label: 'Block', visible: true, order: 6 },
-  { id: 'hit', label: 'Hit', visible: true, order: 7 },
-  { id: 'counterHit', label: 'CH', visible: true, order: 8 },
-  { id: 'guardBurst', label: 'GB', visible: true, order: 9 },
-  { id: 'notes', label: 'Notes', visible: true, order: 10 }
+  { 
+    id: 'stance', 
+    label: 'Stance', 
+    visible: true, 
+    order: 0,
+    colClasses: 'pt-2 px-2 cursor-pointer min-w-[100px] max-w-[100px] text-right'
+  },
+  { 
+    id: 'command', 
+    label: 'Command', 
+    visible: true, 
+    order: 1,
+    colClasses: 'pt-2 px-2 cursor-pointer min-w-[210px] max-w-[300px]'
+  },
+  { 
+    id: 'rawCommand', 
+    label: 'Raw Command', 
+    visible: false, 
+    order: 2,
+    colClasses: 'pt-2 px-2 cursor-pointer w-[200px] min-w-[210px] max-w-[300px]'
+  },
+  { 
+    id: 'hitLevel', 
+    label: 'Hit Level', 
+    visible: true, 
+    order: 3,
+    colClasses: 'pt-2 px-2 cursor-pointer w-[135px] min-w-[135px] max-w-[150px]'
+  },
+  { 
+    id: 'impact', 
+    label: 'Impact', 
+    visible: true, 
+    order: 4,
+    colClasses: 'pt-2 px-2 cursor-pointer w-[50px]'
+  },
+  { 
+    id: 'damage', 
+    label: 'Damage', 
+    visible: true, 
+    order: 5,
+    colClasses: 'pt-2 px-2 cursor-pointer w-[50px]',
+  },
+  { 
+    id: 'block', 
+    label: 'Block', 
+    visible: true, 
+    order: 6,
+    colClasses: 'pt-2 px-2 cursor-pointer w-[70px]',
+  },
+  { 
+    id: 'hit', 
+    label: 'Hit', 
+    visible: true, 
+    order: 7,
+    colClasses: 'pt-2 px-2 cursor-pointer w-[60px]'
+  },
+  { 
+    id: 'counterHit', 
+    label: 'CH', 
+    friendlyLabel: 'Counter Hit', 
+    visible: true, 
+    order: 8,
+    colClasses: 'pt-2 px-2 cursor-pointer w-[50px]'
+  },
+  { 
+    id: 'guardBurst', 
+    label: 'GB', 
+    friendlyLabel: 'Guard Burst', 
+    visible: true, 
+    order: 9,
+    colClasses: 'pt-2 px-2 cursor-pointer w-[50px]'
+  },
+  { 
+    id: 'notes', 
+    label: 'Notes', 
+    visible: true, 
+    order: 10,
+    colClasses: 'pt-2 px-2 cursor-pointer overflow-visible'
+  }
 ];
+
+// Define the minimal storage interface for localStorage
+interface StoredColumnConfig {
+  id: string;
+  visible: boolean;
+  order: number;
+}
 
 interface TableConfigContextType {
   columnConfigs: ColumnConfig[];
@@ -37,19 +114,39 @@ const TableConfigContext = createContext<TableConfigContextType | undefined>(und
 
 export const TableConfigProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [columnConfigs, setColumnConfigs] = useState<ColumnConfig[]>(() => {
-    // Try to load from localStorage
+    // Try to load from localStorage and merge with defaults
     try {
       const saved = localStorage.getItem('tableColumnConfig');
-      return saved ? JSON.parse(saved) : DEFAULT_COLUMNS;
+      if (saved) {
+        const storedConfigs: StoredColumnConfig[] = JSON.parse(saved);
+        const storedMap = new Map(storedConfigs.map(config => [config.id, config]));
+        return DEFAULT_COLUMNS.map(defaultCol => {
+          const stored = storedMap.get(defaultCol.id);
+          if (stored) {
+            return {
+              ...defaultCol,
+              visible: stored.visible,
+              order: stored.order
+            };
+          }
+          return defaultCol;
+        }).sort((a, b) => a.order - b.order);
+      }
+      return DEFAULT_COLUMNS;
     } catch {
       return DEFAULT_COLUMNS;
     }
   });
 
-  // Save to localStorage whenever config changes
+  // Save to localStorage whenever config changes (only essential properties)
   useEffect(() => {
     try {
-      localStorage.setItem('tableColumnConfig', JSON.stringify(columnConfigs));
+      const configsToStore: StoredColumnConfig[] = columnConfigs.map(col => ({
+        id: col.id,
+        visible: col.visible,
+        order: col.order
+      }));
+      localStorage.setItem('tableColumnConfig', JSON.stringify(configsToStore));
     } catch (error) {
       console.warn('Failed to save table config to localStorage:', error);
     }

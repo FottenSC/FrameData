@@ -298,22 +298,6 @@ const DataTableContent: React.FC<DataTableContentProps> = ({
     }
   };
 
-  const getCellClasses = (columnId: string) => {
-    switch (columnId) {
-      case 'command':
-      case 'rawCommand':
-        return "font-mono p-2 max-w-[300px] break-words";
-      case 'hitLevel':
-        return "p-2 min-w-[135px] max-w-[150px] align-top";
-      case 'notes':
-        return "max-w-[300px] p-2 overflow-visible";
-      case 'stance':
-        return "text-right p-2";
-      default:
-        return "p-2";
-    }
-  };
-
   return (
     <Table className="table-layout-fixed">
       <TableHeader className="sticky top-0 bg-card z-10">
@@ -326,9 +310,10 @@ const DataTableContent: React.FC<DataTableContentProps> = ({
                 key={column.id}
                 className={column.colClasses}
                 onClick={() => handleSort(sortKey)}
+                title={column.friendlyLabel ? column.friendlyLabel : column.label}
               >
                 <div className="flex items-center justify-between gap-1">
-                  <span>{getColumnHeader(column.label)}</span>
+                  <span>{column.label}</span>
                   {sortColumn === sortKey && (sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
                 </div>
               </TableHead>
@@ -871,15 +856,8 @@ export const FrameDataTable: React.FC = () => {
       document.head.appendChild(styleEl);
     }
 
-    // Cleanup function
-    return () => {
-      const existingStyleEl = document.getElementById(selectionStyleId);
-      if (existingStyleEl && document.head.contains(existingStyleEl)) {
-        // Optional: Remove on component unmount if desired, or leave for performance
-        // document.head.removeChild(existingStyleEl);
-      }
-    };
-  }, []); // Run once on mount
+    return () => {};
+}, []);
 
   if (loading) {
     return (
@@ -910,8 +888,6 @@ export const FrameDataTable: React.FC = () => {
                     alert("Database initialized successfully! Reloading data...");
                     // Re-trigger data loading instead of full page reload
                     setError(null); // Clear error
-                    // Re-fetch characters and potentially moves depending on logic
-                    // This might need a more robust state refresh mechanism
                     window.location.reload(); // Simple reload for now
                   } else {
                     alert("Failed to initialize database.");

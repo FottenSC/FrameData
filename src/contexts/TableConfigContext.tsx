@@ -132,9 +132,10 @@ export const TableConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
           return defaultCol;
         }).sort((a, b) => a.order - b.order);
       }
-      
+
       return DEFAULT_COLUMNS;
-    } catch {
+    } 
+    catch {
       return DEFAULT_COLUMNS;
     }
   });

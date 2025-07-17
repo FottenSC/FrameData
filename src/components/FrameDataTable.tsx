@@ -20,6 +20,8 @@ declare global {
     }
 }
 
+
+//test
 // --- Helper Functions (Moved outside component) ---
 // Helper to get tooltip text for icons (can be expanded for i18n)
 const getIconTooltip = (iconCode: string, availableIcons: IconConfig[]): string => {
@@ -59,7 +61,7 @@ const renderBadge = (value: number | null, text: string | null, forceNoSign: boo
     if (value === null || value === undefined) {
         return <Badge className="bg-gray-500 hover:bg-gray-600 text-white w-12 inline-flex items-center justify-center">{displayText}</Badge>;
     }
-    
+
 
     // Frame advantage coloring
     if (value >= 0) {

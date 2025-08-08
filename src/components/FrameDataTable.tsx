@@ -6,7 +6,7 @@ import { initializeDatabase } from "../utils/initializeDatabase";
 import { Loader2, Shield, ArrowUp, ArrowDown, ChevronRight } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { useGame, AVAILABLE_GAMES, IconConfig } from "../contexts/GameContext";
+import { useGame, avaliableGames, IconConfig } from "../contexts/GameContext";
 import { useTableConfig } from "../contexts/TableConfigContext";
 import { cn } from "@/lib/utils";
 import { FilterBuilder, ActiveFiltersBadge } from "./FilterBuilder";
@@ -45,9 +45,6 @@ const renderBadge = (value: number | null, text: string | null, forceNoSign: boo
         displayText = "—";
     }
 
-
-    // This should be broken out to inherit from current game
-    // Special status strings 
     if (text === "KND") {
         return <Badge className="bg-fuchsia-700 text-white w-12 inline-flex items-center justify-center">{displayText}</Badge>;
     }
@@ -329,7 +326,7 @@ export const FrameDataTable: React.FC = () => {
         if (!selectedGame.id) return;
 
         if (gameId && gameId !== selectedGame.id) {
-            const game = AVAILABLE_GAMES.find((g) => g.id === gameId);
+            const game = avaliableGames.find((g) => g.id === gameId);
             if (game) {
                 setSelectedGameById(gameId);
                 return;

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { Gamepad2, Sword } from 'lucide-react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 // Remove the old import
 // import { AVAILABLE_GAMES, Game } from '../components/GameSelector';
@@ -104,6 +105,7 @@ export interface Game {
   icons: IconConfig[];
   /** Translation configuration for command and note text */
   translations: GameTranslationConfig;
+  icon: ReactNode;
 }
 
 // Define Character interface here
@@ -112,12 +114,13 @@ export interface Character {
   name: string;
 }
 
-// Define AVAILABLE_GAMES here
-export const AVAILABLE_GAMES: Game[] = [
+// Define avaliableGames here
+export const avaliableGames: Game[] = [
   {
     id: 'SoulCalibur6',
     name: 'SoulCalibur VI',
     dbPath: '/SoulCalibur6/FrameData.db',
+    icon: <Sword className="h-5 w-5 mr-2" />,
     translations: {
       extends: ['soulCaliburButtons'],
       specific: {}
@@ -157,6 +160,7 @@ export const AVAILABLE_GAMES: Game[] = [
     id: 'Tekken8',
     name: 'Tekken 8',
     dbPath: '/Tekken8/FrameData.db',
+  icon: <Gamepad2 className="h-5 w-5 mr-2" />,
     translations: {
       extends: ['weirdTekken'],
       specific: {}
@@ -211,10 +215,10 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const location = useLocation();
   
   const [selectedGame, setSelectedGame] = useState<Game>(() => {
-    const gameFromUrl = params.gameId ? AVAILABLE_GAMES.find(g => g.id === params.gameId) : null;
+    const gameFromUrl = params.gameId ? avaliableGames.find(g => g.id === params.gameId) : null;
     const savedGameId = !gameFromUrl ? localStorage.getItem('selectedGameId') : null;
-    const gameFromStorage = savedGameId ? AVAILABLE_GAMES.find(g => g.id === savedGameId) : null;
-    return gameFromUrl || gameFromStorage || AVAILABLE_GAMES[0];
+    const gameFromStorage = savedGameId ? avaliableGames.find(g => g.id === savedGameId) : null;
+    return gameFromUrl || gameFromStorage || avaliableGames[0];
   });
   
   const [isCharactersLoading, setIsCharactersLoading] = useState(true);
@@ -273,7 +277,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   }, [selectedGame?.id]);
 
   const handleSetSelectedGameById = (gameId: string) => {
-    const game = AVAILABLE_GAMES.find(g => g.id === gameId);
+    const game = avaliableGames.find(g => g.id === gameId);
     if (game && game.id !== selectedGame?.id) {
       setSelectedGame(game);
       setSelectedCharacterId(null);

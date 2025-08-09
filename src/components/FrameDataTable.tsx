@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 // Table rendering moved into FrameDataTableContent
 import { ChevronRight } from "lucide-react";
@@ -574,6 +574,8 @@ export const FrameDataTable: React.FC = () => {
     // Get selected character name based on the ID stored in context
     const selectedCharacterNameFromContext = selectedCharacterId === -1 ? "All Characters" : (selectedCharacterId ? characters.find((c) => c.id === selectedCharacterId)?.name : null);
 
+    const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+
     return (
         <div className="space-y-6 h-full flex flex-col pl-4 pr-4 flex-grow">
             {selectedCharacterId ? (
@@ -606,7 +608,7 @@ export const FrameDataTable: React.FC = () => {
                         </div>
                     </CardHeader>
                     <CardContent className="flex-grow p-0 flex flex-col overflow-visible">
-                        <div className="overflow-y-auto flex-grow">
+                        <div className="overflow-y-auto flex-grow max-h-[70vh]" ref={scrollContainerRef}>
                             {/* Render the memoized table content */}
                             <MemoizedDataTableContent
                                 moves={displayedMoves}
@@ -618,6 +620,7 @@ export const FrameDataTable: React.FC = () => {
                                 renderNotes={renderNotes}
                                 visibleColumns={visibleColumns}
                                 badges={selectedGame.badges}
+                getScrollElement={() => scrollContainerRef.current}
                             />
                         </div>
                     </CardContent>

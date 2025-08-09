@@ -3,13 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Gamepad2, Sword, Command } from 'lucide-react';
 import { useGame } from '../contexts/GameContext';
 import { useCommand } from '../contexts/CommandContext';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from './ui/select';
+import { Combobox, ComboboxOption } from './ui/combobox';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -33,7 +27,7 @@ export const Navbar: React.FC = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  const handleCharacterSelect = (value: string) => {
+  const handleCharacterSelect = (value: string | null) => {
     if (!value) {
       // Handle case where selection is cleared (empty value)
       setSelectedCharacterId(null);
@@ -46,6 +40,13 @@ export const Navbar: React.FC = () => {
     const selectedId = Number(idString);
 
     if (!isNaN(selectedId) && name) {
+      // No-op if choosing the currently active character and URL segment already matches
+      if (
+        selectedCharacterId === selectedId &&
+        decodeURIComponent(location.pathname.split('/')[2] || '').toLowerCase() === name.toLowerCase()
+      ) {
+        return;
+      }
       setSelectedCharacterId(selectedId); // Set the ID in context
       // Navigate using the name directly from the parsed value
       navigate(`/${selectedGame.id}/${encodeURIComponent(name)}`);
@@ -87,31 +88,20 @@ export const Navbar: React.FC = () => {
                     <>
                       <BreadcrumbSeparator />
                       <BreadcrumbItem>
-                        <Select
+                        <Combobox
                           value={
                             selectedCharacterId === -1
                               ? `-1|All`
-                              : (selectedCharacterId ? `${selectedCharacterId}|${characters.find(c => c.id === selectedCharacterId)?.name || ''}` : "")
+                              : (selectedCharacterId ? `${selectedCharacterId}|${characters.find(c => c.id === selectedCharacterId)?.name || ''}` : null)
                           }
-                          onValueChange={handleCharacterSelect}
-                        >
-                          <SelectTrigger className="h-auto py-0 px-1.5 text-sm font-medium border-none shadow-none bg-transparent focus:ring-0 focus:ring-offset-0 w-auto min-w-[150px] text-foreground/80 hover:text-foreground transition-colors [&>span]:line-clamp-1">
-                            <SelectValue placeholder="Select Character" />
-                          </SelectTrigger>
-                          <SelectContent style={{ backgroundColor: 'hsl(0, 0%, 20%)' }}>
-                            <SelectItem key="all-characters" value={`-1|All`}>
-                              All Characters
-                            </SelectItem>
-                            {characters.map((character) => (
-                              <SelectItem
-                                key={character.id}
-                                value={`${character.id}|${character.name}`}
-                              >
-                                {character.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                          onChange={handleCharacterSelect}
+                          options={[
+                            { label: 'All Characters', value: '-1|All' },
+                            ...characters.map((c) => ({ label: c.name, value: `${c.id}|${c.name}` })) as ComboboxOption[],
+                          ]}
+                          placeholder="Select Character"
+                          className="h-auto py-0 px-1.5 text-sm font-medium border-none shadow-none bg-transparent focus:ring-0 focus:ring-offset-0 w-auto min-w-[150px] text-foreground/80 hover:text-foreground transition-colors"
+                        />
                       </BreadcrumbItem>
                     </>
                   )}

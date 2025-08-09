@@ -1,8 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Gamepad2, Sword } from 'lucide-react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-// Remove the old import
-// import { AVAILABLE_GAMES, Game } from '../components/GameSelector';
 
 // Define configuration for a game-specific icon with its alt text
 export interface IconConfig {
@@ -18,7 +16,7 @@ export interface IconConfig {
 export type TranslationMap = Record<string, string>;
 
 // Define reusable translation mappings
-export const TRANSLATION_MAPPINGS: Record<string, TranslationMap> = {
+export const sharedTranslation: Record<string, TranslationMap> = {
   soulCaliburButtons: {
     ':(B+C):': ':(B+K):',
     ':(B+D):': ':(B+G):',
@@ -63,7 +61,7 @@ export const buildTranslationMap = (config: GameTranslationConfig): TranslationM
   // Add mappings from extended modules
   if (config.extends) {
     config.extends.forEach(mappingName => {
-      const mapping = TRANSLATION_MAPPINGS[mappingName];
+      const mapping = sharedTranslation[mappingName];
       if (mapping) {
         effectiveMap = { ...effectiveMap, ...mapping };
       }
@@ -101,11 +99,10 @@ export interface Game {
   id: string;
   name: string;
   dbPath: string;
-  /** List of available icon configurations for this game */
   icons: IconConfig[];
-  /** Translation configuration for command and note text */
   translations: GameTranslationConfig;
   icon: ReactNode;
+  badges?: Record<string, { className: string }>;
 }
 
 // Define Character interface here
@@ -121,12 +118,17 @@ export const avaliableGames: Game[] = [
     name: 'SoulCalibur VI',
     dbPath: '/SoulCalibur6/FrameData.db',
     icon: <Sword className="h-5 w-5 mr-2" />,
+    badges: {
+      KND: { className: 'bg-fuchsia-700 text-white' },
+      STN: { className: 'bg-pink-700 text-white' },
+      LNC: { className: 'bg-rose-700 text-white' },
+    },
     translations: {
       extends: ['soulCaliburButtons'],
       specific: {}
     },
     icons: [
-      // 2x1 icons
+  // 2x1 icons
       { code: 'UA', title: 'Unblockable', iconClasses: 'h-4 w-8' },
       { code: 'UC', title: 'Universal Cancel', iconClasses: 'h-4 w-8' },
       { code: 'SS', title: 'Stance Switch', iconClasses: 'h-4 w-8' },
@@ -139,16 +141,13 @@ export const avaliableGames: Game[] = [
       { code: 'SC', title: 'Costs Soulcharge', iconClasses: 'h-4 w-8' },
       { code: 'RE', title: 'Reversal edge', iconClasses: 'h-4 w-8' },
 
-      // 1x1 icons
+  // 1x1 icons
       { code: 'H', title: 'H' },
       { code: 'M', title: 'M' },
       { code: 'L', title: 'L' },
       { code: 'SM', title: 'SM' },
 
-      // Icons im unsure about
-      { code: 'AT', title: 'Attack Throw???', iconClasses: 'h-4 w-8' },
-      
-      // Game Buttons (assuming 1x1 size, adjust className if needed)
+  // Game Buttons
       { code: 'A', title: 'A' },
       { code: 'B', title: 'B' },
       { code: 'K', title: 'K' }, 
@@ -160,7 +159,12 @@ export const avaliableGames: Game[] = [
     id: 'Tekken8',
     name: 'Tekken 8',
     dbPath: '/Tekken8/FrameData.db',
-  icon: <Gamepad2 className="h-5 w-5 mr-2" />,
+    icon: <Gamepad2 className="h-5 w-5 mr-2" />,
+    badges: {
+      KND: { className: 'bg-indigo-700 text-white' },
+      STN: { className: 'bg-amber-700 text-white' },
+      LNC: { className: 'bg-rose-700 text-white' },
+    },
     translations: {
       extends: ['weirdTekken'],
       specific: {}
@@ -181,12 +185,7 @@ const DIRECTIONAL_ICONS: Pick<IconConfig, 'code' | 'iconClasses'>[] = [
   { code: '7' }, { code: '8' }, { code: '9' },
 ];
 
-// Declare initSqlJs globally
-declare global {
-  interface Window {
-    initSqlJs: () => Promise<any>;
-  }
-}
+// No longer using SQL.js globally; data is loaded from static JSON in public/Games
 
 interface GameContextType {
   selectedGame: Game;
@@ -228,10 +227,10 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const loadCharacters = async () => {
-      if (!selectedGame || !selectedGame.dbPath) {
+      if (!selectedGame) {
         setCharacters([]);
         setIsCharactersLoading(false);
-        setCharacterError("Selected game or database path is invalid.");
+        setCharacterError("No game selected.");
         return;
       }
 
@@ -239,30 +238,21 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       setCharacterError(null);
       setCharacters([]);
 
-      let database: any = null;
       try {
-        const SQL = await window.initSqlJs();
-        const response = await fetch(selectedGame.dbPath);
-        if (!response.ok) throw new Error(`Failed to fetch database (${response.status}): ${response.statusText}`);
-        const arrayBuffer = await response.arrayBuffer();
-        const uint8Array = new Uint8Array(arrayBuffer);
-        database = new SQL.Database(uint8Array);
-
-        const charactersResult = database.exec('SELECT ID, Name FROM Characters ORDER BY Name ASC');
-        if (charactersResult.length > 0 && charactersResult[0].values.length > 0) {
-          const charactersData: Character[] = charactersResult[0].values.map((row: unknown[]) => ({
-            id: Number(row[0]),
-            name: String(row[1])
-          }));
-          setCharacters(charactersData);
-        } else {
-          setCharacters([]);
-        }
+        // Load from public/Games/{gameId}/Characters.json
+        const url = `/Games/${encodeURIComponent(selectedGame.id)}/Characters.json`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`Failed to fetch characters (${res.status}): ${res.statusText}`);
+        const data = await res.json();
+        const charactersData: Character[] = (Array.isArray(data) ? data : []).map((c: any) => ({
+          id: Number(c.id),
+          name: String(c.name),
+        }));
+        setCharacters(charactersData);
       } catch (err) {
         setCharacterError(err instanceof Error ? err.message : `Unknown error loading characters.`);
         setCharacters([]);
       } finally {
-        database?.close();
         setIsCharactersLoading(false);
       }
     };
@@ -295,7 +285,6 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   };
 
   // Combine game-specific icons with universal directional icons
-  // Use a Map to handle potential duplicates, giving priority to game-specific icons
   const combinedIconsMap = new Map<string, IconConfig>();
   DIRECTIONAL_ICONS.forEach(icon => combinedIconsMap.set(icon.code, icon as IconConfig)); // Add directionals first
   (selectedGame.icons || []).forEach(icon => combinedIconsMap.set(icon.code, icon)); // Game-specific override/add
@@ -304,15 +293,17 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
   const getIconUrl = (iconName: string, isHeld: boolean = false): string => {
     const upperIconName = iconName.toUpperCase();
-    return `/${selectedGame.id}/Icons/${upperIconName}.svg`;
+    return `/Games/${selectedGame.id}/Icons/${upperIconName}.svg`;
   };
 
-  const getTranslationMap = (): TranslationMap => {
+  // Memoize translation map for the selected game
+  const translationMap = React.useMemo<TranslationMap>(() => {
     return buildTranslationMap(selectedGame.translations);
-  };
+  }, [selectedGame.id, selectedGame.translations]);
+
+  const getTranslationMap = (): TranslationMap => translationMap;
 
   const translateText = (text: string | null): string | null => {
-    const translationMap = getTranslationMap();
     return translateString(text, translationMap);
   };
 
@@ -325,8 +316,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     setCharacters,
     selectedCharacterId,
     setSelectedCharacterId: handleSetSelectedCharacterId,
-    availableIcons: combinedIcons, // Use the combined list
-    getIconUrl: getIconUrl, // Use the updated function
+    availableIcons: combinedIcons,
+    getIconUrl: getIconUrl,
     getTranslationMap,
     translateText,
   };

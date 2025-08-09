@@ -59,6 +59,25 @@ export const CharacterSelectionPage: React.FC = () => {
       {/* Character List - Only show if not loading and no error */}
       {!isCharactersLoading && !characterError && selectedGame && characters.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 animate-fadeIn min-h-[40vh]">
+          {/* All Characters option */}
+          <Card
+            key="all-characters"
+            className="hover:shadow-lg transition-shadow duration-200 cursor-pointer flex flex-col items-center p-4 text-center border-primary/40"
+            onClick={() => {
+              if (selectedGame) {
+                setSelectedCharacterId(-1);
+                navigate(`/${selectedGame.id}/All`);
+              }
+            }}
+          >
+            <CardHeader className="p-0 mb-2 flex-grow flex items-center justify-center">
+              <CardTitle className="text-lg">All Characters</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0 mt-auto">
+              <Button variant="outline" size="sm">View All</Button>
+            </CardContent>
+          </Card>
+
           {characters.map((character) => (
             <Card
               key={character.id}

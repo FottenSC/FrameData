@@ -1,12 +1,12 @@
 # Fighting Game Frame Data Viewer
 
-This is a web application designed to display frame data for characters in fighting games like Soul Calibur VI and Tekken 8. It uses React, Vite, TypeScript, and SQL.js to load and display move lists from SQLite database files directly in the browser.
+This is a web application designed to display frame data for characters in fighting games like Soul Calibur VI and Tekken 8. It uses React, Vite, and TypeScript to load and display move lists from static JSON files in the browser.
 
 ## Features
 
 *   Displays character move lists for multiple supported games (Soul Calibur VI, Tekken 8).
 *   Sortable and filterable frame data tables.
-*   Loads data from local game-specific `.db` files using SQL.js.
+*   Loads data from local game-specific JSON files under `public/Games/{Game}/...`.
 *   Built with modern web technologies for a fast and responsive experience.
 
 ## Tech Stack
@@ -16,7 +16,7 @@ This is a web application designed to display frame data for characters in fight
 *   **State Management:** React Context API
 *   **Build Tool:** Vite
 *   **Styling:** Tailwind CSS, shadcn/ui
-*   **Database:** SQL.js (running SQLite in the browser)
+*   **Data Source:** Static JSON files in `public/Games`
 
 ## Setup and Installation
 
@@ -31,7 +31,7 @@ This is a web application designed to display frame data for characters in fight
     ```
 3.  **Database:**
     *   Ensure you have the required database files in the `public/` directory, organized by game ID (e.g., `public/SoulCalibur6/FrameData.db`, `public/Tekken8/FrameData.db`).
-    *   The application expects `sql-wasm.wasm` to be available. It's usually loaded via CDN or should be placed in the `public/` directory if self-hosted.
+    *   No WebAssembly or SQL.js needed. Ensure the JSON files are present under `public/Games`.
 
 ## Available Scripts
 
@@ -43,7 +43,7 @@ This is a web application designed to display frame data for characters in fight
 
 ## How it Works
 
-The application initializes SQL.js in the browser, fetches the appropriate `<GameID>/FrameData.db` file based on the selected game, and loads it into the SQL.js engine. React components then query this in-browser database to display the frame data.
+The application fetches the appropriate JSON files based on the selected game and character under `public/Games/{GameID}/Characters.json` and `public/Games/{GameID}/Characters/{CharacterID}.json`. React components render the data directly.
 
 
 ## Internal Move Notation

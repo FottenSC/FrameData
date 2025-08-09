@@ -120,7 +120,8 @@ export function CommandPalette() {
 
   const handleCharacterSelect = (characterId: number, characterName: string) => {
     setSelectedCharacterId(characterId)
-    navigate(`/${selectedGame.id}/${characterName}`)
+    const nameForUrl = characterId === -1 ? 'All' : characterName
+    navigate(`/${selectedGame.id}/${encodeURIComponent(nameForUrl)}`)
     setOpen(false)
   }
 
@@ -341,6 +342,13 @@ export function CommandPalette() {
                   >
                     <ChevronLeft className="mr-2 h-4 w-4" />
                     <span>Back to Commands</span>
+                  </CommandItem>
+                  <CommandItem
+                    key={-1}
+                    onSelect={() => handleCharacterSelect(-1, 'All')}
+                  >
+                    <Users className="mr-2 h-4 w-4" />
+                    <span>All Characters</span>
                   </CommandItem>
                   {characters.map((character) => (
                     <CommandItem

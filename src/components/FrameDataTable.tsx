@@ -1,274 +1,22 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
-import { Button } from "./ui/button";
-import { initializeDatabase } from "../utils/initializeDatabase";
-import { Loader2, Shield, ArrowUp, ArrowDown, ChevronRight } from "lucide-react";
+// Table rendering moved into FrameDataTableContent
+import { ChevronRight } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
-import { Badge } from "./ui/badge";
-import { useGame, avaliableGames, IconConfig } from "../contexts/GameContext";
+// Badge usage moved into ValueBadge
+import { useGame, avaliableGames } from "../contexts/GameContext";
 import { useTableConfig } from "../contexts/TableConfigContext";
 import { cn } from "@/lib/utils";
 import { FilterBuilder, ActiveFiltersBadge } from "./FilterBuilder";
-import { CommandIcon } from "@/components/ui/CommandIcon";
+import { CommandRenderer } from "@/components/renderers/CommandRenderer";
+import { NotesRenderer } from "@/components/renderers/NotesRenderer";
+import { FrameDataTableContent } from "@/components/table/FrameDataTableContent";
 import { Move, FilterCondition, SortableColumn } from "../types/Move";
 
-// Using the SQL.js loaded via CDN
-declare global {
-    interface Window {
-        initSqlJs: () => Promise<any>;
-    }
-}
 
 
-//test
-// --- Helper Functions (Moved outside component) ---
-// Helper to get tooltip text for icons (can be expanded for i18n)
-const getIconTooltip = (iconCode: string, availableIcons: IconConfig[]): string => {
-    const upperCode = iconCode.toUpperCase();
-    const iconConfig = availableIcons.find((icon) => icon.code.toUpperCase() === upperCode);
-    if (iconConfig && iconConfig.title) {
-        return iconConfig.title;
-    }
 
-    return upperCode;
-};
-
-// Combined badge rendering function (Moved outside component)
-const renderBadge = (value: number | null, text: string | null, forceNoSign: boolean = false): React.ReactNode => {
-    let displayText: string;
-    if (text !== null && text !== undefined) {
-        displayText = text;
-    } else if (value !== null && value !== undefined) {
-        displayText = (!forceNoSign && value > 0 ? "+" : "") + value;
-    } else {
-        displayText = "—";
-    }
-
-    if (text === "KND") {
-        return <Badge className="bg-fuchsia-700 text-white w-12 inline-flex items-center justify-center">{displayText}</Badge>;
-    }
-    if (text === "STN") {
-        return <Badge className="bg-pink-700 text-white w-12 inline-flex items-center justify-center">{displayText}</Badge>;
-    }
-    if (text === "LNC") {
-        return <Badge className="bg-rose-700 text-white w-12 inline-flex items-center justify-center">{displayText}</Badge>;
-    }
-
-    if (value === null || value === undefined) {
-        return <Badge className="bg-gray-500 hover:bg-gray-600 text-white w-12 inline-flex items-center justify-center">{displayText}</Badge>;
-    }
-
-
-    // Frame advantage coloring
-    if (value >= 0) {
-        return <Badge className="bg-green-700 text-white w-12 inline-flex items-center justify-center">{displayText}</Badge>;
-    } else {
-        return <Badge className="bg-rose-700 text-white w-12 inline-flex items-center justify-center">{displayText}</Badge>;
-    }
-};
-
-// --- End Helper Functions ---
-
-// --- Standalone UI Components (Moved outside main component) ---
-
-// Define a self-contained hit level icon component
-const HitLevelIcon = React.memo(({ level }: { level: string }) => {
-    let bgColor = "bg-gray-400";
-    let textColor = "text-white";
-
-    switch (level.toUpperCase()) {
-        case "M":
-            bgColor = "bg-yellow-500";
-            break;
-        case "L":
-            bgColor = "bg-cyan-500";
-            break;
-        case "H":
-            bgColor = "bg-pink-500";
-            break;
-        case "SM":
-            bgColor = "bg-purple-500";
-            break;
-        case "SL":
-            bgColor = "bg-cyan-500";
-            break;
-        case "SH":
-            bgColor = "bg-orange-500";
-            break;
-    }
-
-    return (
-        <div className="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center p-px ring-1 ring-black" title={level}>
-            <div className="w-full h-full rounded-full bg-white flex items-center justify-center p-px">
-                <div className={`w-full h-full rounded-full flex items-center justify-center text-xs font-bold ${bgColor} ${textColor}`}>
-                    {level.length > 1 && ["SL", "SH", "SM"].includes(level.toUpperCase()) ? level.toUpperCase() : level.charAt(0).toUpperCase()}
-                </div>
-            </div>
-        </div>
-    );
-});
-
-// Define a self-contained component for expandable hit levels
-const ExpandableHitLevels = React.memo(({ hitLevelString, maxIconsToShow = 3 }: { hitLevelString: string | null; maxIconsToShow?: number }) => {
-    const [isExpanded, setIsExpanded] = React.useState(false);
-    const levels = React.useMemo(() => {
-        if (!hitLevelString) return [];
-        return hitLevelString
-            .split(/:+/)
-            .map((level) => level.trim())
-            .filter(Boolean);
-    }, [hitLevelString]);
-
-    const canExpand = levels.length > maxIconsToShow + 1;
-    const handleToggle = React.useCallback(() => {
-        if (!canExpand) return;
-        setIsExpanded((prev) => !prev);
-    }, [canExpand]);
-
-    if (levels.length === 0) {
-        return <span className="text-muted-foreground">—</span>;
-    }
-
-    let iconsToShow: number;
-    if (levels.length <= maxIconsToShow + 1) {
-        iconsToShow = levels.length;
-    } else {
-        iconsToShow = isExpanded ? levels.length : maxIconsToShow;
-    }
-
-    const showEllipsis = canExpand && !isExpanded;
-    return (
-        <div className={`flex flex-wrap items-center gap-1 ${canExpand ? "cursor-pointer" : ""}`} onClick={canExpand ? handleToggle : undefined}>
-            {levels.slice(0, iconsToShow).map((level, index) => (
-                <div key={`${level}-${index}`}>
-                    <HitLevelIcon level={level} />
-                </div>
-            ))}
-
-            {showEllipsis && <ChevronRight size={16} className="text-muted-foreground ml-1" />}
-        </div>
-    );
-});
-
-// --- End Standalone UI Components ---
-
-// --- Memoized Table Content Component ---
-interface DataTableContentProps {
-    moves: Move[];
-    movesLoading: boolean;
-    sortColumn: SortableColumn | null;
-    sortDirection: "asc" | "desc";
-    handleSort: (column: SortableColumn) => void;
-    renderCommand: (command: string | null) => React.ReactNode;
-    renderNotes: (note: string | null) => React.ReactNode;
-    ExpandableHitLevelsComponent: typeof ExpandableHitLevels;
-    visibleColumns: any[];
-}
-
-const DataTableContent: React.FC<DataTableContentProps> = ({
-    moves,
-    movesLoading,
-    sortColumn,
-    sortDirection,
-    handleSort,
-    renderCommand,
-    renderNotes,
-    ExpandableHitLevelsComponent,
-    visibleColumns,
-}) => {
-    const renderCellContent = (move: Move, columnId: string) => {
-        switch (columnId) {
-            case "stance":
-                return move.Stance || "—";
-            case "command":
-                return renderCommand(move.Command);
-            case "rawCommand":
-                return move.Command || "—";
-            case "hitLevel":
-                return <ExpandableHitLevelsComponent hitLevelString={move.HitLevel} maxIconsToShow={3} />;
-            case "impact":
-                return move.Impact ?? "—";
-            case "damage":
-                return move.DamageDec ?? "—";
-            case "block":
-                return renderBadge(move.BlockDec, move.Block);
-            case "hit":
-                return renderBadge(move.HitDec, move.Hit);
-            case "counterHit":
-                return renderBadge(move.CounterHitDec, move.CounterHit);
-            case "guardBurst":
-                return renderBadge(move.GuardBurst, null, true);
-            case "notes":
-                return <div className="max-w-full truncate overflow-x-hidden overflow-y-visible">{renderNotes(move.Notes)}</div>;
-            default:
-                return "—";
-        }
-    };
-
-    return (
-        <Table className="table-layout-fixed">
-            <TableHeader className="sticky top-0 bg-card z-10">
-                <TableRow className="border-b-card-border">
-                    {visibleColumns.map((column) => {
-                        return (
-                            <TableHead
-                                key={column.id}
-                                className={column.colClasses}
-                                onClick={() => handleSort(column.id as SortableColumn)}
-                                title={column.friendlyLabel ? column.friendlyLabel : column.label}
-                            >
-                                <div className="flex items-center justify-between gap-1">
-                                    <span>{column.label}</span>
-                                    {sortColumn === column.id && (sortDirection === "asc" ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
-                                </div>
-                            </TableHead>
-                        );
-                    })}
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                {(() => {
-                    if (movesLoading) {
-                        return (
-                            <TableRow>
-                                <TableCell colSpan={visibleColumns.length} className="text-center h-24 p-2">
-                                    <div className="flex justify-center items-center">
-                                        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground mr-2" />
-                                        Loading moves...
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        );
-                    } else if (moves.length === 0) {
-                        return (
-                            <TableRow>
-                                <TableCell colSpan={visibleColumns.length} className="text-center h-24 p-2">
-                                    No moves found for this character or filter criteria.
-                                </TableCell>
-                            </TableRow>
-                        );
-                    }
-
-                    return moves.map((move) => (
-                        <TableRow key={move.ID} className="border-b-card-border">
-                            {visibleColumns.map((column) => (
-                                <TableCell key={`${move.ID}-${column.id}`} className={column.colClasses}>
-                                    {renderCellContent(move, column.id)}
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                    ));
-                })()}
-            </TableBody>
-        </Table>
-    );
-};
-
-const MemoizedDataTableContent = React.memo(DataTableContent);
-
-// --- End Memoized Table Content Component ---
-
+import { FrameDataTableContent as MemoizedDataTableContent } from "@/components/table/FrameDataTableContent";
 export const FrameDataTable: React.FC = () => {
     const params = useParams<{ gameId?: string; characterName?: string }>();
     const { gameId, characterName } = params;
@@ -278,10 +26,7 @@ export const FrameDataTable: React.FC = () => {
 
     // Add table configuration context
     const { getVisibleColumns } = useTableConfig();
-
-    const [db, setDb] = useState<any | null>(null);
     const [originalMoves, setOriginalMoves] = useState<Move[]>([]); // Store the original, unsorted moves
-    const [loading, setLoading] = useState(true);
     const [movesLoading, setMovesLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [deployTimestamp, setDeployTimestamp] = useState<string>("Loading...");
@@ -304,11 +49,20 @@ export const FrameDataTable: React.FC = () => {
         setFiltersVisible((prev) => !prev);
     }, []);
 
-    // Sync URL with selected character
+    // Sync URL with selected character (including "All")
     useEffect(() => {
         if (selectedCharacterId !== null && characters.length > 0 && selectedGame.id) {
             const selectedChar = characters.find((c) => c.id === selectedCharacterId);
-            if (selectedChar) {
+            if (selectedCharacterId === -1) {
+                const expectedUrlName = encodeURIComponent("All");
+                const currentUrlName = characterName ? encodeURIComponent(decodeURIComponent(characterName)) : undefined;
+
+                if (expectedUrlName !== currentUrlName) {
+                    navigate(`/${selectedGame.id}/${expectedUrlName}`, {
+                        replace: true,
+                    });
+                }
+            } else if (selectedChar) {
                 const expectedUrlName = encodeURIComponent(selectedChar.name);
                 const currentUrlName = characterName ? encodeURIComponent(decodeURIComponent(characterName)) : undefined;
 
@@ -333,21 +87,25 @@ export const FrameDataTable: React.FC = () => {
             }
         }
 
-        if (characterName && characters.length > 0 && (selectedCharacterId === null || !characters.some((c) => c.id === selectedCharacterId))) {
+        if (characterName && characters.length > 0 && (selectedCharacterId === null || (!characters.some((c) => c.id === selectedCharacterId) && selectedCharacterId !== -1))) {
             const decodedName = decodeURIComponent(characterName);
-            const characterFromName = characters.find((c) => c.name.toLowerCase() === decodedName.toLowerCase());
-
-            if (characterFromName) {
-                setSelectedCharacterId(characterFromName.id);
+            if (decodedName.toLowerCase() === 'all') {
+                setSelectedCharacterId(-1);
             } else {
-                const firstCharacter = characters[0];
-                if (firstCharacter) {
-                    setSelectedCharacterId(firstCharacter.id);
+                const characterFromName = characters.find((c) => c.name.toLowerCase() === decodedName.toLowerCase());
+
+                if (characterFromName) {
+                    setSelectedCharacterId(characterFromName.id);
                 } else {
-                    setSelectedCharacterId(null);
+                    const firstCharacter = characters[0];
+                    if (firstCharacter) {
+                        setSelectedCharacterId(firstCharacter.id);
+                    } else {
+                        setSelectedCharacterId(null);
+                    }
                 }
             }
-        } else if (!characterName && characters.length > 0 && (selectedCharacterId === null || !characters.some((c) => c.id === selectedCharacterId))) {
+        } else if (!characterName && characters.length > 0 && (selectedCharacterId === null || (!characters.some((c) => c.id === selectedCharacterId) && selectedCharacterId !== -1))) {
             const firstCharacter = characters[0];
             if (firstCharacter) {
                 setSelectedCharacterId(firstCharacter.id);
@@ -355,110 +113,131 @@ export const FrameDataTable: React.FC = () => {
         }
     }, [gameId, characterName, selectedGame.id, characters, selectedCharacterId, setSelectedGameById, setSelectedCharacterId]);
 
-    // Load database when game changes
+    // No database to initialize; moves are loaded from static JSON per character
+
+    // Simple in-memory cache for fetched/processed moves keyed by game+character
+    const movesCacheRef = React.useRef<Map<string, Move[]>>(new Map());
+
+    // Load moves when game or character changes (from static JSON)
     useEffect(() => {
         setOriginalMoves([]);
-        setDb(null);
-        setLoading(true);
-        setError(null);
-
-        const loadDatabase = async () => {
-            if (!selectedGame.dbPath) {
-                setError("No database path configured for the selected game.");
-                setLoading(false);
-                return;
-            }
-            try {
-                setLoading(true);
-                const SQL = await window.initSqlJs();
-                const response = await fetch(selectedGame.dbPath);
-                if (!response.ok) throw new Error(`Failed to fetch database: ${response.statusText}`);
-                const arrayBuffer = await response.arrayBuffer();
-                const uint8Array = new Uint8Array(arrayBuffer);
-                const database = new SQL.Database(uint8Array);
-                setDb(database);
-            } catch (error) {
-                setError(error instanceof Error ? error.message : `Error loading database for ${selectedGame.name}`);
-                setDb(null);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        loadDatabase();
-    }, [selectedGame.dbPath]);
-
-    // Load moves when character or database changes
-    useEffect(() => {
-        setOriginalMoves([]);
-        if (db && selectedCharacterId !== null) {
+    if (selectedGame?.id && selectedCharacterId !== null) {
             setMovesLoading(true);
             setError(null);
-
-            // Use setTimeout to avoid race conditions with state updates
-            const timer = setTimeout(() => {
+            const abort = new AbortController();
+            const fetchMoves = async () => {
                 try {
-                    const movesQuery = `
-            SELECT
-              ID, Command, Stance, HitLevel, Impact, Damage,
-              Hit, CounterHit, BlockDec, HitDec, CounterHitDec,
-              GuardBurst, Notes, DamageDec
-            FROM Moves
-            WHERE CharacterID = ?
-          `;
-                    const movesResult = db.exec(movesQuery, [selectedCharacterId]);
+                    const cacheKey = `${selectedGame.id}::${selectedCharacterId}`;
+                    if (movesCacheRef.current.has(cacheKey)) {
+                        setOriginalMoves(movesCacheRef.current.get(cacheKey)!);
+                        return;
+                    }
+                    let aggregated: Move[] = [];
+                    if (selectedCharacterId === -1) {
+                        // Optimized path: try single file aggregate first
+                        const allUrl = `/Games/${encodeURIComponent(selectedGame.id)}/Characters/AllCharacters.json`;
+                        let flatData: any[] | null = null;
+                        try {
+                            const allRes = await fetch(allUrl, { signal: abort.signal });
+                            if (allRes.ok) {
+                                const allData = await allRes.json();
+                                flatData = Array.isArray(allData) ? allData : [];
+                            }
+                        } catch (_) {
+                            // ignore and fallback
+                        }
 
-                    if (movesResult.length > 0 && movesResult[0].values.length > 0) {
-                        const columns = movesResult[0].columns;
-                        const values = movesResult[0].values;
+                        if (!flatData) {
+                            // Fallback: fetch Characters.json and then each character
+                            const listUrl = `/Games/${encodeURIComponent(selectedGame.id)}/Characters.json`;
+                            const listRes = await fetch(listUrl, { signal: abort.signal });
+                            if (!listRes.ok) throw new Error(`Failed to fetch characters list: ${listRes.status} ${listRes.statusText}`);
+                            const listData = await listRes.json();
+                            const ids: number[] = (Array.isArray(listData) ? listData : []).map((c: any) => Number(c.id)).filter((n: any) => !isNaN(n));
 
-                        const movesData: Move[] = values.map((row: unknown[]) => {
-                            const moveObject: Record<string, unknown> = {};
-                            columns.forEach((colName: string, index: number) => {
-                                moveObject[colName] = row[index];
+                            const fetches = ids.map(async (id: number) => {
+                                const url = `/Games/${encodeURIComponent(selectedGame.id)}/Characters/${encodeURIComponent(String(id))}.json`;
+                                const res = await fetch(url, { signal: abort.signal });
+                                if (!res.ok) return [] as any[];
+                                const data = await res.json();
+                                return Array.isArray(data) ? data : [];
                             });
+                            const allDataArrays = await Promise.all(fetches);
+                            flatData = allDataArrays.flat();
+                        }
 
-                            const originalCommand = String(moveObject.Command);
-                            const translatedCommand = translateText(originalCommand);
-
+                        aggregated = (flatData || []).map((moveObject: any) => {
+                            const originalCommand = moveObject.Command != null ? String(moveObject.Command) : null;
+                            const translatedCommand = originalCommand ? translateText(originalCommand) : null;
                             return {
                                 ID: Number(moveObject.ID),
                                 Command: translatedCommand,
                                 Stance: moveObject.Stance ? String(moveObject.Stance) : null,
                                 HitLevel: moveObject.HitLevel ? String(moveObject.HitLevel) : null,
-                                Impact: Number(moveObject.Impact),
-                                Damage: moveObject.Damage ? String(moveObject.Damage) : null,
-                                DamageDec: moveObject.DamageDec !== null && moveObject.DamageDec !== undefined ? Number(moveObject.DamageDec) : null,
-                                Block: moveObject.Block ? String(moveObject.Block) : null,
-                                BlockDec: moveObject.BlockDec !== null && moveObject.BlockDec !== undefined ? Number(moveObject.BlockDec) : null,
-                                Hit: moveObject.Hit ? String(moveObject.Hit) : null,
-                                HitDec: moveObject.HitDec !== null && moveObject.HitDec !== undefined ? Number(moveObject.HitDec) : null,
-                                HitString: moveObject.Hit ? String(moveObject.Hit) : null,
-                                CounterHit: moveObject.CounterHit ? String(moveObject.CounterHit) : null,
-                                CounterHitDec: moveObject.CounterHitDec !== null && moveObject.CounterHitDec !== undefined ? Number(moveObject.CounterHitDec) : null,
-                                CounterHitString: moveObject.CounterHit ? String(moveObject.CounterHit) : null,
-                                GuardBurst: moveObject.GuardBurst !== null && moveObject.GuardBurst !== undefined ? Number(moveObject.GuardBurst) : null,
-                                Notes: moveObject.Notes ? String(moveObject.Notes) : null,
-                            };
+                                Impact: moveObject.Impact != null ? Number(moveObject.Impact) : 0,
+                                Damage: moveObject.Damage != null ? String(moveObject.Damage) : null,
+                                DamageDec: moveObject.DamageDec != null ? Number(moveObject.DamageDec) : null,
+                                Block: moveObject.Block != null ? String(moveObject.Block) : null,
+                                BlockDec: moveObject.BlockDec != null ? Number(moveObject.BlockDec) : null,
+                                Hit: moveObject.Hit != null ? String(moveObject.Hit) : null,
+                                HitDec: moveObject.HitDec != null ? Number(moveObject.HitDec) : null,
+                                HitString: moveObject.Hit != null ? String(moveObject.Hit) : null,
+                                CounterHit: moveObject.CounterHit != null ? String(moveObject.CounterHit) : null,
+                                CounterHitDec: moveObject.CounterHitDec != null ? Number(moveObject.CounterHitDec) : null,
+                                CounterHitString: moveObject.CounterHit != null ? String(moveObject.CounterHit) : null,
+                                GuardBurst: moveObject.GuardBurst != null ? Number(moveObject.GuardBurst) : null,
+                                Notes: moveObject.Notes != null ? String(moveObject.Notes) : null,
+                            } as Move;
                         });
-                        setOriginalMoves(movesData);
+                        movesCacheRef.current.set(cacheKey, aggregated);
+                        setOriginalMoves(aggregated);
                     } else {
-                        setOriginalMoves([]);
+                        const url = `/Games/${encodeURIComponent(selectedGame.id)}/Characters/${encodeURIComponent(String(selectedCharacterId))}.json`;
+                        const res = await fetch(url, { signal: abort.signal });
+                        if (!res.ok) throw new Error(`Failed to fetch moves: ${res.status} ${res.statusText}`);
+                        const data = await res.json();
+                        const movesData: Move[] = (Array.isArray(data) ? data : []).map((moveObject: any) => {
+                            const originalCommand = moveObject.Command != null ? String(moveObject.Command) : null;
+                            const translatedCommand = originalCommand ? translateText(originalCommand) : null;
+                            return {
+                                ID: Number(moveObject.ID),
+                                Command: translatedCommand,
+                                Stance: moveObject.Stance ? String(moveObject.Stance) : null,
+                                HitLevel: moveObject.HitLevel ? String(moveObject.HitLevel) : null,
+                                Impact: moveObject.Impact != null ? Number(moveObject.Impact) : 0,
+                                Damage: moveObject.Damage != null ? String(moveObject.Damage) : null,
+                                DamageDec: moveObject.DamageDec != null ? Number(moveObject.DamageDec) : null,
+                                Block: moveObject.Block != null ? String(moveObject.Block) : null,
+                                BlockDec: moveObject.BlockDec != null ? Number(moveObject.BlockDec) : null,
+                                Hit: moveObject.Hit != null ? String(moveObject.Hit) : null,
+                                HitDec: moveObject.HitDec != null ? Number(moveObject.HitDec) : null,
+                                HitString: moveObject.Hit != null ? String(moveObject.Hit) : null,
+                                CounterHit: moveObject.CounterHit != null ? String(moveObject.CounterHit) : null,
+                                CounterHitDec: moveObject.CounterHitDec != null ? Number(moveObject.CounterHitDec) : null,
+                                CounterHitString: moveObject.CounterHit != null ? String(moveObject.CounterHit) : null,
+                                GuardBurst: moveObject.GuardBurst != null ? Number(moveObject.GuardBurst) : null,
+                                Notes: moveObject.Notes != null ? String(moveObject.Notes) : null,
+                            } as Move;
+                        });
+                        movesCacheRef.current.set(cacheKey, movesData);
+                        setOriginalMoves(movesData);
                     }
-                } catch (error) {
+                } catch (error: any) {
+                    if (error?.name === "AbortError") return;
                     setError(error instanceof Error ? error.message : `Unknown error loading moves for character ID ${selectedCharacterId}`);
                     setOriginalMoves([]);
                 } finally {
                     setMovesLoading(false);
                 }
-            }, 0);
+            };
 
-            return () => clearTimeout(timer);
+            fetchMoves();
+            return () => abort.abort();
         } else {
             setOriginalMoves([]);
             setMovesLoading(false);
         }
-    }, [db, selectedCharacterId, translateText]);
+    }, [selectedGame?.id, selectedCharacterId, translateText]);
 
     const handleSort = useCallback(
         (column: SortableColumn) => {
@@ -472,94 +251,11 @@ export const FrameDataTable: React.FC = () => {
         [sortColumn]
     );
 
-    // Helper to render Command text with inline icons (Memoized)
-    const renderCommand = useCallback((command: string | null) => {
-        if (!command) {
-            return "—";
-        }
-
-        const parts: React.ReactNode[] = [];
-        const commandArray = command.match(/(?<=:)[^:]+(?=:)/g) || [];
-        for (let i = 0; i < commandArray.length; i++) {
-            let isSlide = false;
-            let isHeld = false;
-            const buttons = commandArray[i];
-            let buttonIndex = 0;
-            for (let button of buttons.split("+")) {
-                if (buttonIndex > 0) {
-                    parts.push(
-                        <div
-                            key={`plus-${i}-${buttonIndex}`}
-                            className="inline-flex items-center justify-center w-3 h-3 text-sm border border-black bg-white text-black rounded-full mx-[-5px] z-20"
-                        >
-                            <img src={"/Icons/+.svg"} alt="+" className="inline object-contain align-text-bottom h-4 w-4" />
-                        </div>
-                    );
-                }
-
-                if (button[0] === "(") {
-                    isHeld = true;
-                    button = button.replace(/[()]/g, "");
-                }
-
-                if (button === "_") {
-                    parts.push(
-                        <span key={`separator-${i}-${buttonIndex}`} className="inline-flex items-center flex-wrap ml-[-1px] mr-[-1px]">
-                            |
-                        </span>
-                    );
-                } else if (!isNaN(button[0] as any)) {
-                    let icon: string; // is direction
-                    icon = `/Icons/${isHeld ? "Held" : ""}${button}.svg`;
-                    parts.push(<img key={`direction-${i}-${buttonIndex}-${button}`} src={icon} alt={button} className="inline object-contain align-text-bottom h-4 w-4" />);
-                } else {
-                    if (button[0] === button[0].toLowerCase()) {
-                        isSlide = true;
-                    }
-                    parts.push(<CommandIcon key={`command-${i}-${buttonIndex}-${button}`} input={button} isHeld={isHeld} isSlide={isSlide} />);
-                }
-                buttonIndex++;
-            }
-        }
-
-        return <span className="inline-flex items-center flex-wrap">{parts}</span>;
-    }, []);
+    // Wrapper to keep existing prop shape while using extracted component
+    const renderCommand = useCallback((command: string | null) => <CommandRenderer command={command} />, []);
 
     // Helper to render Notes text with inline icons (Memoized)
-    const renderNotes = useCallback(
-        (note: string | null) => {
-            if (!note) {
-                return "—";
-            }
-
-            const parts: React.ReactNode[] = [];
-            const codes = availableIcons.map((ic) => ic.code).join("|");
-            const regex = new RegExp(`:(${codes}):`, "g");
-            let lastIndex = 0;
-            let match: RegExpExecArray | null;
-            let partIndex = 0;
-            while ((match = regex.exec(note))) {
-                const [full, iconName] = match;
-                const start = match.index;
-                if (start > lastIndex) {
-                    parts.push(<span key={`text-${partIndex}`}>{note.slice(lastIndex, start)}</span>);
-                    partIndex++;
-                }
-                const iconConfig = availableIcons.find((ic) => ic.code === iconName);
-                if (iconConfig) {
-                    const titleText = getIconTooltip(iconName, availableIcons);
-                    const classes = cn("inline object-contain align-text-bottom h-4 w-4", iconConfig.iconClasses);
-                    parts.push(<img key={`${iconName}-${start}`} src={getIconUrl(iconName)} alt={iconName} title={titleText} className={cn(classes, "mx-0.5")} />);
-                }
-                lastIndex = regex.lastIndex;
-            }
-            if (lastIndex < note.length) {
-                parts.push(<span key={`text-${partIndex}`}>{note.slice(lastIndex)}</span>);
-            }
-            return parts;
-        },
-        [availableIcons, getIconUrl]
-    );
+    const renderNotes = useCallback((note: string | null) => <NotesRenderer note={note} />, []);
 
     // Helper function to get field value based on field name (Optimized)
     const getFieldValueString = useCallback((move: Move, fieldName: string): string | null => {
@@ -861,17 +557,6 @@ export const FrameDataTable: React.FC = () => {
         return () => {};
     }, []);
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center h-[50vh]">
-                <div className="flex flex-col items-center gap-2">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    <p className="text-sm text-muted-foreground">Loading data...</p>
-                </div>
-            </div>
-        );
-    }
-
     if (error) {
         return (
             <Card className="border-destructive/20">
@@ -879,36 +564,15 @@ export const FrameDataTable: React.FC = () => {
                     <CardTitle className="text-destructive">Error</CardTitle>
                     <CardDescription>{error}</CardDescription>
                 </CardHeader>
-                {/* Keep Initialize button for potential manual schema creation */}
-                {db && (
-                    <CardContent>
-                        <Button
-                            onClick={async () => {
-                                try {
-                                    const success = await initializeDatabase(db);
-                                    if (success) {
-                                        alert("Database initialized successfully! Reloading data...");
-                                        // Re-trigger data loading instead of full page reload
-                                        setError(null); // Clear error
-                                        window.location.reload(); // Simple reload for now
-                                    } else {
-                                        alert("Failed to initialize database.");
-                                    }
-                                } catch (err) {
-                                    alert(`Error initializing database: ${err}`);
-                                }
-                            }}
-                        >
-                            Attempt Database Initialization
-                        </Button>
-                    </CardContent>
-                )}
+                <CardContent>
+                    <p className="text-sm text-muted-foreground">Try another character or game, or refresh the page.</p>
+                </CardContent>
             </Card>
         );
     }
 
     // Get selected character name based on the ID stored in context
-    const selectedCharacterNameFromContext = selectedCharacterId ? characters.find((c) => c.id === selectedCharacterId)?.name : null;
+    const selectedCharacterNameFromContext = selectedCharacterId === -1 ? "All Characters" : (selectedCharacterId ? characters.find((c) => c.id === selectedCharacterId)?.name : null);
 
     return (
         <div className="space-y-6 h-full flex flex-col pl-4 pr-4 flex-grow">
@@ -952,8 +616,8 @@ export const FrameDataTable: React.FC = () => {
                                 handleSort={handleSort}
                                 renderCommand={renderCommand}
                                 renderNotes={renderNotes}
-                                ExpandableHitLevelsComponent={ExpandableHitLevels}
                                 visibleColumns={visibleColumns}
+                                badges={selectedGame.badges}
                             />
                         </div>
                     </CardContent>

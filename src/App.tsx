@@ -1,7 +1,6 @@
 import React from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { FrameDataTable } from './components/FrameDataTable';
-import { PreloadWasm } from './PreloadWasm';
 import { GameProvider } from './contexts/GameContext';
 import { CommandProvider } from './contexts/CommandContext';
 import { TableConfigProvider } from './contexts/TableConfigContext';
@@ -17,7 +16,6 @@ function App() {
         <CommandProvider>
           <TableConfigProvider>
             <div className="min-h-screen flex flex-col bg-[hsl(var(--background))] text-[hsl(var(--foreground))]">
-              <PreloadWasm />
               <Navbar />
               <CommandPaletteContainer />
               <main className="flex-grow">

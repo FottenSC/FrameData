@@ -18,24 +18,15 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@/components/ui/command"
-import {
-  Gamepad2,
-  Users,
-  ChevronLeft,
-  Table,
-  Eye,
-  EyeOff,
-  GripVertical,
-  RotateCcw,
-  Check,
-  X
-} from "lucide-react"
+import { Gamepad2, Users, ChevronLeft, Table } from "lucide-react"
 import { useGame } from "@/contexts/GameContext"
 import { useCommand } from "@/contexts/CommandContext"
 import { useTableConfig } from "@/contexts/TableConfigContext"
+import type { ColumnConfig } from "@/contexts/TableConfigContext"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import { TableConfigurator } from "@/components/TableConfigurator"
 
 export function CommandPalette() {
   const navigate = useNavigate()
@@ -47,26 +38,14 @@ export function CommandPalette() {
     selectedCharacterId 
   } = useGame()
   
-  const {
-    getSortedColumns,
-    updateColumnVisibility,
-    reorderColumns,
-    restoreDefaults,
-    setColumnConfigs
-  } = useTableConfig()
+  const { } = useTableConfig()
   
   // State to track navigation between different views
   const [showCharacters, setShowCharacters] = React.useState(false)
   const [showTableConfig, setShowTableConfig] = React.useState(false)
   const [searchValue, setSearchValue] = React.useState("")
 
-  // Temporary state for table configuration (to avoid live updates)
-  const [tempColumnConfigs, setTempColumnConfigs] = React.useState<any[]>([])
-  const [configChanged, setConfigChanged] = React.useState(false)
-  
-  // Drag and drop state
-  const [draggedIndex, setDraggedIndex] = React.useState<number | null>(null)
-  const [dragOverIndex, setDragOverIndex] = React.useState<number | null>(null)
+  // TableConfigurator manages its own state
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -80,28 +59,11 @@ export function CommandPalette() {
     return () => document.removeEventListener("keydown", down)
   }, [open, setOpen])
 
-  // Initialize temp config when opening table config
-  React.useEffect(() => {
-    if (showTableConfig) {
-      const columns = getSortedColumns().map(col => ({ ...col }))
-      setTempColumnConfigs(columns)
-      setConfigChanged(false)
-    }
-  }, [showTableConfig, getSortedColumns])
+  // No initialization needed; configurator derives from context
 
-  const applyChanges = React.useCallback(() => {
-    // Apply all the temporary changes at once
-    setColumnConfigs(tempColumnConfigs.map(col => ({ ...col })))
-    setConfigChanged(false)
-  }, [tempColumnConfigs, setColumnConfigs])
+  // Apply handled by TableConfigurator
 
-  const cancelChanges = React.useCallback(() => {
-    const columns = getSortedColumns().map(col => ({ ...col }))
-    setTempColumnConfigs(columns)
-    setDraggedIndex(null) // Reset drag state
-    setDragOverIndex(null)
-    setConfigChanged(false)
-  }, [getSortedColumns])
+  // Cancel handled by TableConfigurator
 
   React.useEffect(() => {
     // Reset to main menu when command palette is closed
@@ -109,14 +71,8 @@ export function CommandPalette() {
       setShowCharacters(false)
       setShowTableConfig(false)
       setSearchValue("")
-      setDraggedIndex(null) // Reset drag state
-      setDragOverIndex(null)
-      // Apply any pending changes when closing
-      if (configChanged) {
-        applyChanges()
-      }
     }
-  }, [open, configChanged, applyChanges])
+  }, [open])
 
   const handleCharacterSelect = (characterId: number, characterName: string) => {
     setSelectedCharacterId(characterId)
@@ -125,78 +81,19 @@ export function CommandPalette() {
     setOpen(false)
   }
 
-  const handleColumnVisibilityToggle = (columnId: string) => {
-    setTempColumnConfigs(prev => 
-      prev.map(col => 
-        col.id === columnId ? { ...col, visible: !col.visible } : col
-      )
-    )
-    setConfigChanged(true)
-  }
+  // Visibility/reorder/defaults handled by TableConfigurator
 
-  const handleColumnReorder = (fromIndex: number, toIndex: number) => {
-    setTempColumnConfigs(prev => {
-      const newConfigs = [...prev]
-      const [movedColumn] = newConfigs.splice(fromIndex, 1)
-      newConfigs.splice(toIndex, 0, movedColumn)
-      
-      // Update order values
-      return newConfigs.map((col, index) => ({ ...col, order: index }))
-    })
-    setConfigChanged(true)
-  }
-
-  const handleRestoreDefaults = () => {
-    restoreDefaults()
-    const columns = getSortedColumns().map(col => ({ ...col }))
-    setTempColumnConfigs(columns)
-    setConfigChanged(false)
-  }
-
-  // Drag and drop handlers
-  const handleDragStart = (e: React.DragEvent, index: number) => {
-    setDraggedIndex(index)
-    e.dataTransfer.effectAllowed = 'move'
-  }
-
-  const handleDragOver = (e: React.DragEvent, index: number) => {
-    e.preventDefault()
-    e.dataTransfer.dropEffect = 'move'
-    setDragOverIndex(index)
-  }
-
-  const handleDragLeave = () => {
-    setDragOverIndex(null)
-  }
-
-  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
-    e.preventDefault()
-    
-    if (draggedIndex !== null && draggedIndex !== dropIndex) {
-      handleColumnReorder(draggedIndex, dropIndex)
-    }
-    
-    setDraggedIndex(null)
-    setDragOverIndex(null)
-  }
-
-  const handleDragEnd = () => {
-    setDraggedIndex(null)
-    setDragOverIndex(null)
-  }
+  // No dnd handlers here
 
   const goBackToMain = () => {
-    // Apply changes when going back
-    if (configChanged) {
-      applyChanges()
-    }
     setShowCharacters(false)
     setShowTableConfig(false)
     setSearchValue("")
   }
 
-  // Get sorted columns for display (use temp config when in table config mode)
-  const sortedColumns = showTableConfig ? tempColumnConfigs : getSortedColumns()
+  // No local sorted columns needed here
+
+  // Removed inline sortable row; TableConfigurator provides its own UI
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -234,102 +131,7 @@ export function CommandPalette() {
                   </CommandItem>
                   
                   <div className="px-2 py-2">
-                    <div className="flex justify-between items-center mb-3">
-                      <span className="text-sm font-medium">Column Settings</span>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleRestoreDefaults}
-                        className="h-7 text-xs"
-                      >
-                        <RotateCcw className="mr-1 h-3 w-3" />
-                        Restore Defaults
-                      </Button>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      {sortedColumns.map((column, index) => (
-                        <div 
-                          key={column.id}
-                          className={cn(
-                            "flex items-center space-x-3 p-2 rounded border border-border bg-background/50 transition-colors",
-                            draggedIndex === index && "opacity-50",
-                            dragOverIndex === index && "border-primary bg-primary/10"
-                          )}
-                          draggable
-                          onDragStart={(e) => handleDragStart(e, index)}
-                          onDragOver={(e) => handleDragOver(e, index)}
-                          onDragLeave={handleDragLeave}
-                          onDrop={(e) => handleDrop(e, index)}
-                          onDragEnd={handleDragEnd}
-                        >
-                          <GripVertical className="h-4 w-4 text-muted-foreground cursor-move" />
-                          
-                          <input
-                            type="checkbox"
-                            checked={column.visible}
-                            onChange={(e) => handleColumnVisibilityToggle(column.id)}
-                            className="h-4 w-4 rounded border border-primary accent-primary focus:ring-2 focus:ring-primary"
-                          />
-                          
-                          <div className="flex-1 flex items-center justify-between">
-                            <span className={cn(
-                              "text-sm font-medium",
-                              !column.visible && "text-muted-foreground line-through"
-                            )}>
-                              {column.label}
-                            </span>
-                          </div>
-                          
-                          {column.visible ? (
-                            <Eye className="h-4 w-4 text-green-500" />
-                          ) : (
-                            <EyeOff className="h-4 w-4 text-muted-foreground" />
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <div className="mt-4 flex justify-between items-center space-x-2">
-                      <div className="flex space-x-2">
-                        <Button
-                          variant="default"
-                          size="sm"
-                          onClick={() => {
-                            applyChanges()
-                            setShowTableConfig(false)
-                            setSearchValue("")
-                          }}
-                          disabled={!configChanged}
-                          className="h-7 text-xs"
-                        >
-                          <Check className="mr-1 h-3 w-3" />
-                          Apply
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={cancelChanges}
-                          disabled={!configChanged}
-                          className="h-7 text-xs"
-                        >
-                          <X className="mr-1 h-3 w-3" />
-                          Cancel
-                        </Button>
-                      </div>
-                      {configChanged && (
-                        <span className="text-xs text-orange-500 font-medium">
-                          Changes pending...
-                        </span>
-                      )}
-                    </div>
-                    
-                    <div className="mt-3 p-2 rounded bg-muted/50 text-xs text-muted-foreground">
-                      <p>• Use the checkbox to show/hide columns</p>
-                      <p>• Drag the grip handle to reorder columns</p>
-                      <p>• Click Apply to save changes or Cancel to discard</p>
-                      <p>• Changes auto-apply when closing this dialog</p>
-                    </div>
+                    <TableConfigurator />
                   </div>
                 </CommandGroup>
               </>

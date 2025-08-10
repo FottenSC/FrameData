@@ -14,7 +14,7 @@ export function MultiCombobox({
   placeholder = "Select...",
   emptyText = "No results found.",
   className,
-  maxPreview = 2,
+  maxPreview = 3,
 }: {
   value: string[];
   onChange: (value: string[]) => void;

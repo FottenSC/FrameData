@@ -22,9 +22,7 @@ export const CommandRenderer: React.FC<{ command: string | null }> = ({ command 
             key={`plus-${i}-${buttonIndex}`}
             className="relative inline-flex items-center justify-center w-3 h-3 border border-black bg-white text-black rounded-full mx-[-5px] z-20 align-middle plus-separator"
           >
-            {/* Keep a real '+' for copy/paste while hiding it visually */}
             <span className="text-transparent select-text leading-none">+</span>
-            {/* Visual SVG overlay for perfect centering */}
             <svg
               width="10"
               height="10"

@@ -175,7 +175,7 @@ def move_row_to_dict(row: pd.Series):
         "ID": to_int_or_none(row.get("ID")),
         "Command": to_str_or_none(row.get("Command")),
         "Stance": to_str_or_none(row.get("Stance")),
-        "HitLevel": to_str_or_none(row.get("Hit Level")),
+        "HitLevel": to_str_or_none(row.get("Hit level")),
         "Impact": to_int_or_none(row.get("Impact")),
         "Damage": to_str_or_none(row.get("Damage")),
         "DamageDec": to_int_or_none(row.get("DamageDec")),
@@ -197,11 +197,6 @@ for c in characters_manifest:
     moves_list = [move_row_to_dict(row) for _, row in moves_df.iterrows()]
     with open(moves_dir / f"{cid}.json", "w", encoding="utf-8") as f:
         json.dump(moves_list, f, ensure_ascii=False, indent=2)
-
-# All-characters aggregate file (to speed up "All Characters" view)
-all_moves_list = [move_row_to_dict(row) for _, row in frameData.iterrows()]
-with open(moves_dir / "AllCharacters.json", "w", encoding="utf-8") as f:
-    json.dump(all_moves_list, f, ensure_ascii=False, indent=2)
 
 
 # If you still need to populate SQLite for other tools, you can uncomment below:

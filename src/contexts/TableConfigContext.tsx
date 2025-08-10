@@ -13,6 +13,13 @@ export interface ColumnConfig {
 // Default column configuration
 export const DEFAULT_COLUMNS: ColumnConfig[] = [
   { 
+    id: 'character', 
+    label: 'Character', 
+    visible: true, 
+    order: -1,
+    colClasses: 'pt-2 px-2 cursor-pointer min-w-[160px] max-w-[200px]'
+  },
+  { 
     id: 'stance', 
     label: 'Stance', 
     visible: true, 

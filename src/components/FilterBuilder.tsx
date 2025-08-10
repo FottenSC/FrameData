@@ -6,34 +6,17 @@ import { Input } from "./ui/input";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Move, FilterCondition } from "../types/Move";
+import { useGame } from "../contexts/GameContext";
+import { gameFilterConfigs } from "../filters/gameFilterConfigs";
+import { builtinOperators, operatorById } from "../filters/operators";
+import type { FieldType, FilterOperator, FieldConfig, GameFilterConfig } from "../filters/types";
+import { MultiCombobox } from "./ui/multi-combobox";
 
 // Re-export FilterCondition for backwards compatibility
 export type { FilterCondition } from "../types/Move";
 
-// Define base filter fields without min/max values
-export const filterFields = [
-    { value: "Impact", label: "Impact", type: "number" },
-    { value: "Damage", label: "Damage", type: "number" },
-    { value: "Block", label: "Block", type: "number" },
-    { value: "Hit", label: "Hit", type: "number" },
-    { value: "CounterHit", label: "Counter Hit", type: "number" },
-    { value: "GuardBurst", label: "Guard Burst", type: "number" },
-    { value: "HitLevel", label: "Hit Level", type: "text" },
-    { value: "Command", label: "Command", type: "text" },
-    { value: "Stance", label: "Stance", type: "text" },
-];
-
-// Define condition options
-export const conditionOptions = [
-    { value: "equals", label: "Equals", appliesTo: ["text", "number"] },
-    { value: "notEquals", label: "Not Equals", appliesTo: ["text", "number"] },
-    { value: "greaterThan", label: "Greater Than", appliesTo: ["number"] },
-    { value: "lessThan", label: "Less Than", appliesTo: ["number"] },
-    { value: "between", label: "Between", appliesTo: ["number"] },
-    { value: "notBetween", label: "Not Between", appliesTo: ["number"] },
-    { value: "contains", label: "Contains", appliesTo: ["text"] },
-    { value: "startsWith", label: "Starts With", appliesTo: ["text"] },
-];
+// The column/field IDs are aligned with TableConfigContext and FrameDataTable sorting keys
+// e.g., 'impact', 'damage', 'block', 'hit', 'counterHit', 'guardBurst', 'command', etc.
 
 // Create a separate badge component for active filters
 export const ActiveFiltersBadge: React.FC<{ count: number; className?: string }> = ({ count, className }) => {
@@ -52,6 +35,18 @@ interface FilterBuilderProps {
 
 // Use React.memo to prevent re-renders if props haven't changed
 export const FilterBuilder = React.memo<FilterBuilderProps>(({ onFiltersChange, className, moves = [] }) => {
+    const { selectedGame } = useGame();
+    const gameConfig: GameFilterConfig = useMemo(() => gameFilterConfigs[selectedGame.id] ?? { fields: [] }, [selectedGame.id]);
+    const allOperators: FilterOperator[] = useMemo(() => {
+        const customs = gameConfig.customOperators ?? [];
+        // Merge by id, allowing custom operators to override
+        const map = new Map<string, FilterOperator>();
+        for (const op of builtinOperators) map.set(op.id, op);
+        for (const op of customs) map.set(op.id, op);
+        return Array.from(map.values());
+    }, [gameConfig]);
+    const operatorsById = useMemo(() => operatorById(allOperators), [allOperators]);
+    const fieldMap = useMemo(() => new Map(gameConfig.fields.map(f => [f.id, f as FieldConfig])), [gameConfig.fields]);
     const [filters, setFilters] = useState<FilterCondition[]>([]);
     const defaultFilterAdded = useRef(false);
     const [fieldRanges, setFieldRanges] = useState<Record<string, { min: number; max: number }>>({});
@@ -64,12 +59,12 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(({ onFiltersChange, 
 
             // Initialize with default fallback ranges
             const defaultRanges: Record<string, { min: number; max: number }> = {
-                Impact: { min: 0, max: 50 },
-                Damage: { min: 0, max: 100 },
-                Block: { min: -30, max: 30 },
-                Hit: { min: -30, max: 30 },
-                CounterHit: { min: -30, max: 30 },
-                GuardBurst: { min: 0, max: 100 },
+                impact: { min: 0, max: 50 },
+                damage: { min: 0, max: 100 },
+                block: { min: -30, max: 30 },
+                hit: { min: -30, max: 30 },
+                counterHit: { min: -30, max: 30 },
+                guardBurst: { min: 0, max: 100 },
             };
 
             // Start with default ranges
@@ -78,25 +73,25 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(({ onFiltersChange, 
             // Helper function to get field value from a move
             const getFieldValue = (move: Move, field: string): number | null => {
                 switch (field) {
-                    case "Impact":
-                        return move.Impact;
-                    case "Damage":
-                        return move.DamageDec;
-                    case "Block":
-                        return move.BlockDec;
-                    case "Hit":
-                        return move.HitDec;
-                    case "CounterHit":
-                        return move.CounterHitDec;
-                    case "GuardBurst":
-                        return move.GuardBurst;
+                    case "impact":
+                        return move.Impact ?? null;
+                    case "damage":
+                        return move.DamageDec ?? null;
+                    case "block":
+                        return move.BlockDec ?? null;
+                    case "hit":
+                        return move.HitDec ?? null;
+                    case "counterHit":
+                        return move.CounterHitDec ?? null;
+                    case "guardBurst":
+                        return move.GuardBurst ?? null;
                     default:
                         return null;
                 }
             };
 
             // Iterate through numeric fields to find min/max values
-            filterFields.forEach((field) => {
+            gameConfig.fields.forEach((field) => {
                 if (field.type === "number") {
                     let min = Number.MAX_SAFE_INTEGER;
                     let max = Number.MIN_SAFE_INTEGER;
@@ -104,7 +99,7 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(({ onFiltersChange, 
 
                     // Check each move for this field
                     moves.forEach((move) => {
-                        const value = getFieldValue(move, field.value);
+                        const value = getFieldValue(move, field.id);
                         if (value !== null && value !== undefined && !isNaN(value)) {
                             min = Math.min(min, value);
                             max = Math.max(max, value);
@@ -116,7 +111,7 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(({ onFiltersChange, 
                     if (hasValidValues) {
                         // Add some padding to the ranges
                         const padding = Math.max(1, Math.round((max - min) * 0.1)); // 10% padding
-                        ranges[field.value] = {
+                        ranges[field.id] = {
                             min: Math.floor(min - padding),
                             max: Math.ceil(max + padding),
                         };
@@ -126,21 +121,26 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(({ onFiltersChange, 
 
             setFieldRanges(ranges);
         }
-    }, [moves]);
+    }, [moves, gameConfig.fields]);
 
     // --- Helper functions (memoized if necessary, but these are simple lookups) ---
-    const getFieldType = useCallback((fieldName: string): string => {
-        const field = filterFields.find((f) => f.value === fieldName);
+    const getFieldType = useCallback((fieldId: string): FieldType => {
+        const field = fieldMap.get(fieldId);
         return field ? field.type : "text";
-    }, []); // No dependencies needed if filterFields is constant
+    }, [fieldMap]);
 
-    const isRangeCondition = useCallback((condition: string): boolean => {
-        return condition === "between" || condition === "notBetween";
-    }, []);
+    const isRangeCondition = useCallback((conditionId: string): boolean => {
+        const op = operatorsById.get(conditionId);
+        return op ? op.input === "range" : false;
+    }, [operatorsById]);
 
-    const getAvailableConditions = (fieldName: string) => {
-        const fieldType = getFieldType(fieldName);
-        return conditionOptions.filter((condition) => condition.appliesTo.includes(fieldType));
+    const getAvailableConditions = (fieldId: string): FilterOperator[] => {
+        const field = fieldMap.get(fieldId);
+        if (!field) return allOperators;
+        const allowed = field.allowedOperators && field.allowedOperators.length > 0
+            ? new Set(field.allowedOperators)
+            : null;
+        return allOperators.filter(op => op.appliesTo.includes(field.type) && (!allowed || allowed.has(op.id)));
     };
     // --- End Helper functions ---
 
@@ -181,33 +181,43 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(({ onFiltersChange, 
 
     // --- Memoized Callbacks for filter manipulation ---
     const addFilter = useCallback(() => {
+        const desired = "impact";
+        const hasImpact = gameConfig.fields.some(f => f.id === desired);
+        const defaultField = hasImpact ? desired : (gameConfig.fields[0]?.id ?? desired);
+        const fType = getFieldType(defaultField);
+        const available = getAvailableConditions(defaultField);
+        const defaultCondition = available[0]?.id ?? "equals";
         const newFilter: FilterCondition = {
             id: `filter-${Date.now()}`,
-            field: "impact",
-            numericField: "impact",
-            condition: "equals",
+            field: defaultField,
+            numericField: fType === "number" ? defaultField : null,
+            condition: defaultCondition,
             value: "",
             value2: "",
         };
         setFilters((prevFilters) => [...prevFilters, newFilter]);
-    }, []); // No dependencies
+    }, [gameConfig.fields, getFieldType]); // No dependencies
 
     const removeFilter = useCallback((id: string) => {
         setFilters((currentFilters) => {
             if (currentFilters.length === 1) {
-                return [{ 
-                    id: `filter-${Date.now()}`, 
-                    field: "impact", 
-                    numericField: "impact",
-                    condition: "equals", 
-                    value: "", 
-                    value2: "" 
+                const desired = "impact";
+                const hasImpact = gameConfig.fields.some(f => f.id === desired);
+                const firstField = hasImpact ? desired : (gameConfig.fields[0]?.id ?? desired);
+                const fType = getFieldType(firstField);
+                return [{
+                    id: `filter-${Date.now()}`,
+                    field: firstField,
+                    numericField: fType === "number" ? firstField : null,
+                    condition: getAvailableConditions(firstField)[0]?.id ?? "equals",
+                    value: "",
+                    value2: ""
                 }];
             } else {
                 return currentFilters.filter((f) => f.id !== id);
             }
         });
-    }, []); // No dependencies
+    }, [gameConfig.fields, getFieldType]); // No dependencies
 
     // updateFilter depends on helpers
     const updateFilter = useCallback(
@@ -227,9 +237,9 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(({ onFiltersChange, 
                             updatedFilter.numericField = newFieldType === "number" ? value : null;
 
                             // Check and update condition if needed for the new field type
-                            const available = conditionOptions.filter((c) => c.appliesTo.includes(newFieldType));
-                            if (!available.some((c) => c.value === filter.condition)) {
-                                updatedFilter.condition = available[0]?.value || "equals";
+                            const available = getAvailableConditions(value);
+                            if (!available.some((c) => c.id === filter.condition)) {
+                                updatedFilter.condition = available[0]?.id || "equals";
                             }
 
                             // Reset values ONLY if field types are incompatible
@@ -319,7 +329,7 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(({ onFiltersChange, 
                     {filters.map((filter) => {
                         const fieldType = getFieldType(filter.field);
                         const availableConditions = getAvailableConditions(filter.field);
-                        const showRange = isRangeCondition(filter.condition);
+            const showRange = isRangeCondition(filter.condition);
                         const isActive = showRange ? filter.value.trim() !== "" && filter.value2 != null && filter.value2.trim() !== "" : filter.value.trim() !== "";
 
                         return (
@@ -328,10 +338,11 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(({ onFiltersChange, 
                                 filter={filter}
                                 isActive={isActive}
                                 fieldType={fieldType}
-                                availableConditions={availableConditions}
+                availableConditions={availableConditions}
                                 showRange={showRange}
                                 updateFilter={updateFilter} // Pass memoized updateFilter
                                 removeFilter={removeFilter} // Pass memoized removeFilter
+                                fields={gameConfig.fields}
                             />
                         );
                     })}
@@ -381,14 +392,18 @@ FilterBuilder.displayName = "FilterBuilder";
 interface FilterRowProps {
     filter: FilterCondition;
     isActive: boolean;
-    fieldType: string;
-    availableConditions: typeof conditionOptions;
+    fieldType: FieldType;
+    availableConditions: FilterOperator[];
     showRange: boolean;
     updateFilter: (id: string, property: keyof FilterCondition, value: string) => void;
     removeFilter: (id: string) => void;
+    fields: FieldConfig[];
 }
 
-const FilterRow = React.memo<FilterRowProps>(({ filter, isActive, fieldType, availableConditions, showRange, updateFilter, removeFilter }) => {
+const FilterRow = React.memo<FilterRowProps>(({ filter, isActive, fieldType, availableConditions, showRange, updateFilter, removeFilter, fields }) => {
+    const field = fields.find(f => f.id === filter.field);
+    const isEnum = fieldType === "enum";
+    const multi = availableConditions.find(op => op.id === filter.condition)?.input === "multi";
     return (
         <div className={`flex items-center gap-2 filter-row ${isActive ? "active" : "inactive"}`}>
             <Select value={filter.field} onValueChange={(value) => updateFilter(filter.id, "field", value)}>
@@ -396,29 +411,31 @@ const FilterRow = React.memo<FilterRowProps>(({ filter, isActive, fieldType, ava
                     <SelectValue placeholder="Field" />
                 </SelectTrigger>
                 <SelectContent>
-                    {filterFields.map((field) => (
-                        <SelectItem key={field.value} value={field.value}>
-                            {field.label}
+                    {fields.map((f) => (
+                        <SelectItem key={f.id} value={f.id}>
+                            {f.label}
                         </SelectItem>
                     ))}
                 </SelectContent>
             </Select>
-            <Select value={filter.condition} onValueChange={(value) => updateFilter(filter.id, "condition", value)}>
-                <SelectTrigger className="w-[140px] custom-select-trigger">
-                    <SelectValue placeholder="Condition" />
-                </SelectTrigger>
-                <SelectContent>
-                    {availableConditions.map((condition) => (
-                        <SelectItem key={condition.value} value={condition.value}>
-                            {condition.label}
-                        </SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
+            {availableConditions.length > 1 && (
+                <Select value={filter.condition} onValueChange={(value) => updateFilter(filter.id, "condition", value)}>
+                    <SelectTrigger className="w-[140px] custom-select-trigger">
+                        <SelectValue placeholder="Condition" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {availableConditions.map((op) => (
+                            <SelectItem key={op.id} value={op.id}>
+                                {op.label}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            )}
             {showRange ? (
                 <div className="flex items-center gap-2">
                     <Input
-                        type="number"
+                        type={fieldType === "number" ? "number" : "text"}
                         value={filter.value}
                         onChange={(e) => updateFilter(filter.id, "value", e.target.value)}
                         placeholder="Min"
@@ -426,7 +443,7 @@ const FilterRow = React.memo<FilterRowProps>(({ filter, isActive, fieldType, ava
                     />
                     <span className="text-muted-foreground">-</span>
                     <Input
-                        type="number"
+                        type={fieldType === "number" ? "number" : "text"}
                         value={filter.value2 || ""}
                         onChange={(e) => updateFilter(filter.id, "value2", e.target.value)}
                         placeholder="Max"
@@ -434,13 +451,37 @@ const FilterRow = React.memo<FilterRowProps>(({ filter, isActive, fieldType, ava
                     />
                 </div>
             ) : (
-                <Input
-                    type={fieldType === "number" ? "number" : "text"}
-                    value={filter.value}
-                    onChange={(e) => updateFilter(filter.id, "value", e.target.value)}
-                    placeholder="Value"
-                    className="w-[180px] custom-input"
-                />
+                isEnum ? (
+                    multi ? (
+                        <MultiCombobox
+                            value={(filter.value || "").split(",").map(s => s.trim()).filter(Boolean)}
+                            onChange={(vals) => updateFilter(filter.id, "value", vals.join(","))}
+                            options={(field?.options ?? []).map(o => ({ label: o.label ?? o.value, value: o.value }))}
+                            placeholder="Select..."
+                        />
+                    ) : (
+                        <Select value={filter.value} onValueChange={(value) => updateFilter(filter.id, "value", value)}>
+                            <SelectTrigger className="w-[180px] custom-select-trigger">
+                                <SelectValue placeholder="Select" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {(field?.options ?? []).map(opt => (
+                                    <SelectItem key={opt.value} value={opt.value}>
+                                        {opt.label ?? opt.value}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    )
+                ) : (
+                    <Input
+                        type={fieldType === "number" ? "number" : "text"}
+                        value={filter.value}
+                        onChange={(e) => updateFilter(filter.id, "value", e.target.value)}
+                        placeholder="Value"
+                        className="w-[180px] custom-input"
+                    />
+                )
             )}
             <Button variant="ghost" size="icon" className="h-8 w-8 p-0 hover:bg-destructive/20" onClick={() => removeFilter(filter.id)}>
                 <X className="h-4 w-4" />

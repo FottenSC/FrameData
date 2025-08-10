@@ -80,6 +80,8 @@ export const FrameDataTableContent: React.FC<DataTableContentProps> = ({
   }, [getScrollElement, visibleColumns]);
   const renderCellContent = (move: Move, columnId: string) => {
     switch (columnId) {
+      case "character":
+        return move.CharacterName || "—";
       case "stance":
         return move.Stance || "—";
       case "command":

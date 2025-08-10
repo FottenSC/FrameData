@@ -384,10 +384,6 @@ export function CommandPalette() {
                     <Gamepad2 className="mr-2 h-4 w-4" />
                     <span>Game Selection</span>
                   </CommandItem>
-                  <CommandItem onSelect={() => { navigate(`/${selectedGame.id}`); setOpen(false); }}>
-                    <Users className="mr-2 h-4 w-4" />
-                    <span>Character Selection</span>
-                  </CommandItem>
                 </CommandGroup>
               </>
             )}

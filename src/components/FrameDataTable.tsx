@@ -12,6 +12,9 @@ import { CommandRenderer } from "@/components/renderers/CommandRenderer";
 import { NotesRenderer } from "@/components/renderers/NotesRenderer";
 import { FrameDataTableContent } from "@/components/table/FrameDataTableContent";
 import { Move, FilterCondition, SortableColumn } from "../types/Move";
+import { builtinOperators, operatorById } from "../filters/operators";
+import { gameFilterConfigs } from "../filters/gameFilterConfigs";
+import type { FieldConfig, FieldType, FilterOperator } from "../filters/types";
 
 
 
@@ -25,8 +28,8 @@ export const FrameDataTable: React.FC = () => {
     const { selectedGame, setSelectedGameById, characters, setCharacters, selectedCharacterId, setSelectedCharacterId, availableIcons, getIconUrl, translateText } = useGame();
 
     // Add table configuration context
-    const { getVisibleColumns } = useTableConfig();
-    const [originalMoves, setOriginalMoves] = useState<Move[]>([]); // Store the original, unsorted moves
+    const { getVisibleColumns, updateColumnVisibility } = useTableConfig();
+    const [originalMoves, setOriginalMoves] = useState<Move[]>([]);
     const [movesLoading, setMovesLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [deployTimestamp, setDeployTimestamp] = useState<string>("Loading...");
@@ -42,7 +45,30 @@ export const FrameDataTable: React.FC = () => {
     const [filtersVisible, setFiltersVisible] = useState<boolean>(true);
 
     // Get visible columns from table configuration
-    const visibleColumns = getVisibleColumns();
+    const baseColumns = getVisibleColumns();
+    // Only show the Character column when viewing "All Characters"
+    const visibleColumns = useMemo(() => {
+        if (selectedCharacterId !== -1) {
+            return baseColumns.filter((c) => c.id !== "character");
+        }
+        return baseColumns;
+    }, [baseColumns, selectedCharacterId]);
+
+    // Persist column visibility preference so it auto-toggles with page mode
+    useEffect(() => {
+        if (selectedCharacterId === -1) {
+            updateColumnVisibility("character", true);
+        } else if (selectedCharacterId !== null) {
+            updateColumnVisibility("character", false);
+        }
+    }, [selectedCharacterId, updateColumnVisibility]);
+
+    // If leaving All Characters view, clear sorting on the hidden 'character' column
+    useEffect(() => {
+        if (selectedCharacterId !== -1 && sortColumn === "character") {
+            setSortColumn(null);
+        }
+    }, [selectedCharacterId, sortColumn]);
 
     // Toggle filters visibility (Memoized)
     const toggleFiltersVisibility = useCallback(() => {
@@ -113,12 +139,8 @@ export const FrameDataTable: React.FC = () => {
         }
     }, [gameId, characterName, selectedGame.id, characters, selectedCharacterId, setSelectedGameById, setSelectedCharacterId]);
 
-    // No database to initialize; moves are loaded from static JSON per character
-
     // Simple in-memory cache for fetched/processed moves keyed by game+character
     const movesCacheRef = React.useRef<Map<string, Move[]>>(new Map());
-
-    // Load moves when game or character changes (from static JSON)
     useEffect(() => {
         setOriginalMoves([]);
     if (selectedGame?.id && selectedCharacterId !== null) {
@@ -134,37 +156,25 @@ export const FrameDataTable: React.FC = () => {
                     }
                     let aggregated: Move[] = [];
                     if (selectedCharacterId === -1) {
-                        // Optimized path: try single file aggregate first
-                        const allUrl = `/Games/${encodeURIComponent(selectedGame.id)}/Characters/AllCharacters.json`;
-                        let flatData: any[] | null = null;
-                        try {
-                            const allRes = await fetch(allUrl, { signal: abort.signal });
-                            if (allRes.ok) {
-                                const allData = await allRes.json();
-                                flatData = Array.isArray(allData) ? allData : [];
-                            }
-                        } catch (_) {
-                            // ignore and fallback
-                        }
+                        // Aggregate by fetching Characters.json then each character file
+                        const listUrl = `/Games/${encodeURIComponent(selectedGame.id)}/Characters.json`;
+                        const listRes = await fetch(listUrl, { signal: abort.signal });
+                        if (!listRes.ok) throw new Error(`Failed to fetch characters list: ${listRes.status} ${listRes.statusText}`);
+                        const listData = await listRes.json();
+                        const chars = (Array.isArray(listData) ? listData : []).map((c: any) => ({ id: Number(c.id), name: String(c.name) }));
+                        const ids: number[] = chars.map((c) => c.id).filter((n: any) => !isNaN(n));
 
-                        if (!flatData) {
-                            // Fallback: fetch Characters.json and then each character
-                            const listUrl = `/Games/${encodeURIComponent(selectedGame.id)}/Characters.json`;
-                            const listRes = await fetch(listUrl, { signal: abort.signal });
-                            if (!listRes.ok) throw new Error(`Failed to fetch characters list: ${listRes.status} ${listRes.statusText}`);
-                            const listData = await listRes.json();
-                            const ids: number[] = (Array.isArray(listData) ? listData : []).map((c: any) => Number(c.id)).filter((n: any) => !isNaN(n));
-
-                            const fetches = ids.map(async (id: number) => {
-                                const url = `/Games/${encodeURIComponent(selectedGame.id)}/Characters/${encodeURIComponent(String(id))}.json`;
-                                const res = await fetch(url, { signal: abort.signal });
-                                if (!res.ok) return [] as any[];
-                                const data = await res.json();
-                                return Array.isArray(data) ? data : [];
-                            });
-                            const allDataArrays = await Promise.all(fetches);
-                            flatData = allDataArrays.flat();
-                        }
+                        const fetches = ids.map(async (id: number) => {
+                            const url = `/Games/${encodeURIComponent(selectedGame.id)}/Characters/${encodeURIComponent(String(id))}.json`;
+                            const res = await fetch(url, { signal: abort.signal });
+                            if (!res.ok) return [] as any[];
+                            const data = await res.json();
+                            const name = chars.find(c => c.id === id)?.name || null;
+                            const arr = Array.isArray(data) ? data : [];
+                            return arr.map((m: any) => ({ ...m, CharacterId: id, CharacterName: name }));
+                        });
+                        const allDataArrays = await Promise.all(fetches);
+                        const flatData = allDataArrays.flat();
 
                         aggregated = (flatData || []).map((moveObject: any) => {
                             const originalCommand = moveObject.Command != null ? String(moveObject.Command) : null;
@@ -172,6 +182,8 @@ export const FrameDataTable: React.FC = () => {
                             return {
                                 ID: Number(moveObject.ID),
                                 Command: translatedCommand,
+                                CharacterId: moveObject.CharacterId != null ? Number(moveObject.CharacterId) : null,
+                                CharacterName: moveObject.CharacterName != null ? String(moveObject.CharacterName) : null,
                                 Stance: moveObject.Stance ? String(moveObject.Stance) : null,
                                 HitLevel: moveObject.HitLevel ? String(moveObject.HitLevel) : null,
                                 Impact: moveObject.Impact != null ? Number(moveObject.Impact) : 0,
@@ -202,6 +214,8 @@ export const FrameDataTable: React.FC = () => {
                             return {
                                 ID: Number(moveObject.ID),
                                 Command: translatedCommand,
+                                CharacterId: selectedCharacterId,
+                                CharacterName: characters.find(c => c.id === selectedCharacterId)?.name || null,
                                 Stance: moveObject.Stance ? String(moveObject.Stance) : null,
                                 HitLevel: moveObject.HitLevel ? String(moveObject.HitLevel) : null,
                                 Impact: moveObject.Impact != null ? Number(moveObject.Impact) : 0,
@@ -257,120 +271,78 @@ export const FrameDataTable: React.FC = () => {
     // Helper to render Notes text with inline icons (Memoized)
     const renderNotes = useCallback((note: string | null) => <NotesRenderer note={note} />, []);
 
-    // Helper function to get field value based on field name (Optimized)
-    const getFieldValueString = useCallback((move: Move, fieldName: string): string | null => {
-        switch (fieldName) {
+    // Build game-specific field configs and operator registry
+    const gameFilterConfig = useMemo(() => gameFilterConfigs[selectedGame.id] ?? { fields: [] }, [selectedGame.id]);
+    const fieldMap = useMemo(() => new Map<string, FieldConfig>(gameFilterConfig.fields.map(f => [f.id, f])), [gameFilterConfig.fields]);
+    const allOperators: FilterOperator[] = useMemo(() => {
+        const customs = gameFilterConfig.customOperators ?? [];
+        const map = new Map<string, FilterOperator>();
+        for (const op of builtinOperators) map.set(op.id, op);
+        for (const op of customs) map.set(op.id, op);
+        return Array.from(map.values());
+    }, [gameFilterConfig]);
+    const opsById = useMemo(() => operatorById(allOperators), [allOperators]);
+
+    // Helper to read field value as string or number consistently
+    const getFieldAs = useCallback((move: Move, fieldId: string): { string: string | null; number: number | null; type: FieldType } => {
+        const field = fieldMap.get(fieldId);
+        const type: FieldType = field?.type ?? "text";
+        switch (fieldId) {
+            case "character":
+                return { string: move.CharacterName || null, number: null, type };
             case "stance":
-                return move.Stance;
+                return { string: move.Stance, number: null, type };
             case "command":
-                return move.Command;
             case "rawCommand":
-                return move.Command;
+                return { string: move.Command, number: null, type };
             case "hitLevel":
-                return move.HitLevel;
+                return { string: move.HitLevel, number: null, type };
             case "impact":
-                return move.Impact.toString();
+                return { string: move.Impact != null ? String(move.Impact) : null, number: move.Impact ?? null, type };
             case "damage":
-                return move.Damage;
+                return { string: move.DamageDec != null ? String(move.DamageDec) : move.Damage, number: move.DamageDec ?? null, type };
             case "block":
-                return move.Block;
+                return { string: move.BlockDec != null ? String(move.BlockDec) : move.Block, number: move.BlockDec ?? null, type };
             case "hit":
-                return move.Hit;
+                return { string: move.HitDec != null ? String(move.HitDec) : move.Hit, number: move.HitDec ?? null, type };
             case "counterHit":
-                return move.CounterHit;
+                return { string: move.CounterHitDec != null ? String(move.CounterHitDec) : move.CounterHit, number: move.CounterHitDec ?? null, type };
             case "guardBurst":
-                return move.GuardBurst.toString();
+                return { string: move.GuardBurst != null ? String(move.GuardBurst) : null, number: move.GuardBurst ?? null, type };
             case "notes":
-                return move.Notes;
+                return { string: move.Notes, number: null, type };
             default:
-                console.error(`Unknown field name: ${fieldName}`);
-                return null;
+                return { string: null, number: null, type };
         }
-    }, []);
+    }, [fieldMap]);
 
     // Type for processed filters
     type ProcessedFilter = FilterCondition & {
-        lowerValue: string;
-        numericValue: number;
-        isNumericValue: boolean;
-        lowerValue2?: string;
-        numericValue2?: number;
-        isNumericValue2: boolean;
+        value1?: string;
+        value2?: string;
     };
 
     // Pre-process filters for better performance
     const processedFilters = useMemo((): ProcessedFilter[] => {
-        return activeFilters.map((filter) => {
-            const lowerValue = filter.value.toLowerCase();
-            const numericValue = Number(filter.value);
-            const isNumericValue = !isNaN(numericValue);
-
-            let lowerValue2: string | undefined;
-            let numericValue2: number | undefined;
-            let isNumericValue2 = false;
-
-            if (filter.value2) {
-                lowerValue2 = filter.value2.toLowerCase();
-                numericValue2 = Number(filter.value2);
-                isNumericValue2 = !isNaN(numericValue2);
-            }
-
-            return {
-                ...filter,
-                lowerValue,
-                numericValue,
-                isNumericValue,
-                lowerValue2,
-                numericValue2,
-                isNumericValue2,
-            };
-        });
+        return activeFilters.map((f) => ({ ...f, value1: f.value, value2: f.value2 }));
     }, [activeFilters]);
 
-    const applyFilter = useCallback(
-        (move: Move, filter: ProcessedFilter): boolean => {
-            const fieldValue = getFieldValueString(move, filter.field);
-            if (fieldValue === null || fieldValue === undefined) return false;
-
-            const fieldValueStr = String(fieldValue);
-            const fieldValueLower = fieldValueStr.toLowerCase();
-            const fieldValueNum = Number(fieldValue);
-            const isFieldNumeric = !isNaN(fieldValueNum);
-
-            switch (filter.condition) {
-                case "equals": {
-                    return move[filter.field as keyof Move] === filter.lowerValue;
-                }
-                case "notEquals": {
-                    return fieldValueLower !== filter.lowerValue;
-                }
-                case "greaterThan": {
-                    return isFieldNumeric && filter.isNumericValue && fieldValueNum > filter.numericValue;
-                }
-                case "lessThan": {
-                    return isFieldNumeric && filter.isNumericValue && fieldValueNum < filter.numericValue;
-                }
-                case "between": {
-                    return isFieldNumeric && filter.isNumericValue && filter.isNumericValue2 && fieldValueNum >= filter.numericValue && fieldValueNum <= filter.numericValue2!;
-                }
-                case "notBetween": {
-                    return isFieldNumeric && filter.isNumericValue && filter.isNumericValue2 && (fieldValueNum < filter.numericValue || fieldValueNum > filter.numericValue2!);
-                }
-                case "contains": {
-                    return fieldValueLower.includes(filter.lowerValue);
-                }
-                case "startsWith": {
-                    return fieldValueLower.startsWith(filter.lowerValue);
-                }
-                default:
-                    return true;
-            }
-        },
-        []
-    );
+    const applyFilter = useCallback((move: Move, filter: ProcessedFilter): boolean => {
+        const op = opsById.get(filter.condition);
+        if (!op) return true;
+        const f = getFieldAs(move, filter.field);
+        return op.test({
+            fieldType: f.type,
+            fieldString: f.string,
+            fieldNumber: f.number,
+            value: filter.value1,
+            value2: filter.value2,
+        });
+    }, [opsById, getFieldAs]);
 
     // Optimized field value extraction with type information
     const SORT_FIELD_MAP = useMemo(() => ({
+    character: { getter: (move: Move) => move.CharacterName, type: 'string' as const },
         stance: { getter: (move: Move) => move.Stance, type: 'string' as const },
         command: { getter: (move: Move) => move.Command, type: 'string' as const },
         rawCommand: { getter: (move: Move) => move.Command, type: 'string' as const },

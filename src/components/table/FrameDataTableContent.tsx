@@ -152,7 +152,7 @@ export const FrameDataTableContent: React.FC<DataTableContentProps> = ({
             return (
               <TableHead
                 key={column.id}
-                className={column.colClasses}
+                className={column.colClasses + ' cursor-pointer select-none'}
                 ref={(el) => {
                   headerRefs.current.set(column.id, el);
                 }}

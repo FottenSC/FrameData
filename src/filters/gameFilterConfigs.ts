@@ -17,15 +17,12 @@ export const DEFAULT_FIELDS: GameFilterConfig["fields"] = [
 
 export const gameFilterConfigs: Record<string, GameFilterConfig> = {
   SoulCalibur6: {
-    fields: [
-      ...DEFAULT_FIELDS.map(f => ({ ...f })),
+    fields: [...DEFAULT_FIELDS.map(f => ({ ...f })),
     ].map(f => f.id === "hitLevel"
-    ? {
+      ? {
           ...f,
           type: "enum",
-      // Allow both equals and inList (default UI can hide condition when only one)
-      allowedOperators: ["equals", "inList"],
-          // Map available options
+          allowedOperators: ["inList"],
           options: [
             { value: ":H:" },
             { value: ":M:" },

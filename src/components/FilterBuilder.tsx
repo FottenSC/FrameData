@@ -161,7 +161,12 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(({ onFiltersChange, 
 
         // Only call onChange if the stringified filters are different from the last ones sent
         if (currentActiveFiltersString !== previousActiveFiltersRef.current) {
-            onFiltersChange(currentActiveFilters);
+            // Defer heavy parent/table updates so the combobox value paints first
+            if (typeof React.startTransition === "function") {
+                React.startTransition(() => onFiltersChange(currentActiveFilters));
+            } else {
+                onFiltersChange(currentActiveFilters);
+            }
             // Update the ref to store the filters we just sent
             previousActiveFiltersRef.current = currentActiveFiltersString;
         }
@@ -222,7 +227,7 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(({ onFiltersChange, 
     // updateFilter depends on helpers
     const updateFilter = useCallback(
         (id: string, property: keyof FilterCondition, value: string) => {
-            setFilters((prevFilters) =>
+            const doUpdate = () => setFilters((prevFilters) =>
                 prevFilters.map((filter) => {
                     if (filter.id === id) {
                         const updatedFilter = { ...filter, [property]: value };
@@ -261,16 +266,21 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(({ onFiltersChange, 
                     return filter;
                 })
             );
+            // For value/value2 changes, transition to keep input snappy
+            if (property === "value" || property === "value2") {
+                if (typeof React.startTransition === "function") {
+                    React.startTransition(doUpdate);
+                    return;
+                }
+            }
+            doUpdate();
             // Depend only on stable getFieldType
         },
         [getFieldType]
     );
     // --- End Memoized Callbacks ---
 
-    // Memoize the active filter count based on the *memoized* active filters array
-    const activeFilterCount = useMemo(() => {
-        return currentActiveFilters.length;
-    }, [currentActiveFilters]);
+    // active filter count UI is handled outside; no internal count display
 
     // Inject CSS styles
     useEffect(() => {
@@ -359,26 +369,6 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(({ onFiltersChange, 
                         <Plus className="h-3.5 w-3.5" />
                         <span>Add Filter</span>
                     </Button>
-
-                    {/* Use the memoized count */}
-                    {activeFilterCount > 0 && (
-                        <div className="flex items-center ml-auto">
-                            <span className="text-sm text-muted-foreground mr-2">
-                                {activeFilterCount} active filter{activeFilterCount === 1 ? "" : "s"}
-                            </span>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => {
-                                    setFilters([]);
-                                    defaultFilterAdded.current = false;
-                                }}
-                                className="ml-2"
-                            >
-                                Clear Filters
-                            </Button>
-                        </div>
-                    )}
                 </div>
             </div>
         </div>
@@ -418,20 +408,28 @@ const FilterRow = React.memo<FilterRowProps>(({ filter, isActive, fieldType, ava
                     ))}
                 </SelectContent>
             </Select>
-            {availableConditions.length > 1 && (
-                <Select value={filter.condition} onValueChange={(value) => updateFilter(filter.id, "condition", value)}>
-                    <SelectTrigger className="w-[140px] custom-select-trigger">
-                        <SelectValue placeholder="Condition" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {availableConditions.map((op) => (
-                            <SelectItem key={op.id} value={op.id}>
-                                {op.label}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            )}
+            {(() => {
+                const disabled = availableConditions.length <= 1;
+                return (
+                    <Select
+                        value={filter.condition}
+                        onValueChange={(value) => {
+                            if (!disabled) updateFilter(filter.id, "condition", value);
+                        }}
+                    >
+                        <SelectTrigger className="w-[140px] custom-select-trigger" disabled={disabled}>
+                            <SelectValue placeholder="Condition" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {availableConditions.map((op) => (
+                                <SelectItem key={op.id} value={op.id}>
+                                    {op.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                );
+            })()}
             {showRange ? (
                 <div className="flex items-center gap-2">
                     <Input
@@ -487,6 +485,15 @@ const FilterRow = React.memo<FilterRowProps>(({ filter, isActive, fieldType, ava
                 <X className="h-4 w-4" />
             </Button>
         </div>
+    );
+}, (prev, next) => {
+    return (
+        prev.filter === next.filter &&
+        prev.isActive === next.isActive &&
+        prev.fieldType === next.fieldType &&
+        prev.showRange === next.showRange &&
+        prev.availableConditions === next.availableConditions &&
+        prev.fields === next.fields
     );
 });
 FilterRow.displayName = "FilterRow";

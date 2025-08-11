@@ -579,9 +579,8 @@ export const FrameDataTable: React.FC = () => {
                             <FilterBuilder onFiltersChange={handleFiltersChange} moves={originalMoves} />
                         </div>
                     </CardHeader>
-                    <CardContent className="flex-grow p-0 flex flex-col overflow-visible">
-                        <div className="overflow-y-auto flex-grow max-h-[70vh]" ref={scrollContainerRef}>
-                            {/* Render the memoized table content */}
+                    <CardContent className="flex-1 min-h-0 p-0 flex flex-col overflow-hidden">
+                        <div className="overflow-y-auto flex-1 min-h-0" ref={scrollContainerRef}>
                             <MemoizedDataTableContent
                                 moves={displayedMoves}
                                 movesLoading={movesLoading}
@@ -592,7 +591,7 @@ export const FrameDataTable: React.FC = () => {
                                 renderNotes={renderNotes}
                                 visibleColumns={visibleColumns}
                                 badges={selectedGame.badges}
-                getScrollElement={() => scrollContainerRef.current}
+                                getScrollElement={() => scrollContainerRef.current}
                             />
                         </div>
                     </CardContent>

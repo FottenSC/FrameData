@@ -11,69 +11,69 @@ export interface ColumnConfig {
 }
 
 // Default column configuration
-export const DEFAULT_COLUMNS: ColumnConfig[] = [
+export const defaultColumns: ColumnConfig[] = [
   { 
     id: 'character', 
     label: 'Character', 
     visible: true, 
     order: -1,
-  colClasses: 'pt-2 px-2 min-w-[160px] max-w-[200px]'
+    colClasses: 'pt-2 px-2 min-w-[160px] max-w-[200px]'
   },
   { 
     id: 'stance', 
     label: 'Stance', 
     visible: true, 
     order: 0,
-  colClasses: 'pt-2 px-2 min-w-[150px] max-w-[150px] text-right'
+    colClasses: 'pt-2 px-2 min-w-[150px] max-w-[150px] text-right'
   },
   { 
     id: 'command', 
     label: 'Command', 
     visible: true, 
     order: 1,
-  colClasses: 'pt-2 px-2 min-w-[300px] max-w-[300px]'
+    colClasses: 'pt-2 px-2 min-w-[300px] max-w-[300px]'
   },
   { 
     id: 'rawCommand', 
     label: 'Raw Command', 
     visible: false, 
     order: 2,
-  colClasses: 'pt-2 px-2 w-[200px] min-w-[210px] max-w-[300px]'
+    colClasses: 'pt-2 px-2 w-[200px] min-w-[210px] max-w-[300px]'
   },
   { 
     id: 'hitLevel', 
     label: 'Hit Level', 
     visible: true, 
     order: 3,
-  colClasses: 'pt-2 px-2 w-[135px] min-w-[135px] max-w-[150px]'
+    colClasses: 'pt-2 px-2 w-[135px] min-w-[135px] max-w-[150px]'
   },
   { 
     id: 'impact', 
     label: 'Impact', 
     visible: true, 
     order: 4,
-  colClasses: 'pt-2 px-2 w-[70px] min-w-[70px] max-w-[70px]'
+    colClasses: 'pt-2 px-2 w-[70px] min-w-[70px] max-w-[70px]'
   },
   { 
     id: 'damage', 
     label: 'Damage', 
     visible: true, 
     order: 5,
-  colClasses: 'pt-2 px-2 w-[70px] min-w-[70px] max-w-[70px]',
+    colClasses: 'pt-2 px-2 w-[70px] min-w-[70px] max-w-[70px]',
   },
   { 
     id: 'block', 
     label: 'Block', 
     visible: true, 
     order: 6,
-  colClasses: 'pt-2 px-2 w-[70px]',
+    colClasses: 'pt-2 px-2 w-[60px] min-w-[60px] max-w-[60px]',
   },
   { 
     id: 'hit', 
     label: 'Hit', 
     visible: true, 
     order: 7,
-  colClasses: 'pt-2 px-2 w-[60px]'
+    colClasses: 'pt-2 px-2 w-[60px] min-w-[60px] max-w-[60px]',
   },
   { 
     id: 'counterHit', 
@@ -81,7 +81,7 @@ export const DEFAULT_COLUMNS: ColumnConfig[] = [
     friendlyLabel: 'Counter Hit', 
     visible: true, 
     order: 8,
-  colClasses: 'pt-2 px-2 w-[50px]'
+    colClasses: 'pt-2 px-2 w-[60px] min-w-[60px] max-w-[60px]',
   },
   { 
     id: 'guardBurst', 
@@ -89,14 +89,14 @@ export const DEFAULT_COLUMNS: ColumnConfig[] = [
     friendlyLabel: 'Guard Burst', 
     visible: true, 
     order: 9,
-  colClasses: 'pt-2 px-2 w-[50px]'
+    colClasses: 'pt-2 px-2 w-[60px] min-w-[60px] max-w-[60px]',
   },
-  { 
+  {
     id: 'notes', 
     label: 'Notes', 
     visible: true, 
     order: 10,
-  colClasses: 'pt-2 px-2 overflow-visible'
+    colClasses: 'pt-2 px-2 overflow-visible'
   }
 ];
 
@@ -127,7 +127,7 @@ export const TableConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
       if (saved) {
         const storedConfigs: StoredColumnConfig[] = JSON.parse(saved);
         const storedMap = new Map(storedConfigs.map(config => [config.id, config]));
-        return DEFAULT_COLUMNS.map(defaultCol => {
+        return defaultColumns.map(defaultCol => {
           const stored = storedMap.get(defaultCol.id);
           if (stored) {
             return {
@@ -140,10 +140,10 @@ export const TableConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
         }).sort((a, b) => a.order - b.order);
       }
 
-      return DEFAULT_COLUMNS;
+      return defaultColumns;
     } 
     catch {
-      return DEFAULT_COLUMNS;
+      return defaultColumns;
     }
   });
 
@@ -194,7 +194,7 @@ export const TableConfigProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   // Memoized function to restore defaults
   const restoreDefaults = useCallback(() => {
-    setColumnConfigs(DEFAULT_COLUMNS);
+    setColumnConfigs(defaultColumns);
   }, []);
 
   // Memoized getters to prevent unnecessary recalculations

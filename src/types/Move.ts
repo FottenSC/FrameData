@@ -14,7 +14,6 @@ export interface Move {
   CounterHitDec: number;
   GuardBurst: number;
   Notes: string | null;
-  // Present when using "All Characters" to indicate the source character
   CharacterName?: string | null;
   CharacterId?: number | null;
 }

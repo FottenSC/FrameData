@@ -284,6 +284,10 @@ export const FrameDataTable: React.FC = () => {
             case "command":
             case "rawCommand":
                 return { string: move.Command, number: null, type };
+            case "input": { // combined stance + command
+                const combined = [move.Stance, move.Command].filter(Boolean).join(" ") || null;
+                return { string: combined, number: null, type };
+            }
             case "hitLevel":
                 return { string: move.HitLevel, number: null, type };
             case "impact":
@@ -328,6 +332,7 @@ export const FrameDataTable: React.FC = () => {
         stance: { getter: (move: Move) => move.Stance, type: 'string' as const },
         command: { getter: (move: Move) => move.Command, type: 'string' as const },
         rawCommand: { getter: (move: Move) => move.Command, type: 'string' as const },
+        input: { getter: (move: Move) => [move.Stance, move.Command].filter(Boolean).join(' '), type: 'string' as const },
         hitLevel: { getter: (move: Move) => move.HitLevel, type: 'string' as const },
         impact: { getter: (move: Move) => move.Impact, type: 'number' as const },
         damage: { getter: (move: Move) => move.DamageDec, type: 'number' as const },
@@ -411,6 +416,7 @@ export const FrameDataTable: React.FC = () => {
                     case 'stance': return m.Stance;
                     case 'command':
                     case 'rawCommand': return m.Command;
+                    case 'input': return [m.Stance, m.Command].filter(Boolean).join(' ');
                     case 'hitLevel': return m.HitLevel;
                     case 'impact': return m.Impact;
                     case 'damage': return m.DamageDec ?? m.Damage;

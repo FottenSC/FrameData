@@ -3,6 +3,8 @@ import type { FilterOperator } from "./types";
 
 // Default field configs shared if a game doesn't override
 export const defaultFields: GameFilterConfig["fields"] = [
+  // Combined Stance + Command field renamed id to 'input'
+  { id: "input", label: "Input", type: "text" },
   { id: "character", label: "Character", type: "text" },
   { id: "stance", label: "Stance", type: "text" },
   { id: "command", label: "Command", type: "text" },

@@ -12,6 +12,7 @@ import { builtinOperators, operatorById } from "../filters/operators";
 import type { FieldType, FilterOperator, FieldConfig, GameFilterConfig } from "../filters/types";
 import { MultiCombobox } from "./ui/multi-combobox";
 import { HitLevelMultiCombobox } from "./ui/hitlevel-multi-combobox";
+import { Combobox } from "./ui/combobox";
 
 // Re-export FilterCondition for backwards compatibility
 export type { FilterCondition } from "../types/Move";
@@ -176,9 +177,10 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(({ onFiltersChange, 
 
     // --- Memoized Callbacks for filter manipulation ---
     const addFilter = useCallback(() => {
-        const desired = "impact";
-        const hasImpact = gameConfig.fields.some(f => f.id === desired);
-        const defaultField = hasImpact ? desired : (gameConfig.fields[0]?.id ?? desired);
+        const desired = "input"; // prefer combined stance+command
+        const hasDesired = gameConfig.fields.some(f => f.id === desired);
+        const fallback = "impact";
+        const defaultField = hasDesired ? desired : (gameConfig.fields.some(f=>f.id===fallback)?fallback:(gameConfig.fields[0]?.id ?? desired));
         const fType = getFieldType(defaultField);
         const available = getAvailableConditions(defaultField);
         const defaultCondition = available[0]?.id ?? "equals";
@@ -196,9 +198,10 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(({ onFiltersChange, 
     const removeFilter = useCallback((id: string) => {
         setFilters((currentFilters) => {
             if (currentFilters.length === 1) {
-                const desired = "impact";
-                const hasImpact = gameConfig.fields.some(f => f.id === desired);
-                const firstField = hasImpact ? desired : (gameConfig.fields[0]?.id ?? desired);
+                const desired = "input";
+                const hasDesired = gameConfig.fields.some(f => f.id === desired);
+                const fallback = "impact";
+                const firstField = hasDesired ? desired : (gameConfig.fields.some(f=>f.id===fallback)?fallback:(gameConfig.fields[0]?.id ?? desired));
                 const fType = getFieldType(firstField);
                 return [{
                     id: `filter-${Date.now()}`,
@@ -334,18 +337,13 @@ const FilterRow = React.memo<FilterRowProps>(({ filter, isActive, fieldType, ava
     const multi = availableConditions.find(op => op.id === filter.condition)?.input === "multi";
     return (
         <div className={`flex items-center gap-2 filter-row ${isActive ? "active" : "inactive"}`}>
-            <Select value={filter.field} onValueChange={(value) => updateFilter(filter.id, "field", value)}>
-                <SelectTrigger className="w-[120px] custom-select-trigger">
-                    <SelectValue placeholder="Field" />
-                </SelectTrigger>
-                <SelectContent>
-                    {fields.map((f) => (
-                        <SelectItem key={f.id} value={f.id}>
-                            {f.label}
-                        </SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
+            <Combobox
+                value={filter.field}
+                onChange={(val) => val && updateFilter(filter.id, "field", val)}
+                options={fields.map(f => ({ label: f.label, value: f.id }))}
+                placeholder="Field"
+                className="w-[160px]"
+            />
             {(() => {
                 const disabled = availableConditions.length <= 1;
                 return (

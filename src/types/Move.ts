@@ -32,6 +32,7 @@ export type SortableColumn =
   | "stance" 
   | "command" 
   | "rawCommand" 
+  | "input"
   | "hitLevel" 
   | "impact" 
   | "damage" 
@@ -39,4 +40,4 @@ export type SortableColumn =
   | "hit" 
   | "counterHit" 
   | "guardBurst" 
-  | "notes"; 
+  | "notes";

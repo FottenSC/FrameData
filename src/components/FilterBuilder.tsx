@@ -11,6 +11,7 @@ import { gameFilterConfigs } from "../filters/gameFilterConfigs";
 import { builtinOperators, operatorById } from "../filters/operators";
 import type { FieldType, FilterOperator, FieldConfig, GameFilterConfig } from "../filters/types";
 import { MultiCombobox } from "./ui/multi-combobox";
+import { HitLevelMultiCombobox } from "./ui/hitlevel-multi-combobox";
 
 // Re-export FilterCondition for backwards compatibility
 export type { FilterCondition } from "../types/Move";
@@ -451,12 +452,21 @@ const FilterRow = React.memo<FilterRowProps>(({ filter, isActive, fieldType, ava
             ) : (
                 isEnum ? (
                     multi ? (
-                        <MultiCombobox
-                            value={(filter.value || "").split(",").map(s => s.trim()).filter(Boolean)}
-                            onChange={(vals) => updateFilter(filter.id, "value", vals.join(","))}
-                            options={(field?.options ?? []).map(o => ({ label: o.label ?? o.value, value: o.value }))}
-                            placeholder="Select..."
-                        />
+                        field?.id === 'hitLevel' ? (
+                            <HitLevelMultiCombobox
+                                value={(filter.value || "").split(",").map(s => s.trim()).filter(Boolean)}
+                                onChange={(vals) => updateFilter(filter.id, "value", vals.join(","))}
+                                options={(field?.options ?? []).map(o => ({ value: o.value }))}
+                                placeholder="Select..."
+                            />
+                        ) : (
+                            <MultiCombobox
+                                value={(filter.value || "").split(",").map(s => s.trim()).filter(Boolean)}
+                                onChange={(vals) => updateFilter(filter.id, "value", vals.join(","))}
+                                options={(field?.options ?? []).map(o => ({ label: o.label ?? o.value, value: o.value }))}
+                                placeholder="Select..."
+                            />
+                        )
                     ) : (
                         <Select value={filter.value} onValueChange={(value) => updateFilter(filter.id, "value", value)}>
                             <SelectTrigger className="w-[180px] custom-select-trigger">

@@ -1,7 +1,7 @@
 import { GameFilterConfig } from "./types";
 
 // Default field configs shared if a game doesn't override
-export const DEFAULT_FIELDS: GameFilterConfig["fields"] = [
+export const defaultFields: GameFilterConfig["fields"] = [
   { id: "character", label: "Character", type: "text" },
   { id: "stance", label: "Stance", type: "text" },
   { id: "command", label: "Command", type: "text" },
@@ -17,7 +17,7 @@ export const DEFAULT_FIELDS: GameFilterConfig["fields"] = [
 
 export const gameFilterConfigs: Record<string, GameFilterConfig> = {
   SoulCalibur6: {
-    fields: [...DEFAULT_FIELDS.map(f => ({ ...f })),
+    fields: [...defaultFields.map(f => ({ ...f })),
     ].map(f => f.id === "hitLevel"
       ? {
           ...f,
@@ -41,7 +41,6 @@ export const gameFilterConfigs: Record<string, GameFilterConfig> = {
         appliesTo: ["enum"],
         test: ({ fieldString, value }) => {
           if (!fieldString) {
-            console.log("[inList] field is null/empty; returning false. value=", value);
             return false;
           }
           // Normalize field string to tokens without colons, e.g. ":H::M:" -> ["h","m"]
@@ -58,29 +57,25 @@ export const gameFilterConfigs: Record<string, GameFilterConfig> = {
 
           // If nothing selected, treat as not matching
           if (selectedRaw.length === 0) {
-            console.log("[inList] no selections; returning false. field=", fieldString);
             return false;
           }
 
           // Match if any selected item is present as a token OR as a substring in the raw field string
           const rawLower = fieldString.toLowerCase();
-          console.log("[inList] field=", fieldString, "tokens=", Array.from(fieldSet), "selected=", selectedRaw);
           const result = selectedRaw.some(sel => {
             const token = sel.replace(/:+/g, "").toLowerCase(); // ":H:" -> "h"
             const hasToken = fieldSet.has(token);
             const hasRaw = rawLower.includes(sel.toLowerCase());
             const match = hasToken || hasRaw;
-            console.log("[inList] check sel=", sel, "token=", token, { hasToken, hasRaw, match });
             return match;
           });
-          console.log("[inList] final=", result);
           return result;
         },
       }
     ],
   },
   Tekken8: {
-    fields: DEFAULT_FIELDS,
+    fields: defaultFields,
     // Example: Tekken might allow an 'endsWith' on command
     customOperators: [
       {

@@ -98,7 +98,6 @@ export const translateString = (text: string | null, map: TranslationMap): strin
 export interface Game {
   id: string;
   name: string;
-  dbPath: string;
   icons: IconConfig[];
   translations: GameTranslationConfig;
   icon: ReactNode;
@@ -116,7 +115,6 @@ export const avaliableGames: Game[] = [
   {
     id: 'SoulCalibur6',
     name: 'SoulCalibur VI',
-    dbPath: '/SoulCalibur6/FrameData.db',
     icon: <Sword className="h-5 w-5 mr-2" />,
     badges: {
       KND: { className: 'bg-fuchsia-700 text-white' },
@@ -158,7 +156,6 @@ export const avaliableGames: Game[] = [
   {
     id: 'Tekken8',
     name: 'Tekken 8',
-    dbPath: '/Tekken8/FrameData.db',
     icon: <Gamepad2 className="h-5 w-5 mr-2" />,
     badges: {
       KND: { className: 'bg-indigo-700 text-white' },

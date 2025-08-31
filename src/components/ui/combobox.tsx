@@ -14,6 +14,8 @@ export function Combobox({
   placeholder = "Select...",
   emptyText = "No results found.",
   className,
+  buttonVariant = "outline",
+  buttonClassName,
 }: {
   value: string | null
   onChange: (value: string | null) => void
@@ -21,28 +23,34 @@ export function Combobox({
   placeholder?: string
   emptyText?: string
   className?: string
+  buttonVariant?: string
+  buttonClassName?: string
 }) {
   const [open, setOpen] = React.useState(false)
+  const triggerRef = React.useRef<HTMLButtonElement | null>(null)
   const selected = options.find((o) => o.value === value) || null
 
   const onSelect = (val: string) => {
     if (selected && selected.value === val) {
-      // Selecting the current value: just close, no change
       setOpen(false)
+      // Defer blur so popover state finishes closing
+      requestAnimationFrame(() => triggerRef.current?.blur())
       return
     }
     onChange(val)
     setOpen(false)
+    requestAnimationFrame(() => triggerRef.current?.blur())
   }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          variant="outline"
+          ref={triggerRef}
+          variant={buttonVariant as any}
           role="combobox"
           aria-expanded={open}
-          className={cn("h-10 px-3 text-sm justify-between w-[200px]", className)}
+          className={cn("h-10 px-3 text-sm justify-between w-[200px]", className, buttonClassName)}
         >
           <span className="truncate">
             {selected ? selected.label : placeholder}

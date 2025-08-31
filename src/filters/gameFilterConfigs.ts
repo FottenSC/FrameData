@@ -5,7 +5,6 @@ import type { FilterOperator } from "./types";
 export const defaultFields: GameFilterConfig["fields"] = [
   // Combined Stance + Command field renamed id to 'input'
   { id: "input", label: "Input", type: "text" },
-  { id: "character", label: "Character", type: "text" },
   { id: "stance", label: "Stance", type: "text" },
   { id: "command", label: "Command", type: "text" },
   { id: "hitLevel", label: "Hit Level", type: "text" },
@@ -16,6 +15,7 @@ export const defaultFields: GameFilterConfig["fields"] = [
   { id: "counterHit", label: "Counter Hit", type: "number" },
   { id: "guardBurst", label: "Guard Burst", type: "number" },
   { id: "notes", label: "Notes", type: "text" },
+  { id: "character", label: "Character", type: "text" },
 ];
 
 // ------------------------------

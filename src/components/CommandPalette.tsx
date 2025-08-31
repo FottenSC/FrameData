@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { TableConfigurator } from "@/components/TableConfigurator"
+import { avaliableGames } from "@/contexts/GameContext"
 
 export function CommandPalette() {
   const navigate = useNavigate()
@@ -35,7 +36,8 @@ export function CommandPalette() {
     characters, 
     selectedGame, 
     setSelectedCharacterId,
-    selectedCharacterId 
+    selectedCharacterId,
+    setSelectedGameById,
   } = useGame()
   
   const { } = useTableConfig()
@@ -43,6 +45,7 @@ export function CommandPalette() {
   // State to track navigation between different views
   const [showCharacters, setShowCharacters] = React.useState(false)
   const [showTableConfig, setShowTableConfig] = React.useState(false)
+  const [showGames, setShowGames] = React.useState(false)
   const [searchValue, setSearchValue] = React.useState("")
 
   // TableConfigurator manages its own state
@@ -70,6 +73,7 @@ export function CommandPalette() {
     if (!open) {
       setShowCharacters(false)
       setShowTableConfig(false)
+      setShowGames(false)
       setSearchValue("")
     }
   }, [open])
@@ -88,6 +92,7 @@ export function CommandPalette() {
   const goBackToMain = () => {
     setShowCharacters(false)
     setShowTableConfig(false)
+    setShowGames(false)
     setSearchValue("")
   }
 
@@ -111,7 +116,9 @@ export function CommandPalette() {
                 ? "Configure table columns..." 
                 : showCharacters 
                   ? `Search ${characters.length} characters...` 
-                  : "Type a command or search..."
+                  : showGames
+                    ? `Search ${avaliableGames.length} games...`
+                    : "Type a command or search..."
             } 
             value={searchValue}
             onValueChange={setSearchValue}
@@ -163,9 +170,40 @@ export function CommandPalette() {
                   ))}
                 </CommandGroup>
               </>
+            ) : showGames ? (
+              <>
+                <CommandGroup heading="Games">
+                  <CommandItem 
+                    onSelect={goBackToMain}
+                    className="mb-1"
+                  >
+                    <ChevronLeft className="mr-2 h-4 w-4" />
+                    <span>Back to Commands</span>
+                  </CommandItem>
+                  {avaliableGames.map(game => (
+                    <CommandItem
+                      key={game.id}
+                      onSelect={() => { setSelectedGameById(game.id); setOpen(false) }}
+                      className={game.id === selectedGame.id ? "aria-selected:bg-accent" : ""}
+                    >
+                      {/* icon from config */}
+                      {game.icon}
+                      <span>{game.name}</span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </>
             ) : (
               <>
                 <CommandGroup heading="Commands">
+                  <CommandItem onSelect={() => {
+                    setShowGames(true)
+                    setSearchValue("")
+                  }}>
+                    <Gamepad2 className="mr-2 h-4 w-4" />
+                    <span>Game</span>
+                    <CommandShortcut>→</CommandShortcut>
+                  </CommandItem>
                   <CommandItem onSelect={() => {
                     setShowCharacters(true)
                     setSearchValue("")
@@ -182,10 +220,6 @@ export function CommandPalette() {
                     <span>Table Config</span>
                     <CommandShortcut>→</CommandShortcut>
                   </CommandItem>
-                  <CommandItem onSelect={() => { navigate("/games"); setOpen(false); }}>
-                    <Gamepad2 className="mr-2 h-4 w-4" />
-                    <span>Game Selection</span>
-                  </CommandItem>
                 </CommandGroup>
               </>
             )}
@@ -195,4 +229,4 @@ export function CommandPalette() {
       </DialogContent>
     </Dialog>
   )
-} 
+}

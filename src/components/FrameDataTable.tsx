@@ -443,92 +443,6 @@ export const FrameDataTable: React.FC = () => {
             });
     }, []);
 
-    // Inject CSS styles for transitions
-    useEffect(() => {
-        const styleEl = document.createElement("style");
-        styleEl.innerHTML = `
-      .filter-container {
-        transition: all 0.25s ease-in-out;
-        transform-origin: top center;
-      }
-      
-      .filter-container.visible {
-        opacity: 1;
-        transform: scaleY(1);
-        margin-top: 12px;
-        pointer-events: all;
-      }
-      
-      .filter-container.hidden {
-        opacity: 0;
-        transform: scaleY(0);
-        margin-top: 0;
-        max-height: 0;
-        pointer-events: none;
-      }
-      
-      /* Special case for empty filters */
-      .filter-container.empty.visible {
-        transition: all 0.1s ease-out;
-      }
-      
-      .filter-container.empty.hidden {
-        transition: all 0.1s ease-in;
-      }
-      
-      .title-interactive {
-        position: relative;
-        padding: 6px 10px;
-        margin: -6px -10px;
-        border-radius: 4px;
-        transition: background-color 0.2s ease;
-      }
-      
-      .title-interactive:hover {
-        background-color: rgba(255, 255, 255, 0.05);
-      }
-      
-      .title-interactive:active {
-        background-color: rgba(255, 255, 255, 0.1);
-      }
-    `;
-
-        document.head.appendChild(styleEl);
-
-        // Return cleanup function
-        return () => {
-            if (styleEl && document.head.contains(styleEl)) {
-                document.head.removeChild(styleEl);
-            }
-        };
-    }, []);
-
-    // Inject ::selection styles for custom icons
-    useEffect(() => {
-        const selectionStyleId = "custom-icon-selection-styles";
-        let styleEl = document.getElementById(selectionStyleId) as HTMLStyleElement | null;
-
-        if (!styleEl) {
-            styleEl = document.createElement("style");
-            styleEl.id = selectionStyleId;
-            styleEl.innerHTML = `
-        /* Style the text inside ButtonIcon when selected */
-        .button-icon::selection {
-          background-color: #3390FF; /* Standard selection blue */
-          color: white;
-        }
-        /* Style the text inside the plus separator when selected */
-        .plus-separator::selection {
-          background-color: #3390FF;
-          color: white;
-        }
-      `;
-            document.head.appendChild(styleEl);
-        }
-
-        return () => {};
-    }, []);
-
     if (error) {
         return (
             <Card className="border-destructive/20">
@@ -575,7 +489,13 @@ export const FrameDataTable: React.FC = () => {
                             </CardDescription>
                         </div>
 
-                        <div className={`filter-container ${filtersVisible ? "visible" : "hidden"} ${activeFilters.length === 0 ? "empty" : ""}`}>
+                        <div
+                          className={cn(
+                            "filter-container",
+                            filtersVisible ? "visible" : "hidden",
+                            activeFilters.length === 0 ? "empty" : ""
+                          )}
+                        >
                             <FilterBuilder onFiltersChange={handleFiltersChange} moves={originalMoves} />
                         </div>
                     </CardHeader>

@@ -22,7 +22,6 @@ export interface FieldConfig {
   id: string; // e.g., 'impact', 'command'
   label: string; // UI label
   type: FieldType;
-  // restrict conditions for this field; if omitted, all operators valid for the type are allowed
   allowedOperators?: string[];
   // For enum fields, provide options for UI
   options?: Array<{ value: string; label?: string }>;

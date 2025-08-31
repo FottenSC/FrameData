@@ -16,10 +16,6 @@ import { HitLevelMultiCombobox } from "./ui/hitlevel-multi-combobox";
 // Re-export FilterCondition for backwards compatibility
 export type { FilterCondition } from "../types/Move";
 
-// The column/field IDs are aligned with TableConfigContext and FrameDataTable sorting keys
-// e.g., 'impact', 'damage', 'block', 'hit', 'counterHit', 'guardBurst', 'command', etc.
-
-// Create a separate badge component for active filters
 export const ActiveFiltersBadge: React.FC<{ count: number; className?: string }> = ({ count, className }) => {
     return (
         <Badge variant="outline" className={cn("ml-2 text-xs font-normal", className)}>
@@ -60,9 +56,9 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(({ onFiltersChange, 
 
             // Initialize with default fallback ranges
             const defaultRanges: Record<string, { min: number; max: number }> = {
-                impact: { min: 0, max: 50 },
-                damage: { min: 0, max: 100 },
-                block: { min: -30, max: 30 },
+                impact: { min: 0, max: 500 },
+                damage: { min: 0, max: 500 },
+                block: { min: -30, max: 500 },
                 hit: { min: -30, max: 30 },
                 counterHit: { min: -30, max: 30 },
                 guardBurst: { min: 0, max: 100 },
@@ -143,7 +139,6 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(({ onFiltersChange, 
             : null;
         return allOperators.filter(op => op.appliesTo.includes(field.type) && (!allowed || allowed.has(op.id)));
     };
-    // --- End Helper functions ---
 
     // Memoize the active filter calculation based on the filters state
     const currentActiveFilters = useMemo(() => {
@@ -156,24 +151,18 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(({ onFiltersChange, 
         });
     }, [filters]);
 
-    // Notify parent ONLY when the active filters have meaningfully changed
+    // Notify parent when the active filters have meaningfully changed
     useEffect(() => {
         const currentActiveFiltersString = JSON.stringify(currentActiveFilters);
 
-        // Only call onChange if the stringified filters are different from the last ones sent
         if (currentActiveFiltersString !== previousActiveFiltersRef.current) {
-            // Defer heavy parent/table updates so the combobox value paints first
             if (typeof React.startTransition === "function") {
                 React.startTransition(() => onFiltersChange(currentActiveFilters));
             } else {
                 onFiltersChange(currentActiveFilters);
             }
-            // Update the ref to store the filters we just sent
             previousActiveFiltersRef.current = currentActiveFiltersString;
         }
-        // Dependency on onFiltersChange is still technically needed because it's a prop,
-        // but the internal check prevents the infinite loop even if parent doesn't memoize.
-        // However, parent memoization is still strongly recommended for performance.
     }, [currentActiveFilters, onFiltersChange]); // Depend on the memoized value & the prop
 
     // Create a default filter exactly once if none exists
@@ -279,58 +268,6 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(({ onFiltersChange, 
         },
         [getFieldType]
     );
-    // --- End Memoized Callbacks ---
-
-    // active filter count UI is handled outside; no internal count display
-
-    // Inject CSS styles
-    useEffect(() => {
-        // Create a style element
-        const styleEl = document.createElement("style");
-
-        // Add CSS rules for our filter builder components
-        styleEl.innerHTML = `
-      .custom-filter-builder .custom-select-trigger,
-      .custom-filter-builder .custom-input {
-        background-color: #1e1e1e !important;
-        color: white !important;
-        border: 1px solid #2d2d2d !important;
-      }
-      
-      /* Target selectContent via its React portal container */
-      div[data-radix-popper-content-wrapper] {
-        --select-content-bg: #1e1e1e !important;
-      }
-      
-      div[data-radix-popper-content-wrapper] [role="listbox"] {
-        background-color: #1e1e1e !important;
-        color: white !important;
-        border: 1px solid #2d2d2d !important;
-      }
-      
-      /* Force the input to have proper styling */
-      .custom-filter-builder input.custom-input {
-        background-color: #1e1e1e !important;
-        color: white !important;
-        border-color: #2d2d2d !important;
-      }
-      
-      /* Inactive filter row styling */
-      .filter-row.inactive {
-        opacity: 0.7;
-      }
-    `;
-
-        // Add to head
-        document.head.appendChild(styleEl);
-
-        // Cleanup on unmount
-        return () => {
-            if (styleEl && document.head.contains(styleEl)) {
-                document.head.removeChild(styleEl);
-            }
-        };
-    }, []);
 
     return (
         <div className={cn("mb-4 custom-filter-builder", className)}>
@@ -340,7 +277,7 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(({ onFiltersChange, 
                     {filters.map((filter) => {
                         const fieldType = getFieldType(filter.field);
                         const availableConditions = getAvailableConditions(filter.field);
-            const showRange = isRangeCondition(filter.condition);
+                        const showRange = isRangeCondition(filter.condition);
                         const isActive = showRange ? filter.value.trim() !== "" && filter.value2 != null && filter.value2.trim() !== "" : filter.value.trim() !== "";
 
                         return (
@@ -349,7 +286,7 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(({ onFiltersChange, 
                                 filter={filter}
                                 isActive={isActive}
                                 fieldType={fieldType}
-                availableConditions={availableConditions}
+                                availableConditions={availableConditions}
                                 showRange={showRange}
                                 updateFilter={updateFilter} // Pass memoized updateFilter
                                 removeFilter={removeFilter} // Pass memoized removeFilter
@@ -374,7 +311,7 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(({ onFiltersChange, 
             </div>
         </div>
     );
-}); // Close React.memo
+}); 
 
 // Explicitly set displayName for React DevTools
 FilterBuilder.displayName = "FilterBuilder";

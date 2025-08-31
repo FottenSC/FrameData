@@ -1,4 +1,5 @@
 import { GameFilterConfig } from "./types";
+import type { FilterOperator } from "./types";
 
 // Default field configs shared if a game doesn't override
 export const defaultFields: GameFilterConfig["fields"] = [
@@ -15,64 +16,78 @@ export const defaultFields: GameFilterConfig["fields"] = [
   { id: "notes", label: "Notes", type: "text" },
 ];
 
+// ------------------------------
+// Soul Calibur 6 specific config
+// ------------------------------
+
+// Enumerated Hit Level options (keep the original values for compatibility)
+const HIT_LEVEL_OPTIONS: { value: string }[] = [
+  { value: ":H:" },
+  { value: ":M:" },
+  { value: ":L:" },
+  { value: ":SM:" },
+  { value: ":SL:" },
+];
+
+// Helper: clone a field and convert hitLevel to enum configuration
+function createHitLevelField(base: GameFilterConfig["fields"][number]): GameFilterConfig["fields"][number] {
+  return {
+    ...base,
+    type: "enum",
+    allowedOperators: ["inList"],
+    options: HIT_LEVEL_OPTIONS,
+  };
+}
+
+// Helper: shallow clone default fields (avoid accidental mutation)
+const cloneDefaultFields = () => defaultFields.map(f => ({ ...f }));
+
+// Custom operator: checks if any of the selected values appears in the hit level string.
+// Matching strategy:
+// 1. Token-based: ":H::M:" -> tokens ["h","m"] (colons stripped, lower-cased)
+// 2. Fallback substring: raw lowercase inclusion (allows partial or differently formatted input)
+const inListOperator: FilterOperator = {
+  id: "inList",
+  label: "In List",
+  input: "multi",
+  appliesTo: ["enum"],
+  test: ({ fieldString, value }: { fieldType: any; fieldString: string | null; fieldNumber: any; value?: string }) => {
+    if (!fieldString) return false;
+
+    // Parse user selection list (comma separated)
+    const selections = (value ?? "")
+      .split(",")
+      .map((s: string) => s.trim())
+      .filter(Boolean);
+    if (selections.length === 0) return false; // nothing selected -> no match
+
+    // Normalize field string to tokens (remove extra colons / whitespace) e.g. ":H::M:" => ["h","m"]
+    const normalizedTokens = fieldString
+      .split(/:+/)
+      .map((t: string) => t.trim().toLowerCase())
+      .filter(Boolean);
+    const tokenSet = new Set(normalizedTokens);
+
+    const fieldLower = fieldString.toLowerCase();
+
+    // Match if any selection is either present as a normalized token OR as a raw substring
+    return selections.some((sel: string) => {
+      const selLower = sel.toLowerCase();
+      const selToken = sel.replace(/:+/g, "").toLowerCase(); // ":H:" -> "h"
+      return tokenSet.has(selToken) || fieldLower.includes(selLower);
+    });
+  },
+};
+
+// Construct Soul Calibur fields with hitLevel overridden
+const soulCaliburFields: GameFilterConfig["fields"] = cloneDefaultFields().map(f =>
+  f.id === "hitLevel" ? createHitLevelField(f) : f
+);
+
 export const gameFilterConfigs: Record<string, GameFilterConfig> = {
   SoulCalibur6: {
-    fields: [...defaultFields.map(f => ({ ...f })),
-    ].map(f => f.id === "hitLevel"
-      ? {
-          ...f,
-          type: "enum",
-          allowedOperators: ["inList"],
-          options: [
-            { value: ":H:" },
-            { value: ":M:" },
-            { value: ":L:" },
-            { value: ":SM:" },
-            { value: ":SL:" },
-          ],
-        }
-      : f
-    ),
-    customOperators: [
-      {
-        id: "inList",
-        label: "In List",
-        input: "multi",
-        appliesTo: ["enum"],
-        test: ({ fieldString, value }) => {
-          if (!fieldString) {
-            return false;
-          }
-          // Normalize field string to tokens without colons, e.g. ":H::M:" -> ["h","m"]
-          const fieldTokens = fieldString
-            .split(/:+/)
-            .map(t => t.trim().toLowerCase())
-            .filter(Boolean);
-          const fieldSet = new Set(fieldTokens);
-
-          const selectedRaw = (value ?? "")
-            .split(",")
-            .map(v => v.trim())
-            .filter(Boolean);
-
-          // If nothing selected, treat as not matching
-          if (selectedRaw.length === 0) {
-            return false;
-          }
-
-          // Match if any selected item is present as a token OR as a substring in the raw field string
-          const rawLower = fieldString.toLowerCase();
-          const result = selectedRaw.some(sel => {
-            const token = sel.replace(/:+/g, "").toLowerCase(); // ":H:" -> "h"
-            const hasToken = fieldSet.has(token);
-            const hasRaw = rawLower.includes(sel.toLowerCase());
-            const match = hasToken || hasRaw;
-            return match;
-          });
-          return result;
-        },
-      }
-    ],
+    fields: soulCaliburFields,
+    customOperators: [inListOperator],
   },
   Tekken8: {
     fields: defaultFields,

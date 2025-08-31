@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 // Table rendering moved into FrameDataTableContent
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Download } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
 // Badge usage moved into ValueBadge
 import { useGame, avaliableGames } from "../contexts/GameContext";
@@ -15,6 +15,7 @@ import { Move, FilterCondition, SortableColumn } from "../types/Move";
 import { builtinOperators, operatorById } from "../filters/operators";
 import { gameFilterConfigs } from "../filters/gameFilterConfigs";
 import type { FieldConfig, FieldType, FilterOperator } from "../filters/types";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "./ui/dropdown-menu";
 
 
 
@@ -33,6 +34,16 @@ export const FrameDataTable: React.FC = () => {
     const [movesLoading, setMovesLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [deployTimestamp, setDeployTimestamp] = useState<string>("Loading...");
+
+    // String interning pool to reduce memory (Suggestion #5)
+    const stringPoolRef = useRef<Map<string, string>>(new Map());
+    const intern = useCallback((value: string | null | undefined): string | null => {
+        if (value == null) return null;
+        const existing = stringPoolRef.current.get(value);
+        if (existing) return existing;
+        stringPoolRef.current.set(value, value);
+        return value;
+    }, []);
 
     // --- Sorting State ---
     const [sortColumn, setSortColumn] = useState<SortableColumn | null>(null);
@@ -155,6 +166,32 @@ export const FrameDataTable: React.FC = () => {
                         return;
                     }
                     let aggregated: Move[] = [];
+                    // Helper to process and intern a raw move object
+                    const processMove = (moveObject: any, charId: number | null, charName: string | null): Move => {
+                        const originalCommand = moveObject.Command != null ? String(moveObject.Command) : null;
+                        const translatedCommand = originalCommand ? translateText(originalCommand) : null;
+                        return {
+                            ID: Number(moveObject.ID),
+                            Command: intern(translatedCommand),
+                            CharacterId: charId,
+                            CharacterName: intern(charName),
+                            Stance: intern(moveObject.Stance ? String(moveObject.Stance) : null),
+                            HitLevel: intern(moveObject.HitLevel ? String(moveObject.HitLevel) : null),
+                            Impact: moveObject.Impact != null ? Number(moveObject.Impact) : 0,
+                            Damage: intern(moveObject.Damage != null ? String(moveObject.Damage) : null),
+                            DamageDec: moveObject.DamageDec != null ? Number(moveObject.DamageDec) : null,
+                            Block: intern(moveObject.Block != null ? String(moveObject.Block) : null),
+                            BlockDec: moveObject.BlockDec != null ? Number(moveObject.BlockDec) : null,
+                            Hit: intern(moveObject.Hit != null ? String(moveObject.Hit) : null),
+                            HitDec: moveObject.HitDec != null ? Number(moveObject.HitDec) : null,
+                            HitString: intern(moveObject.Hit != null ? String(moveObject.Hit) : null),
+                            CounterHit: intern(moveObject.CounterHit != null ? String(moveObject.CounterHit) : null),
+                            CounterHitDec: moveObject.CounterHitDec != null ? Number(moveObject.CounterHitDec) : null,
+                            CounterHitString: intern(moveObject.CounterHit != null ? String(moveObject.CounterHit) : null),
+                            GuardBurst: moveObject.GuardBurst != null ? Number(moveObject.GuardBurst) : null,
+                            Notes: intern(moveObject.Notes != null ? String(moveObject.Notes) : null),
+                        } as Move;
+                    };
                     if (selectedCharacterId === -1) {
                         // Aggregate by fetching Characters.json then each character file
                         const listUrl = `/Games/${encodeURIComponent(selectedGame.id)}/Characters.json`;
@@ -164,43 +201,21 @@ export const FrameDataTable: React.FC = () => {
                         const chars = (Array.isArray(listData) ? listData : []).map((c: any) => ({ id: Number(c.id), name: String(c.name) }));
                         const ids: number[] = chars.map((c) => c.id).filter((n: any) => !isNaN(n));
 
-                        const fetches = ids.map(async (id: number) => {
+                        // Sequential fetch to lower peak memory instead of Promise.all
+                        const tempMoves: Move[] = [];
+                        for (const id of ids) {
                             const url = `/Games/${encodeURIComponent(selectedGame.id)}/Characters/${encodeURIComponent(String(id))}.json`;
                             const res = await fetch(url, { signal: abort.signal });
-                            if (!res.ok) return [] as any[];
+                            if (!res.ok) continue;
                             const data = await res.json();
-                            const name = chars.find(c => c.id === id)?.name || null;
-                            const arr = Array.isArray(data) ? data : [];
-                            return arr.map((m: any) => ({ ...m, CharacterId: id, CharacterName: name }));
-                        });
-                        const allDataArrays = await Promise.all(fetches);
-                        const flatData = allDataArrays.flat();
-
-                        aggregated = (flatData || []).map((moveObject: any) => {
-                            const originalCommand = moveObject.Command != null ? String(moveObject.Command) : null;
-                            const translatedCommand = originalCommand ? translateText(originalCommand) : null;
-                            return {
-                                ID: Number(moveObject.ID),
-                                Command: translatedCommand,
-                                CharacterId: moveObject.CharacterId != null ? Number(moveObject.CharacterId) : null,
-                                CharacterName: moveObject.CharacterName != null ? String(moveObject.CharacterName) : null,
-                                Stance: moveObject.Stance ? String(moveObject.Stance) : null,
-                                HitLevel: moveObject.HitLevel ? String(moveObject.HitLevel) : null,
-                                Impact: moveObject.Impact != null ? Number(moveObject.Impact) : 0,
-                                Damage: moveObject.Damage != null ? String(moveObject.Damage) : null,
-                                DamageDec: moveObject.DamageDec != null ? Number(moveObject.DamageDec) : null,
-                                Block: moveObject.Block != null ? String(moveObject.Block) : null,
-                                BlockDec: moveObject.BlockDec != null ? Number(moveObject.BlockDec) : null,
-                                Hit: moveObject.Hit != null ? String(moveObject.Hit) : null,
-                                HitDec: moveObject.HitDec != null ? Number(moveObject.HitDec) : null,
-                                HitString: moveObject.Hit != null ? String(moveObject.Hit) : null,
-                                CounterHit: moveObject.CounterHit != null ? String(moveObject.CounterHit) : null,
-                                CounterHitDec: moveObject.CounterHitDec != null ? Number(moveObject.CounterHitDec) : null,
-                                CounterHitString: moveObject.CounterHit != null ? String(moveObject.CounterHit) : null,
-                                GuardBurst: moveObject.GuardBurst != null ? Number(moveObject.GuardBurst) : null,
-                                Notes: moveObject.Notes != null ? String(moveObject.Notes) : null,
-                            } as Move;
-                        });
+                            if (Array.isArray(data)) {
+                                const charName = chars.find(c => c.id === id)?.name || null;
+                                for (let i = 0; i < data.length; i++) {
+                                    tempMoves.push(processMove(data[i], id, charName));
+                                }
+                            }
+                        }
+                        aggregated = tempMoves;
                         movesCacheRef.current.set(cacheKey, aggregated);
                         setOriginalMoves(aggregated);
                     } else {
@@ -208,31 +223,10 @@ export const FrameDataTable: React.FC = () => {
                         const res = await fetch(url, { signal: abort.signal });
                         if (!res.ok) throw new Error(`Failed to fetch moves: ${res.status} ${res.statusText}`);
                         const data = await res.json();
-                        const movesData: Move[] = (Array.isArray(data) ? data : []).map((moveObject: any) => {
-                            const originalCommand = moveObject.Command != null ? String(moveObject.Command) : null;
-                            const translatedCommand = originalCommand ? translateText(originalCommand) : null;
-                            return {
-                                ID: Number(moveObject.ID),
-                                Command: translatedCommand,
-                                CharacterId: selectedCharacterId,
-                                CharacterName: characters.find(c => c.id === selectedCharacterId)?.name || null,
-                                Stance: moveObject.Stance ? String(moveObject.Stance) : null,
-                                HitLevel: moveObject.HitLevel ? String(moveObject.HitLevel) : null,
-                                Impact: moveObject.Impact != null ? Number(moveObject.Impact) : 0,
-                                Damage: moveObject.Damage != null ? String(moveObject.Damage) : null,
-                                DamageDec: moveObject.DamageDec != null ? Number(moveObject.DamageDec) : null,
-                                Block: moveObject.Block != null ? String(moveObject.Block) : null,
-                                BlockDec: moveObject.BlockDec != null ? Number(moveObject.BlockDec) : null,
-                                Hit: moveObject.Hit != null ? String(moveObject.Hit) : null,
-                                HitDec: moveObject.HitDec != null ? Number(moveObject.HitDec) : null,
-                                HitString: moveObject.Hit != null ? String(moveObject.Hit) : null,
-                                CounterHit: moveObject.CounterHit != null ? String(moveObject.CounterHit) : null,
-                                CounterHitDec: moveObject.CounterHitDec != null ? Number(moveObject.CounterHitDec) : null,
-                                CounterHitString: moveObject.CounterHit != null ? String(moveObject.CounterHit) : null,
-                                GuardBurst: moveObject.GuardBurst != null ? Number(moveObject.GuardBurst) : null,
-                                Notes: moveObject.Notes != null ? String(moveObject.Notes) : null,
-                            } as Move;
-                        });
+                        const charName = characters.find(c => c.id === selectedCharacterId)?.name || null;
+                        const movesData: Move[] = Array.isArray(data)
+                            ? data.map((moveObject: any) => processMove(moveObject, selectedCharacterId, charName))
+                            : [];
                         movesCacheRef.current.set(cacheKey, movesData);
                         setOriginalMoves(movesData);
                     }
@@ -251,7 +245,7 @@ export const FrameDataTable: React.FC = () => {
             setOriginalMoves([]);
             setMovesLoading(false);
         }
-    }, [selectedGame?.id, selectedCharacterId, translateText]);
+    }, [selectedGame?.id, selectedCharacterId, translateText, characters, intern]);
 
     const handleSort = useCallback(
         (column: SortableColumn) => {
@@ -265,13 +259,9 @@ export const FrameDataTable: React.FC = () => {
         [sortColumn]
     );
 
-    // Wrapper to keep existing prop shape while using extracted component
     const renderCommand = useCallback((command: string | null) => <CommandRenderer command={command} />, []);
-
-    // Helper to render Notes text with inline icons (Memoized)
     const renderNotes = useCallback((note: string | null) => <NotesRenderer note={note} />, []);
 
-    // Build game-specific field configs and operator registry
     const gameFilterConfig = useMemo(() => gameFilterConfigs[selectedGame.id] ?? { fields: [] }, [selectedGame.id]);
     const fieldMap = useMemo(() => new Map<string, FieldConfig>(gameFilterConfig.fields.map(f => [f.id, f])), [gameFilterConfig.fields]);
     const allOperators: FilterOperator[] = useMemo(() => {
@@ -283,7 +273,6 @@ export const FrameDataTable: React.FC = () => {
     }, [gameFilterConfig]);
     const opsById = useMemo(() => operatorById(allOperators), [allOperators]);
 
-    // Helper to read field value as string or number consistently
     const getFieldAs = useCallback((move: Move, fieldId: string): { string: string | null; number: number | null; type: FieldType } => {
         const field = fieldMap.get(fieldId);
         const type: FieldType = field?.type ?? "text";
@@ -316,13 +305,7 @@ export const FrameDataTable: React.FC = () => {
         }
     }, [fieldMap]);
 
-    // Type for processed filters
-    type ProcessedFilter = FilterCondition & {
-        value1?: string;
-        value2?: string;
-    };
-
-    // Pre-process filters for better performance
+    type ProcessedFilter = FilterCondition & { value1?: string; value2?: string };
     const processedFilters = useMemo((): ProcessedFilter[] => {
         return activeFilters.map((f) => ({ ...f, value1: f.value, value2: f.value2 }));
     }, [activeFilters]);
@@ -340,9 +323,8 @@ export const FrameDataTable: React.FC = () => {
         });
     }, [opsById, getFieldAs]);
 
-    // Optimized field value extraction with type information
     const SORT_FIELD_MAP = useMemo(() => ({
-    character: { getter: (move: Move) => move.CharacterName, type: 'string' as const },
+        character: { getter: (move: Move) => move.CharacterName, type: 'string' as const },
         stance: { getter: (move: Move) => move.Stance, type: 'string' as const },
         command: { getter: (move: Move) => move.Command, type: 'string' as const },
         rawCommand: { getter: (move: Move) => move.Command, type: 'string' as const },
@@ -356,91 +338,112 @@ export const FrameDataTable: React.FC = () => {
         notes: { getter: (move: Move) => move.Notes, type: 'string' as const },
     }), []);
 
-    // Pre-compute sort values for the current sort column
     const movesWithSortValues = useMemo(() => {
         if (!sortColumn || originalMoves.length === 0) return originalMoves;
-        
         const fieldConfig = SORT_FIELD_MAP[sortColumn as keyof typeof SORT_FIELD_MAP];
         if (!fieldConfig) return originalMoves;
-        
-        return originalMoves.map(move => ({
-            ...move,
-            _sortValue: fieldConfig.getter(move)
-        }));
+        return originalMoves.map(move => ({ ...move, _sortValue: fieldConfig.getter(move) }));
     }, [originalMoves, sortColumn, SORT_FIELD_MAP]);
 
-    // Optimized comparator functions
     const createOptimizedComparator = useCallback((direction: "asc" | "desc", fieldType: 'string' | 'number') => {
         const order = direction === "asc" ? 1 : -1;
-        
         if (fieldType === 'number') {
             return (a: Move & { _sortValue?: any }, b: Move & { _sortValue?: any }): number => {
                 const valA = a._sortValue;
                 const valB = b._sortValue;
-                
                 if (valA == null && valB == null) return 0;
                 if (valA == null) return order;
                 if (valB == null) return -order;
-                
                 return (valA - valB) * order;
             };
         } else {
             return (a: Move & { _sortValue?: any }, b: Move & { _sortValue?: any }): number => {
                 const valA = a._sortValue;
                 const valB = b._sortValue;
-                
                 if (valA == null && valB == null) return 0;
                 if (valA == null) return order;
                 if (valB == null) return -order;
-                
                 return String(valA).localeCompare(String(valB)) * order;
             };
         }
     }, []);
 
-    // compute displayedMoves via memoization with optimized filtering and sorting
     const displayedMoves = useMemo(() => {
         const sourceMoves = sortColumn ? movesWithSortValues : originalMoves;
         if (sourceMoves.length === 0) return [];
-
         let result = sourceMoves;
         if (processedFilters.length > 0) {
-            result = result.filter((move) => {
-                return processedFilters.every((filter) => applyFilter(move, filter));
-            });
+            result = result.filter((move) => processedFilters.every((filter) => applyFilter(move, filter)));
         }
-
-        // Apply sorting if column is specified
         if (sortColumn) {
             if (result === sourceMoves) {
                 result = [...result];
             }
-
             const fieldConfig = SORT_FIELD_MAP[sortColumn as keyof typeof SORT_FIELD_MAP];
             if (fieldConfig) {
                 const comparator = createOptimizedComparator(sortDirection, fieldConfig.type);
                 result.sort(comparator);
             }
         }
-
         return result;
     }, [movesWithSortValues, originalMoves, processedFilters, sortColumn, sortDirection, applyFilter, createOptimizedComparator, SORT_FIELD_MAP]);
 
-    // Handle filter changes (Memoized)
-    const handleFiltersChange = useCallback((filters: FilterCondition[]) => {
-        setActiveFilters(filters);
-    }, []);
+    // Export handlers
+    const handleExport = useCallback((format: "csv" | "excel") => {
+        // Use currently visible (filtered + sorted) moves
+        const rows = displayedMoves;
+        if (!rows || rows.length === 0) return;
+        // Build headers from visible columns (skip non-data if any)
+        const headers = visibleColumns.map(c => c.label);
+        const fieldIds = visibleColumns.map(c => c.id);
+        const escape = (v: any) => {
+            if (v == null) return "";
+            const s = String(v);
+            if (/[,"\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+            return s;
+        };
+        const dataLines: string[] = [];
+        dataLines.push(headers.map(escape).join(","));
+        for (const m of rows) {
+            const line = fieldIds.map(fid => {
+                switch (fid) {
+                    case 'character': return m.CharacterName;
+                    case 'stance': return m.Stance;
+                    case 'command':
+                    case 'rawCommand': return m.Command;
+                    case 'hitLevel': return m.HitLevel;
+                    case 'impact': return m.Impact;
+                    case 'damage': return m.DamageDec ?? m.Damage;
+                    case 'block': return m.BlockDec ?? m.Block;
+                    case 'hit': return m.HitDec ?? m.Hit;
+                    case 'counterHit': return m.CounterHitDec ?? m.CounterHit;
+                    case 'guardBurst': return m.GuardBurst;
+                    case 'notes': return m.Notes;
+                    default: return '';
+                }
+            }).map(escape).join(",");
+            dataLines.push(line);
+        }
+        const csv = dataLines.join("\n");
+        const blob = new Blob([csv], { type: format === 'excel' ? 'application/vnd.ms-excel' : 'text/csv;charset=utf-8;' });
+        const ext = format === 'excel' ? 'xls' : 'csv';
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${selectedGame.id || 'export'}_${selectedCharacterId === -1 ? 'All' : selectedCharacterId}.${ext}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }, [displayedMoves, visibleColumns, selectedGame.id, selectedCharacterId]);
 
-    // New useEffect to fetch the timestamp
+    const handleFiltersChange = useCallback((filters: FilterCondition[]) => { setActiveFilters(filters); }, []);
+
     useEffect(() => {
         fetch("/timestamp.json")
             .then((res) => res.json())
-            .then((data) => {
-                setDeployTimestamp(data.timestamp);
-            })
-            .catch((err) => {
-                setDeployTimestamp("Unknown");
-            });
+            .then((data) => { setDeployTimestamp(data.timestamp); })
+            .catch(() => { setDeployTimestamp("Unknown"); });
     }, []);
 
     if (error) {
@@ -457,9 +460,7 @@ export const FrameDataTable: React.FC = () => {
         );
     }
 
-    // Get selected character name based on the ID stored in context
     const selectedCharacterNameFromContext = selectedCharacterId === -1 ? "All Characters" : (selectedCharacterId ? characters.find((c) => c.id === selectedCharacterId)?.name : null);
-
     const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
     return (
@@ -484,8 +485,25 @@ export const FrameDataTable: React.FC = () => {
                                 </CardTitle>
                                 <ActiveFiltersBadge count={activeFilters.length} />
                             </div>
-                            <CardDescription className="m-0">
-                                Total Moves: {displayedMoves.length} {originalMoves.length !== displayedMoves.length ? `(filtered from ${originalMoves.length})` : ""}
+                            <CardDescription className="m-0 flex items-center gap-2">
+                                <span>
+                                    Total Moves: {displayedMoves.length} {originalMoves.length !== displayedMoves.length ? `(filtered from ${originalMoves.length})` : ""}
+                                </span>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <button
+                                            className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-md border bg-gradient-to-r from-secondary/80 via-secondary to-secondary/80 hover:from-secondary hover:via-secondary hover:to-secondary/90 shadow-sm hover:shadow transition-colors transition-shadow"
+                                            title="Export"
+                                        >
+                                            <span className="flex items-center justify-center h-5 w-5 rounded-sm bg-background/40 border border-border/50 mr-1"><Download className="h-3.5 w-3.5" /></span>
+                                            <span className="font-medium tracking-wide">Export</span>
+                                        </button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="bg-card/95 backdrop-blur-sm border-border shadow-lg">
+                                        <DropdownMenuItem onClick={() => handleExport('csv')}>Export to CSV</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => handleExport('excel')}>Export to Excel</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </CardDescription>
                         </div>
 

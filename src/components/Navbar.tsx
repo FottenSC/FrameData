@@ -100,7 +100,7 @@ export const Navbar: React.FC = () => {
                             ...characters.map((c) => ({ label: c.name, value: `${c.id}|${c.name}` })) as ComboboxOption[],
                           ]}
                           placeholder="Select Character"
-                          className="h-auto py-0 px-1.5 text-sm font-medium border-none shadow-none bg-transparent focus:ring-0 focus:ring-offset-0 w-auto min-w-[150px] text-foreground/80 hover:text-foreground transition-colors"
+                          className="w-[200px] font-medium"
                         />
                       </BreadcrumbItem>
                     </>
@@ -125,4 +125,4 @@ export const Navbar: React.FC = () => {
       </div>
     </nav>
   );
-}; 
+};

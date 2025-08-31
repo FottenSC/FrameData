@@ -42,7 +42,7 @@ export function Combobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={cn("h-8 px-2 text-sm justify-between w-[200px]", className)}
+          className={cn("h-10 px-3 text-sm justify-between w-[200px]", className)}
         >
           <span className="truncate">
             {selected ? selected.label : placeholder}

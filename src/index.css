@@ -58,8 +58,10 @@
 }
 
 /* Basic Firefox scrollbar styling */
-scrollbar-color: hsl(0, 0%, 50%) hsl(0, 0%, 20%);
-scrollbar-width: thin;
+html {
+    scrollbar-color: hsl(0, 0%, 50%) hsl(0, 0%, 20%);
+    scrollbar-width: thin;
+}
 
 /* Animations */
 @keyframes fadeIn {

@@ -2,7 +2,7 @@ export interface Move {
   ID: number;
   Command: string;
   Stance: string | null;
-  HitLevel: string| null;
+  HitLevel: string | null;
   Impact: number;
   Damage: string | null;
   DamageDec: number;
@@ -27,17 +27,17 @@ export interface FilterCondition {
   value2?: string;
 }
 
-export type SortableColumn = 
+export type SortableColumn =
   | "character"
-  | "stance" 
-  | "command" 
-  | "rawCommand" 
+  | "stance"
+  | "command"
+  | "rawCommand"
   | "input"
-  | "hitLevel" 
-  | "impact" 
-  | "damage" 
-  | "block" 
-  | "hit" 
-  | "counterHit" 
-  | "guardBurst" 
+  | "hitLevel"
+  | "impact"
+  | "damage"
+  | "block"
+  | "hit"
+  | "counterHit"
+  | "guardBurst"
   | "notes";

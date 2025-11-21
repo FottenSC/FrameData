@@ -1,60 +1,60 @@
 @import "tailwindcss";
 
 :root {
-  /* Dark theme variables */
-  --background: hsl(0, 0%, 10%);
-  --foreground: hsl(0, 0%, 98%);
-  --card: hsl(0, 0%, 20%);
-  --card-foreground: hsl(0, 0%, 98%);
-  --popover: hsl(0, 0%, 20%);
-  --popover-foreground: hsl(0, 0%, 98%);
-  --primary: hsl(0, 0%, 92%);
-  --primary-foreground: hsl(0, 0%, 15%);
-  --secondary: hsl(0, 0%, 20%);
-  --secondary-foreground: hsl(0, 0%, 98%);
-  --muted: hsl(0, 0%, 20%);
-  --muted-foreground: hsl(0, 0%, 70%);
-  --accent: hsl(0, 0%, 20%);
-  --accent-foreground: hsl(0, 0%, 98%);
-  --destructive: hsl(358, 83%, 66%);
-  --destructive-foreground: hsl(0, 0%, 100%);
-  --border: hsla(0, 0%, 100%, 0.1);
-  --input: hsla(0, 0%, 100%, 0.15);
-  --ring: hsl(0, 0%, 55%);
-  --chart-1: hsl(262, 70%, 50%);
-  --chart-2: hsl(160, 60%, 60%);
-  --chart-3: hsl(65, 75%, 70%);
-  --chart-4: hsl(300, 80%, 60%);
-  --chart-5: hsl(10, 85%, 60%);
-  --sidebar: hsl(0, 0%, 15%);
-  --sidebar-foreground: hsl(0, 0%, 98%);
-  --sidebar-primary: hsl(262, 70%, 50%);
-  --sidebar-primary-foreground: hsl(0, 0%, 98%);
-  --sidebar-accent: hsl(0, 0%, 20%);
-  --sidebar-accent-foreground: hsl(0, 0%, 98%);
-  --sidebar-border: hsla(0, 0%, 100%, 0.1);
-  --sidebar-ring: hsl(0, 0%, 55%);
+    /* Dark theme variables */
+    --background: hsl(0, 0%, 10%);
+    --foreground: hsl(0, 0%, 98%);
+    --card: hsl(0, 0%, 20%);
+    --card-foreground: hsl(0, 0%, 98%);
+    --popover: hsl(0, 0%, 20%);
+    --popover-foreground: hsl(0, 0%, 98%);
+    --primary: hsl(0, 0%, 92%);
+    --primary-foreground: hsl(0, 0%, 15%);
+    --secondary: hsl(0, 0%, 20%);
+    --secondary-foreground: hsl(0, 0%, 98%);
+    --muted: hsl(0, 0%, 20%);
+    --muted-foreground: hsl(0, 0%, 70%);
+    --accent: hsl(0, 0%, 20%);
+    --accent-foreground: hsl(0, 0%, 98%);
+    --destructive: hsl(358, 83%, 66%);
+    --destructive-foreground: hsl(0, 0%, 100%);
+    --border: hsla(0, 0%, 100%, 0.1);
+    --input: hsla(0, 0%, 100%, 0.15);
+    --ring: hsl(0, 0%, 55%);
+    --chart-1: hsl(262, 70%, 50%);
+    --chart-2: hsl(160, 60%, 60%);
+    --chart-3: hsl(65, 75%, 70%);
+    --chart-4: hsl(300, 80%, 60%);
+    --chart-5: hsl(10, 85%, 60%);
+    --sidebar: hsl(0, 0%, 15%);
+    --sidebar-foreground: hsl(0, 0%, 98%);
+    --sidebar-primary: hsl(262, 70%, 50%);
+    --sidebar-primary-foreground: hsl(0, 0%, 98%);
+    --sidebar-accent: hsl(0, 0%, 20%);
+    --sidebar-accent-foreground: hsl(0, 0%, 98%);
+    --sidebar-border: hsla(0, 0%, 100%, 0.1);
+    --sidebar-ring: hsl(0, 0%, 55%);
 }
 
 /* WebKit Scrollbar Styling */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+    width: 8px;
+    height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(0, 0%, 20%);
-  border-radius: 10px;
+    background: hsl(0, 0%, 20%);
+    border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: hsl(0, 0%, 50%);
-  border-radius: 10px;
-  border: 2px solid hsl(0, 0%, 20%);
+    background-color: hsl(0, 0%, 50%);
+    border-radius: 10px;
+    border: 2px solid hsl(0, 0%, 20%);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: hsl(0, 0%, 65%);
+    background-color: hsl(0, 0%, 65%);
 }
 
 /* Basic Firefox scrollbar styling */
@@ -63,91 +63,101 @@ scrollbar-width: thin;
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes fadeOut {
-  from { opacity: 1; }
-  to { opacity: 0; }
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
 }
 
 @layer base {
-  * {
-    /* @apply border-border outline-ring/50; */
-    border-color: var(--border);
-    outline-color: color-mix(in srgb, var(--ring) 50%, transparent);
-  }
-  body {
-    background-color: var(--background);
-    color: var(--foreground);
-  }
+    * {
+        /* @apply border-border outline-ring/50; */
+        border-color: var(--border);
+        outline-color: color-mix(in srgb, var(--ring) 50%, transparent);
+    }
+    body {
+        background-color: var(--background);
+        color: var(--foreground);
+    }
 }
 
 @layer components {
-  .filter-container {
-    transition: all 0.25s ease-in-out;
-    transform-origin: top center;
-  }
-  .filter-container.visible {
-    opacity: 1;
-    transform: scaleY(1);
-    margin-top: 12px;
-    pointer-events: all;
-  }
-  .filter-container.hidden {
-    opacity: 0;
-    transform: scaleY(0);
-    margin-top: 0;
-    max-height: 0;
-    pointer-events: none;
-  }
-  .filter-container.empty.visible {
-    transition: all 0.1s ease-out;
-  }
-  .filter-container.empty.hidden {
-    transition: all 0.1s ease-in;
-  }
-  .title-interactive {
-    position: relative;
-    padding: 6px 10px;
-    margin: -6px -10px;
-    border-radius: 4px;
-    transition: background-color 0.2s ease;
-  }
-  .title-interactive:hover {
-    background-color: rgba(255,255,255,0.05);
-  }
-  .title-interactive:active {
-    background-color: rgba(255,255,255,0.1);
-  }
+    .filter-container {
+        transition: all 0.25s ease-in-out;
+        transform-origin: top center;
+    }
+    .filter-container.visible {
+        opacity: 1;
+        transform: scaleY(1);
+        margin-top: 12px;
+        pointer-events: all;
+    }
+    .filter-container.hidden {
+        opacity: 0;
+        transform: scaleY(0);
+        margin-top: 0;
+        max-height: 0;
+        pointer-events: none;
+    }
+    .filter-container.empty.visible {
+        transition: all 0.1s ease-out;
+    }
+    .filter-container.empty.hidden {
+        transition: all 0.1s ease-in;
+    }
+    .title-interactive {
+        position: relative;
+        padding: 6px 10px;
+        margin: -6px -10px;
+        border-radius: 4px;
+        transition: background-color 0.2s ease;
+    }
+    .title-interactive:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+    .title-interactive:active {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
 
-  /* Selection styling */
-  .button-icon::selection,
-  .plus-separator::selection {
-    background-color: #3390FF;
-    color: #fff;
-  }
+    /* Selection styling */
+    .button-icon::selection,
+    .plus-separator::selection {
+        background-color: #3390ff;
+        color: #fff;
+    }
 
-  /* FilterBuilder migrated styles */
-  .custom-filter-builder .custom-select-trigger,
-  .custom-filter-builder .custom-input {
-    background-color: #1e1e1e !important;
-    color: #ffffff !important;
-    border: 1px solid #2d2d2d !important;
-  }
-  div[data-radix-popper-content-wrapper] {
-    --select-content-bg: #1e1e1e !important;
-  }
-  div[data-radix-popper-content-wrapper] [role="listbox"] {
-    background-color: #1e1e1e !important;
-    color: #ffffff !important;
-    border: 1px solid #2d2d2d !important;
-  }
-  .custom-filter-builder input.custom-input {
-    background-color: #1e1e1e !important;
-    color: #ffffff !important;
-    border-color: #2d2d2d !important;
-  }
-  .filter-row.inactive { opacity: 0.7; }
+    /* FilterBuilder migrated styles */
+    .custom-filter-builder .custom-select-trigger,
+    .custom-filter-builder .custom-input {
+        background-color: #1e1e1e !important;
+        color: #ffffff !important;
+        border: 1px solid #2d2d2d !important;
+    }
+    div[data-radix-popper-content-wrapper] {
+        --select-content-bg: #1e1e1e !important;
+    }
+    div[data-radix-popper-content-wrapper] [role="listbox"] {
+        background-color: #1e1e1e !important;
+        color: #ffffff !important;
+        border: 1px solid #2d2d2d !important;
+    }
+    .custom-filter-builder input.custom-input {
+        background-color: #1e1e1e !important;
+        color: #ffffff !important;
+        border-color: #2d2d2d !important;
+    }
+    .filter-row.inactive {
+        opacity: 0.7;
+    }
 }

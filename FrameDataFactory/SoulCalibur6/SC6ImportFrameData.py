@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 def project_root() -> Path:
-    # This file lives in DatabaseMan/SoulCalibur6 -> root is two levels up
+    # This file lives in FrameDataFactory/SoulCalibur6 -> root is two levels up
     return Path(sys.path[0]).parent.parent
 
 
@@ -198,10 +198,4 @@ for c in characters_manifest:
     with open(moves_dir / f"{cid}.json", "w", encoding="utf-8") as f:
         json.dump(moves_list, f, ensure_ascii=False, indent=2)
 
-
-# If you still need to populate SQLite for other tools, you can uncomment below:
-# import sqlite3
-# dbName = "FrameData.db"
-# con = sqlite3.connect(str(project_root() / "DatabaseMan" / "SoulCalibur6" / dbName))
-# frameData.to_sql(name='UnicornData', con=con, if_exists='replace', index=False)
 

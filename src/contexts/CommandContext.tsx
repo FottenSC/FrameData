@@ -1,30 +1,30 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from "react";
 
 interface CommandContextType {
-  open: boolean;
-  setOpen: (open: boolean) => void;
+    open: boolean;
+    setOpen: (open: boolean) => void;
 }
 
 const CommandContext = createContext<CommandContextType | undefined>(undefined);
 
 interface CommandProviderProps {
-  children: ReactNode;
+    children: ReactNode;
 }
 
 export function CommandProvider({ children }: CommandProviderProps) {
-  const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(false);
 
-  return (
-    <CommandContext.Provider value={{ open, setOpen }}>
-      {children}
-    </CommandContext.Provider>
-  );
+    return (
+        <CommandContext.Provider value={{ open, setOpen }}>
+            {children}
+        </CommandContext.Provider>
+    );
 }
 
 export function useCommand() {
-  const context = useContext(CommandContext);
-  if (context === undefined) {
-    throw new Error('useCommand must be used within a CommandProvider');
-  }
-  return context;
-} 
+    const context = useContext(CommandContext);
+    if (context === undefined) {
+        throw new Error("useCommand must be used within a CommandProvider");
+    }
+    return context;
+}

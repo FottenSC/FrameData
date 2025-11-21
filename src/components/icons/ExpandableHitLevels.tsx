@@ -58,5 +58,5 @@ export const ExpandableHitLevels = React.memo(
                 )}
             </div>
         );
-    }
+    },
 );

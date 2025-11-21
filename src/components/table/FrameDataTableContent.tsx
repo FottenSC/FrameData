@@ -229,7 +229,7 @@ export const FrameDataTableContent: React.FC<DataTableContentProps> = ({
                     if (items.length === 0) {
                         const slice = moves.slice(
                             0,
-                            Math.min(30, moves.length)
+                            Math.min(30, moves.length),
                         );
                         return (
                             <>
@@ -250,7 +250,7 @@ export const FrameDataTableContent: React.FC<DataTableContentProps> = ({
                                             >
                                                 {renderCellContent(
                                                     move,
-                                                    column.id
+                                                    column.id,
                                                 )}
                                             </TableCell>
                                         ))}
@@ -286,7 +286,7 @@ export const FrameDataTableContent: React.FC<DataTableContentProps> = ({
                                         ref={(el) => {
                                             if (el)
                                                 rowVirtualizer.measureElement(
-                                                    el
+                                                    el,
                                                 );
                                         }}
                                     >
@@ -309,7 +309,7 @@ export const FrameDataTableContent: React.FC<DataTableContentProps> = ({
                                                 >
                                                     {renderCellContent(
                                                         move,
-                                                        column.id
+                                                        column.id,
                                                     )}
                                                 </TableCell>
                                             );

@@ -25,13 +25,13 @@ DEFAULT_HEADERS = [
 # Output directory structure based on user's workspace assumption
 # Consider making this configurable or relative
 BASE_OUTPUT_DIR = "." # Use workspace root as base
-OUTPUT_SUBDIR = os.path.join("DatabaseMan", "Tekken8")
+OUTPUT_SUBDIR = os.path.join("FrameDataFactory", "Tekken8")
 
-class DatabaseMan:
+class FrameDataFactory:
     """Manages fetching and parsing Tekken 8 frame data from Wavu Wiki."""
 
     def __init__(self, base_output_dir=BASE_OUTPUT_DIR, output_subdir=OUTPUT_SUBDIR):
-        """Initializes the DatabaseMan with configuration."""
+        """Initializes the FrameDataFactory with configuration."""
         self.base_output_dir = base_output_dir
         self.output_subdir = output_subdir
         self.api_url = BASE_URL
@@ -414,8 +414,8 @@ class DatabaseMan:
             # Remove leading comma if present - this happens when a root move incorrectly starts with a comma
             if full_command and full_command.startswith(','):
                 full_command = full_command[1:].strip()
-            move_data['Command'] = DatabaseMan._clean_wikitext(full_command)
-            move_data['MoveName'] = DatabaseMan._clean_wikitext(root_params.get('name', ''))
+            move_data['Command'] = FrameDataFactory._clean_wikitext(full_command)
+            move_data['MoveName'] = FrameDataFactory._clean_wikitext(root_params.get('name', ''))
             
             # Use final hit's params for frame data, damage, level
             final_hit_params = current_params 
@@ -462,10 +462,10 @@ class DatabaseMan:
             else:
                 move_data['Impact'] = None
 
-            move_data['Damage'] = DatabaseMan._clean_wikitext(final_hit_params.get('damage', ''))
-            move_data['DamageDec'] = DatabaseMan._clean_sum_damage(final_hit_params.get('damage'))
-            move_data['Block'] = DatabaseMan._clean_wikitext(final_hit_params.get('block', ''))
-            move_data['BlockDec'] = DatabaseMan._clean_numerical(final_hit_params.get('block'))
+            move_data['Damage'] = FrameDataFactory._clean_wikitext(final_hit_params.get('damage', ''))
+            move_data['DamageDec'] = FrameDataFactory._clean_sum_damage(final_hit_params.get('damage'))
+            move_data['Block'] = FrameDataFactory._clean_wikitext(final_hit_params.get('block', ''))
+            move_data['BlockDec'] = FrameDataFactory._clean_numerical(final_hit_params.get('block'))
             
             # Improved Hit frame handling with special attention to links
             hit_val = final_hit_params.get('hit', '')
@@ -514,7 +514,7 @@ class DatabaseMan:
                 
                 move_data['Hit'] = hit_val_clean.strip()
                 # Extract numerical value for HitDec
-                move_data['HitDec'] = DatabaseMan._clean_numerical(hit_val_clean)
+                move_data['HitDec'] = FrameDataFactory._clean_numerical(hit_val_clean)
             else:
                 move_data['Hit'] = ''
                 move_data['HitDec'] = None
@@ -565,7 +565,7 @@ class DatabaseMan:
                 
                 move_data['CounterHit'] = ch_val_clean.strip()
                 # Extract numerical value for CounterHitDec
-                move_data['CounterHitDec'] = DatabaseMan._clean_numerical(ch_val_clean)
+                move_data['CounterHitDec'] = FrameDataFactory._clean_numerical(ch_val_clean)
             else:
                 move_data['CounterHit'] = ''
                 move_data['CounterHitDec'] = None
@@ -573,7 +573,7 @@ class DatabaseMan:
             # Combine and clean notes from all parts of the string
             unique_cleaned_notes = set()
             for note_text in all_notes_raw:
-                cleaned = DatabaseMan._clean_notes_string(note_text)
+                cleaned = FrameDataFactory._clean_notes_string(note_text)
                 if cleaned: 
                     unique_cleaned_notes.add(cleaned)
             move_data['Notes'] = "; ".join(sorted(list(unique_cleaned_notes)))
@@ -704,7 +704,7 @@ if __name__ == "__main__":
     print("Starting Tekken 8 Frame Data Scraper for Wavu Wiki...")
 
     # Instantiate the manager
-    db_man = DatabaseMan()
+    db_man = FrameDataFactory()
 
     # Run the scraping process with the determined character list
     scraped_data = db_man.scrape_tekken8_data()

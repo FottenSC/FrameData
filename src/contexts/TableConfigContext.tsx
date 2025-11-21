@@ -97,7 +97,7 @@ export const defaultColumns: ColumnConfig[] = [
         className: "pt-2 px-2",
         width: 80,
         minWidth: 80,
-        maxWidth: 80
+        maxWidth: 80,
     },
     {
         id: "block",
@@ -169,7 +169,7 @@ interface TableConfigContextType {
 }
 
 const TableConfigContext = createContext<TableConfigContextType | undefined>(
-    undefined
+    undefined,
 );
 
 export const TableConfigProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -182,7 +182,7 @@ export const TableConfigProvider: React.FC<{ children: React.ReactNode }> = ({
             if (saved) {
                 const storedConfigs: StoredColumnConfig[] = JSON.parse(saved);
                 const storedMap = new Map(
-                    storedConfigs.map((config) => [config.id, config])
+                    storedConfigs.map((config) => [config.id, config]),
                 );
                 return defaultColumns
                     .map((defaultCol) => {
@@ -213,11 +213,11 @@ export const TableConfigProvider: React.FC<{ children: React.ReactNode }> = ({
                     id: col.id,
                     visible: col.visible,
                     order: col.order,
-                })
+                }),
             );
             localStorage.setItem(
                 "tableColumnConfig",
-                JSON.stringify(configsToStore)
+                JSON.stringify(configsToStore),
             );
         } catch (error) {
             console.warn("Failed to save table config to localStorage:", error);
@@ -229,11 +229,11 @@ export const TableConfigProvider: React.FC<{ children: React.ReactNode }> = ({
         (columnId: string, visible: boolean) => {
             setColumnConfigs((prev) =>
                 prev.map((col) =>
-                    col.id === columnId ? { ...col, visible } : col
-                )
+                    col.id === columnId ? { ...col, visible } : col,
+                ),
             );
         },
-        []
+        [],
     );
 
     // Optimized reorderColumns - only updates objects that actually change
@@ -293,7 +293,7 @@ export const TableConfigProvider: React.FC<{ children: React.ReactNode }> = ({
             restoreDefaults,
             getVisibleColumns,
             getSortedColumns,
-        ]
+        ],
     );
 
     return (
@@ -307,7 +307,7 @@ export const useTableConfig = (): TableConfigContextType => {
     const context = useContext(TableConfigContext);
     if (context === undefined) {
         throw new Error(
-            "useTableConfig must be used within a TableConfigProvider"
+            "useTableConfig must be used within a TableConfigProvider",
         );
     }
     return context;

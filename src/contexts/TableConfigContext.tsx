@@ -55,9 +55,9 @@ export const defaultColumns: ColumnConfig[] = [
     visible: true,
     order: 1,
     className: "pt-2 px-2",
-    width: 300,
-    minWidth: 300,
-    maxWidth: 300,
+    width: 170,
+    minWidth: 170,
+    maxWidth: 170,
   },
   {
     id: "rawCommand",

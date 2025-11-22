@@ -13,6 +13,7 @@ import { ColumnConfig } from "@/contexts/TableConfigContext";
 import { ValueBadge } from "@/components/ui/ValueBadge";
 import { ExpandableHitLevels } from "@/components/icons/ExpandableHitLevels";
 import { useVirtualizer, useWindowVirtualizer } from "@tanstack/react-virtual";
+import { Badge } from "@/components/ui/badge";
 
 interface DataTableContentProps {
   moves: Move[];
@@ -47,7 +48,20 @@ export const FrameDataTableContent: React.FC<DataTableContentProps> = ({
       case "character":
         return move.CharacterName || "—";
       case "stance":
-        return move.Stance || "—";
+        if (!move.Stance || move.Stance.length === 0) return "—";
+        return (
+          <div className="flex flex-wrap gap-0.5 justify-end">
+            {move.Stance.map((s, i) => (
+              <Badge
+                key={i}
+                variant="secondary"
+                className="whitespace-nowrap border border-gray-500"
+              >
+                {s}
+              </Badge>
+            ))}
+          </div>
+        );
       case "command":
         return renderCommand(move.Command);
       case "rawCommand":

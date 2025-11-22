@@ -7,12 +7,11 @@ import json
 from pathlib import Path
 
 
-
 def project_root() -> Path:
-    # This file lives in FrameDataFactory/SoulCalibur6 -> root is two levels up
     return Path(sys.path[0]).parent.parent
 
 
+print("Loading SoulCalibur6 Frame Data from Google Sheets...")
 frameDataSheetLink = "https://docs.google.com/spreadsheets/d/1R3I_LXfqhvFjlHTuj-wSWwwqYmlUf299a3VY9pVyGEw/export?exportFormat=csv"
 frameData = pd.read_csv(
     filepath_or_buffer=frameDataSheetLink,
@@ -125,16 +124,224 @@ frameData["isSS"] = frameData["Notes"].apply(lambda n: 1 if note_has(n, ":SS:") 
 frameData["isRE"] = frameData.apply(lambda r: 1 if note_has(r.get("Notes"), ":RE:") or (isinstance(r.get("Stance"), str) and ("RE" in r.get("Stance"))) else 0, axis=1)
 frameData["isLH"] = frameData["Notes"].apply(lambda n: 1 if note_has(n, ":LH:") and True else 0)
 
-# Prepare Characters list (dedupe and sort)
+
+# Stance case fixer
+stanceTranslator = [
+    ["bt", "BT"],
+    ["enemy in sc", "Enemy in SC"],
+    ["sch", "SCH"],
+    ["sc", "SC"],
+
+    ["back throw", "Back Side"],
+    ["back side throw", "Back Side"],
+    ["left side throw", "Left Side"],
+    ["left side", "Left Side"],
+    ["left", "Left Side"],
+    ["right side throw", "Right Side"],
+    ["right side", "Right Side"],
+    ["right", "Right Side"],
+    ["re  second round", "RE2"],
+    ["re  2nd round", "RE2"],
+    ["se mid-air opponent", "SE Mid-air Opponent"],
+    ["downed opponent", "Downed Opponent"],
+    ["manji dragonfly", "Manji Dragonfly"],
+    ["midair opponent", "Midair Opponent"],
+    ["even activation", "even activation"],
+    ["sky  stage iii", "SKY stage III"],
+    ["odd activation", "odd activation"],
+    ["during motion", "During Motion"],
+    ["indian stance", "Indian Stance"],
+    ["sky  stage ii", "SKY stage II"],
+    ["sky  stage i", "SKY stage I"],
+    ["flea stance", "Flea Stance"],
+    ["short hold", "Short Hold"],
+    ["weaponless", "Weaponless"],
+    ["tip range", "tip range"],
+    ["vs crouch", "vs crouch"],
+    ["full hold", "Full Hold"],
+    ["short hold", "Short Hold"],
+    ["any stance", "Any Stance"],
+    ["grounded", "GROUNDED"],
+    ["mcft far", "MCFT far"],
+    ["almighty", "almighty"],
+    ["partial", "partial"],
+    ["revenge", "Revenge"],
+    ["medium", "Medium"],
+    ["evade", "Evade"],
+    ["shura", "Shura"],
+    ["quake", "Quake"],
+    ["short", "Short"],
+    ["spear", "spear"],
+    ["sword", "sword"],
+    ["wall", "Wall"],
+    ["down", "DOWN"],
+    ["down", "Down"],
+    ["jump", "JUMP"],
+    ["mcft", "MCFT"],
+    ["mcht", "MCHT"],
+    ["sgdf", "SGDF"],
+    ["srsh", "SRSH"],
+    ["long", "Long"],
+    ["full", "Full"],
+    ["miss", "Miss"],
+    ["tip", "Tip"],
+    ["ags", "AGS"],
+    ["air", "AIR"],
+    ["ang", "ANG"],
+    ["avn", "AVN"],
+    ["bhh", "BHH"],
+    ["bkn", "BKN"],
+    ["bob", "BOB"],
+    ["coe", "COE"],
+    ["dgf", "DGF"],
+    ["fle", "FLE"],
+    ["ind", "IND"],
+    ["mst", "MST"],
+    ["nbs", "NBS"],
+    ["nls", "NLS"],
+    ["nss", "NSS"],
+    ["ntc", "NTC"],
+    ["pxs", "PXS"],
+    ["rlc", "RLC"],
+    ["rrp", "RRP"],
+    ["run", "RUN"],
+    ["rxp", "RXP"],
+    ["sbh", "SBH"],
+    ["spr", "SPR"],
+    ["ssh", "SSH"],
+    ["ssr", "SSR"],
+    ["stg", "STG"],
+    ["stk", "STK"],
+    ["swr", "SWR"],
+    ["sxs", "SXS"],
+    ["tas", "TAS"],
+    ["tow", "TOW"],
+    ["ts1", "TS1"],
+    ["ts2", "TS2"],
+    ["ts3", "TS3"],
+    ["wnb", "WNB"],
+    ["wnc", "WNC"],
+    ["wnf", "WNF"],
+    ["wns", "WNS"],
+    ["wro", "WRO"],
+    ["wrp", "WRP"],
+    ["woh", "WoH"],
+    ["yyt", "YYT"],
+    ["on hit", "Hit"],
+    ["hit", "Hit"],
+    ["run", "Run"],
+    ["sky", "Sky"],
+    ["lh", "LH"],
+    ["ag", "AG"],
+    ["dr", "DR"],
+    ["ts", "TS"],
+    ["al", "AL"],
+    ["as", "AS"],
+    ["at", "AT"],
+    ["be", "BE"],
+    ["bl", "BL"],
+    ["bp", "BP"],
+    ["bs", "BS"],
+    ["ch", "CH"],
+    ["cr", "CR"],
+    ["db", "DB"],
+    ["dc", "DC"],
+    ["df", "DF"],
+    ["dl", "DL"],
+    ["ds", "DS"],
+    ["dw", "DW"],
+    ["fc", "FC"],
+    ["fj", "FJ"],
+    ["gi", "GI"],
+    ["gs", "GS"],
+    ["hl", "HL"],
+    ["hp", "HP"],
+    ["js", "JS"],
+    ["li", "LI"],
+    ["lo", "LO"],
+    ["lp", "LP"],
+    ["ls", "LS"],
+    ["mc", "MC"],
+    ["mo", "MO"],
+    ["mp", "MP"],
+    ["ms", "MS"],
+    ["ng", "NG"],
+    ["po", "PO"],
+    ["pr", "PR"],
+    ["qp", "QP"],
+    ["rc", "RC"],
+    ["re", "RE"],
+    ["rg", "RG"],
+    ["ro", "RO"],
+    ["rs", "RS"],
+    ["rt", "RT"],
+    ["se", "SE"],
+    ["sg", "SG"],
+    ["sl", "SL"],
+    ["ss", "SS"],
+    ["ud", "UD"],
+    ["vg", "VG"],
+    ["vs", "VS"],
+    ["wd", "WD"],
+    ["wf", "WF"],
+    ["wr", "WR"],
+    ["ws", "WS"],
+    ["wt", "WT"],
+    ["ax", "ax"],
+    ["c", "c"],
+]
+
+alreadyExported = {}
+
+def caseFixer(stance):
+    stances = []
+    originalStance = stance
+
+    if not isinstance(stance, str):
+        return stance
+
+    for test in stanceTranslator:
+        keepLooping = True
+        while keepLooping:
+            if test[0] in stance.lower():
+                stances.append(test[1])
+                stance = stance.lower().replace(test[0], "")
+            else:
+                keepLooping = False
+        
+    # if (not alreadyExported.get(originalStance)):
+    #     with open("debugStances.txt", "a", encoding="utf-8") as f:
+    #         f.write(f"{stances} , {originalStance}\n")
+    # alreadyExported[originalStance] = True
+
+    stance = stance.strip()
+    if len(stance) > 0:
+        print(f"Warning: Unknown stance case: {stance} | output {stances} | Original: {originalStance}")
+        
+    return stances
+
+frameData["Stance"] = frameData["Stance"].apply(caseFixer)
+
+
+
+#region Character export
 characters = sorted(set([c for c in frameData["Character"].dropna().tolist()]))
 characters_manifest = [
     {"id": idx + 1, "name": name}
     for idx, name in enumerate(characters)
 ]
 char_id_map = {c["name"]: c["id"] for c in characters_manifest}
-
-# Assign CharacterID
 frameData["CharacterID"] = frameData["Character"].map(char_id_map)
+root = project_root()
+output_base = root / "public" / "Games" / "SoulCalibur6"
+moves_dir = output_base / "Characters"
+os.makedirs(moves_dir, exist_ok=True)
+
+# Write Characters.json
+with open(output_base / "Characters.json", "w", encoding="utf-8") as f:
+    json.dump(characters_manifest, f, ensure_ascii=False, indent=2)
+#endregion Character export
+
 
 # Helpers to coerce values for JSON
 def to_int_or_none(v):
@@ -159,22 +366,22 @@ def to_str_or_none(v):
         pass
     return str(v) if v is not None else None
 
-# Export to JSON under public/SoulCalibur6
-root = project_root()
-output_base = root / "public" / "Games" / "SoulCalibur6"
-moves_dir = output_base / "Characters"
-os.makedirs(moves_dir, exist_ok=True)
-
-# Write Characters.json
-with open(output_base / "Characters.json", "w", encoding="utf-8") as f:
-    json.dump(characters_manifest, f, ensure_ascii=False, indent=2)
+def toArrayOrNone(v):
+    try:
+        if pd.isna(v):
+            return None
+    except Exception:
+        pass
+    if isinstance(v, list):
+        return v
+    return None
 
 # Columns mapping to UI Move interface
 def move_row_to_dict(row: pd.Series):
     return {
         "ID": to_int_or_none(row.get("ID")),
         "Command": to_str_or_none(row.get("Command")),
-        "Stance": to_str_or_none(row.get("Stance")),
+        "Stance": toArrayOrNone(row.get("Stance")),
         "HitLevel": to_str_or_none(row.get("Hit level")),
         "Impact": to_int_or_none(row.get("Impact")),
         "Damage": to_str_or_none(row.get("Damage")),
@@ -189,6 +396,7 @@ def move_row_to_dict(row: pd.Series):
         "Notes": to_str_or_none(row.get("Notes")),
     }
 
+print("Exporting per-character move data to JSON files...")
 # Per-character files
 for c in characters_manifest:
     cid = c["id"]
@@ -199,3 +407,4 @@ for c in characters_manifest:
         json.dump(moves_list, f, ensure_ascii=False, indent=2)
 
 
+print("SoulCalibur6 frame data export complete.")

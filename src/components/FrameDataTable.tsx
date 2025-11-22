@@ -246,9 +246,17 @@ export const FrameDataTable: React.FC = () => {
               Command: intern(translatedCommand),
               CharacterId: charId,
               CharacterName: intern(charName),
-              Stance: intern(
-                moveObject.Stance ? String(moveObject.Stance) : null,
-              ),
+              Stance: (() => {
+                const raw = moveObject.Stance;
+                if (Array.isArray(raw)) {
+                  const arr = raw
+                    .map((s: any) => (s != null ? intern(String(s)) : null))
+                    .filter((s): s is string => s !== null);
+                  return arr.length > 0 ? arr : null;
+                }
+                const s = intern(raw ? String(raw) : null);
+                return s ? [s] : null;
+              })(),
               HitLevel: intern(
                 moveObject.HitLevel ? String(moveObject.HitLevel) : null,
               ),
@@ -444,14 +452,19 @@ export const FrameDataTable: React.FC = () => {
             type,
           };
         case "stance":
-          return { string: move.Stance, number: null, type };
+          return {
+            string: move.Stance ? move.Stance.join(", ") : null,
+            number: null,
+            type,
+          };
         case "command":
         case "rawCommand":
           return { string: move.Command, number: null, type };
         case "input": {
           // combined stance + command
+          const stanceStr = move.Stance ? move.Stance.join(" ") : null;
           const combined =
-            [move.Stance, move.Command].filter(Boolean).join(" ") || null;
+            [stanceStr, move.Command].filter(Boolean).join(" ") || null;
           return { string: combined, number: null, type };
         }
         case "hitLevel":
@@ -540,7 +553,7 @@ export const FrameDataTable: React.FC = () => {
         type: "string" as const,
       },
       stance: {
-        getter: (move: Move) => move.Stance,
+        getter: (move: Move) => (move.Stance ? move.Stance.join(", ") : null),
         type: "string" as const,
       },
       command: {
@@ -553,7 +566,9 @@ export const FrameDataTable: React.FC = () => {
       },
       input: {
         getter: (move: Move) =>
-          [move.Stance, move.Command].filter(Boolean).join(" "),
+          [move.Stance ? move.Stance.join(" ") : null, move.Command]
+            .filter(Boolean)
+            .join(" "),
         type: "string" as const,
       },
       hitLevel: {
@@ -694,12 +709,14 @@ export const FrameDataTable: React.FC = () => {
               case "character":
                 return m.CharacterName;
               case "stance":
-                return m.Stance;
+                return m.Stance ? m.Stance.join(", ") : "";
               case "command":
               case "rawCommand":
                 return m.Command;
               case "input":
-                return [m.Stance, m.Command].filter(Boolean).join(" ");
+                return [m.Stance ? m.Stance.join(" ") : null, m.Command]
+                  .filter(Boolean)
+                  .join(" ");
               case "hitLevel":
                 return m.HitLevel;
               case "impact":

@@ -327,23 +327,23 @@ export const FrameDataTable: React.FC = () => {
               .map((c) => c.id)
               .filter((n: any) => !isNaN(n));
 
-            // Sequential fetch to lower peak memory instead of Promise.all
-            const tempMoves: Move[] = [];
-            for (const id of ids) {
+            // Parallel fetch using Promise.all
+            const fetchPromises = ids.map(async (id) => {
               const url = `/Games/${encodeURIComponent(selectedGame.id)}/Characters/${encodeURIComponent(String(id))}.json`;
               const res = await fetch(url, {
                 signal: abort.signal,
               });
-              if (!res.ok) continue;
+              if (!res.ok) return [];
               const data = await res.json();
               if (Array.isArray(data)) {
                 const charName = chars.find((c) => c.id === id)?.name || null;
-                for (let i = 0; i < data.length; i++) {
-                  tempMoves.push(processMove(data[i], id, charName));
-                }
+                return data.map((m: any) => processMove(m, id, charName));
               }
-            }
-            aggregated = tempMoves;
+              return [];
+            });
+
+            const results = await Promise.all(fetchPromises);
+            aggregated = results.flat();
             movesCacheRef.current.set(cacheKey, aggregated);
             setOriginalMoves(aggregated);
           } else {

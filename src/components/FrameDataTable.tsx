@@ -3,27 +3,23 @@ import React, {
   useState,
   useCallback,
   useMemo,
-  useRef,
   useDeferredValue,
 } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-// Table rendering moved into FrameDataTableContent
-import { ChevronRight, Download, Settings2, Languages, MoreVertical } from "lucide-react";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "./ui/card";
-// Badge usage moved into ValueBadge
 import { useGame, avaliableGames } from "../contexts/GameContext";
 import { useTableConfig } from "../contexts/UserSettingsContext";
 import { useCommand } from "../contexts/CommandContext";
+import { useToolbar } from "../contexts/ToolbarContext";
 import { cn } from "@/lib/utils";
-import { FilterBuilder, ActiveFiltersBadge } from "./FilterBuilder";
+import { FilterBuilder } from "./FilterBuilder";
 import { CommandRenderer } from "@/components/renderers/CommandRenderer";
 import { NotesRenderer } from "@/components/renderers/NotesRenderer";
 import { FrameDataTableContent } from "@/components/table/FrameDataTableContent";
@@ -31,12 +27,6 @@ import { Move, FilterCondition, SortableColumn } from "../types/Move";
 import { builtinOperators, operatorById } from "../filters/operators";
 import { gameFilterConfigs } from "../filters/gameFilterConfigs";
 import type { FieldConfig, FieldType, FilterOperator } from "../filters/types";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "./ui/dropdown-menu";
 import { useMoves } from "@/hooks/useMoves";
 
 import { FrameDataTableContent as MemoizedDataTableContent } from "@/components/table/FrameDataTableContent";
@@ -61,6 +51,13 @@ export const FrameDataTable: React.FC = () => {
   // Add table configuration context
   const { getVisibleColumns, updateColumnVisibility } = useTableConfig();
   const { openView } = useCommand();
+  const {
+    setActiveFiltersCount,
+    setExportHandler,
+    setTotalMoves,
+    setFilteredMoves,
+    setIsUpdating,
+  } = useToolbar();
   const queryClient = useQueryClient();
 
   // Use TanStack Query for data fetching with automatic caching
@@ -83,9 +80,6 @@ export const FrameDataTable: React.FC = () => {
 
   // Add state for filters
   const [activeFilters, setActiveFilters] = useState<FilterCondition[]>([]);
-
-  // Add state for filters visibility
-  const [filtersVisible, setFiltersVisible] = useState<boolean>(true);
 
   // Get visible columns from table configuration
   const baseColumns = getVisibleColumns();
@@ -112,11 +106,6 @@ export const FrameDataTable: React.FC = () => {
       setSortColumn(null);
     }
   }, [selectedCharacterId, sortColumn]);
-
-  // Toggle filters visibility (Memoized)
-  const toggleFiltersVisibility = useCallback(() => {
-    setFiltersVisible((prev) => !prev);
-  }, []);
 
   // Sync URL with selected character (including "All")
   useEffect(() => {
@@ -615,6 +604,28 @@ export const FrameDataTable: React.FC = () => {
     setActiveFilters(filters);
   }, []);
 
+  // Sync toolbar context with current state
+  useEffect(() => {
+    setActiveFiltersCount(activeFilters.length);
+  }, [activeFilters.length, setActiveFiltersCount]);
+
+  useEffect(() => {
+    setExportHandler(() => handleExport);
+    return () => setExportHandler(null);
+  }, [handleExport, setExportHandler]);
+
+  useEffect(() => {
+    setTotalMoves(originalMoves.length);
+  }, [originalMoves.length, setTotalMoves]);
+
+  useEffect(() => {
+    setFilteredMoves(deferredMoves.length);
+  }, [deferredMoves.length, setFilteredMoves]);
+
+  useEffect(() => {
+    setIsUpdating(isStale);
+  }, [isStale, setIsUpdating]);
+
   if (error) {
     return (
       <Card className="border-destructive/20">
@@ -631,138 +642,15 @@ export const FrameDataTable: React.FC = () => {
     );
   }
 
-  const selectedCharacterNameFromContext =
-    selectedCharacterId === -1
-      ? "All Characters"
-      : selectedCharacterId
-        ? characters.find((c) => c.id === selectedCharacterId)?.name
-        : null;
-
   return (
     <div className="space-y-6 h-full flex flex-col pl-4 pr-4 flex-grow">
       {selectedCharacterId ? (
         <Card className="h-full flex flex-col overflow-hidden border border-card-border">
           <CardHeader className="pb-2 flex-shrink-0">
-            <div className="flex justify-between items-center">
-              <div
-                className="flex items-center cursor-pointer group title-interactive"
-                onClick={toggleFiltersVisibility}
-                title={
-                  filtersVisible
-                    ? "Click to hide filters"
-                    : "Click to show filters"
-                }
-              >
-                <CardTitle className="flex items-center">
-                  {selectedCharacterNameFromContext || "Character"} Frame Data
-                  <ChevronRight
-                    className={cn(
-                      "ml-2 h-4 w-4 text-muted-foreground transition-transform duration-200 group-hover:text-foreground",
-                      filtersVisible ? "transform rotate-90" : "",
-                    )}
-                  />
-                </CardTitle>
-                <ActiveFiltersBadge count={activeFilters.length} />
-              </div>
-              <CardDescription className="m-0 flex items-center gap-2">
-                {/* Desktop view - visible on md and up */}
-                <span className="hidden md:inline">
-                  Total Moves: {deferredMoves.length}{" "}
-                  {originalMoves.length !== deferredMoves.length
-                    ? `(filtered from ${originalMoves.length})`
-                    : ""}
-                  {isStale && " (updating...)"}
-                </span>
-                <button
-                  onClick={() => openView("tableConfig")}
-                  className="hidden md:inline-flex items-center justify-center p-1.5 text-muted-foreground hover:text-foreground rounded-md border border-border bg-secondary/30 hover:bg-secondary/50 active:scale-95 active:bg-secondary/70 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
-                  title="Table Configuration"
-                >
-                  <Settings2 className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={() => openView("notationMappings")}
-                  className="hidden md:inline-flex items-center justify-center p-1.5 text-muted-foreground hover:text-foreground rounded-md border border-border bg-secondary/30 hover:bg-secondary/50 active:scale-95 active:bg-secondary/70 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
-                  title="Notation Mappings"
-                >
-                  <Languages className="h-4 w-4" />
-                </button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      className="hidden md:inline-flex items-center justify-center p-1.5 text-muted-foreground hover:text-foreground rounded-md border border-border bg-secondary/30 hover:bg-secondary/50 active:scale-95 active:bg-secondary/70 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
-                      title="Export"
-                    >
-                      <Download className="h-4 w-4" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="end"
-                    className="bg-card/95 backdrop-blur-sm border-border shadow-lg"
-                  >
-                    <DropdownMenuItem onClick={() => handleExport("csv")}>
-                      Export to CSV
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleExport("excel")}>
-                      Export to Excel
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-
-                {/* Mobile view - visible below md */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      className="md:hidden inline-flex items-center justify-center p-1.5 text-muted-foreground hover:text-foreground rounded-md border border-border bg-secondary/30 hover:bg-secondary/50 active:scale-95 active:bg-secondary/70 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
-                      title="Options"
-                    >
-                      <MoreVertical className="h-4 w-4" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="end"
-                    className="bg-card/95 backdrop-blur-sm border-border shadow-lg min-w-[180px]"
-                  >
-                    <DropdownMenuItem disabled className="text-xs text-muted-foreground">
-                      Total Moves: {deferredMoves.length}{" "}
-                      {originalMoves.length !== deferredMoves.length
-                        ? `(filtered from ${originalMoves.length})`
-                        : ""}
-                      {isStale && " (updating...)"}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => openView("tableConfig")}>
-                      <Settings2 className="h-4 w-4 mr-2" />
-                      Table Configuration
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => openView("notationMappings")}>
-                      <Languages className="h-4 w-4 mr-2" />
-                      Notation Mappings
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleExport("csv")}>
-                      <Download className="h-4 w-4 mr-2" />
-                      Export to CSV
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleExport("excel")}>
-                      <Download className="h-4 w-4 mr-2" />
-                      Export to Excel
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </CardDescription>
-            </div>
-
-            <div
-              className={cn(
-                "filter-container",
-                filtersVisible ? "visible" : "hidden",
-                activeFilters.length === 0 ? "empty" : "",
-              )}
-            >
-              <FilterBuilder
-                onFiltersChange={handleFiltersChange}
-                moves={originalMoves}
-              />
-            </div>
+            <FilterBuilder
+              onFiltersChange={handleFiltersChange}
+              moves={originalMoves}
+            />
           </CardHeader>
           <CardContent className="flex-1 min-h-0 p-0 flex flex-col overflow-hidden">
             <div className={cn("flex-1 min-h-0 h-full", isStale && "opacity-70 transition-opacity")}>

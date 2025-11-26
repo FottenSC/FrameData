@@ -1,8 +1,9 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Gamepad2, Sword, Command } from "lucide-react";
+import { Gamepad2, Sword, Command, Download, Settings2, Languages, MoreVertical } from "lucide-react";
 import { useGame } from "../contexts/GameContext";
 import { useCommand } from "../contexts/CommandContext";
+import { useToolbar } from "../contexts/ToolbarContext";
 import { Combobox, ComboboxOption } from "./ui/combobox";
 import {
   Breadcrumb,
@@ -13,6 +14,14 @@ import {
   BreadcrumbSeparator,
 } from "./ui/breadcrumb";
 import { Button } from "./ui/button";
+import { Badge } from "./ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "./ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 
 const gameIcons: Record<string, React.ReactNode> = {
   soulcalibur6: <Sword className="h-4 w-4 mr-1.5" />,
@@ -28,7 +37,17 @@ export const Navbar: React.FC = () => {
     selectedCharacterId,
     setSelectedCharacterId,
   } = useGame();
-  const { setOpen } = useCommand();
+  const { setOpen, openView } = useCommand();
+  const {
+    activeFiltersCount,
+    exportHandler,
+    totalMoves,
+    filteredMoves,
+    isUpdating,
+  } = useToolbar();
+
+  // Check if we're on a frame data page (has character selected)
+  const isFrameDataPage = selectedCharacterId !== null;
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -130,7 +149,107 @@ export const Navbar: React.FC = () => {
           </Breadcrumb>
         </div>
 
-        <div className="flex items-center justify-end space-x-4">
+        <div className="flex items-center justify-end space-x-2">
+          {/* Frame data page toolbar items */}
+          {isFrameDataPage && (
+            <>
+              {/* Active filters badge */}
+              <Badge
+                variant="outline"
+                className={cn(
+                  "text-xs font-normal hidden sm:inline-flex",
+                  activeFiltersCount === 0 && "opacity-50"
+                )}
+              >
+                {activeFiltersCount} {activeFiltersCount === 1 ? "filter" : "filters"}
+              </Badge>
+
+              {/* Move count - hidden on mobile */}
+              <span className="hidden lg:inline text-sm text-muted-foreground">
+                {filteredMoves}{" "}
+                {totalMoves !== filteredMoves && `/ ${totalMoves}`}
+                {isUpdating && " ..."}
+              </span>
+
+              {/* Desktop view - visible on md and up */}
+              <button
+                onClick={() => openView("tableConfig")}
+                className="hidden md:inline-flex items-center justify-center p-1.5 text-muted-foreground hover:text-foreground rounded-md border border-border bg-secondary/30 hover:bg-secondary/50 active:scale-95 active:bg-secondary/70 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
+                title="Table Configuration"
+              >
+                <Settings2 className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => openView("notationMappings")}
+                className="hidden md:inline-flex items-center justify-center p-1.5 text-muted-foreground hover:text-foreground rounded-md border border-border bg-secondary/30 hover:bg-secondary/50 active:scale-95 active:bg-secondary/70 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
+                title="Notation Mappings"
+              >
+                <Languages className="h-4 w-4" />
+              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className="hidden md:inline-flex items-center justify-center p-1.5 text-muted-foreground hover:text-foreground rounded-md border border-border bg-secondary/30 hover:bg-secondary/50 active:scale-95 active:bg-secondary/70 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
+                    title="Export"
+                  >
+                    <Download className="h-4 w-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="bg-card/95 backdrop-blur-sm border-border shadow-lg"
+                >
+                  <DropdownMenuItem onClick={() => exportHandler?.("csv")}>
+                    Export to CSV
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => exportHandler?.("excel")}>
+                    Export to Excel
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Mobile view - visible below md */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className="md:hidden inline-flex items-center justify-center p-1.5 text-muted-foreground hover:text-foreground rounded-md border border-border bg-secondary/30 hover:bg-secondary/50 active:scale-95 active:bg-secondary/70 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
+                    title="Options"
+                  >
+                    <MoreVertical className="h-4 w-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="bg-card/95 backdrop-blur-sm border-border shadow-lg min-w-[180px]"
+                >
+                  <DropdownMenuItem disabled className="text-xs text-muted-foreground">
+                    Total Moves: {filteredMoves}{" "}
+                    {totalMoves !== filteredMoves
+                      ? `(filtered from ${totalMoves})`
+                      : ""}
+                    {isUpdating && " (updating...)"}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => openView("tableConfig")}>
+                    <Settings2 className="h-4 w-4 mr-2" />
+                    Table Configuration
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => openView("notationMappings")}>
+                    <Languages className="h-4 w-4 mr-2" />
+                    Notation Mappings
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => exportHandler?.("csv")}>
+                    <Download className="h-4 w-4 mr-2" />
+                    Export to CSV
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => exportHandler?.("excel")}>
+                    <Download className="h-4 w-4 mr-2" />
+                    Export to Excel
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          )}
+
           <Button
             variant="outline"
             size="icon"

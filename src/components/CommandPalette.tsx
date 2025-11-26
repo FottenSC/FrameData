@@ -226,13 +226,15 @@ export function CommandPalette() {
             ) : showGames ? (
               <>
                 <CommandGroup heading="Games">
-                  <CommandItem onSelect={goBackToMain} className="mb-1">
+                  <CommandItem onSelect={goBackToMain} className="mb-1" value="back-to-commands">
                     <ChevronLeft className="mr-2 h-4 w-4" />
                     <span>Back to Commands</span>
                   </CommandItem>
                   {avaliableGames.map((game) => (
                     <CommandItem
                       key={game.id}
+                      value={game.id}
+                      keywords={[game.name]}
                       onSelect={() => {
                         setSelectedGameById(game.id);
                         setOpen(false);

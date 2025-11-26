@@ -156,16 +156,27 @@ export const FrameDataTable: React.FC = () => {
     characterName,
   ]);
 
+  // Track if we've done initial URL sync for game
+  const initialGameSyncDoneRef = React.useRef(false);
+  
   // Handle URL parameters and initial character selection
   useEffect(() => {
     if (!selectedGame.id) return;
 
-    if (gameId && gameId !== selectedGame.id) {
+    // Only sync game from URL on initial load when the component mounts
+    // After that, trust the selectedGame state (which is updated by command palette etc.)
+    if (gameId && gameId !== selectedGame.id && !initialGameSyncDoneRef.current) {
       const game = avaliableGames.find((g) => g.id === gameId);
       if (game) {
         setSelectedGameById(gameId);
+        initialGameSyncDoneRef.current = true;
         return;
       }
+    }
+    
+    // Mark initial sync as done even if games matched
+    if (!initialGameSyncDoneRef.current) {
+      initialGameSyncDoneRef.current = true;
     }
 
     if (

@@ -53,7 +53,7 @@ export const FrameDataTable: React.FC = () => {
   const { openView } = useCommand();
   const {
     setActiveFiltersCount,
-    setExportHandler,
+    exportHandler,
     setTotalMoves,
     setFilteredMoves,
     setIsUpdating,
@@ -609,10 +609,11 @@ export const FrameDataTable: React.FC = () => {
     setActiveFiltersCount(activeFilters.length);
   }, [activeFilters.length, setActiveFiltersCount]);
 
+  // Keep export handler ref updated
   useEffect(() => {
-    setExportHandler(() => handleExport);
-    return () => setExportHandler(null);
-  }, [handleExport, setExportHandler]);
+    exportHandler.current = handleExport;
+    return () => { exportHandler.current = null; };
+  }, [handleExport, exportHandler]);
 
   useEffect(() => {
     setTotalMoves(originalMoves.length);
@@ -643,16 +644,16 @@ export const FrameDataTable: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6 h-full flex flex-col pl-4 pr-4 flex-grow">
+    <div className="h-full flex flex-col pl-4 pr-4 flex-grow">
       {selectedCharacterId ? (
-        <Card className="h-full flex flex-col overflow-hidden border border-card-border">
-          <CardHeader className="pb-2 flex-shrink-0">
+        <div className="h-full flex flex-col overflow-hidden">
+          <div className="pb-2 flex-shrink-0">
             <FilterBuilder
               onFiltersChange={handleFiltersChange}
               moves={originalMoves}
             />
-          </CardHeader>
-          <CardContent className="flex-1 min-h-0 p-0 flex flex-col overflow-hidden">
+          </div>
+          <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
             <div className={cn("flex-1 min-h-0 h-full", isStale && "opacity-70 transition-opacity")}>
               <MemoizedDataTableContent
                 moves={deferredMoves}
@@ -667,8 +668,8 @@ export const FrameDataTable: React.FC = () => {
                 isAllCharacters={selectedCharacterId === -1}
               />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       ) : (
         <div className="flex items-center justify-center h-48 border rounded-lg bg-muted/40">
           <p className="text-muted-foreground">

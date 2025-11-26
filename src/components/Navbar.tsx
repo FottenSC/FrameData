@@ -164,12 +164,17 @@ export const Navbar: React.FC = () => {
                 {activeFiltersCount} {activeFiltersCount === 1 ? "filter" : "filters"}
               </Badge>
 
-              {/* Move count - hidden on mobile */}
-              <span className="hidden lg:inline text-sm text-muted-foreground">
-                {filteredMoves}{" "}
-                {totalMoves !== filteredMoves && `/ ${totalMoves}`}
+              {/* Move count badge */}
+              <Badge
+                variant="outline"
+                className={cn(
+                  "text-xs font-normal hidden sm:inline-flex",
+                  isUpdating && "opacity-50"
+                )}
+              >
+                {filteredMoves}{totalMoves !== filteredMoves && ` / ${totalMoves}`} moves
                 {isUpdating && " ..."}
-              </span>
+              </Badge>
 
               {/* Desktop view - visible on md and up */}
               <button
@@ -199,10 +204,10 @@ export const Navbar: React.FC = () => {
                   align="end"
                   className="bg-card/95 backdrop-blur-sm border-border shadow-lg"
                 >
-                  <DropdownMenuItem onClick={() => exportHandler?.("csv")}>
+                  <DropdownMenuItem onClick={() => exportHandler.current?.("csv")}>
                     Export to CSV
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => exportHandler?.("excel")}>
+                  <DropdownMenuItem onClick={() => exportHandler.current?.("excel")}>
                     Export to Excel
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -237,11 +242,11 @@ export const Navbar: React.FC = () => {
                     <Languages className="h-4 w-4 mr-2" />
                     Notation Mappings
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => exportHandler?.("csv")}>
+                  <DropdownMenuItem onClick={() => exportHandler.current?.("csv")}>
                     <Download className="h-4 w-4 mr-2" />
                     Export to CSV
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => exportHandler?.("excel")}>
+                  <DropdownMenuItem onClick={() => exportHandler.current?.("excel")}>
                     <Download className="h-4 w-4 mr-2" />
                     Export to Excel
                   </DropdownMenuItem>

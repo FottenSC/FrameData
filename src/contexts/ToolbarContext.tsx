@@ -1,10 +1,9 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import React, { createContext, useContext, useState, useRef, useCallback, ReactNode } from "react";
 
 interface ToolbarContextType {
   activeFiltersCount: number;
   setActiveFiltersCount: (count: number) => void;
-  exportHandler: ((format: "csv" | "excel") => void) | null;
-  setExportHandler: (handler: ((format: "csv" | "excel") => void) | null) => void;
+  exportHandler: React.MutableRefObject<((format: "csv" | "excel") => void) | null>;
   totalMoves: number;
   setTotalMoves: (count: number) => void;
   filteredMoves: number;
@@ -21,7 +20,7 @@ interface ToolbarProviderProps {
 
 export function ToolbarProvider({ children }: ToolbarProviderProps) {
   const [activeFiltersCount, setActiveFiltersCount] = useState(0);
-  const [exportHandler, setExportHandler] = useState<((format: "csv" | "excel") => void) | null>(null);
+  const exportHandler = useRef<((format: "csv" | "excel") => void) | null>(null);
   const [totalMoves, setTotalMoves] = useState(0);
   const [filteredMoves, setFilteredMoves] = useState(0);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -32,7 +31,6 @@ export function ToolbarProvider({ children }: ToolbarProviderProps) {
         activeFiltersCount,
         setActiveFiltersCount,
         exportHandler,
-        setExportHandler,
         totalMoves,
         setTotalMoves,
         filteredMoves,

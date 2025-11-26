@@ -7,7 +7,6 @@ import {
 import { FrameDataTable } from "./components/FrameDataTable";
 import { GameProvider } from "./contexts/GameContext";
 import { CommandProvider } from "./contexts/CommandContext";
-import { TableConfigProvider } from "./contexts/TableConfigContext";
 import { UserSettingsProvider } from "./contexts/UserSettingsContext";
 import { Navbar } from "./components/Navbar";
 import { GameSelectionPage } from "./components/GameSelectionPage";
@@ -20,23 +19,21 @@ function App() {
       <UserSettingsProvider>
         <GameProvider>
           <CommandProvider>
-            <TableConfigProvider>
-              <div className="min-h-screen flex flex-col bg-[hsl(var(--background))] text-[hsl(var(--foreground))]">
-                <Navbar />
-                <CommandPaletteContainer />
-                <main className="flex-grow">
-                  <Routes>
-                    <Route path="/" element={<Navigate to="/games" replace />} />
-                    <Route path="/games" element={<GameSelectionPage />} />
-                    <Route path="/:gameId" element={<CharacterSelectionPage />} />
-                    <Route
-                      path="/:gameId/:characterName"
-                      element={<FrameDataTable />}
-                    />
-                  </Routes>
-                </main>
-              </div>
-            </TableConfigProvider>
+            <div className="min-h-screen flex flex-col bg-[hsl(var(--background))] text-[hsl(var(--foreground))]">
+              <Navbar />
+              <CommandPaletteContainer />
+              <main className="flex-grow">
+                <Routes>
+                  <Route path="/" element={<Navigate to="/games" replace />} />
+                  <Route path="/games" element={<GameSelectionPage />} />
+                  <Route path="/:gameId" element={<CharacterSelectionPage />} />
+                  <Route
+                    path="/:gameId/:characterName"
+                    element={<FrameDataTable />}
+                  />
+                </Routes>
+              </main>
+            </div>
           </CommandProvider>
         </GameProvider>
       </UserSettingsProvider>

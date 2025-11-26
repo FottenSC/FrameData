@@ -1,7 +1,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { useTableConfig } from "@/contexts/TableConfigContext";
+import { useTableConfig } from "@/contexts/UserSettingsContext";
 import {
   DndContext,
   DragEndEvent,

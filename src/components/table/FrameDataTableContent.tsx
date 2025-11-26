@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { Move, SortableColumn } from "@/types/Move";
-import { ColumnConfig } from "@/contexts/TableConfigContext";
+import { ColumnConfig } from "@/contexts/UserSettingsContext";
 import { ValueBadge } from "@/components/ui/ValueBadge";
 import { ExpandableHitLevels } from "@/components/icons/ExpandableHitLevels";
 import { useVirtualizer, useWindowVirtualizer } from "@tanstack/react-virtual";

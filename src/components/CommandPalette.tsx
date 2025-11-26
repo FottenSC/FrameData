@@ -21,10 +21,9 @@ import {
 import { Gamepad2, Users, ChevronLeft, Table, Info, Languages, Check } from "lucide-react";
 import { useGame } from "@/contexts/GameContext";
 import { useCommand } from "@/contexts/CommandContext";
-import { useTableConfig } from "@/contexts/TableConfigContext";
-import { useUserSettings } from "@/contexts/UserSettingsContext";
+import { useTableConfig, useUserSettings } from "@/contexts/UserSettingsContext";
 import { sharedTranslation } from "@/lib/translations";
-import type { ColumnConfig } from "@/contexts/TableConfigContext";
+import type { ColumnConfig } from "@/contexts/UserSettingsContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";

@@ -18,7 +18,7 @@ import {
 } from "./ui/card";
 // Badge usage moved into ValueBadge
 import { useGame, avaliableGames } from "../contexts/GameContext";
-import { useTableConfig } from "../contexts/TableConfigContext";
+import { useTableConfig } from "../contexts/UserSettingsContext";
 import { cn } from "@/lib/utils";
 import { FilterBuilder, ActiveFiltersBadge } from "./FilterBuilder";
 import { CommandRenderer } from "@/components/renderers/CommandRenderer";
@@ -216,6 +216,16 @@ export const FrameDataTable: React.FC = () => {
 
   // Simple in-memory cache for fetched/processed moves keyed by game+character
   const movesCacheRef = React.useRef<Map<string, Move[]>>(new Map());
+  
+  // Clear cache when translateText changes (translation settings changed)
+  const prevTranslateTextRef = React.useRef(translateText);
+  useEffect(() => {
+    if (prevTranslateTextRef.current !== translateText) {
+      movesCacheRef.current.clear();
+      prevTranslateTextRef.current = translateText;
+    }
+  }, [translateText]);
+
   useEffect(() => {
     setOriginalMoves([]);
     if (selectedGame?.id && selectedCharacterId !== null) {

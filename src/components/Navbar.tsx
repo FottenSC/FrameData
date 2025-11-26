@@ -83,7 +83,7 @@ export const Navbar: React.FC = () => {
                   <BreadcrumbItem>
                     <BreadcrumbLink asChild>
                       <Link
-                        to={`/${selectedGame.id}`}
+                        to="/games"
                         className="flex items-center hover:text-foreground/80 transition-colors"
                       >
                         {gameIcons[selectedGame.id] || (

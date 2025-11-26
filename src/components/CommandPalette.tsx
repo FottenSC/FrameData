@@ -35,7 +35,7 @@ type CreditEntry = { name: string; role?: string; link?: string };
 
 export function CommandPalette() {
   const navigate = useNavigate();
-  const { open, setOpen } = useCommand();
+  const { open, setOpen, currentView, setCurrentView } = useCommand();
   const {
     characters,
     selectedGame,
@@ -47,13 +47,14 @@ export function CommandPalette() {
   const { } = useTableConfig();
   const { getEnabledNotationMappings, toggleGameNotationMapping } = useUserSettings();
 
-  // State to track navigation between different views
-  const [showCharacters, setShowCharacters] = React.useState(false);
-  const [showTableConfig, setShowTableConfig] = React.useState(false);
-  const [showGames, setShowGames] = React.useState(false);
-  const [showCredits, setShowCredits] = React.useState(false);
-  const [showNotationMappings, setShowNotationMappings] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState("");
+
+  // Derived booleans for cleaner JSX
+  const showCharacters = currentView === "characters";
+  const showTableConfig = currentView === "tableConfig";
+  const showGames = currentView === "games";
+  const showCredits = currentView === "credits";
+  const showNotationMappings = currentView === "notationMappings";
 
   // Credits state (lazy per game)
   const creditsCacheRef = React.useRef<Map<string, CreditEntry[] | null>>(
@@ -131,14 +132,9 @@ export function CommandPalette() {
     }
   }, [showCredits, selectedGame.id]);
 
+  // Reset search when closing
   React.useEffect(() => {
-    // Reset to main menu when command palette is closed
     if (!open) {
-      setShowCharacters(false);
-      setShowTableConfig(false);
-      setShowGames(false);
-      setShowCredits(false);
-      setShowNotationMappings(false);
       setSearchValue("");
     }
   }, [open]);
@@ -154,11 +150,7 @@ export function CommandPalette() {
   };
 
   const goBackToMain = () => {
-    setShowCharacters(false);
-    setShowTableConfig(false);
-    setShowGames(false);
-    setShowCredits(false);
-    setShowNotationMappings(false);
+    setCurrentView("main");
     setSearchValue("");
   };
 
@@ -364,7 +356,7 @@ export function CommandPalette() {
                 <CommandGroup heading="Commands">
                   <CommandItem
                     onSelect={() => {
-                      setShowGames(true);
+                      setCurrentView("games");
                       setSearchValue("");
                     }}
                   >
@@ -374,7 +366,7 @@ export function CommandPalette() {
                   </CommandItem>
                   <CommandItem
                     onSelect={() => {
-                      setShowCharacters(true);
+                      setCurrentView("characters");
                       setSearchValue("");
                     }}
                   >
@@ -384,7 +376,7 @@ export function CommandPalette() {
                   </CommandItem>
                   <CommandItem
                     onSelect={() => {
-                      setShowTableConfig(true);
+                      setCurrentView("tableConfig");
                       setSearchValue("");
                     }}
                   >
@@ -394,7 +386,7 @@ export function CommandPalette() {
                   </CommandItem>
                   <CommandItem
                     onSelect={() => {
-                      setShowCredits(true);
+                      setCurrentView("credits");
                       setSearchValue("");
                     }}
                   >
@@ -404,7 +396,7 @@ export function CommandPalette() {
                   </CommandItem>
                   <CommandItem
                     onSelect={() => {
-                      setShowNotationMappings(true);
+                      setCurrentView("notationMappings");
                       setSearchValue("");
                     }}
                   >

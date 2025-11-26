@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 // Table rendering moved into FrameDataTableContent
-import { ChevronRight, Download } from "lucide-react";
+import { ChevronRight, Download, Settings2, Languages, MoreVertical } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -19,6 +19,7 @@ import {
 // Badge usage moved into ValueBadge
 import { useGame, avaliableGames } from "../contexts/GameContext";
 import { useTableConfig } from "../contexts/UserSettingsContext";
+import { useCommand } from "../contexts/CommandContext";
 import { cn } from "@/lib/utils";
 import { FilterBuilder, ActiveFiltersBadge } from "./FilterBuilder";
 import { CommandRenderer } from "@/components/renderers/CommandRenderer";
@@ -55,6 +56,7 @@ export const FrameDataTable: React.FC = () => {
 
   // Add table configuration context
   const { getVisibleColumns, updateColumnVisibility } = useTableConfig();
+  const { openView } = useCommand();
   const [originalMoves, setOriginalMoves] = useState<Move[]>([]);
   const [movesLoading, setMovesLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -837,22 +839,34 @@ export const FrameDataTable: React.FC = () => {
                 <ActiveFiltersBadge count={activeFilters.length} />
               </div>
               <CardDescription className="m-0 flex items-center gap-2">
-                <span>
+                {/* Desktop view - visible on md and up */}
+                <span className="hidden md:inline">
                   Total Moves: {displayedMoves.length}{" "}
                   {originalMoves.length !== displayedMoves.length
                     ? `(filtered from ${originalMoves.length})`
                     : ""}
                 </span>
+                <button
+                  onClick={() => openView("tableConfig")}
+                  className="hidden md:inline-flex items-center justify-center p-1.5 text-muted-foreground hover:text-foreground rounded-md border border-border bg-secondary/30 hover:bg-secondary/50 active:scale-95 active:bg-secondary/70 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
+                  title="Table Configuration"
+                >
+                  <Settings2 className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => openView("notationMappings")}
+                  className="hidden md:inline-flex items-center justify-center p-1.5 text-muted-foreground hover:text-foreground rounded-md border border-border bg-secondary/30 hover:bg-secondary/50 active:scale-95 active:bg-secondary/70 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
+                  title="Notation Mappings"
+                >
+                  <Languages className="h-4 w-4" />
+                </button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button
-                      className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-md border bg-gradient-to-r from-secondary/80 via-secondary to-secondary/80 hover:from-secondary hover:via-secondary hover:to-secondary/90 shadow-sm hover:shadow transition-colors transition-shadow"
+                      className="hidden md:inline-flex items-center justify-center p-1.5 text-muted-foreground hover:text-foreground rounded-md border border-border bg-secondary/30 hover:bg-secondary/50 active:scale-95 active:bg-secondary/70 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
                       title="Export"
                     >
-                      <span className="flex items-center justify-center h-5 w-5 rounded-sm bg-background/40 border border-border/50 mr-1">
-                        <Download className="h-3.5 w-3.5" />
-                      </span>
-                      <span className="font-medium tracking-wide">Export</span>
+                      <Download className="h-4 w-4" />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
@@ -863,6 +877,45 @@ export const FrameDataTable: React.FC = () => {
                       Export to CSV
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => handleExport("excel")}>
+                      Export to Excel
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                {/* Mobile view - visible below md */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      className="md:hidden inline-flex items-center justify-center p-1.5 text-muted-foreground hover:text-foreground rounded-md border border-border bg-secondary/30 hover:bg-secondary/50 active:scale-95 active:bg-secondary/70 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
+                      title="Options"
+                    >
+                      <MoreVertical className="h-4 w-4" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    className="bg-card/95 backdrop-blur-sm border-border shadow-lg min-w-[180px]"
+                  >
+                    <DropdownMenuItem disabled className="text-xs text-muted-foreground">
+                      Total Moves: {displayedMoves.length}{" "}
+                      {originalMoves.length !== displayedMoves.length
+                        ? `(filtered from ${originalMoves.length})`
+                        : ""}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => openView("tableConfig")}>
+                      <Settings2 className="h-4 w-4 mr-2" />
+                      Table Configuration
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => openView("notationMappings")}>
+                      <Languages className="h-4 w-4 mr-2" />
+                      Notation Mappings
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleExport("csv")}>
+                      <Download className="h-4 w-4 mr-2" />
+                      Export to CSV
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleExport("excel")}>
+                      <Download className="h-4 w-4 mr-2" />
                       Export to Excel
                     </DropdownMenuItem>
                   </DropdownMenuContent>

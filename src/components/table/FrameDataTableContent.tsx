@@ -12,7 +12,7 @@ import { Move, SortableColumn } from "@/types/Move";
 import { ColumnConfig } from "@/contexts/UserSettingsContext";
 import { ValueBadge } from "@/components/ui/ValueBadge";
 import { ExpandableHitLevels } from "@/components/icons/ExpandableHitLevels";
-import { useVirtualizer, useWindowVirtualizer } from "@tanstack/react-virtual";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { Badge } from "@/components/ui/badge";
 
 interface DataTableContentProps {
@@ -113,45 +113,29 @@ export const FrameDataTableContent: React.FC<DataTableContentProps> = ({
     }
   };
 
-  // Resolve scroll element, and create both virtualizers; pick the right one at render time
+  // Resolve scroll element and use element-based virtualizer for sticky header support
   const scrollEl = getScrollElement ? getScrollElement() : null;
-  const elVirtualizer = useVirtualizer({
+  const rowVirtualizer = useVirtualizer({
     count: moves.length,
     getScrollElement: () => scrollEl,
     estimateSize: () => 40,
     overscan: 12,
   });
-  const winVirtualizer = useWindowVirtualizer({
-    count: moves.length,
-    estimateSize: () => 40,
-    overscan: 12,
-  });
-  const useWindow =
-    !scrollEl || scrollEl.scrollHeight <= scrollEl.clientHeight + 1;
-  const rowVirtualizer = useWindow ? winVirtualizer : elVirtualizer;
 
   const virtualItems = rowVirtualizer.getVirtualItems();
   const totalSize = rowVirtualizer.getTotalSize();
 
   // Recompute on container resize (height changes)
   React.useEffect(() => {
-    const target = useWindow ? window : scrollEl;
-    if (!target) return;
-    let ro: ResizeObserver | null = null;
-    if (target instanceof Window) {
-      const onResize = () => rowVirtualizer.measure();
-      window.addEventListener("resize", onResize);
-      return () => window.removeEventListener("resize", onResize);
-    } else {
-      ro = new ResizeObserver(() => rowVirtualizer.measure());
-      ro.observe(target);
-      return () => ro && ro.disconnect();
-    }
-  }, [scrollEl, rowVirtualizer, useWindow]);
+    if (!scrollEl) return;
+    const ro = new ResizeObserver(() => rowVirtualizer.measure());
+    ro.observe(scrollEl);
+    return () => ro.disconnect();
+  }, [scrollEl, rowVirtualizer]);
 
   return (
     <Table ref={tableRef} className="table-layout-fixed">
-      <TableHeader className="sticky top-0 bg-card z-10">
+      <TableHeader>
         <TableRow className="border-b-card-border">
           {visibleColumns.map((column) => {
             const style: React.CSSProperties = {};
@@ -161,7 +145,7 @@ export const FrameDataTableContent: React.FC<DataTableContentProps> = ({
             return (
               <TableHead
                 key={column.id}
-                className={column.className + " cursor-pointer select-none"}
+                className={column.className + " cursor-pointer select-none bg-card sticky top-0 z-10"}
                 style={style}
                 onClick={() => handleSort(column.id as SortableColumn)}
                 title={

@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { Gamepad2, Sword } from "lucide-react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { sharedTranslation, TranslationMap } from "@/lib/translations";
+import { sharedNotationMapping, NotationMap } from "@/lib/notationMapping";
 import { useUserSettings } from "./UserSettingsContext";
 
 // Define configuration for a game-specific icon with its alt text
@@ -20,31 +20,31 @@ export interface IconConfig {
   iconClasses?: string;
 }
 
-// --- Translation Layer ---
-// TranslationMap imported from lib
+// --- Notation Mapping Layer ---
+// NotationMap imported from lib
 
-// Define reusable translation mappings
-// Define reusable translation mappings
-// Moved to src/lib/translations.ts
+// Define reusable notation mappings
+// Define reusable notation mappings
+// Moved to src/lib/notationMapping.ts
 
-// Define translation configuration for games
-// Define translation configuration for games
-export type GameTranslationConfig = {
+// Define notation mapping configuration for games
+// Define notation mapping configuration for games
+export type GameNotationMappingConfig = {
   // extends?: string[]; // Removed: managed by user settings
-  specific?: TranslationMap; // Game-unique mappings
-  defaultEnabled?: string[]; // Default enabled translations for this game
+  specific?: NotationMap; // Game-unique mappings
+  defaultEnabled?: string[]; // Default enabled notation mappings for this game
 };
 
-// Helper function to build the final translation map for a game
-export const buildTranslationMap = (
-  config: GameTranslationConfig,
-  enabledTranslations: string[]
-): TranslationMap => {
-  let effectiveMap: TranslationMap = {};
+// Helper function to build the final notation map for a game
+export const buildNotationMap = (
+  config: GameNotationMappingConfig,
+  enabledNotationMappings: string[]
+): NotationMap => {
+  let effectiveMap: NotationMap = {};
 
-  // Add mappings from enabled translations (User Settings)
-  enabledTranslations.forEach((mappingName) => {
-    const mapping = sharedTranslation[mappingName];
+  // Add mappings from enabled notation mappings (User Settings)
+  enabledNotationMappings.forEach((mappingName) => {
+    const mapping = sharedNotationMapping[mappingName];
     if (mapping) {
       effectiveMap = { ...effectiveMap, ...mapping };
     }
@@ -58,10 +58,10 @@ export const buildTranslationMap = (
   return effectiveMap;
 };
 
-// Helper function to apply translations
-export const translateString = (
+// Helper function to apply notation mappings
+export const applyNotationMapping = (
   text: string | null,
-  map: TranslationMap,
+  map: NotationMap,
 ): string | null => {
   if (text === null) {
     return null;
@@ -84,7 +84,7 @@ export interface Game {
   id: string;
   name: string;
   icons: IconConfig[];
-  translations: GameTranslationConfig;
+  notationMapping: GameNotationMappingConfig;
   icon: ReactNode;
   badges?: Record<string, { className: string }>;
 }
@@ -106,7 +106,7 @@ export const avaliableGames: Game[] = [
       STN: { className: "bg-pink-700 text-white" },
       LNC: { className: "bg-rose-700 text-white" },
     },
-    translations: {
+    notationMapping: {
       specific: {},
       defaultEnabled: ["soulCaliburButtons"],
     },
@@ -147,7 +147,7 @@ export const avaliableGames: Game[] = [
       STN: { className: "bg-amber-700 text-white" },
       LNC: { className: "bg-rose-700 text-white" },
     },
-    translations: {
+    notationMapping: {
       specific: {},
       defaultEnabled: ["weirdTekken"],
     },
@@ -186,8 +186,8 @@ interface GameContextType {
   setSelectedCharacterId: (id: number | null) => void;
   availableIcons: IconConfig[];
   getIconUrl: (iconName: string, isHeld?: boolean) => string;
-  getTranslationMap: () => TranslationMap;
-  translateText: (text: string | null) => string | null;
+  getNotationMap: () => NotationMap;
+  applyNotation: (text: string | null) => string | null;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -307,25 +307,25 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     return `/Games/${selectedGame.id}/Icons/${upperIconName}.svg`;
   };
 
-  const { getEnabledTranslations } = useUserSettings();
+  const { getEnabledNotationMappings } = useUserSettings();
 
-  // Memoize translation map for the selected game
-  const translationMap = React.useMemo<TranslationMap>(() => {
-    const enabled = getEnabledTranslations(
+  // Memoize notation map for the selected game
+  const notationMap = React.useMemo<NotationMap>(() => {
+    const enabled = getEnabledNotationMappings(
       selectedGame.id,
-      selectedGame.translations.defaultEnabled
+      selectedGame.notationMapping.defaultEnabled
     );
-    return buildTranslationMap(selectedGame.translations, enabled);
+    return buildNotationMap(selectedGame.notationMapping, enabled);
   }, [
     selectedGame.id,
-    selectedGame.translations,
-    getEnabledTranslations,
+    selectedGame.notationMapping,
+    getEnabledNotationMappings,
   ]);
 
-  const getTranslationMap = (): TranslationMap => translationMap;
+  const getNotationMap = (): NotationMap => notationMap;
 
-  const translateText = (text: string | null): string | null => {
-    return translateString(text, translationMap);
+  const applyNotation = (text: string | null): string | null => {
+    return applyNotationMapping(text, notationMap);
   };
 
   const contextValue: GameContextType = {
@@ -339,8 +339,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     setSelectedCharacterId: handleSetSelectedCharacterId,
     availableIcons: combinedIcons,
     getIconUrl: getIconUrl,
-    getTranslationMap,
-    translateText,
+    getNotationMap,
+    applyNotation,
   };
 
   return (

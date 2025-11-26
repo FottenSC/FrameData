@@ -50,7 +50,7 @@ export const FrameDataTable: React.FC = () => {
     setSelectedCharacterId,
     availableIcons,
     getIconUrl,
-    translateText,
+    applyNotation,
   } = useGame();
 
   // Add table configuration context
@@ -217,14 +217,14 @@ export const FrameDataTable: React.FC = () => {
   // Simple in-memory cache for fetched/processed moves keyed by game+character
   const movesCacheRef = React.useRef<Map<string, Move[]>>(new Map());
   
-  // Clear cache when translateText changes (translation settings changed)
-  const prevTranslateTextRef = React.useRef(translateText);
+  // Clear cache when applyNotation changes (notation mapping settings changed)
+  const prevApplyNotationRef = React.useRef(applyNotation);
   useEffect(() => {
-    if (prevTranslateTextRef.current !== translateText) {
+    if (prevApplyNotationRef.current !== applyNotation) {
       movesCacheRef.current.clear();
-      prevTranslateTextRef.current = translateText;
+      prevApplyNotationRef.current = applyNotation;
     }
-  }, [translateText]);
+  }, [applyNotation]);
 
   useEffect(() => {
     setOriginalMoves([]);
@@ -248,12 +248,12 @@ export const FrameDataTable: React.FC = () => {
           ): Move => {
             const originalCommand =
               moveObject.Command != null ? String(moveObject.Command) : null;
-            const translatedCommand = originalCommand
-              ? translateText(originalCommand)
+            const mappedCommand = originalCommand
+              ? applyNotation(originalCommand)
               : null;
             return {
               ID: Number(moveObject.ID),
-              Command: intern(translatedCommand),
+              Command: intern(mappedCommand),
               CharacterId: charId,
               CharacterName: intern(charName),
               Stance: (() => {
@@ -397,7 +397,7 @@ export const FrameDataTable: React.FC = () => {
   }, [
     selectedGame?.id,
     selectedCharacterId,
-    translateText,
+    applyNotation,
     characters,
     intern,
   ]);

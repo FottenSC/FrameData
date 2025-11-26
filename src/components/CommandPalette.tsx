@@ -22,7 +22,7 @@ import { Gamepad2, Users, ChevronLeft, Table, Info, Languages, Check } from "luc
 import { useGame } from "@/contexts/GameContext";
 import { useCommand } from "@/contexts/CommandContext";
 import { useTableConfig, useUserSettings } from "@/contexts/UserSettingsContext";
-import { sharedTranslation } from "@/lib/translations";
+import { sharedNotationMapping } from "@/lib/notationMapping";
 import type { ColumnConfig } from "@/contexts/UserSettingsContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,14 +45,14 @@ export function CommandPalette() {
   } = useGame();
 
   const { } = useTableConfig();
-  const { getEnabledTranslations, toggleGameTranslation } = useUserSettings();
+  const { getEnabledNotationMappings, toggleGameNotationMapping } = useUserSettings();
 
   // State to track navigation between different views
   const [showCharacters, setShowCharacters] = React.useState(false);
   const [showTableConfig, setShowTableConfig] = React.useState(false);
   const [showGames, setShowGames] = React.useState(false);
   const [showCredits, setShowCredits] = React.useState(false);
-  const [showTranslations, setShowTranslations] = React.useState(false);
+  const [showNotationMappings, setShowNotationMappings] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState("");
 
   // Credits state (lazy per game)
@@ -138,7 +138,7 @@ export function CommandPalette() {
       setShowTableConfig(false);
       setShowGames(false);
       setShowCredits(false);
-      setShowTranslations(false);
+      setShowNotationMappings(false);
       setSearchValue("");
     }
   }, [open]);
@@ -158,7 +158,7 @@ export function CommandPalette() {
     setShowTableConfig(false);
     setShowGames(false);
     setShowCredits(false);
-    setShowTranslations(false);
+    setShowNotationMappings(false);
     setSearchValue("");
   };
 
@@ -183,8 +183,8 @@ export function CommandPalette() {
                     ? `Search ${avaliableGames.length} games...`
                     : showCredits
                       ? "View credits..."
-                      : showTranslations
-                        ? "Toggle translations..."
+                      : showNotationMappings
+                        ? "Toggle notation mappings..."
                         : "Type a command or search..."
             }
             value={searchValue}
@@ -316,7 +316,7 @@ export function CommandPalette() {
                   </div>
                 </CommandGroup>
               </>
-            ) : showTranslations ? (
+            ) : showNotationMappings ? (
               <>
                 <CommandItem onSelect={goBackToMain} className="mb-1">
                   <ChevronLeft className="mr-2 h-4 w-4" />
@@ -326,20 +326,20 @@ export function CommandPalette() {
                   selectedGame,
                   ...avaliableGames.filter((g) => g.id !== selectedGame.id),
                 ].map((game) => {
-                  const enabledForGame = getEnabledTranslations(
+                  const enabledForGame = getEnabledNotationMappings(
                     game.id,
-                    game.translations.defaultEnabled
+                    game.notationMapping.defaultEnabled
                   );
                   return (
                     <CommandGroup
                       key={game.id}
-                      heading={`${game.name} Translations`}
+                      heading={`${game.name} Notation Mappings`}
                     >
-                      {Object.keys(sharedTranslation).map((key) => (
+                      {Object.keys(sharedNotationMapping).map((key) => (
                         <CommandItem
                           key={`${game.id}-${key}`}
                           onSelect={() =>
-                            toggleGameTranslation(game.id, key, enabledForGame)
+                            toggleGameNotationMapping(game.id, key, enabledForGame)
                           }
                         >
                           <div
@@ -404,12 +404,12 @@ export function CommandPalette() {
                   </CommandItem>
                   <CommandItem
                     onSelect={() => {
-                      setShowTranslations(true);
+                      setShowNotationMappings(true);
                       setSearchValue("");
                     }}
                   >
                     <Languages className="mr-2 h-4 w-4" />
-                    <span>Translations</span>
+                    <span>Notation Mappings</span>
                     <CommandShortcut>→</CommandShortcut>
                   </CommandItem>
                 </CommandGroup>

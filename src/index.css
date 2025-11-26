@@ -95,6 +95,13 @@ html {
 }
 
 @layer components {
+  /* Sticky table header support */
+  thead.sticky th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
   .filter-container {
     transition: all 0.25s ease-in-out;
     transform-origin: top center;

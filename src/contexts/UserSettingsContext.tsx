@@ -159,10 +159,10 @@ interface StoredColumnConfig {
 }
 
 interface UserSettingsContextType {
-    // Game translations
-    gameTranslations: Record<string, string[]>;
-    getEnabledTranslations: (gameId: string, defaults?: string[]) => string[];
-    toggleGameTranslation: (gameId: string, key: string, currentEnabled: string[]) => void;
+    // Game notation mappings
+    gameNotationMappings: Record<string, string[]>;
+    getEnabledNotationMappings: (gameId: string, defaults?: string[]) => string[];
+    toggleGameNotationMapping: (gameId: string, key: string, currentEnabled: string[]) => void;
     // Table config
     columnConfigs: ColumnConfig[];
     setColumnConfigs: React.Dispatch<React.SetStateAction<ColumnConfig[]>>;
@@ -180,22 +180,22 @@ interface UserSettingsProviderProps {
 }
 
 export const UserSettingsProvider: React.FC<UserSettingsProviderProps> = ({ children }) => {
-    // Game translations state
-    const [gameTranslations, setGameTranslations] = useState<Record<string, string[]>>(() => {
-        const saved = localStorage.getItem("gameTranslations");
+    // Game notation mappings state
+    const [gameNotationMappings, setGameNotationMappings] = useState<Record<string, string[]>>(() => {
+        const saved = localStorage.getItem("gameNotationMappings");
         return saved ? JSON.parse(saved) : {};
     });
 
     useEffect(() => {
-        localStorage.setItem("gameTranslations", JSON.stringify(gameTranslations));
-    }, [gameTranslations]);
+        localStorage.setItem("gameNotationMappings", JSON.stringify(gameNotationMappings));
+    }, [gameNotationMappings]);
 
-    const getEnabledTranslations = (gameId: string, defaults: string[] = []) => {
-        return gameTranslations[gameId] ?? defaults;
+    const getEnabledNotationMappings = (gameId: string, defaults: string[] = []) => {
+        return gameNotationMappings[gameId] ?? defaults;
     };
 
-    const toggleGameTranslation = (gameId: string, key: string, currentEnabled: string[]) => {
-        setGameTranslations((prev) => {
+    const toggleGameNotationMapping = (gameId: string, key: string, currentEnabled: string[]) => {
+        setGameNotationMappings((prev) => {
             const isEnabled = currentEnabled.includes(key);
             const newEnabled = isEnabled
                 ? currentEnabled.filter((k) => k !== key)
@@ -291,9 +291,9 @@ export const UserSettingsProvider: React.FC<UserSettingsProviderProps> = ({ chil
 
     const value: UserSettingsContextType = useMemo(
         () => ({
-            gameTranslations,
-            getEnabledTranslations,
-            toggleGameTranslation,
+            gameNotationMappings,
+            getEnabledNotationMappings,
+            toggleGameNotationMapping,
             columnConfigs,
             setColumnConfigs,
             updateColumnVisibility,
@@ -303,7 +303,7 @@ export const UserSettingsProvider: React.FC<UserSettingsProviderProps> = ({ chil
             getSortedColumns,
         }),
         [
-            gameTranslations,
+            gameNotationMappings,
             columnConfigs,
             updateColumnVisibility,
             reorderColumns,

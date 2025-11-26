@@ -1,7 +1,7 @@
-export type TranslationMap = Record<string, string>;
+export type NotationMap = Record<string, string>;
 
-// Define reusable translation mappings
-export const sharedTranslation: Record<string, TranslationMap> = {
+// Define reusable notation mappings
+export const sharedNotationMapping: Record<string, NotationMap> = {
     soulCaliburButtons: {
         ":(B+C):": ":(B+K):",
         ":(B+D):": ":(B+G):",

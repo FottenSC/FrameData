@@ -7,6 +7,8 @@ import React, {
 } from "react";
 import { Gamepad2, Sword } from "lucide-react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { sharedTranslation, TranslationMap } from "@/lib/translations";
+import { useUserSettings } from "./UserSettingsContext";
 
 // Define configuration for a game-specific icon with its alt text
 export interface IconConfig {
@@ -19,62 +21,34 @@ export interface IconConfig {
 }
 
 // --- Translation Layer ---
-export type TranslationMap = Record<string, string>;
+// TranslationMap imported from lib
 
 // Define reusable translation mappings
-export const sharedTranslation: Record<string, TranslationMap> = {
-  soulCaliburButtons: {
-    ":(B+C):": ":(B+K):",
-    ":(B+D):": ":(B+G):",
-    ":(C+D):": ":(K+G):",
-    ":A+B+C:": ":A+B+K:",
-    ":A+D:": ":A+G:",
-    ":A+C:": ":A+K:",
-    ":B+C:": ":B+K:",
-    ":B+D:": ":B+G:",
-    ":C+D:": ":K+G:",
-    "(C)": "(K)",
-    ":C:": ":K:",
-    ":c:": ":k:",
-    "(D)": "(G)",
-    ":D:": ":G:",
-    ":d:": ":g:",
-  },
-  weirdTekken: {
-    ":2::3::6:": ":qcf:", // Quarter Circle Forward
-    ":2::1::4:": ":qcb:", // Quarter Circle Back
-    ":6::2::3:": ":dp:", // Dragon Punch motion
-    ":4::1::2::3::6:": ":hcf:", // Half Circle Forward
-    ":6::3::2::1::4:": ":hcb:", // Half Circle Back
-
-    ":A:": ":LP:",
-    ":B:": ":RP:",
-    ":C:": ":LK:",
-    ":D:": ":RK:",
-  },
-};
+// Define reusable translation mappings
+// Moved to src/lib/translations.ts
 
 // Define translation configuration for games
+// Define translation configuration for games
 export type GameTranslationConfig = {
-  extends?: string[]; // List of mapping names to inherit from
+  // extends?: string[]; // Removed: managed by user settings
   specific?: TranslationMap; // Game-unique mappings
+  defaultEnabled?: string[]; // Default enabled translations for this game
 };
 
 // Helper function to build the final translation map for a game
 export const buildTranslationMap = (
   config: GameTranslationConfig,
+  enabledTranslations: string[]
 ): TranslationMap => {
   let effectiveMap: TranslationMap = {};
 
-  // Add mappings from extended modules
-  if (config.extends) {
-    config.extends.forEach((mappingName) => {
-      const mapping = sharedTranslation[mappingName];
-      if (mapping) {
-        effectiveMap = { ...effectiveMap, ...mapping };
-      }
-    });
-  }
+  // Add mappings from enabled translations (User Settings)
+  enabledTranslations.forEach((mappingName) => {
+    const mapping = sharedTranslation[mappingName];
+    if (mapping) {
+      effectiveMap = { ...effectiveMap, ...mapping };
+    }
+  });
 
   // Add/override with game-specific mappings
   if (config.specific) {
@@ -133,8 +107,8 @@ export const avaliableGames: Game[] = [
       LNC: { className: "bg-rose-700 text-white" },
     },
     translations: {
-      extends: ["soulCaliburButtons"],
       specific: {},
+      defaultEnabled: ["soulCaliburButtons"],
     },
     icons: [
       // 2x1 icons
@@ -174,8 +148,8 @@ export const avaliableGames: Game[] = [
       LNC: { className: "bg-rose-700 text-white" },
     },
     translations: {
-      extends: ["weirdTekken"],
       specific: {},
+      defaultEnabled: ["weirdTekken"],
     },
     icons: [
       { code: "LP", title: "Light Punch" },
@@ -333,10 +307,20 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     return `/Games/${selectedGame.id}/Icons/${upperIconName}.svg`;
   };
 
+  const { getEnabledTranslations } = useUserSettings();
+
   // Memoize translation map for the selected game
   const translationMap = React.useMemo<TranslationMap>(() => {
-    return buildTranslationMap(selectedGame.translations);
-  }, [selectedGame.id, selectedGame.translations]);
+    const enabled = getEnabledTranslations(
+      selectedGame.id,
+      selectedGame.translations.defaultEnabled
+    );
+    return buildTranslationMap(selectedGame.translations, enabled);
+  }, [
+    selectedGame.id,
+    selectedGame.translations,
+    getEnabledTranslations,
+  ]);
 
   const getTranslationMap = (): TranslationMap => translationMap;
 

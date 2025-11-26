@@ -18,10 +18,12 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@/components/ui/command";
-import { Gamepad2, Users, ChevronLeft, Table, Info } from "lucide-react";
+import { Gamepad2, Users, ChevronLeft, Table, Info, Languages, Check } from "lucide-react";
 import { useGame } from "@/contexts/GameContext";
 import { useCommand } from "@/contexts/CommandContext";
 import { useTableConfig } from "@/contexts/TableConfigContext";
+import { useUserSettings } from "@/contexts/UserSettingsContext";
+import { sharedTranslation } from "@/lib/translations";
 import type { ColumnConfig } from "@/contexts/TableConfigContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,13 +45,15 @@ export function CommandPalette() {
     setSelectedGameById,
   } = useGame();
 
-  const {} = useTableConfig();
+  const { } = useTableConfig();
+  const { getEnabledTranslations, toggleGameTranslation } = useUserSettings();
 
   // State to track navigation between different views
   const [showCharacters, setShowCharacters] = React.useState(false);
   const [showTableConfig, setShowTableConfig] = React.useState(false);
   const [showGames, setShowGames] = React.useState(false);
   const [showCredits, setShowCredits] = React.useState(false);
+  const [showTranslations, setShowTranslations] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState("");
 
   // Credits state (lazy per game)
@@ -135,6 +139,7 @@ export function CommandPalette() {
       setShowTableConfig(false);
       setShowGames(false);
       setShowCredits(false);
+      setShowTranslations(false);
       setSearchValue("");
     }
   }, [open]);
@@ -154,6 +159,7 @@ export function CommandPalette() {
     setShowTableConfig(false);
     setShowGames(false);
     setShowCredits(false);
+    setShowTranslations(false);
     setSearchValue("");
   };
 
@@ -178,7 +184,9 @@ export function CommandPalette() {
                     ? `Search ${avaliableGames.length} games...`
                     : showCredits
                       ? "View credits..."
-                      : "Type a command or search..."
+                      : showTranslations
+                        ? "Toggle translations..."
+                        : "Type a command or search..."
             }
             value={searchValue}
             onValueChange={setSearchValue}
@@ -309,6 +317,49 @@ export function CommandPalette() {
                   </div>
                 </CommandGroup>
               </>
+            ) : showTranslations ? (
+              <>
+                <CommandItem onSelect={goBackToMain} className="mb-1">
+                  <ChevronLeft className="mr-2 h-4 w-4" />
+                  <span>Back to Commands</span>
+                </CommandItem>
+                {[
+                  selectedGame,
+                  ...avaliableGames.filter((g) => g.id !== selectedGame.id),
+                ].map((game) => {
+                  const enabledForGame = getEnabledTranslations(
+                    game.id,
+                    game.translations.defaultEnabled
+                  );
+                  return (
+                    <CommandGroup
+                      key={game.id}
+                      heading={`${game.name} Translations`}
+                    >
+                      {Object.keys(sharedTranslation).map((key) => (
+                        <CommandItem
+                          key={`${game.id}-${key}`}
+                          onSelect={() =>
+                            toggleGameTranslation(game.id, key, enabledForGame)
+                          }
+                        >
+                          <div
+                            className={cn(
+                              "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                              enabledForGame.includes(key)
+                                ? "bg-primary text-primary-foreground"
+                                : "opacity-50 [&_svg]:invisible"
+                            )}
+                          >
+                            <Check className={cn("h-4 w-4")} />
+                          </div>
+                          <span>{key}</span>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  );
+                })}
+              </>
             ) : (
               <>
                 <CommandGroup heading="Commands">
@@ -350,6 +401,16 @@ export function CommandPalette() {
                   >
                     <Info className="mr-2 h-4 w-4" />
                     <span>Credits</span>
+                    <CommandShortcut>→</CommandShortcut>
+                  </CommandItem>
+                  <CommandItem
+                    onSelect={() => {
+                      setShowTranslations(true);
+                      setSearchValue("");
+                    }}
+                  >
+                    <Languages className="mr-2 h-4 w-4" />
+                    <span>Translations</span>
                     <CommandShortcut>→</CommandShortcut>
                   </CommandItem>
                 </CommandGroup>

@@ -1,12 +1,14 @@
-import React from "react";
+import React, { memo } from "react";
 import { Badge } from "./badge";
 
-export const ValueBadge: React.FC<{
+interface ValueBadgeProps {
   value: number | null;
   text: string | null;
   forceNoSign?: boolean;
   badges?: Record<string, { className: string }>;
-}> = ({ value, text, forceNoSign = false, badges }) => {
+}
+
+const ValueBadgeInner: React.FC<ValueBadgeProps> = ({ value, text, forceNoSign = false, badges }) => {
   let displayText: string;
   if (text !== null && text !== undefined) {
     displayText = text;
@@ -49,3 +51,6 @@ export const ValueBadge: React.FC<{
     );
   }
 };
+
+// Memoize to prevent re-renders during table virtualization transitions
+export const ValueBadge = memo(ValueBadgeInner);

@@ -62,7 +62,6 @@ export const FrameDataTable: React.FC = () => {
   const { getVisibleColumns, updateColumnVisibility } = useTableConfig();
   const { openView } = useCommand();
   const queryClient = useQueryClient();
-  const [deployTimestamp, setDeployTimestamp] = useState<string>("Loading...");
 
   // Use TanStack Query for data fetching with automatic caching
   const {
@@ -616,17 +615,6 @@ export const FrameDataTable: React.FC = () => {
     setActiveFilters(filters);
   }, []);
 
-  useEffect(() => {
-    fetch("/timestamp.json")
-      .then((res) => res.json())
-      .then((data) => {
-        setDeployTimestamp(data.timestamp);
-      })
-      .catch(() => {
-        setDeployTimestamp("Unknown");
-      });
-  }, []);
-
   if (error) {
     return (
       <Card className="border-destructive/20">
@@ -649,7 +637,6 @@ export const FrameDataTable: React.FC = () => {
       : selectedCharacterId
         ? characters.find((c) => c.id === selectedCharacterId)?.name
         : null;
-  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
   return (
     <div className="space-y-6 h-full flex flex-col pl-4 pr-4 flex-grow">
@@ -778,13 +765,7 @@ export const FrameDataTable: React.FC = () => {
             </div>
           </CardHeader>
           <CardContent className="flex-1 min-h-0 p-0 flex flex-col overflow-hidden">
-            <div
-              className={cn(
-                "overflow-y-auto flex-1 min-h-0",
-                isStale && "opacity-70 transition-opacity"
-              )}
-              ref={scrollContainerRef}
-            >
+            <div className={cn("flex-1 min-h-0 h-full", isStale && "opacity-70 transition-opacity")}>
               <MemoizedDataTableContent
                 moves={deferredMoves}
                 movesLoading={movesLoading || isStale}
@@ -795,13 +776,10 @@ export const FrameDataTable: React.FC = () => {
                 renderNotes={renderNotes}
                 visibleColumns={visibleColumns}
                 badges={selectedGame.badges}
-                getScrollElement={() => scrollContainerRef.current}
+                isAllCharacters={selectedCharacterId === -1}
               />
             </div>
           </CardContent>
-          <CardFooter className="text-xs text-muted-foreground flex-shrink-0">
-            Website last deployed: {deployTimestamp}
-          </CardFooter>
         </Card>
       ) : (
         <div className="flex items-center justify-center h-48 border rounded-lg bg-muted/40">

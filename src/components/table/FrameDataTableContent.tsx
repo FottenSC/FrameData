@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useCallback, useLayoutEffect, memo } from "react";
 import {
   Table,
   TableBody,
@@ -29,7 +29,7 @@ interface DataTableContentProps {
   getScrollElement?: () => HTMLElement | null;
 }
 
-export const FrameDataTableContent: React.FC<DataTableContentProps> = ({
+const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
   moves,
   movesLoading,
   sortColumn,
@@ -43,7 +43,29 @@ export const FrameDataTableContent: React.FC<DataTableContentProps> = ({
 }) => {
   // Table ref retained for potential future features
   const tableRef = React.useRef<HTMLTableElement | null>(null);
-  const renderCellContent = (move: Move, columnId: string) => {
+  
+  // Track scroll element with state to force re-render when it becomes available
+  const [scrollElement, setScrollElement] = useState<HTMLElement | null>(null);
+  
+  // Check for scroll element on mount and when getScrollElement changes
+  useLayoutEffect(() => {
+    const checkScrollElement = () => {
+      const el = getScrollElement ? getScrollElement() : null;
+      if (el !== scrollElement) {
+        setScrollElement(el);
+      }
+    };
+    
+    // Check immediately
+    checkScrollElement();
+    
+    // Also check after a brief delay in case the ref isn't set yet
+    const timeoutId = setTimeout(checkScrollElement, 0);
+    
+    return () => clearTimeout(timeoutId);
+  }, [getScrollElement, scrollElement]);
+
+  const renderCellContent = useCallback((move: Move, columnId: string) => {
     switch (columnId) {
       case "character":
         return move.CharacterName || "—";
@@ -111,13 +133,12 @@ export const FrameDataTableContent: React.FC<DataTableContentProps> = ({
       default:
         return "—";
     }
-  };
+  }, [renderCommand, renderNotes, badges]);
 
-  // Resolve scroll element and use element-based virtualizer for sticky header support
-  const scrollEl = getScrollElement ? getScrollElement() : null;
+  // Use the tracked scroll element for virtualization
   const rowVirtualizer = useVirtualizer({
     count: moves.length,
-    getScrollElement: () => scrollEl,
+    getScrollElement: () => scrollElement,
     estimateSize: () => 40,
     overscan: 12,
   });
@@ -126,12 +147,12 @@ export const FrameDataTableContent: React.FC<DataTableContentProps> = ({
   const totalSize = rowVirtualizer.getTotalSize();
 
   // Recompute on container resize (height changes)
-  React.useEffect(() => {
-    if (!scrollEl) return;
+  useEffect(() => {
+    if (!scrollElement) return;
     const ro = new ResizeObserver(() => rowVirtualizer.measure());
-    ro.observe(scrollEl);
+    ro.observe(scrollElement);
     return () => ro.disconnect();
-  }, [scrollEl, rowVirtualizer]);
+  }, [scrollElement, rowVirtualizer]);
 
   return (
     <Table ref={tableRef} className="table-layout-fixed">
@@ -205,9 +226,10 @@ export const FrameDataTableContent: React.FC<DataTableContentProps> = ({
           const paddingBottom =
             items.length > 0 ? totalSize - items[items.length - 1]!.end : 0;
 
-          // Defensive fallback: if virtualizer hasn't produced items yet, render a small initial slice
-          if (items.length === 0) {
-            const slice = moves.slice(0, Math.min(30, moves.length));
+          // Defensive fallback: if virtualizer hasn't produced items yet or scroll element not ready,
+          // render a small initial slice to prevent blocking the UI
+          if (items.length === 0 || !scrollElement) {
+            const slice = moves.slice(0, Math.min(20, moves.length));
             return (
               <>
                 {slice.map((move) => (
@@ -291,3 +313,6 @@ export const FrameDataTableContent: React.FC<DataTableContentProps> = ({
     </Table>
   );
 };
+
+// Memoize to prevent re-renders when parent re-renders with same props
+export const FrameDataTableContent = memo(FrameDataTableContentInner);

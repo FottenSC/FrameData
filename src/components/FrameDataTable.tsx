@@ -4,8 +4,10 @@ import React, {
   useCallback,
   useMemo,
   useRef,
+  useDeferredValue,
 } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 // Table rendering moved into FrameDataTableContent
 import { ChevronRight, Download, Settings2, Languages, MoreVertical } from "lucide-react";
 import {
@@ -35,8 +37,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "./ui/dropdown-menu";
+import { useMoves } from "@/hooks/useMoves";
 
 import { FrameDataTableContent as MemoizedDataTableContent } from "@/components/table/FrameDataTableContent";
+
 export const FrameDataTable: React.FC = () => {
   const params = useParams<{ gameId?: string; characterName?: string }>();
   const { gameId, characterName } = params;
@@ -57,23 +61,22 @@ export const FrameDataTable: React.FC = () => {
   // Add table configuration context
   const { getVisibleColumns, updateColumnVisibility } = useTableConfig();
   const { openView } = useCommand();
-  const [originalMoves, setOriginalMoves] = useState<Move[]>([]);
-  const [movesLoading, setMovesLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
   const [deployTimestamp, setDeployTimestamp] = useState<string>("Loading...");
 
-  // String interning pool to reduce memory (Suggestion #5)
-  const stringPoolRef = useRef<Map<string, string>>(new Map());
-  const intern = useCallback(
-    (value: string | null | undefined): string | null => {
-      if (value == null) return null;
-      const existing = stringPoolRef.current.get(value);
-      if (existing) return existing;
-      stringPoolRef.current.set(value, value);
-      return value;
-    },
-    [],
-  );
+  // Use TanStack Query for data fetching with automatic caching
+  const {
+    data: originalMoves = [],
+    isLoading: movesLoading,
+    error: movesError,
+  } = useMoves({
+    gameId: selectedGame?.id,
+    characterId: selectedCharacterId,
+    applyNotation,
+    characters,
+  });
+
+  const error = movesError ? (movesError as Error).message : null;
 
   // --- Sorting State ---
   const [sortColumn, setSortColumn] = useState<SortableColumn | null>(null);
@@ -227,193 +230,14 @@ export const FrameDataTable: React.FC = () => {
     setSelectedCharacterId,
   ]);
 
-  // Simple in-memory cache for fetched/processed moves keyed by game+character
-  const movesCacheRef = React.useRef<Map<string, Move[]>>(new Map());
-  
-  // Clear cache when applyNotation changes (notation mapping settings changed)
+  // Invalidate query cache when notation changes
   const prevApplyNotationRef = React.useRef(applyNotation);
   useEffect(() => {
     if (prevApplyNotationRef.current !== applyNotation) {
-      movesCacheRef.current.clear();
+      queryClient.invalidateQueries({ queryKey: ["moves"] });
       prevApplyNotationRef.current = applyNotation;
     }
-  }, [applyNotation]);
-
-  useEffect(() => {
-    setOriginalMoves([]);
-    if (selectedGame?.id && selectedCharacterId !== null) {
-      setMovesLoading(true);
-      setError(null);
-      const abort = new AbortController();
-      const fetchMoves = async () => {
-        try {
-          const cacheKey = `${selectedGame.id}::${selectedCharacterId}`;
-          if (movesCacheRef.current.has(cacheKey)) {
-            setOriginalMoves(movesCacheRef.current.get(cacheKey)!);
-            return;
-          }
-          let aggregated: Move[] = [];
-          // Helper to process and intern a raw move object
-          const processMove = (
-            moveObject: any,
-            charId: number | null,
-            charName: string | null,
-          ): Move => {
-            const originalCommand =
-              moveObject.Command != null ? String(moveObject.Command) : null;
-            const mappedCommand = originalCommand
-              ? applyNotation(originalCommand)
-              : null;
-            return {
-              ID: Number(moveObject.ID),
-              Command: intern(mappedCommand),
-              CharacterId: charId,
-              CharacterName: intern(charName),
-              Stance: (() => {
-                const raw = moveObject.Stance;
-                if (Array.isArray(raw)) {
-                  const arr = raw
-                    .map((s: any) => (s != null ? intern(String(s)) : null))
-                    .filter((s): s is string => s !== null);
-                  return arr.length > 0 ? arr : null;
-                }
-                const s = intern(raw ? String(raw) : null);
-                return s ? [s] : null;
-              })(),
-              HitLevel: intern(
-                moveObject.HitLevel ? String(moveObject.HitLevel) : null,
-              ),
-              Impact: moveObject.Impact != null ? Number(moveObject.Impact) : 0,
-              Damage: intern(
-                moveObject.Damage != null ? String(moveObject.Damage) : null,
-              ),
-              DamageDec:
-                moveObject.DamageDec != null
-                  ? Number(moveObject.DamageDec)
-                  : null,
-              Block: intern(
-                moveObject.Block != null ? String(moveObject.Block) : null,
-              ),
-              BlockDec:
-                moveObject.BlockDec != null
-                  ? Number(moveObject.BlockDec)
-                  : null,
-              Hit: intern(
-                moveObject.Hit != null ? String(moveObject.Hit) : null,
-              ),
-              HitDec:
-                moveObject.HitDec != null ? Number(moveObject.HitDec) : null,
-              HitString: intern(
-                moveObject.Hit != null ? String(moveObject.Hit) : null,
-              ),
-              CounterHit: intern(
-                moveObject.CounterHit != null
-                  ? String(moveObject.CounterHit)
-                  : null,
-              ),
-              CounterHitDec:
-                moveObject.CounterHitDec != null
-                  ? Number(moveObject.CounterHitDec)
-                  : null,
-              CounterHitString: intern(
-                moveObject.CounterHit != null
-                  ? String(moveObject.CounterHit)
-                  : null,
-              ),
-              GuardBurst:
-                moveObject.GuardBurst != null
-                  ? Number(moveObject.GuardBurst)
-                  : null,
-              Notes: intern(
-                moveObject.Notes != null ? String(moveObject.Notes) : null,
-              ),
-            } as Move;
-          };
-          if (selectedCharacterId === -1) {
-            // Aggregate by fetching Characters.json then each character file
-            const listUrl = `/Games/${encodeURIComponent(selectedGame.id)}/Characters.json`;
-            const listRes = await fetch(listUrl, {
-              signal: abort.signal,
-            });
-            if (!listRes.ok)
-              throw new Error(
-                `Failed to fetch characters list: ${listRes.status} ${listRes.statusText}`,
-              );
-            const listData = await listRes.json();
-            const chars = (Array.isArray(listData) ? listData : []).map(
-              (c: any) => ({
-                id: Number(c.id),
-                name: String(c.name),
-              }),
-            );
-            const ids: number[] = chars
-              .map((c) => c.id)
-              .filter((n: any) => !isNaN(n));
-
-            // Parallel fetch using Promise.all
-            const fetchPromises = ids.map(async (id) => {
-              const url = `/Games/${encodeURIComponent(selectedGame.id)}/Characters/${encodeURIComponent(String(id))}.json`;
-              const res = await fetch(url, {
-                signal: abort.signal,
-              });
-              if (!res.ok) return [];
-              const data = await res.json();
-              if (Array.isArray(data)) {
-                const charName = chars.find((c) => c.id === id)?.name || null;
-                return data.map((m: any) => processMove(m, id, charName));
-              }
-              return [];
-            });
-
-            const results = await Promise.all(fetchPromises);
-            aggregated = results.flat();
-            movesCacheRef.current.set(cacheKey, aggregated);
-            setOriginalMoves(aggregated);
-          } else {
-            const url = `/Games/${encodeURIComponent(selectedGame.id)}/Characters/${encodeURIComponent(String(selectedCharacterId))}.json`;
-            const res = await fetch(url, { signal: abort.signal });
-            if (!res.ok)
-              throw new Error(
-                `Failed to fetch moves: ${res.status} ${res.statusText}`,
-              );
-            const data = await res.json();
-            const charName =
-              characters.find((c) => c.id === selectedCharacterId)?.name ||
-              null;
-            const movesData: Move[] = Array.isArray(data)
-              ? data.map((moveObject: any) =>
-                  processMove(moveObject, selectedCharacterId, charName),
-                )
-              : [];
-            movesCacheRef.current.set(cacheKey, movesData);
-            setOriginalMoves(movesData);
-          }
-        } catch (error: any) {
-          if (error?.name === "AbortError") return;
-          setError(
-            error instanceof Error
-              ? error.message
-              : `Unknown error loading moves for character ID ${selectedCharacterId}`,
-          );
-          setOriginalMoves([]);
-        } finally {
-          setMovesLoading(false);
-        }
-      };
-
-      fetchMoves();
-      return () => abort.abort();
-    } else {
-      setOriginalMoves([]);
-      setMovesLoading(false);
-    }
-  }, [
-    selectedGame?.id,
-    selectedCharacterId,
-    applyNotation,
-    characters,
-    intern,
-  ]);
+  }, [applyNotation, queryClient]);
 
   const handleSort = useCallback(
     (column: SortableColumn) => {
@@ -708,6 +532,10 @@ export const FrameDataTable: React.FC = () => {
     SORT_FIELD_MAP,
   ]);
 
+  // Use deferred value to prevent blocking UI during heavy data processing
+  const deferredMoves = useDeferredValue(displayedMoves);
+  const isStale = deferredMoves !== displayedMoves;
+
   // Export handlers
   const handleExport = useCallback(
     (format: "csv" | "excel") => {
@@ -852,10 +680,11 @@ export const FrameDataTable: React.FC = () => {
               <CardDescription className="m-0 flex items-center gap-2">
                 {/* Desktop view - visible on md and up */}
                 <span className="hidden md:inline">
-                  Total Moves: {displayedMoves.length}{" "}
-                  {originalMoves.length !== displayedMoves.length
+                  Total Moves: {deferredMoves.length}{" "}
+                  {originalMoves.length !== deferredMoves.length
                     ? `(filtered from ${originalMoves.length})`
                     : ""}
+                  {isStale && " (updating...)"}
                 </span>
                 <button
                   onClick={() => openView("tableConfig")}
@@ -908,10 +737,11 @@ export const FrameDataTable: React.FC = () => {
                     className="bg-card/95 backdrop-blur-sm border-border shadow-lg min-w-[180px]"
                   >
                     <DropdownMenuItem disabled className="text-xs text-muted-foreground">
-                      Total Moves: {displayedMoves.length}{" "}
-                      {originalMoves.length !== displayedMoves.length
+                      Total Moves: {deferredMoves.length}{" "}
+                      {originalMoves.length !== deferredMoves.length
                         ? `(filtered from ${originalMoves.length})`
                         : ""}
+                      {isStale && " (updating...)"}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => openView("tableConfig")}>
                       <Settings2 className="h-4 w-4 mr-2" />
@@ -949,12 +779,15 @@ export const FrameDataTable: React.FC = () => {
           </CardHeader>
           <CardContent className="flex-1 min-h-0 p-0 flex flex-col overflow-hidden">
             <div
-              className="overflow-y-auto flex-1 min-h-0"
+              className={cn(
+                "overflow-y-auto flex-1 min-h-0",
+                isStale && "opacity-70 transition-opacity"
+              )}
               ref={scrollContainerRef}
             >
               <MemoizedDataTableContent
-                moves={displayedMoves}
-                movesLoading={movesLoading}
+                moves={deferredMoves}
+                movesLoading={movesLoading || isStale}
                 sortColumn={sortColumn}
                 sortDirection={sortDirection}
                 handleSort={handleSort}

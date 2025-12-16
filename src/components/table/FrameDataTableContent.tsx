@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, memo, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -35,36 +35,34 @@ interface MemoizedRowProps {
   dataIndex?: number;
 }
 
-const MemoizedTableRow = memo<MemoizedRowProps>(
-  ({ move, visibleColumns, renderCellContent, measureRef, dataIndex }) => (
-    <TableRow
-      className="border-b-card-border"
-      data-index={dataIndex}
-      ref={measureRef}
-    >
-      {visibleColumns.map((column) => {
-        const style: React.CSSProperties = {};
-        if (column.width) style.width = column.width;
-        if (column.minWidth) style.minWidth = column.minWidth;
-        if (column.maxWidth) style.maxWidth = column.maxWidth;
-        return (
-          <TableCell
-            key={`${move.ID}-${column.id}`}
-            className={column.className}
-            style={style}
-          >
-            {renderCellContent(move, column.id)}
-          </TableCell>
-        );
-      })}
-    </TableRow>
-  ),
-  (prevProps, nextProps) => {
-    return (
-      prevProps.move.ID === nextProps.move.ID &&
-      prevProps.visibleColumns === nextProps.visibleColumns
-    );
-  },
+const MemoizedTableRow: React.FC<MemoizedRowProps> = ({
+  move,
+  visibleColumns,
+  renderCellContent,
+  measureRef,
+  dataIndex,
+}) => (
+  <TableRow
+    className="border-b-card-border"
+    data-index={dataIndex}
+    ref={measureRef}
+  >
+    {visibleColumns.map((column) => {
+      const style: React.CSSProperties = {};
+      if (column.width) style.width = column.width;
+      if (column.minWidth) style.minWidth = column.minWidth;
+      if (column.maxWidth) style.maxWidth = column.maxWidth;
+      return (
+        <TableCell
+          key={`${move.ID}-${column.id}`}
+          className={column.className}
+          style={style}
+        >
+          {renderCellContent(move, column.id)}
+        </TableCell>
+      );
+    })}
+  </TableRow>
 );
 
 interface DataTableContentProps {
@@ -73,7 +71,7 @@ interface DataTableContentProps {
   sortColumn: SortableColumn | null;
   sortDirection: "asc" | "desc";
   handleSort: (column: SortableColumn) => void;
-  renderCommand: (command: string | null) => React.ReactNode;
+  renderCommand: (command: string[] | null) => React.ReactNode;
   renderNotes: (note: string | null) => React.ReactNode;
   visibleColumns: ColumnConfig[];
   badges?: Record<string, { className: string }>;
@@ -196,9 +194,9 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
   const [scrollContainer, setScrollContainer] = useState<HTMLDivElement | null>(
     null,
   );
-  const scrollContainerRef = useCallback((node: HTMLDivElement | null) => {
+  const scrollContainerRef = (node: HTMLDivElement | null) => {
     setScrollContainer(node);
-  }, []);
+  };
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(0);
@@ -211,24 +209,22 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
   // Pagination logic
   const usePagination = isAllCharacters && moves.length > PAGE_SIZE;
   const totalPages = usePagination ? Math.ceil(moves.length / PAGE_SIZE) : 1;
-  const displayMoves = useMemo(() => {
-    if (!usePagination) return moves;
-    const start = currentPage * PAGE_SIZE;
-    return moves.slice(start, start + PAGE_SIZE);
-  }, [moves, currentPage, usePagination]);
+  const displayMoves =
+    !usePagination
+      ? moves
+      : (() => {
+          const start = currentPage * PAGE_SIZE;
+          return moves.slice(start, start + PAGE_SIZE);
+        })();
 
   // Page change handler
-  const handlePageChange = useCallback(
-    (page: number) => {
-      setCurrentPage(page);
-      scrollContainer?.scrollTo({ top: 0, behavior: "smooth" });
-    },
-    [scrollContainer],
-  );
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    scrollContainer?.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   // Cell content renderer
-  const renderCellContent = useCallback(
-    (move: Move, columnId: string) => {
+  const renderCellContent = (move: Move, columnId: string) => {
       switch (columnId) {
         case "character":
           return move.CharacterName || "—";
@@ -250,7 +246,7 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
         case "command":
           return renderCommand(move.Command);
         case "rawCommand":
-          return move.Command || "—";
+          return move.stringCommand || "—";
         case "hitLevel":
           return (
             <ExpandableHitLevels
@@ -296,15 +292,11 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
             <div className="max-w-full truncate overflow-x-hidden overflow-y-visible">
               {renderNotes(move.Notes)}
             </div>
-          );
-        default:
-          return "—";
-      }
-    },
-    [renderCommand, renderNotes, badges],
-  );
-
-  // Virtualizer setup
+        );
+      default:
+        return "—";
+    }
+  };  // Virtualizer setup
   const rowVirtualizer = useVirtualizer({
     count: displayMoves.length,
     getScrollElement: () => scrollContainer,
@@ -508,4 +500,4 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
   );
 };
 
-export const FrameDataTableContent = memo(FrameDataTableContentInner);
+export const FrameDataTableContent = FrameDataTableContentInner;

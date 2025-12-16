@@ -40,7 +40,7 @@ export const HitLevelMultiCombobox: React.FC<HitLevelMultiComboboxProps> = ({
   maxPreview = 5,
 }) => {
   const [open, setOpen] = React.useState(false);
-  const selected = React.useMemo(() => new Set(value), [value]);
+  const selected = new Set(value);
 
   const toggle = (val: string) => {
     const next = new Set(selected);
@@ -49,13 +49,12 @@ export const HitLevelMultiCombobox: React.FC<HitLevelMultiComboboxProps> = ({
     onChange(Array.from(next));
   };
 
-  const combinedString = React.useMemo(() => {
+  const combinedArray = (() => {
     if (selected.size === 0) return null;
     return options
       .filter((o) => selected.has(o.value))
-      .map((o) => o.value)
-      .join("");
-  }, [options, selected]);
+      .map((o) => o.value);
+  })();
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -70,9 +69,9 @@ export const HitLevelMultiCombobox: React.FC<HitLevelMultiComboboxProps> = ({
           )}
         >
           <span className="truncate flex items-center gap-1">
-            {combinedString ? (
+            {combinedArray ? (
               <ExpandableHitLevels
-                hitLevelString={combinedString}
+                hitLevelString={combinedArray}
                 maxIconsToShow={maxPreview}
               />
             ) : (

@@ -2,28 +2,18 @@ import React from "react";
 import { ChevronRight } from "lucide-react";
 import { HitLevelIcon } from "./HitLevelIcon";
 
-export const ExpandableHitLevels = React.memo(
-  ({
-    hitLevelString,
-    maxIconsToShow = 3,
-  }: {
-    hitLevelString: string | null;
-    maxIconsToShow?: number;
-  }) => {
-    const [isExpanded, setIsExpanded] = React.useState(false);
-    const levels = React.useMemo(() => {
-      if (!hitLevelString) return [] as string[];
-      return hitLevelString
-        .split(/:+/)
-        .map((level) => level.trim())
-        .filter(Boolean);
-    }, [hitLevelString]);
+export const ExpandableHitLevels: React.FC<{
+  hitLevelString: string[] | null;
+  maxIconsToShow?: number;
+}> = ({ hitLevelString, maxIconsToShow = 3 }) => {
+  const [isExpanded, setIsExpanded] = React.useState(false);
+  const levels = !hitLevelString ? ([] as string[]) : hitLevelString;
 
-    const canExpand = levels.length > maxIconsToShow + 1;
-    const handleToggle = React.useCallback(() => {
-      if (!canExpand) return;
-      setIsExpanded((prev) => !prev);
-    }, [canExpand]);
+  const canExpand = levels.length > maxIconsToShow + 1;
+  const handleToggle = () => {
+    if (!canExpand) return;
+    setIsExpanded((prev) => !prev);
+  };
 
     if (levels.length === 0) {
       return <span className="text-muted-foreground">—</span>;
@@ -49,11 +39,9 @@ export const ExpandableHitLevels = React.memo(
             <HitLevelIcon level={level} />
           </div>
         ))}
-
         {showEllipsis && (
           <ChevronRight size={16} className="text-muted-foreground ml-1" />
         )}
       </div>
     );
-  },
-);
+};

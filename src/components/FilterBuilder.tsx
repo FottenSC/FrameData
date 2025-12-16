@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  useCallback,
-  useMemo,
-} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Plus, X } from "lucide-react";
 import {
   Select,
@@ -55,29 +49,26 @@ interface FilterBuilderProps {
 }
 
 // Use React.memo to prevent re-renders if props haven't changed
-export const FilterBuilder = React.memo<FilterBuilderProps>(
-  ({ onFiltersChange, className, moves = [] }) => {
-    const { selectedGame } = useGame();
-    const gameConfig: GameFilterConfig = useMemo(
-      () => gameFilterConfigs[selectedGame.id] ?? { fields: [] },
-      [selectedGame.id],
-    );
-    const allOperators: FilterOperator[] = useMemo(() => {
-      const customs = gameConfig.customOperators ?? [];
-      // Merge by id, allowing custom operators to override
-      const map = new Map<string, FilterOperator>();
-      for (const op of builtinOperators) map.set(op.id, op);
-      for (const op of customs) map.set(op.id, op);
-      return Array.from(map.values());
-    }, [gameConfig]);
-    const operatorsById = useMemo(
-      () => operatorById(allOperators),
-      [allOperators],
-    );
-    const fieldMap = useMemo(
-      () => new Map(gameConfig.fields.map((f) => [f.id, f as FieldConfig])),
-      [gameConfig.fields],
-    );
+export const FilterBuilder: React.FC<FilterBuilderProps> = ({
+  onFiltersChange,
+  className,
+  moves = [],
+}) => {
+  const { selectedGame } = useGame();
+  const gameConfig: GameFilterConfig =
+    gameFilterConfigs[selectedGame.id] ?? { fields: [] };
+  const allOperators: FilterOperator[] = (() => {
+    const customs = gameConfig.customOperators ?? [];
+    // Merge by id, allowing custom operators to override
+    const map = new Map<string, FilterOperator>();
+    for (const op of builtinOperators) map.set(op.id, op);
+    for (const op of customs) map.set(op.id, op);
+    return Array.from(map.values());
+  })();
+  const operatorsById = operatorById(allOperators);
+  const fieldMap = new Map(
+    gameConfig.fields.map((f) => [f.id, f as FieldConfig]),
+  );
     const [filters, setFilters] = useState<FilterCondition[]>([]);
     const defaultFilterAdded = useRef(false);
     const [fieldRanges, setFieldRanges] = useState<
@@ -157,21 +148,15 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(
     }, [moves, gameConfig.fields]);
 
     // --- Helper functions (memoized if necessary, but these are simple lookups) ---
-    const getFieldType = useCallback(
-      (fieldId: string): FieldType => {
-        const field = fieldMap.get(fieldId);
-        return field ? field.type : "text";
-      },
-      [fieldMap],
-    );
+    const getFieldType = (fieldId: string): FieldType => {
+      const field = fieldMap.get(fieldId);
+      return field?.type ?? "text";
+    };
 
-    const isRangeCondition = useCallback(
-      (conditionId: string): boolean => {
-        const op = operatorsById.get(conditionId);
-        return op ? op.input === "range" : false;
-      },
-      [operatorsById],
-    );
+    const isRangeCondition = (conditionId: string): boolean => {
+      const op = operatorsById.get(conditionId);
+      return op ? op.input === "range" : false;
+    };
 
     const getAvailableConditions = (fieldId: string): FilterOperator[] => {
       const field = fieldMap.get(fieldId);
@@ -187,20 +172,18 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(
     };
 
     // Memoize the active filter calculation based on the filters state
-    const currentActiveFilters = useMemo(() => {
-      return filters.filter((filter) => {
-        const isRange =
-          filter.condition === "between" || filter.condition === "notBetween";
-        if (isRange) {
-          return (
-            filter.value.trim() !== "" &&
-            filter.value2 != null &&
-            filter.value2.trim() !== ""
-          );
-        }
-        return filter.value.trim() !== "";
-      });
-    }, [filters]);
+    const currentActiveFilters = filters.filter((filter) => {
+      const isRange =
+        filter.condition === "between" || filter.condition === "notBetween";
+      if (isRange) {
+        return (
+          filter.value.trim() !== "" &&
+          filter.value2 != null &&
+          filter.value2.trim() !== ""
+        );
+      }
+      return filter.value.trim() !== "";
+    });
 
     // Notify parent when the active filters have meaningfully changed
     useEffect(() => {
@@ -226,7 +209,7 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(
     }, [filters.length]); // Dependency on addFilter removed as it's memoized now
 
     // --- Memoized Callbacks for filter manipulation ---
-    const addFilter = useCallback(() => {
+    const addFilter = () => {
       const desired = "input"; // prefer combined stance+command
       const hasDesired = gameConfig.fields.some((f) => f.id === desired);
       const fallback = "impact";
@@ -247,100 +230,93 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(
         value2: "",
       };
       setFilters((prevFilters) => [...prevFilters, newFilter]);
-    }, [gameConfig.fields, getFieldType]); // No dependencies
+    };
 
-    const removeFilter = useCallback(
-      (id: string) => {
-        setFilters((currentFilters) => {
-          if (currentFilters.length === 1) {
-            const desired = "input";
-            const hasDesired = gameConfig.fields.some((f) => f.id === desired);
-            const fallback = "impact";
-            const firstField = hasDesired
-              ? desired
-              : gameConfig.fields.some((f) => f.id === fallback)
-                ? fallback
-                : (gameConfig.fields[0]?.id ?? desired);
-            const fType = getFieldType(firstField);
-            return [
-              {
-                id: `filter-${Date.now()}`,
-                field: firstField,
-                numericField: fType === "number" ? firstField : null,
-                condition:
-                  getAvailableConditions(firstField)[0]?.id ?? "equals",
-                value: "",
-                value2: "",
-              },
-            ];
-          } else {
-            return currentFilters.filter((f) => f.id !== id);
-          }
-        });
-      },
-      [gameConfig.fields, getFieldType],
-    ); // No dependencies
+    const removeFilter = (id: string) => {
+      setFilters((currentFilters) => {
+        if (currentFilters.length === 1) {
+          const desired = "input";
+          const hasDesired = gameConfig.fields.some((f) => f.id === desired);
+          const fallback = "impact";
+          const firstField = hasDesired
+            ? desired
+            : gameConfig.fields.some((f) => f.id === fallback)
+              ? fallback
+              : (gameConfig.fields[0]?.id ?? desired);
+          const fType = getFieldType(firstField);
+          return [
+            {
+              id: `filter-${Date.now()}`,
+              field: firstField,
+              numericField: fType === "number" ? firstField : null,
+              condition:
+                getAvailableConditions(firstField)[0]?.id ?? "equals",
+              value: "",
+              value2: "",
+            },
+          ];
+        } else {
+          return currentFilters.filter((f) => f.id !== id);
+        }
+      });
+    };
 
     // updateFilter depends on helpers
-    const updateFilter = useCallback(
-      (id: string, property: keyof FilterCondition, value: string) => {
-        const doUpdate = () =>
-          setFilters((prevFilters) =>
-            prevFilters.map((filter) => {
-              if (filter.id === id) {
-                const updatedFilter = {
-                  ...filter,
-                  [property]: value,
-                };
-                const checkIsRange = (cond: string) =>
-                  cond === "between" || cond === "notBetween";
+    const updateFilter = (id: string, property: keyof FilterCondition, value: string) => {
+      const doUpdate = () =>
+        setFilters((prevFilters) =>
+          prevFilters.map((filter) => {
+            if (filter.id === id) {
+              const updatedFilter = {
+                ...filter,
+                [property]: value,
+              };
+              const checkIsRange = (cond: string) =>
+                cond === "between" || cond === "notBetween";
 
-                if (property === "field") {
-                  // Get types of old and new fields
-                  const oldFieldType = getFieldType(filter.field);
-                  const newFieldType = getFieldType(value);
+              if (property === "field") {
+                // Get types of old and new fields
+                const oldFieldType = getFieldType(filter.field);
+                const newFieldType = getFieldType(value);
 
-                  // Update numericField based on the new field type
-                  updatedFilter.numericField =
-                    newFieldType === "number" ? value : null;
+                // Update numericField based on the new field type
+                updatedFilter.numericField =
+                  newFieldType === "number" ? value : null;
 
-                  // Check and update condition if needed for the new field type
-                  const available = getAvailableConditions(value);
-                  if (!available.some((c) => c.id === filter.condition)) {
-                    updatedFilter.condition = available[0]?.id || "equals";
-                  }
-
-                  // Reset values ONLY if field types are incompatible
-                  if (oldFieldType !== newFieldType) {
-                    updatedFilter.value = "";
-                    updatedFilter.value2 = "";
-                  }
-                  // If types match, existing values in updatedFilter remain untouched
-                } else if (property === "condition") {
-                  // Clear value2 if switching away from a range condition
-                  if (!checkIsRange(value) && checkIsRange(filter.condition)) {
-                    updatedFilter.value2 = "";
-                  }
+                // Check and update condition if needed for the new field type
+                const available = getAvailableConditions(value);
+                if (!available.some((c) => c.id === filter.condition)) {
+                  updatedFilter.condition = available[0]?.id || "equals";
                 }
-                // No special logic needed when just 'value' or 'value2' changes
 
-                return updatedFilter;
+                // Reset values ONLY if field types are incompatible
+                if (oldFieldType !== newFieldType) {
+                  updatedFilter.value = "";
+                  updatedFilter.value2 = "";
+                }
+                // If types match, existing values in updatedFilter remain untouched
+              } else if (property === "condition") {
+                // Clear value2 if switching away from a range condition
+                if (!checkIsRange(value) && checkIsRange(filter.condition)) {
+                  updatedFilter.value2 = "";
+                }
               }
-              return filter;
-            }),
-          );
-        // For value/value2 changes, transition to keep input snappy
-        if (property === "value" || property === "value2") {
-          if (typeof React.startTransition === "function") {
-            React.startTransition(doUpdate);
-            return;
-          }
+              // No special logic needed when just 'value' or 'value2' changes
+
+              return updatedFilter;
+            }
+            return filter;
+          }),
+        );
+      // For value/value2 changes, transition to keep input snappy
+      if (property === "value" || property === "value2") {
+        if (typeof React.startTransition === "function") {
+          React.startTransition(doUpdate);
+          return;
         }
-        doUpdate();
-        // Depend only on stable getFieldType
-      },
-      [getFieldType],
-    );
+      }
+      doUpdate();
+    };
 
     return (
       <div className={cn("mb-4 custom-filter-builder", className)}>
@@ -388,8 +364,7 @@ export const FilterBuilder = React.memo<FilterBuilderProps>(
         </div>
       </div>
     );
-  },
-);
+};
 
 // Explicitly set displayName for React DevTools
 FilterBuilder.displayName = "FilterBuilder";
@@ -410,17 +385,16 @@ interface FilterRowProps {
   fields: FieldConfig[];
 }
 
-const FilterRow = React.memo<FilterRowProps>(
-  ({
-    filter,
-    isActive,
-    fieldType,
-    availableConditions,
-    showRange,
-    updateFilter,
-    removeFilter,
-    fields,
-  }) => {
+const FilterRow: React.FC<FilterRowProps> = ({
+  filter,
+  isActive,
+  fieldType,
+  availableConditions,
+  showRange,
+  updateFilter,
+  removeFilter,
+  fields,
+}) => {
     const field = fields.find((f) => f.id === filter.field);
     const isEnum = fieldType === "enum";
     const multi =
@@ -553,17 +527,7 @@ const FilterRow = React.memo<FilterRowProps>(
         </Button>
       </div>
     );
-  },
-  (prev, next) => {
-    return (
-      prev.filter === next.filter &&
-      prev.isActive === next.isActive &&
-      prev.fieldType === next.fieldType &&
-      prev.showRange === next.showRange &&
-      prev.availableConditions === next.availableConditions &&
-      prev.fields === next.fields
-    );
-  },
-);
+};
+
 FilterRow.displayName = "FilterRow";
 // --- End FilterRow Component ---

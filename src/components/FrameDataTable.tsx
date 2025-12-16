@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  useCallback,
-  useMemo,
-  useDeferredValue,
-} from "react";
+import React, { useEffect, useState, useDeferredValue, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -28,8 +22,6 @@ import { builtinOperators, operatorById } from "../filters/operators";
 import { gameFilterConfigs } from "../filters/gameFilterConfigs";
 import type { FieldConfig, FieldType, FilterOperator } from "../filters/types";
 import { useMoves } from "@/hooks/useMoves";
-
-import { FrameDataTableContent as MemoizedDataTableContent } from "@/components/table/FrameDataTableContent";
 
 export const FrameDataTable: React.FC = () => {
   const params = useParams<{ gameId?: string; characterName?: string }>();
@@ -84,12 +76,10 @@ export const FrameDataTable: React.FC = () => {
   // Get visible columns from table configuration
   const baseColumns = getVisibleColumns();
   // Only show the Character column when viewing "All Characters"
-  const visibleColumns = useMemo(() => {
-    if (selectedCharacterId !== -1) {
-      return baseColumns.filter((c) => c.id !== "character");
-    }
-    return baseColumns;
-  }, [baseColumns, selectedCharacterId]);
+  const visibleColumns =
+    selectedCharacterId !== -1
+      ? baseColumns.filter((c) => c.id !== "character")
+      : baseColumns;
 
   // Persist column visibility preference so it auto-toggles with page mode
   useEffect(() => {
@@ -231,263 +221,249 @@ export const FrameDataTable: React.FC = () => {
     }
   }, [applyNotation, queryClient]);
 
-  const handleSort = useCallback(
-    (column: SortableColumn) => {
-      if (sortColumn === column) {
-        setSortDirection((prevDir) => (prevDir === "asc" ? "desc" : "asc"));
-      } else {
-        setSortColumn(column);
-        setSortDirection("asc");
-      }
-    },
-    [sortColumn],
-  );
+  const handleSort = (column: SortableColumn) => {
+    if (sortColumn === column) {
+      setSortDirection((prevDir) => (prevDir === "asc" ? "desc" : "asc"));
+    } else {
+      setSortColumn(column);
+      setSortDirection("asc");
+    }
+  };
 
-  const renderCommand = useCallback(
-    (command: string | null) => <CommandRenderer command={command} />,
-    [],
+  const renderCommand = (command: string[] | null) => (
+    <CommandRenderer command={command} />
   );
-  const renderNotes = useCallback(
-    (note: string | null) => <NotesRenderer note={note} />,
-    [],
-  );
+  const renderNotes = (note: string | null) => <NotesRenderer note={note} />;
 
-  const gameFilterConfig = useMemo(
-    () => gameFilterConfigs[selectedGame.id] ?? { fields: [] },
-    [selectedGame.id],
+  const gameFilterConfig = gameFilterConfigs[selectedGame.id] ?? { fields: [] };
+  const fieldMap = new Map<string, FieldConfig>(
+    gameFilterConfig.fields.map((f) => [f.id, f]),
   );
-  const fieldMap = useMemo(
-    () =>
-      new Map<string, FieldConfig>(
-        gameFilterConfig.fields.map((f) => [f.id, f]),
-      ),
-    [gameFilterConfig.fields],
-  );
-  const allOperators: FilterOperator[] = useMemo(() => {
+  const allOperators: FilterOperator[] = (() => {
     const customs = gameFilterConfig.customOperators ?? [];
     const map = new Map<string, FilterOperator>();
     for (const op of builtinOperators) map.set(op.id, op);
     for (const op of customs) map.set(op.id, op);
     return Array.from(map.values());
-  }, [gameFilterConfig]);
-  const opsById = useMemo(() => operatorById(allOperators), [allOperators]);
+  })();
+  const opsById = operatorById(allOperators);
 
-  const getFieldAs = useCallback(
-    (
-      move: Move,
-      fieldId: string,
-    ): {
-      string: string | null;
-      number: number | null;
-      type: FieldType;
-    } => {
-      const field = fieldMap.get(fieldId);
-      const type: FieldType = field?.type ?? "text";
-      switch (fieldId) {
-        case "character":
-          return {
-            string: move.CharacterName || null,
-            number: null,
-            type,
-          };
-        case "stance":
-          return {
-            string: move.Stance ? move.Stance.join(", ") : null,
-            number: null,
-            type,
-          };
-        case "command":
-        case "rawCommand":
-          return { string: move.Command, number: null, type };
-        case "input": {
-          // combined stance + command
-          const stanceStr = move.Stance ? move.Stance.join(" ") : null;
-          const combined =
-            [stanceStr, move.Command].filter(Boolean).join(" ") || null;
-          return { string: combined, number: null, type };
-        }
-        case "hitLevel":
-          return { string: move.HitLevel, number: null, type };
-        case "impact":
-          return {
-            string: move.Impact != null ? String(move.Impact) : null,
-            number: move.Impact ?? null,
-            type,
-          };
-        case "damage":
-          return {
-            string:
-              move.DamageDec != null ? String(move.DamageDec) : move.Damage,
-            number: move.DamageDec ?? null,
-            type,
-          };
-        case "block":
-          return {
-            string: move.BlockDec != null ? String(move.BlockDec) : move.Block,
-            number: move.BlockDec ?? null,
-            type,
-          };
-        case "hit":
-          return {
-            string: move.HitDec != null ? String(move.HitDec) : move.Hit,
-            number: move.HitDec ?? null,
-            type,
-          };
-        case "counterHit":
-          return {
-            string:
-              move.CounterHitDec != null
-                ? String(move.CounterHitDec)
-                : move.CounterHit,
-            number: move.CounterHitDec ?? null,
-            type,
-          };
-        case "guardBurst":
-          return {
-            string: move.GuardBurst != null ? String(move.GuardBurst) : null,
-            number: move.GuardBurst ?? null,
-            type,
-          };
-        case "notes":
-          return { string: move.Notes, number: null, type };
-        default:
-          return { string: null, number: null, type };
+  const getFieldAs = (
+    move: Move,
+    fieldId: string,
+  ): {
+    string: string | null;
+    number: number | null;
+    type: FieldType;
+  } => {
+    const field = fieldMap.get(fieldId);
+    const type: FieldType = field?.type ?? "text";
+    switch (fieldId) {
+      case "character":
+        return {
+          string: move.CharacterName || null,
+          number: null,
+          type,
+        };
+      case "stance":
+        return {
+          string: move.Stance ? move.Stance.join(", ") : null,
+          number: null,
+          type,
+        };
+      case "command":
+        return { string: move.Command ? move.Command.join(" ") : null, number: null, type };
+      case "rawCommand":
+        return { string: move.stringCommand, number: null, type };
+      case "input": {
+        // combined stance + command
+        const stanceStr = move.Stance ? move.Stance.join(" ") : null;
+        const commandStr = move.Command ? move.Command.join(" ") : null;
+        const combined =
+          [stanceStr, commandStr].filter(Boolean).join(" ") || null;
+        return { string: combined, number: null, type };
       }
-    },
-    [fieldMap],
-  );
+      case "hitLevel":
+        return { string: move.HitLevel ? move.HitLevel.join(" ") : null, number: null, type };
+      case "impact":
+        return {
+          string: move.Impact != null ? String(move.Impact) : null,
+          number: move.Impact ?? null,
+          type,
+        };
+      case "damage":
+        return {
+          string:
+            move.DamageDec != null ? String(move.DamageDec) : move.Damage,
+          number: move.DamageDec ?? null,
+          type,
+        };
+      case "block":
+        return {
+          string: move.BlockDec != null ? String(move.BlockDec) : move.Block,
+          number: move.BlockDec ?? null,
+          type,
+        };
+      case "hit":
+        return {
+          string: move.HitDec != null ? String(move.HitDec) : move.Hit,
+          number: move.HitDec ?? null,
+          type,
+        };
+      case "counterHit":
+        return {
+          string:
+            move.CounterHitDec != null
+              ? String(move.CounterHitDec)
+              : move.CounterHit,
+          number: move.CounterHitDec ?? null,
+          type,
+        };
+      case "guardBurst":
+        return {
+          string: move.GuardBurst != null ? String(move.GuardBurst) : null,
+          number: move.GuardBurst ?? null,
+          type,
+        };
+      case "notes":
+        return { string: move.Notes, number: null, type };
+      default:
+        return { string: null, number: null, type };
+    }
+  };
 
   type ProcessedFilter = FilterCondition & {
     value1?: string;
     value2?: string;
   };
-  const processedFilters = useMemo((): ProcessedFilter[] => {
-    return activeFilters.map((f) => ({
-      ...f,
-      value1: f.value,
-      value2: f.value2,
-    }));
-  }, [activeFilters]);
+  const processedFilters: ProcessedFilter[] = useMemo(
+    () =>
+      activeFilters.map((f) => ({
+        ...f,
+        value1: f.value,
+        value2: f.value2,
+      })),
+    [activeFilters],
+  );
 
-  const applyFilter = useCallback(
-    (move: Move, filter: ProcessedFilter): boolean => {
-      const op = opsById.get(filter.condition);
-      if (!op) return true;
-      const f = getFieldAs(move, filter.field);
-      return op.test({
-        fieldType: f.type,
-        fieldString: f.string,
-        fieldNumber: f.number,
-        value: filter.value1,
-        value2: filter.value2,
-      });
+  const applyFilter = (move: Move, filter: ProcessedFilter): boolean => {
+    const op = opsById.get(filter.condition);
+    if (!op) return true;
+    const f = getFieldAs(move, filter.field);
+    return op.test({
+      fieldType: f.type,
+      fieldString: f.string,
+      fieldNumber: f.number,
+      value: filter.value1,
+      value2: filter.value2,
+    });
+  };
+
+  const SORT_FIELD_MAP = {
+    character: {
+      getter: (move: Move) => move.CharacterName,
+      type: "string" as const,
     },
-    [opsById, getFieldAs],
-  );
-
-  const SORT_FIELD_MAP = useMemo(
-    () => ({
-      character: {
-        getter: (move: Move) => move.CharacterName,
-        type: "string" as const,
-      },
-      stance: {
-        getter: (move: Move) => (move.Stance ? move.Stance.join(", ") : null),
-        type: "string" as const,
-      },
-      command: {
-        getter: (move: Move) => move.Command,
-        type: "string" as const,
-      },
-      rawCommand: {
-        getter: (move: Move) => move.Command,
-        type: "string" as const,
-      },
-      input: {
-        getter: (move: Move) =>
-          [move.Stance ? move.Stance.join(" ") : null, move.Command]
-            .filter(Boolean)
-            .join(" "),
-        type: "string" as const,
-      },
-      hitLevel: {
-        getter: (move: Move) => move.HitLevel,
-        type: "string" as const,
-      },
-      impact: {
-        getter: (move: Move) => move.Impact,
-        type: "number" as const,
-      },
-      damage: {
-        getter: (move: Move) => move.DamageDec,
-        type: "number" as const,
-      },
-      block: {
-        getter: (move: Move) => move.BlockDec,
-        type: "number" as const,
-      },
-      hit: {
-        getter: (move: Move) => move.HitDec,
-        type: "number" as const,
-      },
-      counterHit: {
-        getter: (move: Move) => move.CounterHitDec,
-        type: "number" as const,
-      },
-      guardBurst: {
-        getter: (move: Move) => move.GuardBurst,
-        type: "number" as const,
-      },
-      notes: {
-        getter: (move: Move) => move.Notes,
-        type: "string" as const,
-      },
-    }),
-    [],
-  );
-
-  const movesWithSortValues = useMemo(() => {
-    if (!sortColumn || originalMoves.length === 0) return originalMoves;
-    const fieldConfig =
-      SORT_FIELD_MAP[sortColumn as keyof typeof SORT_FIELD_MAP];
-    if (!fieldConfig) return originalMoves;
-    return originalMoves.map((move) => ({
-      ...move,
-      _sortValue: fieldConfig.getter(move),
-    }));
-  }, [originalMoves, sortColumn, SORT_FIELD_MAP]);
-
-  const createOptimizedComparator = useCallback(
-    (direction: "asc" | "desc", fieldType: "string" | "number") => {
-      const order = direction === "asc" ? 1 : -1;
-      if (fieldType === "number") {
-        return (
-          a: Move & { _sortValue?: any },
-          b: Move & { _sortValue?: any },
-        ): number => {
-          const valA = a._sortValue;
-          const valB = b._sortValue;
-          if (valA == null && valB == null) return 0;
-          if (valA == null) return order;
-          if (valB == null) return -order;
-          return (valA - valB) * order;
-        };
-      } else {
-        return (
-          a: Move & { _sortValue?: any },
-          b: Move & { _sortValue?: any },
-        ): number => {
-          const valA = a._sortValue;
-          const valB = b._sortValue;
-          if (valA == null && valB == null) return 0;
-          if (valA == null) return order;
-          if (valB == null) return -order;
-          return String(valA).localeCompare(String(valB)) * order;
-        };
-      }
+    stance: {
+      getter: (move: Move) => (move.Stance ? move.Stance.join(", ") : null),
+      type: "string" as const,
     },
-    [],
+    command: {
+      getter: (move: Move) => move.Command ? move.Command.join(" ") : null,
+      type: "string" as const,
+    },
+    rawCommand: {
+      getter: (move: Move) => move.stringCommand ? move.stringCommand : null,
+      type: "string" as const,
+    },
+    input: {
+      getter: (move: Move) =>
+        [move.Stance ? move.Stance.join(" ") : null, move.Command ? move.Command.join(" ") : null]
+          .filter(Boolean)
+          .join(" "),
+      type: "string" as const,
+    },
+    hitLevel: {
+      getter: (move: Move) => move.HitLevel,
+      type: "string" as const,
+    },
+    impact: {
+      getter: (move: Move) => move.Impact,
+      type: "number" as const,
+    },
+    damage: {
+      getter: (move: Move) => move.DamageDec,
+      type: "number" as const,
+    },
+    block: {
+      getter: (move: Move) => move.BlockDec,
+      type: "number" as const,
+    },
+    hit: {
+      getter: (move: Move) => move.HitDec,
+      type: "number" as const,
+    },
+    counterHit: {
+      getter: (move: Move) => move.CounterHitDec,
+      type: "number" as const,
+    },
+    guardBurst: {
+      getter: (move: Move) => move.GuardBurst,
+      type: "number" as const,
+    },
+    notes: {
+      getter: (move: Move) => move.Notes,
+      type: "string" as const,
+    },
+  };
+
+  const movesWithSortValues = useMemo(
+    () =>
+      !sortColumn || originalMoves.length === 0
+        ? originalMoves
+        : (() => {
+            const fieldConfig =
+              SORT_FIELD_MAP[sortColumn as keyof typeof SORT_FIELD_MAP];
+            if (!fieldConfig) return originalMoves;
+            return originalMoves.map((move) => ({
+              ...move,
+              _sortValue: fieldConfig.getter(move),
+            }));
+          })(),
+    [sortColumn, originalMoves],
   );
+
+  const createOptimizedComparator = (
+    direction: "asc" | "desc",
+    fieldType: "string" | "number",
+  ) => {
+    const order = direction === "asc" ? 1 : -1;
+    if (fieldType === "number") {
+      return (
+        a: Move & { _sortValue?: any },
+        b: Move & { _sortValue?: any },
+      ): number => {
+        const valA = a._sortValue;
+        const valB = b._sortValue;
+        if (valA == null && valB == null) return 0;
+        if (valA == null) return order;
+        if (valB == null) return -order;
+        return (valA - valB) * order;
+      };
+    } else {
+      return (
+        a: Move & { _sortValue?: any },
+        b: Move & { _sortValue?: any },
+      ): number => {
+        const valA = a._sortValue;
+        const valB = b._sortValue;
+        if (valA == null && valB == null) return 0;
+        if (valA == null) return order;
+        if (valB == null) return -order;
+        return String(valA).localeCompare(String(valB)) * order;
+      };
+    }
+  };
 
   const displayedMoves = useMemo(() => {
     const sourceMoves = sortColumn ? movesWithSortValues : originalMoves;
@@ -513,100 +489,88 @@ export const FrameDataTable: React.FC = () => {
       }
     }
     return result;
-  }, [
-    movesWithSortValues,
-    originalMoves,
-    processedFilters,
-    sortColumn,
-    sortDirection,
-    applyFilter,
-    createOptimizedComparator,
-    SORT_FIELD_MAP,
-  ]);
+  }, [sortColumn, movesWithSortValues, originalMoves, processedFilters, sortDirection]);
 
   // Use deferred value to prevent blocking UI during heavy data processing
   const deferredMoves = useDeferredValue(displayedMoves);
   const isStale = deferredMoves !== displayedMoves;
 
-  // Export handlers
-  const handleExport = useCallback(
-    (format: "csv" | "excel") => {
-      // Use currently visible (filtered + sorted) moves
-      const rows = displayedMoves;
-      if (!rows || rows.length === 0) return;
-      // Build headers from visible columns (skip non-data if any)
-      const headers = visibleColumns.map((c) => c.label);
-      const fieldIds = visibleColumns.map((c) => c.id);
-      const escape = (v: any) => {
-        if (v == null) return "";
-        const s = String(v);
-        if (/[,"\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
-        return s;
-      };
-      const dataLines: string[] = [];
-      dataLines.push(headers.map(escape).join(","));
-      for (const m of rows) {
-        const line = fieldIds
-          .map((fid) => {
-            switch (fid) {
-              case "character":
-                return m.CharacterName;
-              case "stance":
-                return m.Stance ? m.Stance.join(", ") : "";
-              case "command":
-              case "rawCommand":
-                return m.Command;
-              case "input":
-                return [m.Stance ? m.Stance.join(" ") : null, m.Command]
-                  .filter(Boolean)
-                  .join(" ");
-              case "hitLevel":
-                return m.HitLevel;
-              case "impact":
-                return m.Impact;
-              case "damage":
-                return m.DamageDec ?? m.Damage;
-              case "block":
-                return m.BlockDec ?? m.Block;
-              case "hit":
-                return m.HitDec ?? m.Hit;
-              case "counterHit":
-                return m.CounterHitDec ?? m.CounterHit;
-              case "guardBurst":
-                return m.GuardBurst;
-              case "notes":
-                return m.Notes;
-              default:
-                return "";
-            }
-          })
-          .map(escape)
-          .join(",");
-        dataLines.push(line);
-      }
-      const csv = dataLines.join("\n");
-      const blob = new Blob([csv], {
-        type:
-          format === "excel"
-            ? "application/vnd.ms-excel"
-            : "text/csv;charset=utf-8;",
-      });
-      const ext = format === "excel" ? "xls" : "csv";
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${selectedGame.id || "export"}_${selectedCharacterId === -1 ? "All" : selectedCharacterId}.${ext}`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    },
-    [displayedMoves, visibleColumns, selectedGame.id, selectedCharacterId],
-  );
+  const handleExport = (format: "csv" | "excel") => {
+    // Use currently visible (filtered + sorted) moves
+    const rows = displayedMoves;
+    if (!rows || rows.length === 0) return;
+    // Build headers from visible columns (skip non-data if any)
+    const headers = visibleColumns.map((c) => c.label);
+    const fieldIds = visibleColumns.map((c) => c.id);
+    const escape = (v: any) => {
+      if (v == null) return "";
+      const s = String(v);
+      if (/[,"\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+      return s;
+    };
+    const dataLines: string[] = [];
+    dataLines.push(headers.map(escape).join(","));
+    for (const m of rows) {
+      const line = fieldIds
+        .map((fid) => {
+          switch (fid) {
+            case "character":
+              return m.CharacterName;
+            case "stance":
+              return m.Stance ? m.Stance.join(", ") : "";
+            case "command":
+              return m.Command ? m.Command.join(" ") : "";
+            case "rawCommand":
+              return m.Command ? m.Command.join("::") : "";
+            case "input":
+              return [m.Stance ? m.Stance.join(" ") : null, m.Command ? m.Command.join(" ") : null]
+                .filter(Boolean)
+                .join(" ");
+            case "hitLevel":
+              return m.HitLevel ? m.HitLevel.join(" ") : "";
+            case "impact":
+              return m.Impact;
+            case "damage":
+              return m.DamageDec ?? m.Damage;
+            case "block":
+              return m.BlockDec ?? m.Block;
+            case "hit":
+              return m.HitDec ?? m.Hit;
+            case "counterHit":
+              return m.CounterHitDec ?? m.CounterHit;
+            case "guardBurst":
+              return m.GuardBurst;
+            case "notes":
+              return m.Notes;
+            default:
+              return "";
+          }
+        })
+        .map(escape)
+        .join(",");
+      dataLines.push(line);
+    }
+    const csv = dataLines.join("\n");
+    const blob = new Blob([csv], {
+      type:
+        format === "excel"
+          ? "application/vnd.ms-excel"
+          : "text/csv;charset=utf-8;",
+    });
+    const ext = format === "excel" ? "xls" : "csv";
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${selectedGame.id || "export"}_${selectedCharacterId === -1 ? "All" : selectedCharacterId}.${ext}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
-  const handleFiltersChange = useCallback((filters: FilterCondition[]) => {
+  const handleFiltersChange = (filters: FilterCondition[]) => {
     setActiveFilters(filters);
-  }, []);
+  };
 
   // Sync toolbar context with current state
   useEffect(() => {
@@ -666,7 +630,7 @@ export const FrameDataTable: React.FC = () => {
                 isStale && "opacity-70 transition-opacity",
               )}
             >
-              <MemoizedDataTableContent
+              <FrameDataTableContent
                 moves={deferredMoves}
                 movesLoading={movesLoading || isStale}
                 sortColumn={sortColumn}

@@ -29,10 +29,7 @@ export const TableConfigurator: React.FC = () => {
   const { columnConfigs, setColumnConfigs, restoreDefaults } = useTableConfig();
 
   // Sort by current order and drive a single list of IDs
-  const sorted = React.useMemo(
-    () => [...columnConfigs].sort((a, b) => a.order - b.order),
-    [columnConfigs],
-  );
+  const sorted = [...columnConfigs].sort((a, b) => a.order - b.order);
   const [ids, setIds] = React.useState<string[]>(() => sorted.map((c) => c.id));
 
   // keep in sync if external changes occur

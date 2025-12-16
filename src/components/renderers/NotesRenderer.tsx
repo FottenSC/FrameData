@@ -1,11 +1,11 @@
-import React, { memo, useMemo } from "react";
+import React from "react";
 import { useGame } from "@/contexts/GameContext";
 import { cn } from "@/lib/utils";
 
 const NotesRendererInner: React.FC<{ note: string | null }> = ({ note }) => {
   const { availableIcons, getIconUrl } = useGame();
 
-  const parts = useMemo(() => {
+  const parts = (() => {
     if (!note) return null;
 
     const result: React.ReactNode[] = [];
@@ -48,11 +48,10 @@ const NotesRendererInner: React.FC<{ note: string | null }> = ({ note }) => {
       );
     }
     return result;
-  }, [note, availableIcons, getIconUrl]);
+  })();
 
   if (!note) return <>—</>;
   return <>{parts}</>;
 };
 
-// Memoize to prevent re-renders during table virtualization transitions
-export const NotesRenderer = memo(NotesRendererInner);
+export const NotesRenderer = NotesRendererInner;

@@ -46,12 +46,19 @@ function processMove(
   charName: string | null,
   applyNotation: ApplyNotationFn,
 ): Move {
-  const originalCommand =
-    moveObject.Command != null ? String(moveObject.Command) : null;
-  const mappedCommand = applyNotation(originalCommand);
+  const mappedCommand =
+    moveObject.Command != null
+      ? Array.isArray(moveObject.Command)
+        ? moveObject.Command.map((cmd: any) => String(cmd))
+        : [String(moveObject.Command)]
+      : null;
 
   return {
     ID: Number(moveObject.ID),
+    stringCommand:
+      moveObject.stringCommand != null
+        ? String(moveObject.stringCommand)
+        : null,
     Command: mappedCommand,
     CharacterId: charId,
     CharacterName: charName,
@@ -63,10 +70,18 @@ function processMove(
           .filter((s): s is string => s !== null);
         return arr.length > 0 ? arr : null;
       }
-      const s = raw ? String(raw) : null;
-      return s ? [s] : null;
+      return raw ? [String(raw)] : null;
     })(),
-    HitLevel: moveObject.HitLevel ? String(moveObject.HitLevel) : null,
+    HitLevel: (() => {
+      const raw = moveObject.HitLevel;
+      if (Array.isArray(raw)) {
+        const arr = raw
+          .map((s: any) => (s != null ? String(s) : null))
+          .filter((s): s is string => s !== null);
+        return arr.length > 0 ? arr : null;
+      }
+      return raw ? [String(raw)] : null;
+    })(),
     Impact: moveObject.Impact != null ? Number(moveObject.Impact) : 0,
     Damage: moveObject.Damage != null ? String(moveObject.Damage) : null,
     DamageDec:

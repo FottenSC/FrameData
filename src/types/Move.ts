@@ -1,8 +1,9 @@
 export interface Move {
   ID: number;
-  Command: string;
+  stringCommand: string | null;
+  Command: string[] | null;
   Stance: string[] | null;
-  HitLevel: string | null;
+  HitLevel: string[] | null;
   Impact: number;
   Damage: string | null;
   DamageDec: number;

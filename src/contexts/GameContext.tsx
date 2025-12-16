@@ -304,23 +304,20 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
   const getIconUrl = (iconName: string, isHeld: boolean = false): string => {
     const upperIconName = iconName.toUpperCase();
-    return `/Games/${selectedGame.id}/Icons/${upperIconName}.svg`;
+    const heldSuffix = isHeld ? "-" : "";
+    return `/Games/${selectedGame.id}/Icons/${upperIconName}${heldSuffix}.svg`;
   };
 
   const { getEnabledNotationMappings } = useUserSettings();
 
   // Memoize notation map for the selected game
-  const notationMap = React.useMemo<NotationMap>(() => {
+  const notationMap: NotationMap = (() => {
     const enabled = getEnabledNotationMappings(
       selectedGame.id,
       selectedGame.notationMapping.defaultEnabled,
     );
     return buildNotationMap(selectedGame.notationMapping, enabled);
-  }, [
-    selectedGame.id,
-    selectedGame.notationMapping,
-    getEnabledNotationMappings,
-  ]);
+  })();
 
   const getNotationMap = (): NotationMap => notationMap;
 

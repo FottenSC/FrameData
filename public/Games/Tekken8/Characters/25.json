@@ -1,2977 +1,4317 @@
 [
-    {
-        "ID": 4192,
-        "Command": ":A:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 12,
-        "Damage": "10",
-        "DamageDec": 10,
-        "Block": "-6",
-        "BlockDec": -6,
-        "Hit": "2",
-        "HitDec": 2,
-        "CounterHit": "2",
-        "CounterHitDec": 2,
-        "GuardBurst": 1,
-        "Notes": "G cancel"
-    },
-    {
-        "ID": 4193,
-        "Command": ":A::A:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 12,
-        "Damage": "10,10",
-        "DamageDec": 20,
-        "Block": "-6",
-        "BlockDec": -6,
-        "Hit": "0",
-        "HitDec": 0,
-        "CounterHit": "0",
-        "CounterHitDec": 0,
-        "GuardBurst": 3,
-        "Notes": "NC"
-    },
-    {
-        "ID": 4194,
-        "Command": ":A::A::A:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 12,
-        "Damage": "10,10,18",
-        "DamageDec": 38,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "0",
-        "HitDec": 0,
-        "CounterHit": "0",
-        "CounterHitDec": 0,
-        "GuardBurst": 5,
-        "Notes": "2nd hit -12"
-    },
-    {
-        "ID": 4195,
-        "Command": ":(A):",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 12,
-        "Damage": "38",
-        "DamageDec": 38,
-        "Block": "-4",
-        "BlockDec": -4,
-        "Hit": "4",
-        "HitDec": 4,
-        "CounterHit": "4",
-        "CounterHitDec": 4,
-        "GuardBurst": 6,
-        "Notes": "Forces crouch on hit"
-    },
-    {
-        "ID": 4196,
-        "Command": ":a::6:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 20,
-        "Damage": "20",
-        "DamageDec": 20,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "2",
-        "HitDec": 2,
-        "CounterHit": "2",
-        "CounterHitDec": 2,
-        "GuardBurst": 2,
-        "Notes": null
-    },
-    {
-        "ID": 4197,
-        "Command": ":1::A:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 30,
-        "Damage": "22",
-        "DamageDec": 22,
-        "Block": "-14",
-        "BlockDec": -14,
-        "Hit": "4",
-        "HitDec": 4,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 4,
-        "Notes": "TC[22-41]"
-    },
-    {
-        "ID": 4198,
-        "Command": ":2::A:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 12,
-        "Damage": "12",
-        "DamageDec": 12,
-        "Block": "-6",
-        "BlockDec": -6,
-        "Hit": "6",
-        "HitDec": 6,
-        "CounterHit": "6",
-        "CounterHitDec": 6,
-        "GuardBurst": 1,
-        "Notes": "TC[8-RC]"
-    },
-    {
-        "ID": 4199,
-        "Command": ":3::A:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "10",
-        "DamageDec": 10,
-        "Block": "-18",
-        "BlockDec": -18,
-        "Hit": "-10",
-        "HitDec": -10,
-        "CounterHit": "4",
-        "CounterHitDec": 4,
-        "GuardBurst": 1,
-        "Notes": "TC[17-34]"
-    },
-    {
-        "ID": 4200,
-        "Command": ":3::A::B:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "26",
-        "DamageDec": 26,
-        "Block": "-22",
-        "BlockDec": -22,
-        "Hit": "-6",
-        "HitDec": -6,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 3,
-        "Notes": "NCC"
-    },
-    {
-        "ID": 4201,
-        "Command": ":3::A::B::B+C:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "26",
-        "DamageDec": 26,
-        "Block": null,
-        "BlockDec": null,
-        "Hit": null,
-        "HitDec": null,
-        "CounterHit": null,
-        "CounterHitDec": null,
-        "GuardBurst": null,
-        "Notes": ":GI:"
-    },
-    {
-        "ID": 4202,
-        "Command": ":4::A:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "19",
-        "DamageDec": 19,
-        "Block": "-14",
-        "BlockDec": -14,
-        "Hit": "STN",
-        "HitDec": null,
-        "CounterHit": "STN",
-        "CounterHitDec": null,
-        "GuardBurst": 1,
-        "Notes": "NC. TC[22-41]"
-    },
-    {
-        "ID": 4203,
-        "Command": ":6::A:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "16",
-        "DamageDec": 16,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "-4",
-        "HitDec": -4,
-        "CounterHit": "0",
-        "CounterHitDec": 0,
-        "GuardBurst": 2,
-        "Notes": null
-    },
-    {
-        "ID": 4204,
-        "Command": ":6::A::A:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "16,13",
-        "DamageDec": 29,
-        "Block": "-14",
-        "BlockDec": -14,
-        "Hit": "4",
-        "HitDec": 4,
-        "CounterHit": "4",
-        "CounterHitDec": 4,
-        "GuardBurst": 4,
-        "Notes": "NCC"
-    },
-    {
-        "ID": 4205,
-        "Command": ":6::A::B:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "16,13",
-        "DamageDec": 29,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "4",
-        "HitDec": 4,
-        "CounterHit": "STN",
-        "CounterHitDec": null,
-        "GuardBurst": 6,
-        "Notes": "NCC. TC[22-RC]"
-    },
-    {
-        "ID": 4206,
-        "Command": ":A:",
-        "Stance": "FC",
-        "HitLevel": null,
-        "Impact": 12,
-        "Damage": "12",
-        "DamageDec": 12,
-        "Block": "-6",
-        "BlockDec": -6,
-        "Hit": "6",
-        "HitDec": 6,
-        "CounterHit": "6",
-        "CounterHitDec": 6,
-        "GuardBurst": 1,
-        "Notes": "TC[?-RC]"
-    },
-    {
-        "ID": 4207,
-        "Command": ":3::A:",
-        "Stance": "FC",
-        "HitLevel": null,
-        "Impact": 20,
-        "Damage": "20",
-        "DamageDec": 20,
-        "Block": "-12",
-        "BlockDec": -12,
-        "Hit": "-2",
-        "HitDec": -2,
-        "CounterHit": "2",
-        "CounterHitDec": 2,
-        "GuardBurst": 2,
-        "Notes": "TC[?-RC]"
-    },
-    {
-        "ID": 4208,
-        "Command": ":A:",
-        "Stance": "WR",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "16",
-        "DamageDec": 16,
-        "Block": "-12",
-        "BlockDec": -12,
-        "Hit": "4",
-        "HitDec": 4,
-        "CounterHit": "4",
-        "CounterHitDec": 4,
-        "GuardBurst": 1,
-        "Notes": "TC[1-9]"
-    },
-    {
-        "ID": 4209,
-        "Command": ":7::A:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 19,
-        "Damage": "18",
-        "DamageDec": 18,
-        "Block": "-16",
-        "BlockDec": -16,
-        "Hit": "-8",
-        "HitDec": -8,
-        "CounterHit": "-8",
-        "CounterHitDec": -8,
-        "GuardBurst": 1,
-        "Notes": "TJ[7-33]"
-    },
-    {
-        "ID": 4210,
-        "Command": ":9::A:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 19,
-        "Damage": "20",
-        "DamageDec": 20,
-        "Block": "-14",
-        "BlockDec": -14,
-        "Hit": "-4",
-        "HitDec": -4,
-        "CounterHit": "-4",
-        "CounterHitDec": -4,
-        "GuardBurst": 1,
-        "Notes": "TJ[7-33]"
-    },
-    {
-        "ID": 4211,
-        "Command": ":A:",
-        "Stance": "BT",
-        "HitLevel": null,
-        "Impact": 16,
-        "Damage": "12",
-        "DamageDec": 12,
-        "Block": "-4",
-        "BlockDec": -4,
-        "Hit": "6",
-        "HitDec": 6,
-        "CounterHit": "6",
-        "CounterHitDec": 6,
-        "GuardBurst": 1,
-        "Notes": null
-    },
-    {
-        "ID": 4212,
-        "Command": ":2::A:",
-        "Stance": "BT",
-        "HitLevel": null,
-        "Impact": 16,
-        "Damage": "12",
-        "DamageDec": 12,
-        "Block": "-6",
-        "BlockDec": -6,
-        "Hit": "4",
-        "HitDec": 4,
-        "CounterHit": "8",
-        "CounterHitDec": 8,
-        "GuardBurst": 1,
-        "Notes": "TC[11-RC]"
-    },
-    {
-        "ID": 4213,
-        "Command": ":A:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 12,
-        "Damage": "12",
-        "DamageDec": 12,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "2",
-        "HitDec": 2,
-        "CounterHit": "2",
-        "CounterHitDec": 2,
-        "GuardBurst": 1,
-        "Notes": "G cancel"
-    },
-    {
-        "ID": 4214,
-        "Command": ":A::A:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 12,
-        "Damage": "12,12",
-        "DamageDec": 24,
-        "Block": "-6",
-        "BlockDec": -6,
-        "Hit": "6",
-        "HitDec": 6,
-        "CounterHit": "6",
-        "CounterHitDec": 6,
-        "GuardBurst": 3,
-        "Notes": "NC"
-    },
-    {
-        "ID": 4215,
-        "Command": ":A::C:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 12,
-        "Damage": "12,14",
-        "DamageDec": 26,
-        "Block": "-6",
-        "BlockDec": -6,
-        "Hit": "4",
-        "HitDec": 4,
-        "CounterHit": "4",
-        "CounterHitDec": 4,
-        "GuardBurst": 3,
-        "Notes": "NCC. TJ[14-31] TC[10-13]"
-    },
-    {
-        "ID": 4216,
-        "Command": ":3::A:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 14,
-        "Damage": "12",
-        "DamageDec": 12,
-        "Block": "-14",
-        "BlockDec": -14,
-        "Hit": "-4",
-        "HitDec": -4,
-        "CounterHit": "6",
-        "CounterHitDec": 6,
-        "GuardBurst": 1,
-        "Notes": "TC[11-39]"
-    },
-    {
-        "ID": 4217,
-        "Command": ":3::A::A:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 14,
-        "Damage": "12,30",
-        "DamageDec": 42,
-        "Block": "-12",
-        "BlockDec": -12,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 1,
-        "Notes": "NC. TC[11-58]. Self damage: 2"
-    },
-    {
-        "ID": 4218,
-        "Command": ":3::A::A+B:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 14,
-        "Damage": "12,30,22",
-        "DamageDec": 64,
-        "Block": "-12",
-        "BlockDec": -12,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 5,
-        "Notes": "NC. Self damage: 8. :SS: chance"
-    },
-    {
-        "ID": 4219,
-        "Command": ":4::A:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 20,
-        "Damage": "28",
-        "DamageDec": 28,
-        "Block": "-6",
-        "BlockDec": -6,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 5,
-        "Notes": "TC[8-20]. Self damage: 2"
-    },
-    {
-        "ID": 4220,
-        "Command": ":6::A:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 22,
-        "Damage": "22",
-        "DamageDec": 22,
-        "Block": "-6",
-        "BlockDec": -6,
-        "Hit": "2",
-        "HitDec": 2,
-        "CounterHit": "2",
-        "CounterHitDec": 2,
-        "GuardBurst": 4,
-        "Notes": "TC[7-14]. Self damage: 2"
-    },
-    {
-        "ID": 4221,
-        "Command": ":6::A::B:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 22,
-        "Damage": "22,29",
-        "DamageDec": 51,
-        "Block": "-4",
-        "BlockDec": -4,
-        "Hit": "6",
-        "HitDec": 6,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 12,
-        "Notes": ":GC:. Self damage: 6"
-    },
-    {
-        "ID": 4222,
-        "Command": ":B:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 14,
-        "Damage": "12",
-        "DamageDec": 12,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "2",
-        "HitDec": 2,
-        "CounterHit": "2",
-        "CounterHitDec": 2,
-        "GuardBurst": 2,
-        "Notes": "G cancel"
-    },
-    {
-        "ID": 4223,
-        "Command": ":B::B:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 14,
-        "Damage": "12,14",
-        "DamageDec": 26,
-        "Block": "-6",
-        "BlockDec": -6,
-        "Hit": "4",
-        "HitDec": 4,
-        "CounterHit": "8",
-        "CounterHitDec": 8,
-        "GuardBurst": 4,
-        "Notes": "NC"
-    },
-    {
-        "ID": 4224,
-        "Command": ":B::B::B:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 14,
-        "Damage": "12,14,22",
-        "DamageDec": 48,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "2",
-        "HitDec": 2,
-        "CounterHit": "2",
-        "CounterHitDec": 2,
-        "GuardBurst": 9,
-        "Notes": "Last 2 hits NCC"
-    },
-    {
-        "ID": 4225,
-        "Command": ":b::4:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "15",
-        "DamageDec": 15,
-        "Block": "-14",
-        "BlockDec": -14,
-        "Hit": "-4",
-        "HitDec": -4,
-        "CounterHit": "-4",
-        "CounterHitDec": -4,
-        "GuardBurst": 3,
-        "Notes": "TJ[20-28]"
-    },
-    {
-        "ID": 4226,
-        "Command": ":b::8:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 14,
-        "Damage": "16",
-        "DamageDec": 16,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "0",
-        "HitDec": 0,
-        "CounterHit": "0",
-        "CounterHitDec": 0,
-        "GuardBurst": 3,
-        "Notes": ":LH: on jumping opponent"
-    },
-    {
-        "ID": 4227,
-        "Command": ":1::B:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 16,
-        "Damage": "16",
-        "DamageDec": 16,
-        "Block": "-16",
-        "BlockDec": -16,
-        "Hit": "-4",
-        "HitDec": -4,
-        "CounterHit": "-4",
-        "CounterHitDec": -4,
-        "GuardBurst": 3,
-        "Notes": null
-    },
-    {
-        "ID": 4228,
-        "Command": ":2::B:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 14,
-        "Damage": "14",
-        "DamageDec": 14,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "2",
-        "HitDec": 2,
-        "CounterHit": "2",
-        "CounterHitDec": 2,
-        "GuardBurst": 2,
-        "Notes": "TC[16-RC]. Forces crouch on hit"
-    },
-    {
-        "ID": 4229,
-        "Command": ":3::B:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 17,
-        "Damage": "22",
-        "DamageDec": 22,
-        "Block": "-12",
-        "BlockDec": -12,
-        "Hit": "LNC",
-        "HitDec": null,
-        "CounterHit": "LNC",
-        "CounterHitDec": null,
-        "GuardBurst": 9,
-        "Notes": ":GC:"
-    },
-    {
-        "ID": 4230,
-        "Command": ":4::B:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 20,
-        "Damage": "20",
-        "DamageDec": 20,
-        "Block": "-6",
-        "BlockDec": -6,
-        "Hit": "6",
-        "HitDec": 6,
-        "CounterHit": "6",
-        "CounterHitDec": 6,
-        "GuardBurst": 2,
-        "Notes": null
-    },
-    {
-        "ID": 4231,
-        "Command": ":4::B::A:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 20,
-        "Damage": "20,22",
-        "DamageDec": 42,
-        "Block": "-12",
-        "BlockDec": -12,
-        "Hit": "2",
-        "HitDec": 2,
-        "CounterHit": "2",
-        "CounterHitDec": 2,
-        "GuardBurst": 6,
-        "Notes": "TC[38-65]"
-    },
-    {
-        "ID": 4232,
-        "Command": ":4::B::A::B:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 20,
-        "Damage": "20,22,39",
-        "DamageDec": 81,
-        "Block": "-12",
-        "BlockDec": -12,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 7,
-        "Notes": ":SS: chance. :AT: on final hit"
-    },
-    {
-        "ID": 4233,
-        "Command": ":4::B::B:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 20,
-        "Damage": "20,14",
-        "DamageDec": 34,
-        "Block": "-12",
-        "BlockDec": -12,
-        "Hit": "0",
-        "HitDec": 0,
-        "CounterHit": "0",
-        "CounterHitDec": 0,
-        "GuardBurst": 4,
-        "Notes": "NC"
-    },
-    {
-        "ID": 4234,
-        "Command": ":4::B::B::B:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 20,
-        "Damage": "20,14,39",
-        "DamageDec": 73,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 7,
-        "Notes": ":SS: chance. :AT: on final hit"
-    },
-    {
-        "ID": 4235,
-        "Command": ":4::B::A::C:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 20,
-        "Damage": "20,22,22",
-        "DamageDec": 64,
-        "Block": "-16",
-        "BlockDec": -16,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 8,
-        "Notes": ":GC:"
-    },
-    {
-        "ID": 4236,
-        "Command": ":4::B::B::C:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 20,
-        "Damage": "20,22,14",
-        "DamageDec": 56,
-        "Block": "-16",
-        "BlockDec": -16,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 7,
-        "Notes": ":GC:"
-    },
-    {
-        "ID": 4237,
-        "Command": ":6::B:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 16,
-        "Damage": "18",
-        "DamageDec": 18,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "2",
-        "HitDec": 2,
-        "CounterHit": "6",
-        "CounterHitDec": 6,
-        "GuardBurst": 2,
-        "Notes": "TJ[12-41]"
-    },
-    {
-        "ID": 4238,
-        "Command": ":6::B::B:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 16,
-        "Damage": "18,24",
-        "DamageDec": 42,
-        "Block": "-2",
-        "BlockDec": -2,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 9,
-        "Notes": ":GC:"
-    },
-    {
-        "ID": 4239,
-        "Command": ":6::B::C:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 16,
-        "Damage": "18,22",
-        "DamageDec": 40,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 9,
-        "Notes": "NCC. :GC:"
-    },
-    {
-        "ID": 4240,
-        "Command": ":B:",
-        "Stance": "FC",
-        "HitLevel": null,
-        "Impact": 14,
-        "Damage": "16",
-        "DamageDec": 16,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "2",
-        "HitDec": 2,
-        "CounterHit": "2",
-        "CounterHitDec": 2,
-        "GuardBurst": 2,
-        "Notes": "TC[?-RC]. Forces crouch on hit"
-    },
-    {
-        "ID": 4241,
-        "Command": ":B:",
-        "Stance": "WR",
-        "HitLevel": null,
-        "Impact": 17,
-        "Damage": "20",
-        "DamageDec": 20,
-        "Block": "-16",
-        "BlockDec": -16,
-        "Hit": "STN",
-        "HitDec": null,
-        "CounterHit": "STN",
-        "CounterHitDec": null,
-        "GuardBurst": 2,
-        "Notes": "TC[1-18]"
-    },
-    {
-        "ID": 4242,
-        "Command": ":B::C:",
-        "Stance": "WR",
-        "HitLevel": null,
-        "Impact": 17,
-        "Damage": "20,2",
-        "DamageDec": 22,
-        "Block": "lol",
-        "BlockDec": null,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 4,
-        "Notes": "TC[1-4] TJ[6-33] NC"
-    },
-    {
-        "ID": 4243,
-        "Command": ":7::B:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 36,
-        "Damage": "58",
-        "DamageDec": 58,
-        "Block": "-16",
-        "BlockDec": -16,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 9,
-        "Notes": "TJ. :GC:. :AT: on hit"
-    },
-    {
-        "ID": 4244,
-        "Command": ":8::B:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 36,
-        "Damage": "60",
-        "DamageDec": 60,
-        "Block": "-16",
-        "BlockDec": -16,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 9,
-        "Notes": "TJ. :GC:. :AT: on hit"
-    },
-    {
-        "ID": 4245,
-        "Command": ":9::B:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 36,
-        "Damage": "62",
-        "DamageDec": 62,
-        "Block": "-16",
-        "BlockDec": -16,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 9,
-        "Notes": "TJ. :GC:. :AT: on hit"
-    },
-    {
-        "ID": 4246,
-        "Command": ":B:",
-        "Stance": "BT",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "16",
-        "DamageDec": 16,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "4",
-        "HitDec": 4,
-        "CounterHit": "4",
-        "CounterHitDec": 4,
-        "GuardBurst": 2,
-        "Notes": null
-    },
-    {
-        "ID": 4247,
-        "Command": ":2::B:",
-        "Stance": "BT",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "18",
-        "DamageDec": 18,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "2",
-        "HitDec": 2,
-        "CounterHit": "2",
-        "CounterHitDec": 2,
-        "GuardBurst": 2,
-        "Notes": "TC[18-RTC] GRND"
-    },
-    {
-        "ID": 4248,
-        "Command": ":B:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 14,
-        "Damage": "16",
-        "DamageDec": 16,
-        "Block": "-6",
-        "BlockDec": -6,
-        "Hit": "2",
-        "HitDec": 2,
-        "CounterHit": "2",
-        "CounterHitDec": 2,
-        "GuardBurst": 2,
-        "Notes": "G cancel"
-    },
-    {
-        "ID": 4249,
-        "Command": ":B::B:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 14,
-        "Damage": "16,16",
-        "DamageDec": 32,
-        "Block": "-6",
-        "BlockDec": -6,
-        "Hit": "4",
-        "HitDec": 4,
-        "CounterHit": "4",
-        "CounterHitDec": 4,
-        "GuardBurst": 4,
-        "Notes": "NC"
-    },
-    {
-        "ID": 4250,
-        "Command": ":B::B::B:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 14,
-        "Damage": "16,16,28",
-        "DamageDec": 60,
-        "Block": "-4",
-        "BlockDec": -4,
-        "Hit": "6",
-        "HitDec": 6,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 12,
-        "Notes": ":GC:. TC. Self-damage: 4"
-    },
-    {
-        "ID": 4251,
-        "Command": ":b::8:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 14,
-        "Damage": "20",
-        "DamageDec": 20,
-        "Block": "-12",
-        "BlockDec": -12,
-        "Hit": "-4",
-        "HitDec": -4,
-        "CounterHit": "-4",
-        "CounterHitDec": -4,
-        "GuardBurst": 4,
-        "Notes": ":LH: on jumping opponent"
-    },
-    {
-        "ID": 4252,
-        "Command": ":1::B:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 26,
-        "Damage": "20",
-        "DamageDec": 20,
-        "Block": "-14",
-        "BlockDec": -14,
-        "Hit": "2",
-        "HitDec": 2,
-        "CounterHit": "STN",
-        "CounterHitDec": null,
-        "GuardBurst": 2,
-        "Notes": "TC[19-RC]"
-    },
-    {
-        "ID": 4253,
-        "Command": ":3::B:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "22",
-        "DamageDec": 22,
-        "Block": "-14",
-        "BlockDec": -14,
-        "Hit": "LNC",
-        "HitDec": null,
-        "CounterHit": "LNC",
-        "CounterHitDec": null,
-        "GuardBurst": 9,
-        "Notes": ":GC:"
-    },
-    {
-        "ID": 4254,
-        "Command": ":4::B:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 20,
-        "Damage": "14",
-        "DamageDec": 14,
-        "Block": "-12",
-        "BlockDec": -12,
-        "Hit": "2",
-        "HitDec": 2,
-        "CounterHit": "2",
-        "CounterHitDec": 2,
-        "GuardBurst": 2,
-        "Notes": "OTG"
-    },
-    {
-        "ID": 4255,
-        "Command": ":4::B::B:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 20,
-        "Damage": "14,8",
-        "DamageDec": 22,
-        "Block": "-14",
-        "BlockDec": -14,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 4,
-        "Notes": "NC. :SS: chance (if 3rd hit not pressed). Perfect input for +2 damage"
-    },
-    {
-        "ID": 4256,
-        "Command": ":4::B::B::B:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 20,
-        "Damage": "14,8,12",
-        "DamageDec": 34,
-        "Block": "-18",
-        "BlockDec": -18,
-        "Hit": "LNC",
-        "HitDec": null,
-        "CounterHit": "LNC",
-        "CounterHitDec": null,
-        "GuardBurst": 7,
-        "Notes": "NC"
-    },
-    {
-        "ID": 4257,
-        "Command": ":6::B:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 22,
-        "Damage": "28",
-        "DamageDec": 28,
-        "Block": "-4",
-        "BlockDec": -4,
-        "Hit": "6",
-        "HitDec": 6,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 8,
-        "Notes": ":LH: immediately after losing previous round. TC[22-RC]. Self-damage: 4"
-    },
-    {
-        "ID": 4258,
-        "Command": ":C:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 12,
-        "Damage": "12",
-        "DamageDec": 12,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "0",
-        "HitDec": 0,
-        "CounterHit": "0",
-        "CounterHitDec": 0,
-        "GuardBurst": 1,
-        "Notes": "G cancel"
-    },
-    {
-        "ID": 4259,
-        "Command": ":1::C:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 28,
-        "Damage": "18",
-        "DamageDec": 18,
-        "Block": "-18",
-        "BlockDec": -18,
-        "Hit": "LNC",
-        "HitDec": null,
-        "CounterHit": "LNC",
-        "CounterHitDec": null,
-        "GuardBurst": 4,
-        "Notes": "TC[8-RC]"
-    },
-    {
-        "ID": 4260,
-        "Command": ":2::C:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 16,
-        "Damage": "14",
-        "DamageDec": 14,
-        "Block": "-14",
-        "BlockDec": -14,
-        "Hit": "-4",
-        "HitDec": -4,
-        "CounterHit": "-4",
-        "CounterHitDec": -4,
-        "GuardBurst": 2,
-        "Notes": "TC[11-RC]"
-    },
-    {
-        "ID": 4261,
-        "Command": ":3::C:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 16,
-        "Damage": "20",
-        "DamageDec": 20,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "-4",
-        "HitDec": -4,
-        "CounterHit": "-4",
-        "CounterHitDec": -4,
-        "GuardBurst": 2,
-        "Notes": "TJ[10-38]. Forces crouch on hit."
-    },
-    {
-        "ID": 4262,
-        "Command": ":4::C:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 12,
-        "Damage": "15",
-        "DamageDec": 15,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "STN",
-        "HitDec": null,
-        "CounterHit": "STN",
-        "CounterHitDec": null,
-        "GuardBurst": 2,
-        "Notes": ":SS: chance on hit = +16/+22 on swap or -2/+4 on hedache. Self damage: 4"
-    },
-    {
-        "ID": 4263,
-        "Command": ":6::C:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 16,
-        "Damage": "18",
-        "DamageDec": 18,
-        "Block": "-2",
-        "BlockDec": -2,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 9,
-        "Notes": ":GC:. TC [4-17]"
-    },
-    {
-        "ID": 4264,
-        "Command": ":2::3::6::C:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 28,
-        "Damage": "22",
-        "DamageDec": 22,
-        "Block": "-16",
-        "BlockDec": -16,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 9,
-        "Notes": "TC[8-14]. TJ"
-    },
-    {
-        "ID": 4265,
-        "Command": ":C:",
-        "Stance": "FC",
-        "HitLevel": null,
-        "Impact": 16,
-        "Damage": "14",
-        "DamageDec": 14,
-        "Block": "-14",
-        "BlockDec": -14,
-        "Hit": "-4",
-        "HitDec": -4,
-        "CounterHit": "-4",
-        "CounterHitDec": -4,
-        "GuardBurst": 2,
-        "Notes": "TC[?-RC]"
-    },
-    {
-        "ID": 4266,
-        "Command": ":C:",
-        "Stance": "WR",
-        "HitLevel": null,
-        "Impact": 12,
-        "Damage": "20",
-        "DamageDec": 20,
-        "Block": "-14",
-        "BlockDec": -14,
-        "Hit": "8",
-        "HitDec": 8,
-        "CounterHit": "8",
-        "CounterHitDec": 8,
-        "GuardBurst": 2,
-        "Notes": "TC[1-8] TJ[10-33]"
-    },
-    {
-        "ID": 4267,
-        "Command": ":7:_:8:_:9::C:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 20,
-        "Damage": "16",
-        "DamageDec": 16,
-        "Block": "-12",
-        "BlockDec": -12,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 9,
-        "Notes": ":GC:. Special animation on CH"
-    },
-    {
-        "ID": 4268,
-        "Command": ":C:",
-        "Stance": "BT",
-        "HitLevel": null,
-        "Impact": 14,
-        "Damage": "16",
-        "DamageDec": 16,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "2",
-        "HitDec": 2,
-        "CounterHit": "2",
-        "CounterHitDec": 2,
-        "GuardBurst": 1,
-        "Notes": null
-    },
-    {
-        "ID": 4269,
-        "Command": ":2::C:",
-        "Stance": "BT",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "16",
-        "DamageDec": 16,
-        "Block": "-14",
-        "BlockDec": -14,
-        "Hit": "-4",
-        "HitDec": -4,
-        "CounterHit": "-4",
-        "CounterHitDec": -4,
-        "GuardBurst": 1,
-        "Notes": "TC[17-RC]"
-    },
-    {
-        "ID": 4270,
-        "Command": ":1::C:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 22,
-        "Damage": "18",
-        "DamageDec": 18,
-        "Block": "-14",
-        "BlockDec": -14,
-        "Hit": "-2",
-        "HitDec": -2,
-        "CounterHit": "-2",
-        "CounterHitDec": -2,
-        "GuardBurst": 1,
-        "Notes": "OTG"
-    },
-    {
-        "ID": 4271,
-        "Command": ":4::C:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 12,
-        "Damage": "15",
-        "DamageDec": 15,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 2,
-        "Notes": "Self damage: 4"
-    },
-    {
-        "ID": 4272,
-        "Command": ":2::3::6::C:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 22,
-        "Damage": "22",
-        "DamageDec": 22,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "2",
-        "HitDec": 2,
-        "CounterHit": "STN",
-        "CounterHitDec": null,
-        "GuardBurst": 7,
-        "Notes": "TC[13-18]"
-    },
-    {
-        "ID": 4273,
-        "Command": ":2::3::6::c::A:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 22,
-        "Damage": "28",
-        "DamageDec": 28,
-        "Block": "-11",
-        "BlockDec": -11,
-        "Hit": "2",
-        "HitDec": 2,
-        "CounterHit": "STN",
-        "CounterHitDec": null,
-        "GuardBurst": 4,
-        "Notes": "NC"
-    },
-    {
-        "ID": 4274,
-        "Command": ":B+C:",
-        "Stance": "WR",
-        "HitLevel": null,
-        "Impact": 24,
-        "Damage": "31",
-        "DamageDec": 31,
-        "Block": "-30",
-        "BlockDec": -30,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 1,
-        "Notes": "TC[1-4] TJ[6-33]"
-    },
-    {
-        "ID": 4275,
-        "Command": ":A+B:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 38,
-        "Damage": "32",
-        "DamageDec": 32,
-        "Block": "6",
-        "BlockDec": 6,
-        "Hit": "10",
-        "HitDec": 10,
-        "CounterHit": "10",
-        "CounterHitDec": 10,
-        "GuardBurst": 15,
-        "Notes": ":BA:. :GI:[12-20] vs high&mid horizontals. :LH: on impact counter"
-    },
-    {
-        "ID": 4276,
-        "Command": ":2::A+B:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 30,
-        "Damage": "26",
-        "DamageDec": 26,
-        "Block": "-14",
-        "BlockDec": -14,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 3,
-        "Notes": ":GI:[10-14] vs high&mid verticals"
-    },
-    {
-        "ID": 4277,
-        "Command": ":4::A+B:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 22,
-        "Damage": "10",
-        "DamageDec": 10,
-        "Block": "-14",
-        "BlockDec": -14,
-        "Hit": "-4",
-        "HitDec": -4,
-        "CounterHit": "-4",
-        "CounterHitDec": -4,
-        "GuardBurst": 2,
-        "Notes": ":TS: with veird properties (avodis even some horizontals)"
-    },
-    {
-        "ID": 4278,
-        "Command": ":6::A+B:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 64,
-        "Damage": "65",
-        "DamageDec": 65,
-        "Block": null,
-        "BlockDec": null,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": null,
-        "Notes": ":UA:. G cancel"
-    },
-    {
-        "ID": 4279,
-        "Command": ":B+C:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": null,
-        "Damage": null,
-        "DamageDec": 0,
-        "Block": null,
-        "BlockDec": null,
-        "Hit": null,
-        "HitDec": null,
-        "CounterHit": null,
-        "CounterHitDec": null,
-        "GuardBurst": null,
-        "Notes": ":GI:[6-16] vs non-kick H and L attacks. 30 dmg on successfull GI. :SS: chance. Can cause headache. Self damage: 4"
-    },
-    {
-        "ID": 4280,
-        "Command": ":B+C::C:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": null,
-        "Damage": null,
-        "DamageDec": 0,
-        "Block": null,
-        "BlockDec": null,
-        "Hit": null,
-        "HitDec": null,
-        "CounterHit": null,
-        "CounterHitDec": null,
-        "GuardBurst": null,
-        "Notes": ":SS: chance. Can cause headache. Self damage: 4"
-    },
-    {
-        "ID": 4281,
-        "Command": ":B+C::C::C:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": null,
-        "Damage": null,
-        "DamageDec": 0,
-        "Block": null,
-        "BlockDec": null,
-        "Hit": null,
-        "HitDec": null,
-        "CounterHit": null,
-        "CounterHitDec": null,
-        "GuardBurst": null,
-        "Notes": ":SS: chance. Can cause headache. Self damage: 4"
-    },
-    {
-        "ID": 4282,
-        "Command": ":B+C::A:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 22,
-        "Damage": "22",
-        "DamageDec": 22,
-        "Block": "-14",
-        "BlockDec": -14,
-        "Hit": "-2",
-        "HitDec": -2,
-        "CounterHit": "-2",
-        "CounterHitDec": -2,
-        "GuardBurst": 1,
-        "Notes": "Power increases with number of K's on Gestopft Madness. LH when immediately after :SS:"
-    },
-    {
-        "ID": 4283,
-        "Command": ":B+C::B:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 20,
-        "Damage": "24",
-        "DamageDec": 24,
-        "Block": "-12",
-        "BlockDec": -12,
-        "Hit": "4",
-        "HitDec": 4,
-        "CounterHit": "4",
-        "CounterHitDec": 4,
-        "GuardBurst": 2,
-        "Notes": "Power increases with number of K's on Gestopft Madness. LH when immediately after :SS:"
-    },
-    {
-        "ID": 4284,
-        "Command": ":2::B+C:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 30,
-        "Damage": "60",
-        "DamageDec": 60,
-        "Block": null,
-        "BlockDec": null,
-        "Hit": null,
-        "HitDec": null,
-        "CounterHit": null,
-        "CounterHitDec": null,
-        "GuardBurst": null,
-        "Notes": "Armor [10-28] vs attacks with 20 or less damage. :SS: and 60 dmg on armor click."
-    },
-    {
-        "ID": 4285,
-        "Command": ":4::B+C:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 26,
-        "Damage": "18",
-        "DamageDec": 18,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "LNC",
-        "CounterHitDec": null,
-        "GuardBurst": 9,
-        "Notes": ":GC:"
-    },
-    {
-        "ID": 4286,
-        "Command": ":4::B+C::B:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 26,
-        "Damage": "39",
-        "DamageDec": 39,
-        "Block": "-2",
-        "BlockDec": -2,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 15,
-        "Notes": "NC. Forces crouch on block."
-    },
-    {
-        "ID": 4287,
-        "Command": ":4::B+C::(B):",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 26,
-        "Damage": "50",
-        "DamageDec": 50,
-        "Block": "6",
-        "BlockDec": 6,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 20,
-        "Notes": "NCC. :BA:"
-    },
-    {
-        "ID": 4288,
-        "Command": ":6::B+C:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "22",
-        "DamageDec": 22,
-        "Block": "-6",
-        "BlockDec": -6,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 9,
-        "Notes": "On CH, 60 DMG"
-    },
-    {
-        "ID": 4289,
-        "Command": ":B+C:",
-        "Stance": "JS BT",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "16",
-        "DamageDec": 16,
-        "Block": "-16",
-        "BlockDec": -16,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 9,
-        "Notes": ":GC:. TC[9-43]"
-    },
-    {
-        "ID": 4290,
-        "Command": ":B+C::B:",
-        "Stance": "JS BT",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "16,19",
-        "DamageDec": 35,
-        "Block": "-18",
-        "BlockDec": -18,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 15,
-        "Notes": "NC. Forces crouch on block."
-    },
-    {
-        "ID": 4291,
-        "Command": ":B+C::B::B+C:",
-        "Stance": "JS BT",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "16,19,30",
-        "DamageDec": 65,
-        "Block": null,
-        "BlockDec": null,
-        "Hit": "STN",
-        "HitDec": null,
-        "CounterHit": "STN",
-        "CounterHitDec": null,
-        "GuardBurst": null,
-        "Notes": "Gestopft Madness. :SS: chance."
-    },
-    {
-        "ID": 4292,
-        "Command": ":A+B:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 34,
-        "Damage": "36",
-        "DamageDec": 36,
-        "Block": "4",
-        "BlockDec": 4,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 15,
-        "Notes": ":BA:. :LH: on impact counter. TC[7-RC]"
-    },
-    {
-        "ID": 4293,
-        "Command": ":2::A+B:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 28,
-        "Damage": "24",
-        "DamageDec": 24,
-        "Block": "-2",
-        "BlockDec": -2,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "LNC",
-        "CounterHitDec": null,
-        "GuardBurst": 15,
-        "Notes": "TC[9-12]. TJ[12-?]"
-    },
-    {
-        "ID": 4294,
-        "Command": ":4::A+B:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 22,
-        "Damage": "32",
-        "DamageDec": 32,
-        "Block": "2",
-        "BlockDec": 2,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 4,
-        "Notes": "Self damage: 2"
-    },
-    {
-        "ID": 4295,
-        "Command": ":B+C:",
-        "Stance": "GS BT",
-        "HitLevel": null,
-        "Impact": 17,
-        "Damage": "30",
-        "DamageDec": 30,
-        "Block": "-6",
-        "BlockDec": -6,
-        "Hit": "STN",
-        "HitDec": null,
-        "CounterHit": "STN",
-        "CounterHitDec": null,
-        "GuardBurst": 9,
-        "Notes": ":GI:[4-11] vs non-kick mids. :SS: chance. Self damage: 4"
-    },
-    {
-        "ID": 4296,
-        "Command": ":(2):_:(8)::A:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 22,
-        "Damage": "18",
-        "DamageDec": 18,
-        "Block": "-12",
-        "BlockDec": -12,
-        "Hit": "STN",
-        "HitDec": null,
-        "CounterHit": "STN",
-        "CounterHitDec": null,
-        "GuardBurst": 4,
-        "Notes": null
-    },
-    {
-        "ID": 4297,
-        "Command": ":(1):_:(4):_:(7)::A:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "14",
-        "DamageDec": 14,
-        "Block": "-12",
-        "BlockDec": -12,
-        "Hit": "0",
-        "HitDec": 0,
-        "CounterHit": "0",
-        "CounterHitDec": 0,
-        "GuardBurst": 1,
-        "Notes": null
-    },
-    {
-        "ID": 4298,
-        "Command": ":(1):_:(4):_:(7)::A::A:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "34",
-        "DamageDec": 34,
-        "Block": "-12",
-        "BlockDec": -12,
-        "Hit": "-4",
-        "HitDec": -4,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 3,
-        "Notes": "NC. TC"
-    },
-    {
-        "ID": 4299,
-        "Command": ":(1):_:(4):_:(7)::A::B:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "32",
-        "DamageDec": 32,
-        "Block": "-4",
-        "BlockDec": -4,
-        "Hit": "6",
-        "HitDec": 6,
-        "CounterHit": "6",
-        "CounterHitDec": 6,
-        "GuardBurst": 3,
-        "Notes": "NC"
-    },
-    {
-        "ID": 4300,
-        "Command": ":(3):_:(6):_:(9)::A:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "18",
-        "DamageDec": 18,
-        "Block": "-16",
-        "BlockDec": -16,
-        "Hit": "-6",
-        "HitDec": -6,
-        "CounterHit": "2",
-        "CounterHitDec": 2,
-        "GuardBurst": 1,
-        "Notes": "TC[13-26]"
-    },
-    {
-        "ID": 4301,
-        "Command": ":(3):_:(6):_:(9)::A::A:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "39",
-        "DamageDec": 39,
-        "Block": "-18",
-        "BlockDec": -18,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 3,
-        "Notes": "TC[0-29] NC"
-    },
-    {
-        "ID": 4302,
-        "Command": ":(2):_:(8)::B:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 20,
-        "Damage": "24",
-        "DamageDec": 24,
-        "Block": "-2",
-        "BlockDec": -2,
-        "Hit": "10",
-        "HitDec": 10,
-        "CounterHit": "STN",
-        "CounterHitDec": null,
-        "GuardBurst": 4,
-        "Notes": "NC"
-    },
-    {
-        "ID": 4303,
-        "Command": ":(1):_:(4):_:(7)::B:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 20,
-        "Damage": "20",
-        "DamageDec": 20,
-        "Block": "-18",
-        "BlockDec": -18,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 9,
-        "Notes": ":GC:"
-    },
-    {
-        "ID": 4304,
-        "Command": ":(1):_:(4):_:(7)::B::A:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 20,
-        "Damage": "35",
-        "DamageDec": 35,
-        "Block": "-17",
-        "BlockDec": -17,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "12",
-        "CounterHitDec": 12,
-        "GuardBurst": 10,
-        "Notes": "NC"
-    },
-    {
-        "ID": 4305,
-        "Command": ":(3):_:(6):_:(9)::B:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 22,
-        "Damage": "22",
-        "DamageDec": 22,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "LNC",
-        "HitDec": null,
-        "CounterHit": "LNC",
-        "CounterHitDec": null,
-        "GuardBurst": 9,
-        "Notes": ":LH: when first attack after :SS: (mood change). Forces crouch on block."
-    },
-    {
-        "ID": 4306,
-        "Command": ":(2):_:(8)::C:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 20,
-        "Damage": "16",
-        "DamageDec": 16,
-        "Block": "-6",
-        "BlockDec": -6,
-        "Hit": "8",
-        "HitDec": 8,
-        "CounterHit": "8",
-        "CounterHitDec": 8,
-        "GuardBurst": 1,
-        "Notes": "Forces BT on hit"
-    },
-    {
-        "ID": 4307,
-        "Command": ":(1):_:(4):_:(7)::C:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 16,
-        "Damage": "22",
-        "DamageDec": 22,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "8",
-        "HitDec": 8,
-        "CounterHit": "STN",
-        "CounterHitDec": null,
-        "GuardBurst": 4,
-        "Notes": "NC. TJ[14-:]"
-    },
-    {
-        "ID": 4308,
-        "Command": ":(3):_:(6):_:(9)::C:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 16,
-        "Damage": "26",
-        "DamageDec": 26,
-        "Block": "-6",
-        "BlockDec": -6,
-        "Hit": "4",
-        "HitDec": 4,
-        "CounterHit": "LNC",
-        "CounterHitDec": null,
-        "GuardBurst": 4,
-        "Notes": "NC. TJ[0-37]."
-    },
-    {
-        "ID": 4309,
-        "Command": ":(3):_:(6):_:(9)::C::B+C:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": null,
-        "Damage": "26,30",
-        "DamageDec": 56,
-        "Block": null,
-        "BlockDec": null,
-        "Hit": null,
-        "HitDec": null,
-        "CounterHit": null,
-        "CounterHitDec": null,
-        "GuardBurst": null,
-        "Notes": "Gestopft Madness"
-    },
-    {
-        "ID": 4310,
-        "Command": ":(1):_:(4):_:(7)::A+B:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 28,
-        "Damage": "24",
-        "DamageDec": 24,
-        "Block": "-18",
-        "BlockDec": -18,
-        "Hit": "-6",
-        "HitDec": -6,
-        "CounterHit": "-6",
-        "CounterHitDec": -6,
-        "GuardBurst": 3,
-        "Notes": "TC[8-19] NCC - can move using directional inputs"
-    },
-    {
-        "ID": 4311,
-        "Command": ":(1):_:(4):_:(7)::A+B::A:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 28,
-        "Damage": "34",
-        "DamageDec": 34,
-        "Block": "-18",
-        "BlockDec": -18,
-        "Hit": "-6",
-        "HitDec": -6,
-        "CounterHit": "-6",
-        "CounterHitDec": -6,
-        "GuardBurst": 5,
-        "Notes": "NCC - can move using directional inputs"
-    },
-    {
-        "ID": 4312,
-        "Command": ":(1):_:(4):_:(7)::A+B::A::A:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 28,
-        "Damage": "44",
-        "DamageDec": 44,
-        "Block": "-18",
-        "BlockDec": -18,
-        "Hit": "-6",
-        "HitDec": -6,
-        "CounterHit": "-6",
-        "CounterHitDec": -6,
-        "GuardBurst": 6,
-        "Notes": "NCC - can move using directional inputs"
-    },
-    {
-        "ID": 4313,
-        "Command": ":(3):_:(6):_:(9)::A+B:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 24,
-        "Damage": "28",
-        "DamageDec": 28,
-        "Block": "-12",
-        "BlockDec": -12,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 4,
-        "Notes": "TJ[24-39] :LH: if first attack after :SS: (mood change)"
-    },
-    {
-        "ID": 4314,
-        "Command": ":(1):_:(4):_:(7)::B+C:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 30,
-        "Damage": "36",
-        "DamageDec": 36,
-        "Block": "-6",
-        "BlockDec": -6,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 9,
-        "Notes": ":LH: when whiff punishing a powerful attack"
-    },
-    {
-        "ID": 4315,
-        "Command": ":C:",
-        "Stance": "JS RUN",
-        "HitLevel": null,
-        "Impact": 20,
-        "Damage": "26",
-        "DamageDec": 26,
-        "Block": "-22",
-        "BlockDec": -22,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 9,
-        "Notes": "TC [13-RC]. :SS: on hit. :BT: on hit"
-    },
-    {
-        "ID": 4316,
-        "Command": ":(1):_:(4):_:(7)::A:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 30,
-        "Damage": "36",
-        "DamageDec": 36,
-        "Block": "-14",
-        "BlockDec": -14,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 4,
-        "Notes": ":LH: during opponent's break or unblockable attack"
-    },
-    {
-        "ID": 4317,
-        "Command": ":(3):_:(6):_:(9)::A:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 16,
-        "Damage": "20",
-        "DamageDec": 20,
-        "Block": "-12",
-        "BlockDec": -12,
-        "Hit": "4",
-        "HitDec": 4,
-        "CounterHit": "4",
-        "CounterHitDec": 4,
-        "GuardBurst": 4,
-        "Notes": "TC[14-27]. Self damage: 6"
-    },
-    {
-        "ID": 4318,
-        "Command": ":(3):_:(6):_:(9)::A::C:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 16,
-        "Damage": "54",
-        "DamageDec": 54,
-        "Block": "-6",
-        "BlockDec": -6,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 12,
-        "Notes": "NCC. TC"
-    },
-    {
-        "ID": 4319,
-        "Command": ":(2):_:(8)::B:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 30,
-        "Damage": "32",
-        "DamageDec": 32,
-        "Block": "2",
-        "BlockDec": 2,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 15,
-        "Notes": ":BA:. TC[29-RC]. Self damage: 2"
-    },
-    {
-        "ID": 4320,
-        "Command": ":(1):_:(4):_:(7)::B:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 32,
-        "Damage": "36",
-        "DamageDec": 36,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "6",
-        "HitDec": 6,
-        "CounterHit": "6",
-        "CounterHitDec": 6,
-        "GuardBurst": 5,
-        "Notes": "NC. TC[9-RC]"
-    },
-    {
-        "ID": 4321,
-        "Command": ":(1):_:(4):_:(7)::(B):",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 40,
-        "Damage": "72",
-        "DamageDec": 72,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "6",
-        "HitDec": 6,
-        "CounterHit": "6",
-        "CounterHitDec": 6,
-        "GuardBurst": 12,
-        "Notes": "NC. TC[9-RC]"
-    },
-    {
-        "ID": 4322,
-        "Command": ":(1):_:(4):_:(7)::B:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "40",
-        "DamageDec": 40,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 9,
-        "Notes": ":GC:. :SS: chance on hit"
-    },
-    {
-        "ID": 4323,
-        "Command": ":(1):_:(4):_:(7)::C:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 21,
-        "Damage": "30",
-        "DamageDec": 30,
-        "Block": "-4",
-        "BlockDec": -4,
-        "Hit": "9",
-        "HitDec": 9,
-        "CounterHit": "9",
-        "CounterHitDec": 9,
-        "GuardBurst": 4,
-        "Notes": "NC. TC[8-16]. TJ[18-?]. Forces FC on hit"
-    },
-    {
-        "ID": 4324,
-        "Command": ":(3):_:(6):_:(9)::C:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 20,
-        "Damage": "30",
-        "DamageDec": 30,
-        "Block": "-10",
-        "BlockDec": -10,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 9,
-        "Notes": ":GC:. TC[5-9]. TJ[13-?]. On counter or air hit, 66 damage"
-    },
-    {
-        "ID": 4325,
-        "Command": ":(3):_:(6):_:(9)::A+B:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "50",
-        "DamageDec": 50,
-        "Block": "-14",
-        "BlockDec": -14,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 12,
-        "Notes": ":GC:. :SS: chance on hit. Self damage: 4"
-    },
-    {
-        "ID": 4326,
-        "Command": ":C:",
-        "Stance": "GS RUN",
-        "HitLevel": null,
-        "Impact": 20,
-        "Damage": "26",
-        "DamageDec": 26,
-        "Block": "-22",
-        "BlockDec": -22,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 9,
-        "Notes": "TC[16-48]"
-    },
-    {
-        "ID": 4327,
-        "Command": ":A+D:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "45",
-        "DamageDec": 45,
-        "Block": null,
-        "BlockDec": null,
-        "Hit": null,
-        "HitDec": null,
-        "CounterHit": null,
-        "CounterHitDec": null,
-        "GuardBurst": null,
-        "Notes": ":TH:"
-    },
-    {
-        "ID": 4328,
-        "Command": ":4::A+D:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "50",
-        "DamageDec": 50,
-        "Block": null,
-        "BlockDec": null,
-        "Hit": null,
-        "HitDec": null,
-        "CounterHit": null,
-        "CounterHitDec": null,
-        "GuardBurst": null,
-        "Notes": ":TH:"
-    },
-    {
-        "ID": 4329,
-        "Command": ":A+D:",
-        "Stance": "LEFT SIDE THROW",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "55",
-        "DamageDec": 55,
-        "Block": null,
-        "BlockDec": null,
-        "Hit": null,
-        "HitDec": null,
-        "CounterHit": null,
-        "CounterHitDec": null,
-        "GuardBurst": null,
-        "Notes": ":TH:"
-    },
-    {
-        "ID": 4330,
-        "Command": ":A+D:",
-        "Stance": "RIGHT SIDE THROW",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "60",
-        "DamageDec": 60,
-        "Block": null,
-        "BlockDec": null,
-        "Hit": null,
-        "HitDec": null,
-        "CounterHit": null,
-        "CounterHitDec": null,
-        "GuardBurst": null,
-        "Notes": ":TH:"
-    },
-    {
-        "ID": 4331,
-        "Command": ":A+D:",
-        "Stance": "BACK THROW",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "70",
-        "DamageDec": 70,
-        "Block": null,
-        "BlockDec": null,
-        "Hit": null,
-        "HitDec": null,
-        "CounterHit": null,
-        "CounterHitDec": null,
-        "GuardBurst": null,
-        "Notes": ":TH:"
-    },
-    {
-        "ID": 4332,
-        "Command": ":9::B+C:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": null,
-        "Damage": null,
-        "DamageDec": 0,
-        "Block": null,
-        "BlockDec": null,
-        "Hit": null,
-        "HitDec": null,
-        "CounterHit": null,
-        "CounterHitDec": null,
-        "GuardBurst": null,
-        "Notes": null
-    },
-    {
-        "ID": 4333,
-        "Command": ":A:",
-        "Stance": "UD",
-        "HitLevel": null,
-        "Impact": 32,
-        "Damage": "26",
-        "DamageDec": 26,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "-2",
-        "HitDec": -2,
-        "CounterHit": "-2",
-        "CounterHitDec": -2,
-        "GuardBurst": 4,
-        "Notes": null
-    },
-    {
-        "ID": 4334,
-        "Command": ":B:",
-        "Stance": "UD",
-        "HitLevel": null,
-        "Impact": 31,
-        "Damage": "40",
-        "DamageDec": 40,
-        "Block": "1",
-        "BlockDec": 1,
-        "Hit": "STN",
-        "HitDec": null,
-        "CounterHit": "STN",
-        "CounterHitDec": null,
-        "GuardBurst": 15,
-        "Notes": ":BA:"
-    },
-    {
-        "ID": 4335,
-        "Command": ":C:",
-        "Stance": "UD",
-        "HitLevel": null,
-        "Impact": 32,
-        "Damage": "24",
-        "DamageDec": 24,
-        "Block": "-17",
-        "BlockDec": -17,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 6,
-        "Notes": "Becomes :L: at long range"
-    },
-    {
-        "ID": 4336,
-        "Command": ":B+D:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 48,
-        "Damage": "35",
-        "DamageDec": 35,
-        "Block": "0",
-        "BlockDec": 0,
-        "Hit": null,
-        "HitDec": null,
-        "CounterHit": null,
-        "CounterHitDec": null,
-        "GuardBurst": 16,
-        "Notes": "TC[18-37]"
-    },
-    {
-        "ID": 4337,
-        "Command": ":(B)+(D):",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 68,
-        "Damage": "45",
-        "DamageDec": 45,
-        "Block": "8",
-        "BlockDec": 8,
-        "Hit": null,
-        "HitDec": null,
-        "CounterHit": null,
-        "CounterHitDec": null,
-        "GuardBurst": 20,
-        "Notes": ":BA:"
-    },
-    {
-        "ID": 4338,
-        "Command": ":A:",
-        "Stance": "RE",
-        "HitLevel": null,
-        "Impact": null,
-        "Damage": null,
-        "DamageDec": 0,
-        "Block": "-6",
-        "BlockDec": -6,
-        "Hit": "5",
-        "HitDec": 5,
-        "CounterHit": "5",
-        "CounterHitDec": 5,
-        "GuardBurst": 33,
-        "Notes": ":LH: if first options clashed and second beat enemy attack"
-    },
-    {
-        "ID": 4339,
-        "Command": ":A::A:",
-        "Stance": "RE",
-        "HitLevel": null,
-        "Impact": null,
-        "Damage": "36",
-        "DamageDec": 36,
-        "Block": "2",
-        "BlockDec": 2,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": null,
-        "CounterHitDec": null,
-        "GuardBurst": 33,
-        "Notes": "NC"
-    },
-    {
-        "ID": 4340,
-        "Command": ":A::(A):",
-        "Stance": "RE",
-        "HitLevel": null,
-        "Impact": null,
-        "Damage": "41",
-        "DamageDec": 41,
-        "Block": "2",
-        "BlockDec": 2,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": null,
-        "CounterHitDec": null,
-        "GuardBurst": 49,
-        "Notes": ":BA:"
-    },
-    {
-        "ID": 4341,
-        "Command": ":A::C:",
-        "Stance": "RE GS",
-        "HitLevel": null,
-        "Impact": null,
-        "Damage": "34",
-        "DamageDec": 34,
-        "Block": "-6",
-        "BlockDec": -6,
-        "Hit": "4",
-        "HitDec": 4,
-        "CounterHit": null,
-        "CounterHitDec": null,
-        "GuardBurst": null,
-        "Notes": "NC"
-    },
-    {
-        "ID": 4342,
-        "Command": ":A::C::A:",
-        "Stance": "RE GS SC",
-        "HitLevel": null,
-        "Impact": null,
-        "Damage": "53",
-        "DamageDec": 53,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "LNC",
-        "HitDec": null,
-        "CounterHit": null,
-        "CounterHitDec": null,
-        "GuardBurst": null,
-        "Notes": "NC"
-    },
-    {
-        "ID": 4343,
-        "Command": ":B:",
-        "Stance": "RE JS",
-        "HitLevel": null,
-        "Impact": null,
-        "Damage": "51",
-        "DamageDec": 51,
-        "Block": null,
-        "BlockDec": null,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": null,
-        "CounterHitDec": null,
-        "GuardBurst": 50,
-        "Notes": null
-    },
-    {
-        "ID": 4344,
-        "Command": ":B:",
-        "Stance": "RE GS",
-        "HitLevel": null,
-        "Impact": null,
-        "Damage": "73",
-        "DamageDec": 73,
-        "Block": null,
-        "BlockDec": null,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": null,
-        "CounterHitDec": null,
-        "GuardBurst": null,
-        "Notes": null
-    },
-    {
-        "ID": 4345,
-        "Command": ":C:",
-        "Stance": "RE",
-        "HitLevel": null,
-        "Impact": null,
-        "Damage": "28",
-        "DamageDec": 28,
-        "Block": "-6",
-        "BlockDec": -6,
-        "Hit": "8",
-        "HitDec": 8,
-        "CounterHit": null,
-        "CounterHitDec": null,
-        "GuardBurst": 27,
-        "Notes": "NC. :SS: chance on block. :SS: on hit"
-    },
-    {
-        "ID": 4346,
-        "Command": ":4::A+B+C:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 6,
-        "Damage": "0",
-        "DamageDec": 0,
-        "Block": "0",
-        "BlockDec": 0,
-        "Hit": "8",
-        "HitDec": 8,
-        "CounterHit": "8",
-        "CounterHitDec": 8,
-        "GuardBurst": 0,
-        "Notes": "invincible since i4. Pushback happens at i6"
-    },
-    {
-        "ID": 4347,
-        "Command": ":A+B+C:",
-        "Stance": "JS",
-        "HitLevel": null,
-        "Impact": 16,
-        "Damage": "70",
-        "DamageDec": 70,
-        "Block": "-16",
-        "BlockDec": -16,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 10,
-        "Notes": ":CE: :SS: on hit"
-    },
-    {
-        "ID": 4348,
-        "Command": ":2::3::6::A+B+C:",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 16,
-        "Damage": "39",
-        "DamageDec": 39,
-        "Block": "-6",
-        "BlockDec": -6,
-        "Hit": "10",
-        "HitDec": 10,
-        "CounterHit": "10",
-        "CounterHitDec": 10,
-        "GuardBurst": 9,
-        "Notes": ":SS: on hit"
-    },
-    {
-        "ID": 4349,
-        "Command": ":2::3::6::(A)+(B)+(C):",
-        "Stance": null,
-        "HitLevel": null,
-        "Impact": 16,
-        "Damage": "39",
-        "DamageDec": 39,
-        "Block": null,
-        "BlockDec": null,
-        "Hit": null,
-        "HitDec": null,
-        "CounterHit": null,
-        "CounterHitDec": null,
-        "GuardBurst": 9,
-        "Notes": "Gestopft Madness"
-    },
-    {
-        "ID": 4350,
-        "Command": ":6::A::B::B:",
-        "Stance": "JS SC",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "60",
-        "DamageDec": 60,
-        "Block": "4",
-        "BlockDec": 4,
-        "Hit": "LNC",
-        "HitDec": null,
-        "CounterHit": "LNC",
-        "CounterHitDec": null,
-        "GuardBurst": 10,
-        "Notes": "NCC. :BA:. :GC:"
-    },
-    {
-        "ID": 4351,
-        "Command": ":B::B::B:",
-        "Stance": "JS SC",
-        "HitLevel": null,
-        "Impact": 14,
-        "Damage": "12,14,53",
-        "DamageDec": 79,
-        "Block": "2",
-        "BlockDec": 2,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 9,
-        "Notes": "Last 2 hits NCC. :AT:. :BA:. :SS: intoGS"
-    },
-    {
-        "ID": 4352,
-        "Command": ":B::B::B:",
-        "Stance": "JS SC",
-        "HitLevel": null,
-        "Impact": 14,
-        "Damage": "12,14,78",
-        "DamageDec": 104,
-        "Block": "2",
-        "BlockDec": 2,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 9,
-        "Notes": "Last 2 hits NCC. :AT:. :BA:"
-    },
-    {
-        "ID": 4353,
-        "Command": ":4::B::C:",
-        "Stance": "SC",
-        "HitLevel": null,
-        "Impact": 20,
-        "Damage": "48",
-        "DamageDec": 48,
-        "Block": "-2",
-        "BlockDec": -2,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 8,
-        "Notes": "NC. :LNC: on grounded"
-    },
-    {
-        "ID": 4354,
-        "Command": ":2::3::6::C:",
-        "Stance": "JS SC",
-        "HitLevel": null,
-        "Impact": 22,
-        "Damage": "39",
-        "DamageDec": 39,
-        "Block": "-10",
-        "BlockDec": -10,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 9,
-        "Notes": "NC. TJ. :SS: change"
-    },
-    {
-        "ID": 4355,
-        "Command": ":(3):_:(6):_:(9)::A::A::A:",
-        "Stance": "JS SC",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "63",
-        "DamageDec": 63,
-        "Block": "-2",
-        "BlockDec": -2,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 6,
-        "Notes": "NCC"
-    },
-    {
-        "ID": 4356,
-        "Command": ":(3):_:(6):_:(9)::B::B:",
-        "Stance": "JS SC",
-        "HitLevel": null,
-        "Impact": 22,
-        "Damage": "32",
-        "DamageDec": 32,
-        "Block": "-8",
-        "BlockDec": -8,
-        "Hit": "LNC",
-        "HitDec": null,
-        "CounterHit": "LNC",
-        "CounterHitDec": null,
-        "GuardBurst": 15,
-        "Notes": "NC. :LH if 1st attack after personality change. :SS: chance"
-    },
-    {
-        "ID": 4357,
-        "Command": ":A+B+C:",
-        "Stance": "GS",
-        "HitLevel": null,
-        "Impact": 16,
-        "Damage": "90",
-        "DamageDec": 90,
-        "Block": "-16",
-        "BlockDec": -16,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 10,
-        "Notes": ":CE: :SC:. :GC:. :TH: OTG"
-    },
-    {
-        "ID": 4358,
-        "Command": ":A::C::A:",
-        "Stance": "GS SC",
-        "HitLevel": null,
-        "Impact": 12,
-        "Damage": "48",
-        "DamageDec": 48,
-        "Block": "2",
-        "BlockDec": 2,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 8,
-        "Notes": "NCC. :BA:"
-    },
-    {
-        "ID": 4359,
-        "Command": ":3::A::A+B:",
-        "Stance": "GS SC",
-        "HitLevel": null,
-        "Impact": 14,
-        "Damage": "70",
-        "DamageDec": 70,
-        "Block": "6",
-        "BlockDec": 6,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 8,
-        "Notes": "NC. :BA:. :SS: chance. Self damage: 4"
-    },
-    {
-        "ID": 4360,
-        "Command": ":6::A::B::B:",
-        "Stance": "GS SC",
-        "HitLevel": null,
-        "Impact": 22,
-        "Damage": "86",
-        "DamageDec": 86,
-        "Block": "4",
-        "BlockDec": 4,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 22,
-        "Notes": "NCC. :BA:. :SS: chance. Self damage: 10"
-    },
-    {
-        "ID": 4361,
-        "Command": ":B::B::B::B:",
-        "Stance": "GS SC",
-        "HitLevel": null,
-        "Impact": 14,
-        "Damage": "106",
-        "DamageDec": 106,
-        "Block": "4",
-        "BlockDec": 4,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 22,
-        "Notes": ":SS: chance. Self damage: 8"
-    },
-    {
-        "ID": 4362,
-        "Command": ":1::B::B:",
-        "Stance": "GS SC",
-        "HitLevel": null,
-        "Impact": 26,
-        "Damage": "40",
-        "DamageDec": 40,
-        "Block": "8",
-        "BlockDec": 8,
-        "Hit": "LNC",
-        "HitDec": null,
-        "CounterHit": "LNC",
-        "CounterHitDec": null,
-        "GuardBurst": 15,
-        "Notes": "NCC. :BA:. :SS: chance"
-    },
-    {
-        "ID": 4363,
-        "Command": ":3::B::B:",
-        "Stance": "GS SC",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "45",
-        "DamageDec": 45,
-        "Block": "-16",
-        "BlockDec": -16,
-        "Hit": "LNC",
-        "HitDec": null,
-        "CounterHit": "LNC",
-        "CounterHitDec": null,
-        "GuardBurst": 15,
-        "Notes": "NC. :GC:"
-    },
-    {
-        "ID": 4364,
-        "Command": ":6::B::B:",
-        "Stance": "GS SC",
-        "HitLevel": null,
-        "Impact": 22,
-        "Damage": "64",
-        "DamageDec": 64,
-        "Block": "2",
-        "BlockDec": 2,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 19,
-        "Notes": "TC[22-RC]. NC. :BA:. :SS: chance. Self damage: 8"
-    },
-    {
-        "ID": 4365,
-        "Command": ":(3):_:(6):_:(9)::A+B:",
-        "Stance": "GS SC",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "62",
-        "DamageDec": 62,
-        "Block": "4",
-        "BlockDec": 4,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": "KND",
-        "CounterHitDec": null,
-        "GuardBurst": 19,
-        "Notes": ":LNC: on grounded. :BA:. :SS: chance."
-    },
-    {
-        "ID": 4366,
-        "Command": ":6::A+D:",
-        "Stance": "GS SC",
-        "HitLevel": null,
-        "Impact": 18,
-        "Damage": "70",
-        "DamageDec": 70,
-        "Block": null,
-        "BlockDec": null,
-        "Hit": "KND",
-        "HitDec": null,
-        "CounterHit": null,
-        "CounterHitDec": null,
-        "GuardBurst": null,
-        "Notes": "not breakable. :SS: on hit. Restores health"
-    }
+  {
+    "ID": 4192,
+    "Command": [
+      "A"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "H"
+    ],
+    "Impact": 12,
+    "Damage": "10",
+    "DamageDec": 10,
+    "Block": "-6",
+    "BlockDec": -6,
+    "Hit": "2",
+    "HitDec": 2,
+    "CounterHit": "2",
+    "CounterHitDec": 2,
+    "GuardBurst": 1,
+    "Notes": "G cancel"
+  },
+  {
+    "ID": 4193,
+    "Command": [
+      "A",
+      "A"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "H",
+      "H"
+    ],
+    "Impact": 12,
+    "Damage": "10,10",
+    "DamageDec": 20,
+    "Block": "-6",
+    "BlockDec": -6,
+    "Hit": "0",
+    "HitDec": 0,
+    "CounterHit": "0",
+    "CounterHitDec": 0,
+    "GuardBurst": 3,
+    "Notes": "NC"
+  },
+  {
+    "ID": 4194,
+    "Command": [
+      "A",
+      "A",
+      "A"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "H",
+      "H",
+      "M"
+    ],
+    "Impact": 12,
+    "Damage": "10,10,18",
+    "DamageDec": 38,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "0",
+    "HitDec": 0,
+    "CounterHit": "0",
+    "CounterHitDec": 0,
+    "GuardBurst": 5,
+    "Notes": "2nd hit -12"
+  },
+  {
+    "ID": 4195,
+    "Command": [
+      "(A)"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "H",
+      "M",
+      "M",
+      "M"
+    ],
+    "Impact": 12,
+    "Damage": "38",
+    "DamageDec": 38,
+    "Block": "-4",
+    "BlockDec": -4,
+    "Hit": "4",
+    "HitDec": 4,
+    "CounterHit": "4",
+    "CounterHitDec": 4,
+    "GuardBurst": 6,
+    "Notes": "Forces crouch on hit"
+  },
+  {
+    "ID": 4196,
+    "Command": [
+      "a",
+      "6"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 20,
+    "Damage": "20",
+    "DamageDec": 20,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "2",
+    "HitDec": 2,
+    "CounterHit": "2",
+    "CounterHitDec": 2,
+    "GuardBurst": 2,
+    "Notes": null
+  },
+  {
+    "ID": 4197,
+    "Command": [
+      "1",
+      "A"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "L"
+    ],
+    "Impact": 30,
+    "Damage": "22",
+    "DamageDec": 22,
+    "Block": "-14",
+    "BlockDec": -14,
+    "Hit": "4",
+    "HitDec": 4,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 4,
+    "Notes": "TC[22-41]"
+  },
+  {
+    "ID": 4198,
+    "Command": [
+      "2",
+      "A"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "SL"
+    ],
+    "Impact": 12,
+    "Damage": "12",
+    "DamageDec": 12,
+    "Block": "-6",
+    "BlockDec": -6,
+    "Hit": "6",
+    "HitDec": 6,
+    "CounterHit": "6",
+    "CounterHitDec": 6,
+    "GuardBurst": 1,
+    "Notes": "TC[8-RC]"
+  },
+  {
+    "ID": 4199,
+    "Command": [
+      "3",
+      "A"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "L"
+    ],
+    "Impact": 18,
+    "Damage": "10",
+    "DamageDec": 10,
+    "Block": "-18",
+    "BlockDec": -18,
+    "Hit": "-10",
+    "HitDec": -10,
+    "CounterHit": "4",
+    "CounterHitDec": 4,
+    "GuardBurst": 1,
+    "Notes": "TC[17-34]"
+  },
+  {
+    "ID": 4200,
+    "Command": [
+      "3",
+      "A",
+      "B"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "L",
+      "M"
+    ],
+    "Impact": 18,
+    "Damage": "26",
+    "DamageDec": 26,
+    "Block": "-22",
+    "BlockDec": -22,
+    "Hit": "-6",
+    "HitDec": -6,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 3,
+    "Notes": "NCC"
+  },
+  {
+    "ID": 4201,
+    "Command": [
+      "3",
+      "A",
+      "B",
+      "B+C"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "L",
+      "M"
+    ],
+    "Impact": 18,
+    "Damage": "26",
+    "DamageDec": 26,
+    "Block": null,
+    "BlockDec": null,
+    "Hit": null,
+    "HitDec": null,
+    "CounterHit": null,
+    "CounterHitDec": null,
+    "GuardBurst": null,
+    "Notes": ":GI:"
+  },
+  {
+    "ID": 4202,
+    "Command": [
+      "4",
+      "A"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "H",
+      "H",
+      "H"
+    ],
+    "Impact": 18,
+    "Damage": "19",
+    "DamageDec": 19,
+    "Block": "-14",
+    "BlockDec": -14,
+    "Hit": "STN",
+    "HitDec": null,
+    "CounterHit": "STN",
+    "CounterHitDec": null,
+    "GuardBurst": 1,
+    "Notes": "NC. TC[22-41]"
+  },
+  {
+    "ID": 4203,
+    "Command": [
+      "6",
+      "A"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "H"
+    ],
+    "Impact": 18,
+    "Damage": "16",
+    "DamageDec": 16,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "-4",
+    "HitDec": -4,
+    "CounterHit": "0",
+    "CounterHitDec": 0,
+    "GuardBurst": 2,
+    "Notes": null
+  },
+  {
+    "ID": 4204,
+    "Command": [
+      "6",
+      "A",
+      "A"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "H",
+      "M"
+    ],
+    "Impact": 18,
+    "Damage": "16,13",
+    "DamageDec": 29,
+    "Block": "-14",
+    "BlockDec": -14,
+    "Hit": "4",
+    "HitDec": 4,
+    "CounterHit": "4",
+    "CounterHitDec": 4,
+    "GuardBurst": 4,
+    "Notes": "NCC"
+  },
+  {
+    "ID": 4205,
+    "Command": [
+      "6",
+      "A",
+      "B"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "H",
+      "L"
+    ],
+    "Impact": 18,
+    "Damage": "16,13",
+    "DamageDec": 29,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "4",
+    "HitDec": 4,
+    "CounterHit": "STN",
+    "CounterHitDec": null,
+    "GuardBurst": 6,
+    "Notes": "NCC. TC[22-RC]"
+  },
+  {
+    "ID": 4206,
+    "Command": [
+      "A"
+    ],
+    "Stance": [
+      "FC"
+    ],
+    "HitLevel": [
+      "SL"
+    ],
+    "Impact": 12,
+    "Damage": "12",
+    "DamageDec": 12,
+    "Block": "-6",
+    "BlockDec": -6,
+    "Hit": "6",
+    "HitDec": 6,
+    "CounterHit": "6",
+    "CounterHitDec": 6,
+    "GuardBurst": 1,
+    "Notes": "TC[?-RC]"
+  },
+  {
+    "ID": 4207,
+    "Command": [
+      "3",
+      "A"
+    ],
+    "Stance": [
+      "FC"
+    ],
+    "HitLevel": [
+      "L",
+      "L"
+    ],
+    "Impact": 20,
+    "Damage": "20",
+    "DamageDec": 20,
+    "Block": "-12",
+    "BlockDec": -12,
+    "Hit": "-2",
+    "HitDec": -2,
+    "CounterHit": "2",
+    "CounterHitDec": 2,
+    "GuardBurst": 2,
+    "Notes": "TC[?-RC]"
+  },
+  {
+    "ID": 4208,
+    "Command": [
+      "A"
+    ],
+    "Stance": [
+      "WR"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 18,
+    "Damage": "16",
+    "DamageDec": 16,
+    "Block": "-12",
+    "BlockDec": -12,
+    "Hit": "4",
+    "HitDec": 4,
+    "CounterHit": "4",
+    "CounterHitDec": 4,
+    "GuardBurst": 1,
+    "Notes": "TC[1-9]"
+  },
+  {
+    "ID": 4209,
+    "Command": [
+      "7",
+      "A"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 19,
+    "Damage": "18",
+    "DamageDec": 18,
+    "Block": "-16",
+    "BlockDec": -16,
+    "Hit": "-8",
+    "HitDec": -8,
+    "CounterHit": "-8",
+    "CounterHitDec": -8,
+    "GuardBurst": 1,
+    "Notes": "TJ[7-33]"
+  },
+  {
+    "ID": 4210,
+    "Command": [
+      "9",
+      "A"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 19,
+    "Damage": "20",
+    "DamageDec": 20,
+    "Block": "-14",
+    "BlockDec": -14,
+    "Hit": "-4",
+    "HitDec": -4,
+    "CounterHit": "-4",
+    "CounterHitDec": -4,
+    "GuardBurst": 1,
+    "Notes": "TJ[7-33]"
+  },
+  {
+    "ID": 4211,
+    "Command": [
+      "A"
+    ],
+    "Stance": [
+      "BT"
+    ],
+    "HitLevel": [
+      "H"
+    ],
+    "Impact": 16,
+    "Damage": "12",
+    "DamageDec": 12,
+    "Block": "-4",
+    "BlockDec": -4,
+    "Hit": "6",
+    "HitDec": 6,
+    "CounterHit": "6",
+    "CounterHitDec": 6,
+    "GuardBurst": 1,
+    "Notes": null
+  },
+  {
+    "ID": 4212,
+    "Command": [
+      "2",
+      "A"
+    ],
+    "Stance": [
+      "BT"
+    ],
+    "HitLevel": [
+      "SL"
+    ],
+    "Impact": 16,
+    "Damage": "12",
+    "DamageDec": 12,
+    "Block": "-6",
+    "BlockDec": -6,
+    "Hit": "4",
+    "HitDec": 4,
+    "CounterHit": "8",
+    "CounterHitDec": 8,
+    "GuardBurst": 1,
+    "Notes": "TC[11-RC]"
+  },
+  {
+    "ID": 4213,
+    "Command": [
+      "A"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "H"
+    ],
+    "Impact": 12,
+    "Damage": "12",
+    "DamageDec": 12,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "2",
+    "HitDec": 2,
+    "CounterHit": "2",
+    "CounterHitDec": 2,
+    "GuardBurst": 1,
+    "Notes": "G cancel"
+  },
+  {
+    "ID": 4214,
+    "Command": [
+      "A",
+      "A"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "H",
+      "H"
+    ],
+    "Impact": 12,
+    "Damage": "12,12",
+    "DamageDec": 24,
+    "Block": "-6",
+    "BlockDec": -6,
+    "Hit": "6",
+    "HitDec": 6,
+    "CounterHit": "6",
+    "CounterHitDec": 6,
+    "GuardBurst": 3,
+    "Notes": "NC"
+  },
+  {
+    "ID": 4215,
+    "Command": [
+      "A",
+      "C"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "H",
+      "M"
+    ],
+    "Impact": 12,
+    "Damage": "12,14",
+    "DamageDec": 26,
+    "Block": "-6",
+    "BlockDec": -6,
+    "Hit": "4",
+    "HitDec": 4,
+    "CounterHit": "4",
+    "CounterHitDec": 4,
+    "GuardBurst": 3,
+    "Notes": "NCC. TJ[14-31] TC[10-13]"
+  },
+  {
+    "ID": 4216,
+    "Command": [
+      "3",
+      "A"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 14,
+    "Damage": "12",
+    "DamageDec": 12,
+    "Block": "-14",
+    "BlockDec": -14,
+    "Hit": "-4",
+    "HitDec": -4,
+    "CounterHit": "6",
+    "CounterHitDec": 6,
+    "GuardBurst": 1,
+    "Notes": "TC[11-39]"
+  },
+  {
+    "ID": 4217,
+    "Command": [
+      "3",
+      "A",
+      "A"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "M",
+      "M",
+      "H"
+    ],
+    "Impact": 14,
+    "Damage": "12,30",
+    "DamageDec": 42,
+    "Block": "-12",
+    "BlockDec": -12,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 1,
+    "Notes": "NC. TC[11-58]. Self damage: 2"
+  },
+  {
+    "ID": 4218,
+    "Command": [
+      "3",
+      "A",
+      "A+B"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "M",
+      "M",
+      "H",
+      "H",
+      "H"
+    ],
+    "Impact": 14,
+    "Damage": "12,30,22",
+    "DamageDec": 64,
+    "Block": "-12",
+    "BlockDec": -12,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 5,
+    "Notes": "NC. Self damage: 8. :SS: chance"
+  },
+  {
+    "ID": 4219,
+    "Command": [
+      "4",
+      "A"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "H"
+    ],
+    "Impact": 20,
+    "Damage": "28",
+    "DamageDec": 28,
+    "Block": "-6",
+    "BlockDec": -6,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 5,
+    "Notes": "TC[8-20]. Self damage: 2"
+  },
+  {
+    "ID": 4220,
+    "Command": [
+      "6",
+      "A"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "H"
+    ],
+    "Impact": 22,
+    "Damage": "22",
+    "DamageDec": 22,
+    "Block": "-6",
+    "BlockDec": -6,
+    "Hit": "2",
+    "HitDec": 2,
+    "CounterHit": "2",
+    "CounterHitDec": 2,
+    "GuardBurst": 4,
+    "Notes": "TC[7-14]. Self damage: 2"
+  },
+  {
+    "ID": 4221,
+    "Command": [
+      "6",
+      "A",
+      "B"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "H",
+      "M"
+    ],
+    "Impact": 22,
+    "Damage": "22,29",
+    "DamageDec": 51,
+    "Block": "-4",
+    "BlockDec": -4,
+    "Hit": "6",
+    "HitDec": 6,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 12,
+    "Notes": ":GC:. Self damage: 6"
+  },
+  {
+    "ID": 4222,
+    "Command": [
+      "B"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 14,
+    "Damage": "12",
+    "DamageDec": 12,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "2",
+    "HitDec": 2,
+    "CounterHit": "2",
+    "CounterHitDec": 2,
+    "GuardBurst": 2,
+    "Notes": "G cancel"
+  },
+  {
+    "ID": 4223,
+    "Command": [
+      "B",
+      "B"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M",
+      "M"
+    ],
+    "Impact": 14,
+    "Damage": "12,14",
+    "DamageDec": 26,
+    "Block": "-6",
+    "BlockDec": -6,
+    "Hit": "4",
+    "HitDec": 4,
+    "CounterHit": "8",
+    "CounterHitDec": 8,
+    "GuardBurst": 4,
+    "Notes": "NC"
+  },
+  {
+    "ID": 4224,
+    "Command": [
+      "B",
+      "B",
+      "B"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M",
+      "M",
+      "M"
+    ],
+    "Impact": 14,
+    "Damage": "12,14,22",
+    "DamageDec": 48,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "2",
+    "HitDec": 2,
+    "CounterHit": "2",
+    "CounterHitDec": 2,
+    "GuardBurst": 9,
+    "Notes": "Last 2 hits NCC"
+  },
+  {
+    "ID": 4225,
+    "Command": [
+      "b",
+      "4"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 18,
+    "Damage": "15",
+    "DamageDec": 15,
+    "Block": "-14",
+    "BlockDec": -14,
+    "Hit": "-4",
+    "HitDec": -4,
+    "CounterHit": "-4",
+    "CounterHitDec": -4,
+    "GuardBurst": 3,
+    "Notes": "TJ[20-28]"
+  },
+  {
+    "ID": 4226,
+    "Command": [
+      "b",
+      "8"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "H"
+    ],
+    "Impact": 14,
+    "Damage": "16",
+    "DamageDec": 16,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "0",
+    "HitDec": 0,
+    "CounterHit": "0",
+    "CounterHitDec": 0,
+    "GuardBurst": 3,
+    "Notes": ":LH: on jumping opponent"
+  },
+  {
+    "ID": 4227,
+    "Command": [
+      "1",
+      "B"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "L"
+    ],
+    "Impact": 16,
+    "Damage": "16",
+    "DamageDec": 16,
+    "Block": "-16",
+    "BlockDec": -16,
+    "Hit": "-4",
+    "HitDec": -4,
+    "CounterHit": "-4",
+    "CounterHitDec": -4,
+    "GuardBurst": 3,
+    "Notes": null
+  },
+  {
+    "ID": 4228,
+    "Command": [
+      "2",
+      "B"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 14,
+    "Damage": "14",
+    "DamageDec": 14,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "2",
+    "HitDec": 2,
+    "CounterHit": "2",
+    "CounterHitDec": 2,
+    "GuardBurst": 2,
+    "Notes": "TC[16-RC]. Forces crouch on hit"
+  },
+  {
+    "ID": 4229,
+    "Command": [
+      "3",
+      "B"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 17,
+    "Damage": "22",
+    "DamageDec": 22,
+    "Block": "-12",
+    "BlockDec": -12,
+    "Hit": "LNC",
+    "HitDec": null,
+    "CounterHit": "LNC",
+    "CounterHitDec": null,
+    "GuardBurst": 9,
+    "Notes": ":GC:"
+  },
+  {
+    "ID": 4230,
+    "Command": [
+      "4",
+      "B"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 20,
+    "Damage": "20",
+    "DamageDec": 20,
+    "Block": "-6",
+    "BlockDec": -6,
+    "Hit": "6",
+    "HitDec": 6,
+    "CounterHit": "6",
+    "CounterHitDec": 6,
+    "GuardBurst": 2,
+    "Notes": null
+  },
+  {
+    "ID": 4231,
+    "Command": [
+      "4",
+      "B",
+      "A"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M",
+      "H",
+      "L"
+    ],
+    "Impact": 20,
+    "Damage": "20,22",
+    "DamageDec": 42,
+    "Block": "-12",
+    "BlockDec": -12,
+    "Hit": "2",
+    "HitDec": 2,
+    "CounterHit": "2",
+    "CounterHitDec": 2,
+    "GuardBurst": 6,
+    "Notes": "TC[38-65]"
+  },
+  {
+    "ID": 4232,
+    "Command": [
+      "4",
+      "B",
+      "A",
+      "B"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M",
+      "H",
+      "L",
+      "M"
+    ],
+    "Impact": 20,
+    "Damage": "20,22,39",
+    "DamageDec": 81,
+    "Block": "-12",
+    "BlockDec": -12,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 7,
+    "Notes": ":SS: chance. :AT: on final hit"
+  },
+  {
+    "ID": 4233,
+    "Command": [
+      "4",
+      "B",
+      "B"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M",
+      "M"
+    ],
+    "Impact": 20,
+    "Damage": "20,14",
+    "DamageDec": 34,
+    "Block": "-12",
+    "BlockDec": -12,
+    "Hit": "0",
+    "HitDec": 0,
+    "CounterHit": "0",
+    "CounterHitDec": 0,
+    "GuardBurst": 4,
+    "Notes": "NC"
+  },
+  {
+    "ID": 4234,
+    "Command": [
+      "4",
+      "B",
+      "B",
+      "B"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M",
+      "M",
+      "M"
+    ],
+    "Impact": 20,
+    "Damage": "20,14,39",
+    "DamageDec": 73,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 7,
+    "Notes": ":SS: chance. :AT: on final hit"
+  },
+  {
+    "ID": 4235,
+    "Command": [
+      "4",
+      "B",
+      "A",
+      "C"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M",
+      "H",
+      "L",
+      "L"
+    ],
+    "Impact": 20,
+    "Damage": "20,22,22",
+    "DamageDec": 64,
+    "Block": "-16",
+    "BlockDec": -16,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 8,
+    "Notes": ":GC:"
+  },
+  {
+    "ID": 4236,
+    "Command": [
+      "4",
+      "B",
+      "B",
+      "C"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M",
+      "M",
+      "L"
+    ],
+    "Impact": 20,
+    "Damage": "20,22,14",
+    "DamageDec": 56,
+    "Block": "-16",
+    "BlockDec": -16,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 7,
+    "Notes": ":GC:"
+  },
+  {
+    "ID": 4237,
+    "Command": [
+      "6",
+      "B"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 16,
+    "Damage": "18",
+    "DamageDec": 18,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "2",
+    "HitDec": 2,
+    "CounterHit": "6",
+    "CounterHitDec": 6,
+    "GuardBurst": 2,
+    "Notes": "TJ[12-41]"
+  },
+  {
+    "ID": 4238,
+    "Command": [
+      "6",
+      "B",
+      "B"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M",
+      "M"
+    ],
+    "Impact": 16,
+    "Damage": "18,24",
+    "DamageDec": 42,
+    "Block": "-2",
+    "BlockDec": -2,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 9,
+    "Notes": ":GC:"
+  },
+  {
+    "ID": 4239,
+    "Command": [
+      "6",
+      "B",
+      "C"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M",
+      "H"
+    ],
+    "Impact": 16,
+    "Damage": "18,22",
+    "DamageDec": 40,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 9,
+    "Notes": "NCC. :GC:"
+  },
+  {
+    "ID": 4240,
+    "Command": [
+      "B"
+    ],
+    "Stance": [
+      "FC"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 14,
+    "Damage": "16",
+    "DamageDec": 16,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "2",
+    "HitDec": 2,
+    "CounterHit": "2",
+    "CounterHitDec": 2,
+    "GuardBurst": 2,
+    "Notes": "TC[?-RC]. Forces crouch on hit"
+  },
+  {
+    "ID": 4241,
+    "Command": [
+      "B"
+    ],
+    "Stance": [
+      "WR"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 17,
+    "Damage": "20",
+    "DamageDec": 20,
+    "Block": "-16",
+    "BlockDec": -16,
+    "Hit": "STN",
+    "HitDec": null,
+    "CounterHit": "STN",
+    "CounterHitDec": null,
+    "GuardBurst": 2,
+    "Notes": "TC[1-18]"
+  },
+  {
+    "ID": 4242,
+    "Command": [
+      "B",
+      "C"
+    ],
+    "Stance": [
+      "WR"
+    ],
+    "HitLevel": [
+      "M",
+      "SM",
+      "M",
+      "M",
+      "M"
+    ],
+    "Impact": 17,
+    "Damage": "20,2",
+    "DamageDec": 22,
+    "Block": "lol",
+    "BlockDec": null,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 4,
+    "Notes": "TC[1-4] TJ[6-33] NC"
+  },
+  {
+    "ID": 4243,
+    "Command": [
+      "7",
+      "B"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 36,
+    "Damage": "58",
+    "DamageDec": 58,
+    "Block": "-16",
+    "BlockDec": -16,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 9,
+    "Notes": "TJ. :GC:. :AT: on hit"
+  },
+  {
+    "ID": 4244,
+    "Command": [
+      "8",
+      "B"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 36,
+    "Damage": "60",
+    "DamageDec": 60,
+    "Block": "-16",
+    "BlockDec": -16,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 9,
+    "Notes": "TJ. :GC:. :AT: on hit"
+  },
+  {
+    "ID": 4245,
+    "Command": [
+      "9",
+      "B"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 36,
+    "Damage": "62",
+    "DamageDec": 62,
+    "Block": "-16",
+    "BlockDec": -16,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 9,
+    "Notes": "TJ. :GC:. :AT: on hit"
+  },
+  {
+    "ID": 4246,
+    "Command": [
+      "B"
+    ],
+    "Stance": [
+      "BT"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 18,
+    "Damage": "16",
+    "DamageDec": 16,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "4",
+    "HitDec": 4,
+    "CounterHit": "4",
+    "CounterHitDec": 4,
+    "GuardBurst": 2,
+    "Notes": null
+  },
+  {
+    "ID": 4247,
+    "Command": [
+      "2",
+      "B"
+    ],
+    "Stance": [
+      "BT"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 18,
+    "Damage": "18",
+    "DamageDec": 18,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "2",
+    "HitDec": 2,
+    "CounterHit": "2",
+    "CounterHitDec": 2,
+    "GuardBurst": 2,
+    "Notes": "TC[18-RTC] GRND"
+  },
+  {
+    "ID": 4248,
+    "Command": [
+      "B"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 14,
+    "Damage": "16",
+    "DamageDec": 16,
+    "Block": "-6",
+    "BlockDec": -6,
+    "Hit": "2",
+    "HitDec": 2,
+    "CounterHit": "2",
+    "CounterHitDec": 2,
+    "GuardBurst": 2,
+    "Notes": "G cancel"
+  },
+  {
+    "ID": 4249,
+    "Command": [
+      "B",
+      "B"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "M",
+      "M"
+    ],
+    "Impact": 14,
+    "Damage": "16,16",
+    "DamageDec": 32,
+    "Block": "-6",
+    "BlockDec": -6,
+    "Hit": "4",
+    "HitDec": 4,
+    "CounterHit": "4",
+    "CounterHitDec": 4,
+    "GuardBurst": 4,
+    "Notes": "NC"
+  },
+  {
+    "ID": 4250,
+    "Command": [
+      "B",
+      "B",
+      "B"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "M",
+      "M",
+      "M"
+    ],
+    "Impact": 14,
+    "Damage": "16,16,28",
+    "DamageDec": 60,
+    "Block": "-4",
+    "BlockDec": -4,
+    "Hit": "6",
+    "HitDec": 6,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 12,
+    "Notes": ":GC:. TC. Self-damage: 4"
+  },
+  {
+    "ID": 4251,
+    "Command": [
+      "b",
+      "8"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "H"
+    ],
+    "Impact": 14,
+    "Damage": "20",
+    "DamageDec": 20,
+    "Block": "-12",
+    "BlockDec": -12,
+    "Hit": "-4",
+    "HitDec": -4,
+    "CounterHit": "-4",
+    "CounterHitDec": -4,
+    "GuardBurst": 4,
+    "Notes": ":LH: on jumping opponent"
+  },
+  {
+    "ID": 4252,
+    "Command": [
+      "1",
+      "B"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "L"
+    ],
+    "Impact": 26,
+    "Damage": "20",
+    "DamageDec": 20,
+    "Block": "-14",
+    "BlockDec": -14,
+    "Hit": "2",
+    "HitDec": 2,
+    "CounterHit": "STN",
+    "CounterHitDec": null,
+    "GuardBurst": 2,
+    "Notes": "TC[19-RC]"
+  },
+  {
+    "ID": 4253,
+    "Command": [
+      "3",
+      "B"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 18,
+    "Damage": "22",
+    "DamageDec": 22,
+    "Block": "-14",
+    "BlockDec": -14,
+    "Hit": "LNC",
+    "HitDec": null,
+    "CounterHit": "LNC",
+    "CounterHitDec": null,
+    "GuardBurst": 9,
+    "Notes": ":GC:"
+  },
+  {
+    "ID": 4254,
+    "Command": [
+      "4",
+      "B"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 20,
+    "Damage": "14",
+    "DamageDec": 14,
+    "Block": "-12",
+    "BlockDec": -12,
+    "Hit": "2",
+    "HitDec": 2,
+    "CounterHit": "2",
+    "CounterHitDec": 2,
+    "GuardBurst": 2,
+    "Notes": "OTG"
+  },
+  {
+    "ID": 4255,
+    "Command": [
+      "4",
+      "B",
+      "B"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "M",
+      "M"
+    ],
+    "Impact": 20,
+    "Damage": "14,8",
+    "DamageDec": 22,
+    "Block": "-14",
+    "BlockDec": -14,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 4,
+    "Notes": "NC. :SS: chance (if 3rd hit not pressed). Perfect input for +2 damage"
+  },
+  {
+    "ID": 4256,
+    "Command": [
+      "4",
+      "B",
+      "B",
+      "B"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "M",
+      "M",
+      "M"
+    ],
+    "Impact": 20,
+    "Damage": "14,8,12",
+    "DamageDec": 34,
+    "Block": "-18",
+    "BlockDec": -18,
+    "Hit": "LNC",
+    "HitDec": null,
+    "CounterHit": "LNC",
+    "CounterHitDec": null,
+    "GuardBurst": 7,
+    "Notes": "NC"
+  },
+  {
+    "ID": 4257,
+    "Command": [
+      "6",
+      "B"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 22,
+    "Damage": "28",
+    "DamageDec": 28,
+    "Block": "-4",
+    "BlockDec": -4,
+    "Hit": "6",
+    "HitDec": 6,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 8,
+    "Notes": ":LH: immediately after losing previous round. TC[22-RC]. Self-damage: 4"
+  },
+  {
+    "ID": 4258,
+    "Command": [
+      "C"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "H"
+    ],
+    "Impact": 12,
+    "Damage": "12",
+    "DamageDec": 12,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "0",
+    "HitDec": 0,
+    "CounterHit": "0",
+    "CounterHitDec": 0,
+    "GuardBurst": 1,
+    "Notes": "G cancel"
+  },
+  {
+    "ID": 4259,
+    "Command": [
+      "1",
+      "C"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "L"
+    ],
+    "Impact": 28,
+    "Damage": "18",
+    "DamageDec": 18,
+    "Block": "-18",
+    "BlockDec": -18,
+    "Hit": "LNC",
+    "HitDec": null,
+    "CounterHit": "LNC",
+    "CounterHitDec": null,
+    "GuardBurst": 4,
+    "Notes": "TC[8-RC]"
+  },
+  {
+    "ID": 4260,
+    "Command": [
+      "2",
+      "C"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "L"
+    ],
+    "Impact": 16,
+    "Damage": "14",
+    "DamageDec": 14,
+    "Block": "-14",
+    "BlockDec": -14,
+    "Hit": "-4",
+    "HitDec": -4,
+    "CounterHit": "-4",
+    "CounterHitDec": -4,
+    "GuardBurst": 2,
+    "Notes": "TC[11-RC]"
+  },
+  {
+    "ID": 4261,
+    "Command": [
+      "3",
+      "C"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 16,
+    "Damage": "20",
+    "DamageDec": 20,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "-4",
+    "HitDec": -4,
+    "CounterHit": "-4",
+    "CounterHitDec": -4,
+    "GuardBurst": 2,
+    "Notes": "TJ[10-38]. Forces crouch on hit."
+  },
+  {
+    "ID": 4262,
+    "Command": [
+      "4",
+      "C"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "H"
+    ],
+    "Impact": 12,
+    "Damage": "15",
+    "DamageDec": 15,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "STN",
+    "HitDec": null,
+    "CounterHit": "STN",
+    "CounterHitDec": null,
+    "GuardBurst": 2,
+    "Notes": ":SS: chance on hit = +16/+22 on swap or -2/+4 on hedache. Self damage: 4"
+  },
+  {
+    "ID": 4263,
+    "Command": [
+      "6",
+      "C"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "H"
+    ],
+    "Impact": 16,
+    "Damage": "18",
+    "DamageDec": 18,
+    "Block": "-2",
+    "BlockDec": -2,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 9,
+    "Notes": ":GC:. TC [4-17]"
+  },
+  {
+    "ID": 4264,
+    "Command": [
+      "2",
+      "3",
+      "6",
+      "C"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "L"
+    ],
+    "Impact": 28,
+    "Damage": "22",
+    "DamageDec": 22,
+    "Block": "-16",
+    "BlockDec": -16,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 9,
+    "Notes": "TC[8-14]. TJ"
+  },
+  {
+    "ID": 4265,
+    "Command": [
+      "C"
+    ],
+    "Stance": [
+      "FC"
+    ],
+    "HitLevel": [
+      "L"
+    ],
+    "Impact": 16,
+    "Damage": "14",
+    "DamageDec": 14,
+    "Block": "-14",
+    "BlockDec": -14,
+    "Hit": "-4",
+    "HitDec": -4,
+    "CounterHit": "-4",
+    "CounterHitDec": -4,
+    "GuardBurst": 2,
+    "Notes": "TC[?-RC]"
+  },
+  {
+    "ID": 4266,
+    "Command": [
+      "C"
+    ],
+    "Stance": [
+      "WR"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 12,
+    "Damage": "20",
+    "DamageDec": 20,
+    "Block": "-14",
+    "BlockDec": -14,
+    "Hit": "8",
+    "HitDec": 8,
+    "CounterHit": "8",
+    "CounterHitDec": 8,
+    "GuardBurst": 2,
+    "Notes": "TC[1-8] TJ[10-33]"
+  },
+  {
+    "ID": 4267,
+    "Command": [
+      "7:_:8:_:9",
+      "C"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 20,
+    "Damage": "16",
+    "DamageDec": 16,
+    "Block": "-12",
+    "BlockDec": -12,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 9,
+    "Notes": ":GC:. Special animation on CH"
+  },
+  {
+    "ID": 4268,
+    "Command": [
+      "C"
+    ],
+    "Stance": [
+      "BT"
+    ],
+    "HitLevel": [
+      "H"
+    ],
+    "Impact": 14,
+    "Damage": "16",
+    "DamageDec": 16,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "2",
+    "HitDec": 2,
+    "CounterHit": "2",
+    "CounterHitDec": 2,
+    "GuardBurst": 1,
+    "Notes": null
+  },
+  {
+    "ID": 4269,
+    "Command": [
+      "2",
+      "C"
+    ],
+    "Stance": [
+      "BT"
+    ],
+    "HitLevel": [
+      "L"
+    ],
+    "Impact": 18,
+    "Damage": "16",
+    "DamageDec": 16,
+    "Block": "-14",
+    "BlockDec": -14,
+    "Hit": "-4",
+    "HitDec": -4,
+    "CounterHit": "-4",
+    "CounterHitDec": -4,
+    "GuardBurst": 1,
+    "Notes": "TC[17-RC]"
+  },
+  {
+    "ID": 4270,
+    "Command": [
+      "1",
+      "C"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "L"
+    ],
+    "Impact": 22,
+    "Damage": "18",
+    "DamageDec": 18,
+    "Block": "-14",
+    "BlockDec": -14,
+    "Hit": "-2",
+    "HitDec": -2,
+    "CounterHit": "-2",
+    "CounterHitDec": -2,
+    "GuardBurst": 1,
+    "Notes": "OTG"
+  },
+  {
+    "ID": 4271,
+    "Command": [
+      "4",
+      "C"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "H"
+    ],
+    "Impact": 12,
+    "Damage": "15",
+    "DamageDec": 15,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 2,
+    "Notes": "Self damage: 4"
+  },
+  {
+    "ID": 4272,
+    "Command": [
+      "2",
+      "3",
+      "6",
+      "C"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 22,
+    "Damage": "22",
+    "DamageDec": 22,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "2",
+    "HitDec": 2,
+    "CounterHit": "STN",
+    "CounterHitDec": null,
+    "GuardBurst": 7,
+    "Notes": "TC[13-18]"
+  },
+  {
+    "ID": 4273,
+    "Command": [
+      "2",
+      "3",
+      "6",
+      "c",
+      "A"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "M",
+      "H"
+    ],
+    "Impact": 22,
+    "Damage": "28",
+    "DamageDec": 28,
+    "Block": "-11",
+    "BlockDec": -11,
+    "Hit": "2",
+    "HitDec": 2,
+    "CounterHit": "STN",
+    "CounterHitDec": null,
+    "GuardBurst": 4,
+    "Notes": "NC"
+  },
+  {
+    "ID": 4274,
+    "Command": [
+      "B+C"
+    ],
+    "Stance": [
+      "WR"
+    ],
+    "HitLevel": [
+      "SM",
+      "M",
+      "M",
+      "M",
+      "M"
+    ],
+    "Impact": 24,
+    "Damage": "31",
+    "DamageDec": 31,
+    "Block": "-30",
+    "BlockDec": -30,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 1,
+    "Notes": "TC[1-4] TJ[6-33]"
+  },
+  {
+    "ID": 4275,
+    "Command": [
+      "A+B"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 38,
+    "Damage": "32",
+    "DamageDec": 32,
+    "Block": "6",
+    "BlockDec": 6,
+    "Hit": "10",
+    "HitDec": 10,
+    "CounterHit": "10",
+    "CounterHitDec": 10,
+    "GuardBurst": 15,
+    "Notes": ":BA:. :GI:[12-20] vs high&mid horizontals. :LH: on impact counter"
+  },
+  {
+    "ID": 4276,
+    "Command": [
+      "2",
+      "A+B"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "L"
+    ],
+    "Impact": 30,
+    "Damage": "26",
+    "DamageDec": 26,
+    "Block": "-14",
+    "BlockDec": -14,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 3,
+    "Notes": ":GI:[10-14] vs high&mid verticals"
+  },
+  {
+    "ID": 4277,
+    "Command": [
+      "4",
+      "A+B"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 22,
+    "Damage": "10",
+    "DamageDec": 10,
+    "Block": "-14",
+    "BlockDec": -14,
+    "Hit": "-4",
+    "HitDec": -4,
+    "CounterHit": "-4",
+    "CounterHitDec": -4,
+    "GuardBurst": 2,
+    "Notes": ":TS: with veird properties (avodis even some horizontals)"
+  },
+  {
+    "ID": 4278,
+    "Command": [
+      "6",
+      "A+B"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 64,
+    "Damage": "65",
+    "DamageDec": 65,
+    "Block": null,
+    "BlockDec": null,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": null,
+    "Notes": ":UA:. G cancel"
+  },
+  {
+    "ID": 4279,
+    "Command": [
+      "B+C"
+    ],
+    "Stance": null,
+    "HitLevel": null,
+    "Impact": null,
+    "Damage": null,
+    "DamageDec": 0,
+    "Block": null,
+    "BlockDec": null,
+    "Hit": null,
+    "HitDec": null,
+    "CounterHit": null,
+    "CounterHitDec": null,
+    "GuardBurst": null,
+    "Notes": ":GI:[6-16] vs non-kick H and L attacks. 30 dmg on successfull GI. :SS: chance. Can cause headache. Self damage: 4"
+  },
+  {
+    "ID": 4280,
+    "Command": [
+      "B+C",
+      "C"
+    ],
+    "Stance": null,
+    "HitLevel": null,
+    "Impact": null,
+    "Damage": null,
+    "DamageDec": 0,
+    "Block": null,
+    "BlockDec": null,
+    "Hit": null,
+    "HitDec": null,
+    "CounterHit": null,
+    "CounterHitDec": null,
+    "GuardBurst": null,
+    "Notes": ":SS: chance. Can cause headache. Self damage: 4"
+  },
+  {
+    "ID": 4281,
+    "Command": [
+      "B+C",
+      "C",
+      "C"
+    ],
+    "Stance": null,
+    "HitLevel": null,
+    "Impact": null,
+    "Damage": null,
+    "DamageDec": 0,
+    "Block": null,
+    "BlockDec": null,
+    "Hit": null,
+    "HitDec": null,
+    "CounterHit": null,
+    "CounterHitDec": null,
+    "GuardBurst": null,
+    "Notes": ":SS: chance. Can cause headache. Self damage: 4"
+  },
+  {
+    "ID": 4282,
+    "Command": [
+      "B+C",
+      "A"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "L"
+    ],
+    "Impact": 22,
+    "Damage": "22",
+    "DamageDec": 22,
+    "Block": "-14",
+    "BlockDec": -14,
+    "Hit": "-2",
+    "HitDec": -2,
+    "CounterHit": "-2",
+    "CounterHitDec": -2,
+    "GuardBurst": 1,
+    "Notes": "Power increases with number of K's on Gestopft Madness. LH when immediately after :SS:"
+  },
+  {
+    "ID": 4283,
+    "Command": [
+      "B+C",
+      "B"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 20,
+    "Damage": "24",
+    "DamageDec": 24,
+    "Block": "-12",
+    "BlockDec": -12,
+    "Hit": "4",
+    "HitDec": 4,
+    "CounterHit": "4",
+    "CounterHitDec": 4,
+    "GuardBurst": 2,
+    "Notes": "Power increases with number of K's on Gestopft Madness. LH when immediately after :SS:"
+  },
+  {
+    "ID": 4284,
+    "Command": [
+      "2",
+      "B+C"
+    ],
+    "Stance": null,
+    "HitLevel": null,
+    "Impact": 30,
+    "Damage": "60",
+    "DamageDec": 60,
+    "Block": null,
+    "BlockDec": null,
+    "Hit": null,
+    "HitDec": null,
+    "CounterHit": null,
+    "CounterHitDec": null,
+    "GuardBurst": null,
+    "Notes": "Armor [10-28] vs attacks with 20 or less damage. :SS: and 60 dmg on armor click."
+  },
+  {
+    "ID": 4285,
+    "Command": [
+      "4",
+      "B+C"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 26,
+    "Damage": "18",
+    "DamageDec": 18,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "LNC",
+    "CounterHitDec": null,
+    "GuardBurst": 9,
+    "Notes": ":GC:"
+  },
+  {
+    "ID": 4286,
+    "Command": [
+      "4",
+      "B+C",
+      "B"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "M",
+      "M"
+    ],
+    "Impact": 26,
+    "Damage": "39",
+    "DamageDec": 39,
+    "Block": "-2",
+    "BlockDec": -2,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 15,
+    "Notes": "NC. Forces crouch on block."
+  },
+  {
+    "ID": 4287,
+    "Command": [
+      "4",
+      "B+C",
+      "(B)"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "M",
+      "M"
+    ],
+    "Impact": 26,
+    "Damage": "50",
+    "DamageDec": 50,
+    "Block": "6",
+    "BlockDec": 6,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 20,
+    "Notes": "NCC. :BA:"
+  },
+  {
+    "ID": 4288,
+    "Command": [
+      "6",
+      "B+C"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 18,
+    "Damage": "22",
+    "DamageDec": 22,
+    "Block": "-6",
+    "BlockDec": -6,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 9,
+    "Notes": "On CH, 60 DMG"
+  },
+  {
+    "ID": 4289,
+    "Command": [
+      "B+C"
+    ],
+    "Stance": [
+      "BT",
+      "JS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 18,
+    "Damage": "16",
+    "DamageDec": 16,
+    "Block": "-16",
+    "BlockDec": -16,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 9,
+    "Notes": ":GC:. TC[9-43]"
+  },
+  {
+    "ID": 4290,
+    "Command": [
+      "B+C",
+      "B"
+    ],
+    "Stance": [
+      "BT",
+      "JS"
+    ],
+    "HitLevel": [
+      "M",
+      "M"
+    ],
+    "Impact": 18,
+    "Damage": "16,19",
+    "DamageDec": 35,
+    "Block": "-18",
+    "BlockDec": -18,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 15,
+    "Notes": "NC. Forces crouch on block."
+  },
+  {
+    "ID": 4291,
+    "Command": [
+      "B+C",
+      "B",
+      "B+C"
+    ],
+    "Stance": [
+      "BT",
+      "JS"
+    ],
+    "HitLevel": [
+      "M",
+      "M"
+    ],
+    "Impact": 18,
+    "Damage": "16,19,30",
+    "DamageDec": 65,
+    "Block": null,
+    "BlockDec": null,
+    "Hit": "STN",
+    "HitDec": null,
+    "CounterHit": "STN",
+    "CounterHitDec": null,
+    "GuardBurst": null,
+    "Notes": "Gestopft Madness. :SS: chance."
+  },
+  {
+    "ID": 4292,
+    "Command": [
+      "A+B"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 34,
+    "Damage": "36",
+    "DamageDec": 36,
+    "Block": "4",
+    "BlockDec": 4,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 15,
+    "Notes": ":BA:. :LH: on impact counter. TC[7-RC]"
+  },
+  {
+    "ID": 4293,
+    "Command": [
+      "2",
+      "A+B"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 28,
+    "Damage": "24",
+    "DamageDec": 24,
+    "Block": "-2",
+    "BlockDec": -2,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "LNC",
+    "CounterHitDec": null,
+    "GuardBurst": 15,
+    "Notes": "TC[9-12]. TJ[12-?]"
+  },
+  {
+    "ID": 4294,
+    "Command": [
+      "4",
+      "A+B"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "H"
+    ],
+    "Impact": 22,
+    "Damage": "32",
+    "DamageDec": 32,
+    "Block": "2",
+    "BlockDec": 2,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 4,
+    "Notes": "Self damage: 2"
+  },
+  {
+    "ID": 4295,
+    "Command": [
+      "B+C"
+    ],
+    "Stance": [
+      "BT",
+      "GS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 17,
+    "Damage": "30",
+    "DamageDec": 30,
+    "Block": "-6",
+    "BlockDec": -6,
+    "Hit": "STN",
+    "HitDec": null,
+    "CounterHit": "STN",
+    "CounterHitDec": null,
+    "GuardBurst": 9,
+    "Notes": ":GI:[4-11] vs non-kick mids. :SS: chance. Self damage: 4"
+  },
+  {
+    "ID": 4296,
+    "Command": [
+      "(2):_:(8)",
+      "A"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 22,
+    "Damage": "18",
+    "DamageDec": 18,
+    "Block": "-12",
+    "BlockDec": -12,
+    "Hit": "STN",
+    "HitDec": null,
+    "CounterHit": "STN",
+    "CounterHitDec": null,
+    "GuardBurst": 4,
+    "Notes": null
+  },
+  {
+    "ID": 4297,
+    "Command": [
+      "(1):_:(4):_:(7)",
+      "A"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "H"
+    ],
+    "Impact": 18,
+    "Damage": "14",
+    "DamageDec": 14,
+    "Block": "-12",
+    "BlockDec": -12,
+    "Hit": "0",
+    "HitDec": 0,
+    "CounterHit": "0",
+    "CounterHitDec": 0,
+    "GuardBurst": 1,
+    "Notes": null
+  },
+  {
+    "ID": 4298,
+    "Command": [
+      "(1):_:(4):_:(7)",
+      "A",
+      "A"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "H",
+      "L"
+    ],
+    "Impact": 18,
+    "Damage": "34",
+    "DamageDec": 34,
+    "Block": "-12",
+    "BlockDec": -12,
+    "Hit": "-4",
+    "HitDec": -4,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 3,
+    "Notes": "NC. TC"
+  },
+  {
+    "ID": 4299,
+    "Command": [
+      "(1):_:(4):_:(7)",
+      "A",
+      "B"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "H",
+      "M"
+    ],
+    "Impact": 18,
+    "Damage": "32",
+    "DamageDec": 32,
+    "Block": "-4",
+    "BlockDec": -4,
+    "Hit": "6",
+    "HitDec": 6,
+    "CounterHit": "6",
+    "CounterHitDec": 6,
+    "GuardBurst": 3,
+    "Notes": "NC"
+  },
+  {
+    "ID": 4300,
+    "Command": [
+      "(3):_:(6):_:(9)",
+      "A"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 18,
+    "Damage": "18",
+    "DamageDec": 18,
+    "Block": "-16",
+    "BlockDec": -16,
+    "Hit": "-6",
+    "HitDec": -6,
+    "CounterHit": "2",
+    "CounterHitDec": 2,
+    "GuardBurst": 1,
+    "Notes": "TC[13-26]"
+  },
+  {
+    "ID": 4301,
+    "Command": [
+      "(3):_:(6):_:(9)",
+      "A",
+      "A"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M",
+      "M"
+    ],
+    "Impact": 18,
+    "Damage": "39",
+    "DamageDec": 39,
+    "Block": "-18",
+    "BlockDec": -18,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 3,
+    "Notes": "TC[0-29] NC"
+  },
+  {
+    "ID": 4302,
+    "Command": [
+      "(2):_:(8)",
+      "B"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M",
+      "M"
+    ],
+    "Impact": 20,
+    "Damage": "24",
+    "DamageDec": 24,
+    "Block": "-2",
+    "BlockDec": -2,
+    "Hit": "10",
+    "HitDec": 10,
+    "CounterHit": "STN",
+    "CounterHitDec": null,
+    "GuardBurst": 4,
+    "Notes": "NC"
+  },
+  {
+    "ID": 4303,
+    "Command": [
+      "(1):_:(4):_:(7)",
+      "B"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 20,
+    "Damage": "20",
+    "DamageDec": 20,
+    "Block": "-18",
+    "BlockDec": -18,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 9,
+    "Notes": ":GC:"
+  },
+  {
+    "ID": 4304,
+    "Command": [
+      "(1):_:(4):_:(7)",
+      "B",
+      "A"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M",
+      "H"
+    ],
+    "Impact": 20,
+    "Damage": "35",
+    "DamageDec": 35,
+    "Block": "-17",
+    "BlockDec": -17,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "12",
+    "CounterHitDec": 12,
+    "GuardBurst": 10,
+    "Notes": "NC"
+  },
+  {
+    "ID": 4305,
+    "Command": [
+      "(3):_:(6):_:(9)",
+      "B"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 22,
+    "Damage": "22",
+    "DamageDec": 22,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "LNC",
+    "HitDec": null,
+    "CounterHit": "LNC",
+    "CounterHitDec": null,
+    "GuardBurst": 9,
+    "Notes": ":LH: when first attack after :SS: (mood change). Forces crouch on block."
+  },
+  {
+    "ID": 4306,
+    "Command": [
+      "(2):_:(8)",
+      "C"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 20,
+    "Damage": "16",
+    "DamageDec": 16,
+    "Block": "-6",
+    "BlockDec": -6,
+    "Hit": "8",
+    "HitDec": 8,
+    "CounterHit": "8",
+    "CounterHitDec": 8,
+    "GuardBurst": 1,
+    "Notes": "Forces BT on hit"
+  },
+  {
+    "ID": 4307,
+    "Command": [
+      "(1):_:(4):_:(7)",
+      "C"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M",
+      "M"
+    ],
+    "Impact": 16,
+    "Damage": "22",
+    "DamageDec": 22,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "8",
+    "HitDec": 8,
+    "CounterHit": "STN",
+    "CounterHitDec": null,
+    "GuardBurst": 4,
+    "Notes": "NC. TJ[14-:]"
+  },
+  {
+    "ID": 4308,
+    "Command": [
+      "(3):_:(6):_:(9)",
+      "C"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M",
+      "H"
+    ],
+    "Impact": 16,
+    "Damage": "26",
+    "DamageDec": 26,
+    "Block": "-6",
+    "BlockDec": -6,
+    "Hit": "4",
+    "HitDec": 4,
+    "CounterHit": "LNC",
+    "CounterHitDec": null,
+    "GuardBurst": 4,
+    "Notes": "NC. TJ[0-37]."
+  },
+  {
+    "ID": 4309,
+    "Command": [
+      "(3):_:(6):_:(9)",
+      "C",
+      "B+C"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M",
+      "M"
+    ],
+    "Impact": null,
+    "Damage": "26,30",
+    "DamageDec": 56,
+    "Block": null,
+    "BlockDec": null,
+    "Hit": null,
+    "HitDec": null,
+    "CounterHit": null,
+    "CounterHitDec": null,
+    "GuardBurst": null,
+    "Notes": "Gestopft Madness"
+  },
+  {
+    "ID": 4310,
+    "Command": [
+      "(1):_:(4):_:(7)",
+      "A+B"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M",
+      "M"
+    ],
+    "Impact": 28,
+    "Damage": "24",
+    "DamageDec": 24,
+    "Block": "-18",
+    "BlockDec": -18,
+    "Hit": "-6",
+    "HitDec": -6,
+    "CounterHit": "-6",
+    "CounterHitDec": -6,
+    "GuardBurst": 3,
+    "Notes": "TC[8-19] NCC - can move using directional inputs"
+  },
+  {
+    "ID": 4311,
+    "Command": [
+      "(1):_:(4):_:(7)",
+      "A+B",
+      "A"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M",
+      "M",
+      "M"
+    ],
+    "Impact": 28,
+    "Damage": "34",
+    "DamageDec": 34,
+    "Block": "-18",
+    "BlockDec": -18,
+    "Hit": "-6",
+    "HitDec": -6,
+    "CounterHit": "-6",
+    "CounterHitDec": -6,
+    "GuardBurst": 5,
+    "Notes": "NCC - can move using directional inputs"
+  },
+  {
+    "ID": 4312,
+    "Command": [
+      "(1):_:(4):_:(7)",
+      "A+B",
+      "A",
+      "A"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M",
+      "M",
+      "M",
+      "M"
+    ],
+    "Impact": 28,
+    "Damage": "44",
+    "DamageDec": 44,
+    "Block": "-18",
+    "BlockDec": -18,
+    "Hit": "-6",
+    "HitDec": -6,
+    "CounterHit": "-6",
+    "CounterHitDec": -6,
+    "GuardBurst": 6,
+    "Notes": "NCC - can move using directional inputs"
+  },
+  {
+    "ID": 4313,
+    "Command": [
+      "(3):_:(6):_:(9)",
+      "A+B"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 24,
+    "Damage": "28",
+    "DamageDec": 28,
+    "Block": "-12",
+    "BlockDec": -12,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 4,
+    "Notes": "TJ[24-39] :LH: if first attack after :SS: (mood change)"
+  },
+  {
+    "ID": 4314,
+    "Command": [
+      "(1):_:(4):_:(7)",
+      "B+C"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 30,
+    "Damage": "36",
+    "DamageDec": 36,
+    "Block": "-6",
+    "BlockDec": -6,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 9,
+    "Notes": ":LH: when whiff punishing a powerful attack"
+  },
+  {
+    "ID": 4315,
+    "Command": [
+      "C"
+    ],
+    "Stance": [
+      "RUN",
+      "JS"
+    ],
+    "HitLevel": [
+      "L"
+    ],
+    "Impact": 20,
+    "Damage": "26",
+    "DamageDec": 26,
+    "Block": "-22",
+    "BlockDec": -22,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 9,
+    "Notes": "TC [13-RC]. :SS: on hit. :BT: on hit"
+  },
+  {
+    "ID": 4316,
+    "Command": [
+      "(1):_:(4):_:(7)",
+      "A"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 30,
+    "Damage": "36",
+    "DamageDec": 36,
+    "Block": "-14",
+    "BlockDec": -14,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 4,
+    "Notes": ":LH: during opponent's break or unblockable attack"
+  },
+  {
+    "ID": 4317,
+    "Command": [
+      "(3):_:(6):_:(9)",
+      "A"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 16,
+    "Damage": "20",
+    "DamageDec": 20,
+    "Block": "-12",
+    "BlockDec": -12,
+    "Hit": "4",
+    "HitDec": 4,
+    "CounterHit": "4",
+    "CounterHitDec": 4,
+    "GuardBurst": 4,
+    "Notes": "TC[14-27]. Self damage: 6"
+  },
+  {
+    "ID": 4318,
+    "Command": [
+      "(3):_:(6):_:(9)",
+      "A",
+      "C"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "M",
+      "M"
+    ],
+    "Impact": 16,
+    "Damage": "54",
+    "DamageDec": 54,
+    "Block": "-6",
+    "BlockDec": -6,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 12,
+    "Notes": "NCC. TC"
+  },
+  {
+    "ID": 4319,
+    "Command": [
+      "(2):_:(8)",
+      "B"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 30,
+    "Damage": "32",
+    "DamageDec": 32,
+    "Block": "2",
+    "BlockDec": 2,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 15,
+    "Notes": ":BA:. TC[29-RC]. Self damage: 2"
+  },
+  {
+    "ID": 4320,
+    "Command": [
+      "(1):_:(4):_:(7)",
+      "B"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "SM",
+      "SM",
+      "SM"
+    ],
+    "Impact": 32,
+    "Damage": "36",
+    "DamageDec": 36,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "6",
+    "HitDec": 6,
+    "CounterHit": "6",
+    "CounterHitDec": 6,
+    "GuardBurst": 5,
+    "Notes": "NC. TC[9-RC]"
+  },
+  {
+    "ID": 4321,
+    "Command": [
+      "(1):_:(4):_:(7)",
+      "(B)"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "SM",
+      "SM",
+      "SM",
+      "SM",
+      "SM",
+      "SM"
+    ],
+    "Impact": 40,
+    "Damage": "72",
+    "DamageDec": 72,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "6",
+    "HitDec": 6,
+    "CounterHit": "6",
+    "CounterHitDec": 6,
+    "GuardBurst": 12,
+    "Notes": "NC. TC[9-RC]"
+  },
+  {
+    "ID": 4322,
+    "Command": [
+      "(1):_:(4):_:(7)",
+      "B"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "M",
+      "M",
+      "M"
+    ],
+    "Impact": 18,
+    "Damage": "40",
+    "DamageDec": 40,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 9,
+    "Notes": ":GC:. :SS: chance on hit"
+  },
+  {
+    "ID": 4323,
+    "Command": [
+      "(1):_:(4):_:(7)",
+      "C"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "M",
+      "M"
+    ],
+    "Impact": 21,
+    "Damage": "30",
+    "DamageDec": 30,
+    "Block": "-4",
+    "BlockDec": -4,
+    "Hit": "9",
+    "HitDec": 9,
+    "CounterHit": "9",
+    "CounterHitDec": 9,
+    "GuardBurst": 4,
+    "Notes": "NC. TC[8-16]. TJ[18-?]. Forces FC on hit"
+  },
+  {
+    "ID": 4324,
+    "Command": [
+      "(3):_:(6):_:(9)",
+      "C"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 20,
+    "Damage": "30",
+    "DamageDec": 30,
+    "Block": "-10",
+    "BlockDec": -10,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 9,
+    "Notes": ":GC:. TC[5-9]. TJ[13-?]. On counter or air hit, 66 damage"
+  },
+  {
+    "ID": 4325,
+    "Command": [
+      "(3):_:(6):_:(9)",
+      "A+B"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "M",
+      "M",
+      "M",
+      "M",
+      "M"
+    ],
+    "Impact": 18,
+    "Damage": "50",
+    "DamageDec": 50,
+    "Block": "-14",
+    "BlockDec": -14,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 12,
+    "Notes": ":GC:. :SS: chance on hit. Self damage: 4"
+  },
+  {
+    "ID": 4326,
+    "Command": [
+      "C"
+    ],
+    "Stance": [
+      "RUN",
+      "GS"
+    ],
+    "HitLevel": [
+      "L"
+    ],
+    "Impact": 20,
+    "Damage": "26",
+    "DamageDec": 26,
+    "Block": "-22",
+    "BlockDec": -22,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 9,
+    "Notes": "TC[16-48]"
+  },
+  {
+    "ID": 4327,
+    "Command": [
+      "A+D"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "H"
+    ],
+    "Impact": 18,
+    "Damage": "45",
+    "DamageDec": 45,
+    "Block": null,
+    "BlockDec": null,
+    "Hit": null,
+    "HitDec": null,
+    "CounterHit": null,
+    "CounterHitDec": null,
+    "GuardBurst": null,
+    "Notes": ":TH:"
+  },
+  {
+    "ID": 4328,
+    "Command": [
+      "4",
+      "A+D"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "H"
+    ],
+    "Impact": 18,
+    "Damage": "50",
+    "DamageDec": 50,
+    "Block": null,
+    "BlockDec": null,
+    "Hit": null,
+    "HitDec": null,
+    "CounterHit": null,
+    "CounterHitDec": null,
+    "GuardBurst": null,
+    "Notes": ":TH:"
+  },
+  {
+    "ID": 4329,
+    "Command": [
+      "A+D"
+    ],
+    "Stance": [
+      "Left Side"
+    ],
+    "HitLevel": [
+      "H"
+    ],
+    "Impact": 18,
+    "Damage": "55",
+    "DamageDec": 55,
+    "Block": null,
+    "BlockDec": null,
+    "Hit": null,
+    "HitDec": null,
+    "CounterHit": null,
+    "CounterHitDec": null,
+    "GuardBurst": null,
+    "Notes": ":TH:"
+  },
+  {
+    "ID": 4330,
+    "Command": [
+      "A+D"
+    ],
+    "Stance": [
+      "Right Side"
+    ],
+    "HitLevel": [
+      "H"
+    ],
+    "Impact": 18,
+    "Damage": "60",
+    "DamageDec": 60,
+    "Block": null,
+    "BlockDec": null,
+    "Hit": null,
+    "HitDec": null,
+    "CounterHit": null,
+    "CounterHitDec": null,
+    "GuardBurst": null,
+    "Notes": ":TH:"
+  },
+  {
+    "ID": 4331,
+    "Command": [
+      "A+D"
+    ],
+    "Stance": [
+      "Back Side"
+    ],
+    "HitLevel": [
+      "H"
+    ],
+    "Impact": 18,
+    "Damage": "70",
+    "DamageDec": 70,
+    "Block": null,
+    "BlockDec": null,
+    "Hit": null,
+    "HitDec": null,
+    "CounterHit": null,
+    "CounterHitDec": null,
+    "GuardBurst": null,
+    "Notes": ":TH:"
+  },
+  {
+    "ID": 4332,
+    "Command": [
+      "9",
+      "B+C"
+    ],
+    "Stance": null,
+    "HitLevel": null,
+    "Impact": null,
+    "Damage": null,
+    "DamageDec": 0,
+    "Block": null,
+    "BlockDec": null,
+    "Hit": null,
+    "HitDec": null,
+    "CounterHit": null,
+    "CounterHitDec": null,
+    "GuardBurst": null,
+    "Notes": null
+  },
+  {
+    "ID": 4333,
+    "Command": [
+      "A"
+    ],
+    "Stance": [
+      "UD"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 32,
+    "Damage": "26",
+    "DamageDec": 26,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "-2",
+    "HitDec": -2,
+    "CounterHit": "-2",
+    "CounterHitDec": -2,
+    "GuardBurst": 4,
+    "Notes": null
+  },
+  {
+    "ID": 4334,
+    "Command": [
+      "B"
+    ],
+    "Stance": [
+      "UD"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 31,
+    "Damage": "40",
+    "DamageDec": 40,
+    "Block": "1",
+    "BlockDec": 1,
+    "Hit": "STN",
+    "HitDec": null,
+    "CounterHit": "STN",
+    "CounterHitDec": null,
+    "GuardBurst": 15,
+    "Notes": ":BA:"
+  },
+  {
+    "ID": 4335,
+    "Command": [
+      "C"
+    ],
+    "Stance": [
+      "UD"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 32,
+    "Damage": "24",
+    "DamageDec": 24,
+    "Block": "-17",
+    "BlockDec": -17,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 6,
+    "Notes": "Becomes :L: at long range"
+  },
+  {
+    "ID": 4336,
+    "Command": [
+      "B+D"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 48,
+    "Damage": "35",
+    "DamageDec": 35,
+    "Block": "0",
+    "BlockDec": 0,
+    "Hit": null,
+    "HitDec": null,
+    "CounterHit": null,
+    "CounterHitDec": null,
+    "GuardBurst": 16,
+    "Notes": "TC[18-37]"
+  },
+  {
+    "ID": 4337,
+    "Command": [
+      "(B)+(D)"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 68,
+    "Damage": "45",
+    "DamageDec": 45,
+    "Block": "8",
+    "BlockDec": 8,
+    "Hit": null,
+    "HitDec": null,
+    "CounterHit": null,
+    "CounterHitDec": null,
+    "GuardBurst": 20,
+    "Notes": ":BA:"
+  },
+  {
+    "ID": 4338,
+    "Command": [
+      "A"
+    ],
+    "Stance": [
+      "RE"
+    ],
+    "HitLevel": [
+      "H"
+    ],
+    "Impact": null,
+    "Damage": null,
+    "DamageDec": 0,
+    "Block": "-6",
+    "BlockDec": -6,
+    "Hit": "5",
+    "HitDec": 5,
+    "CounterHit": "5",
+    "CounterHitDec": 5,
+    "GuardBurst": 33,
+    "Notes": ":LH: if first options clashed and second beat enemy attack"
+  },
+  {
+    "ID": 4339,
+    "Command": [
+      "A",
+      "A"
+    ],
+    "Stance": [
+      "RE"
+    ],
+    "HitLevel": [
+      "H",
+      "M",
+      "M",
+      "M",
+      "M",
+      "M"
+    ],
+    "Impact": null,
+    "Damage": "36",
+    "DamageDec": 36,
+    "Block": "2",
+    "BlockDec": 2,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": null,
+    "CounterHitDec": null,
+    "GuardBurst": 33,
+    "Notes": "NC"
+  },
+  {
+    "ID": 4340,
+    "Command": [
+      "A",
+      "(A)"
+    ],
+    "Stance": [
+      "RE"
+    ],
+    "HitLevel": [
+      "H",
+      "M",
+      "M",
+      "M",
+      "M",
+      "M"
+    ],
+    "Impact": null,
+    "Damage": "41",
+    "DamageDec": 41,
+    "Block": "2",
+    "BlockDec": 2,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": null,
+    "CounterHitDec": null,
+    "GuardBurst": 49,
+    "Notes": ":BA:"
+  },
+  {
+    "ID": 4341,
+    "Command": [
+      "A",
+      "C"
+    ],
+    "Stance": [
+      "GS",
+      "RE"
+    ],
+    "HitLevel": [
+      "H",
+      "M"
+    ],
+    "Impact": null,
+    "Damage": "34",
+    "DamageDec": 34,
+    "Block": "-6",
+    "BlockDec": -6,
+    "Hit": "4",
+    "HitDec": 4,
+    "CounterHit": null,
+    "CounterHitDec": null,
+    "GuardBurst": null,
+    "Notes": "NC"
+  },
+  {
+    "ID": 4342,
+    "Command": [
+      "A",
+      "C",
+      "A"
+    ],
+    "Stance": [
+      "SC",
+      "GS",
+      "RE"
+    ],
+    "HitLevel": [
+      "H",
+      "M",
+      "M"
+    ],
+    "Impact": null,
+    "Damage": "53",
+    "DamageDec": 53,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "LNC",
+    "HitDec": null,
+    "CounterHit": null,
+    "CounterHitDec": null,
+    "GuardBurst": null,
+    "Notes": "NC"
+  },
+  {
+    "ID": 4343,
+    "Command": [
+      "B"
+    ],
+    "Stance": [
+      "JS",
+      "RE"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": null,
+    "Damage": "51",
+    "DamageDec": 51,
+    "Block": null,
+    "BlockDec": null,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": null,
+    "CounterHitDec": null,
+    "GuardBurst": 50,
+    "Notes": null
+  },
+  {
+    "ID": 4344,
+    "Command": [
+      "B"
+    ],
+    "Stance": [
+      "GS",
+      "RE"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": null,
+    "Damage": "73",
+    "DamageDec": 73,
+    "Block": null,
+    "BlockDec": null,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": null,
+    "CounterHitDec": null,
+    "GuardBurst": null,
+    "Notes": null
+  },
+  {
+    "ID": 4345,
+    "Command": [
+      "C"
+    ],
+    "Stance": [
+      "RE"
+    ],
+    "HitLevel": [
+      "M",
+      "M"
+    ],
+    "Impact": null,
+    "Damage": "28",
+    "DamageDec": 28,
+    "Block": "-6",
+    "BlockDec": -6,
+    "Hit": "8",
+    "HitDec": 8,
+    "CounterHit": null,
+    "CounterHitDec": null,
+    "GuardBurst": 27,
+    "Notes": "NC. :SS: chance on block. :SS: on hit"
+  },
+  {
+    "ID": 4346,
+    "Command": [
+      "4",
+      "A+B+C"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "SM"
+    ],
+    "Impact": 6,
+    "Damage": "0",
+    "DamageDec": 0,
+    "Block": "0",
+    "BlockDec": 0,
+    "Hit": "8",
+    "HitDec": 8,
+    "CounterHit": "8",
+    "CounterHitDec": 8,
+    "GuardBurst": 0,
+    "Notes": "invincible since i4. Pushback happens at i6"
+  },
+  {
+    "ID": 4347,
+    "Command": [
+      "A+B+C"
+    ],
+    "Stance": [
+      "JS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 16,
+    "Damage": "70",
+    "DamageDec": 70,
+    "Block": "-16",
+    "BlockDec": -16,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 10,
+    "Notes": ":CE: :SS: on hit"
+  },
+  {
+    "ID": 4348,
+    "Command": [
+      "2",
+      "3",
+      "6",
+      "A+B+C"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 16,
+    "Damage": "39",
+    "DamageDec": 39,
+    "Block": "-6",
+    "BlockDec": -6,
+    "Hit": "10",
+    "HitDec": 10,
+    "CounterHit": "10",
+    "CounterHitDec": 10,
+    "GuardBurst": 9,
+    "Notes": ":SS: on hit"
+  },
+  {
+    "ID": 4349,
+    "Command": [
+      "2",
+      "3",
+      "6",
+      "(A)+(B)+(C)"
+    ],
+    "Stance": null,
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 16,
+    "Damage": "39",
+    "DamageDec": 39,
+    "Block": null,
+    "BlockDec": null,
+    "Hit": null,
+    "HitDec": null,
+    "CounterHit": null,
+    "CounterHitDec": null,
+    "GuardBurst": 9,
+    "Notes": "Gestopft Madness"
+  },
+  {
+    "ID": 4350,
+    "Command": [
+      "6",
+      "A",
+      "B",
+      "B"
+    ],
+    "Stance": [
+      "SC",
+      "JS"
+    ],
+    "HitLevel": [
+      "H",
+      "L",
+      "M"
+    ],
+    "Impact": 18,
+    "Damage": "60",
+    "DamageDec": 60,
+    "Block": "4",
+    "BlockDec": 4,
+    "Hit": "LNC",
+    "HitDec": null,
+    "CounterHit": "LNC",
+    "CounterHitDec": null,
+    "GuardBurst": 10,
+    "Notes": "NCC. :BA:. :GC:"
+  },
+  {
+    "ID": 4351,
+    "Command": [
+      "B",
+      "B",
+      "B"
+    ],
+    "Stance": [
+      "SC",
+      "JS"
+    ],
+    "HitLevel": [
+      "M",
+      "M",
+      "M"
+    ],
+    "Impact": 14,
+    "Damage": "12,14,53",
+    "DamageDec": 79,
+    "Block": "2",
+    "BlockDec": 2,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 9,
+    "Notes": "Last 2 hits NCC. :AT:. :BA:. :SS: intoGS"
+  },
+  {
+    "ID": 4352,
+    "Command": [
+      "B",
+      "B",
+      "B"
+    ],
+    "Stance": [
+      "SC",
+      "JS"
+    ],
+    "HitLevel": [
+      "M",
+      "M",
+      "M"
+    ],
+    "Impact": 14,
+    "Damage": "12,14,78",
+    "DamageDec": 104,
+    "Block": "2",
+    "BlockDec": 2,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 9,
+    "Notes": "Last 2 hits NCC. :AT:. :BA:"
+  },
+  {
+    "ID": 4353,
+    "Command": [
+      "4",
+      "B",
+      "C"
+    ],
+    "Stance": [
+      "SC"
+    ],
+    "HitLevel": [
+      "M",
+      "M",
+      "M"
+    ],
+    "Impact": 20,
+    "Damage": "48",
+    "DamageDec": 48,
+    "Block": "-2",
+    "BlockDec": -2,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 8,
+    "Notes": "NC. :LNC: on grounded"
+  },
+  {
+    "ID": 4354,
+    "Command": [
+      "2",
+      "3",
+      "6",
+      "C"
+    ],
+    "Stance": [
+      "SC",
+      "JS"
+    ],
+    "HitLevel": [
+      "L",
+      "L"
+    ],
+    "Impact": 22,
+    "Damage": "39",
+    "DamageDec": 39,
+    "Block": "-10",
+    "BlockDec": -10,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 9,
+    "Notes": "NC. TJ. :SS: change"
+  },
+  {
+    "ID": 4355,
+    "Command": [
+      "(3):_:(6):_:(9)",
+      "A",
+      "A",
+      "A"
+    ],
+    "Stance": [
+      "SC",
+      "JS"
+    ],
+    "HitLevel": [
+      "M",
+      "M",
+      "M",
+      "M",
+      "M",
+      "M"
+    ],
+    "Impact": 18,
+    "Damage": "63",
+    "DamageDec": 63,
+    "Block": "-2",
+    "BlockDec": -2,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 6,
+    "Notes": "NCC"
+  },
+  {
+    "ID": 4356,
+    "Command": [
+      "(3):_:(6):_:(9)",
+      "B",
+      "B"
+    ],
+    "Stance": [
+      "SC",
+      "JS"
+    ],
+    "HitLevel": [
+      "M",
+      "M"
+    ],
+    "Impact": 22,
+    "Damage": "32",
+    "DamageDec": 32,
+    "Block": "-8",
+    "BlockDec": -8,
+    "Hit": "LNC",
+    "HitDec": null,
+    "CounterHit": "LNC",
+    "CounterHitDec": null,
+    "GuardBurst": 15,
+    "Notes": "NC. :LH if 1st attack after personality change. :SS: chance"
+  },
+  {
+    "ID": 4357,
+    "Command": [
+      "A+B+C"
+    ],
+    "Stance": [
+      "GS"
+    ],
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 16,
+    "Damage": "90",
+    "DamageDec": 90,
+    "Block": "-16",
+    "BlockDec": -16,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 10,
+    "Notes": ":CE: :SC:. :GC:. :TH: OTG"
+  },
+  {
+    "ID": 4358,
+    "Command": [
+      "A",
+      "C",
+      "A"
+    ],
+    "Stance": [
+      "SC",
+      "GS"
+    ],
+    "HitLevel": [
+      "H",
+      "M",
+      "M"
+    ],
+    "Impact": 12,
+    "Damage": "48",
+    "DamageDec": 48,
+    "Block": "2",
+    "BlockDec": 2,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 8,
+    "Notes": "NCC. :BA:"
+  },
+  {
+    "ID": 4359,
+    "Command": [
+      "3",
+      "A",
+      "A+B"
+    ],
+    "Stance": [
+      "SC",
+      "GS"
+    ],
+    "HitLevel": [
+      "M",
+      "M",
+      "H",
+      "H",
+      "H"
+    ],
+    "Impact": 14,
+    "Damage": "70",
+    "DamageDec": 70,
+    "Block": "6",
+    "BlockDec": 6,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 8,
+    "Notes": "NC. :BA:. :SS: chance. Self damage: 4"
+  },
+  {
+    "ID": 4360,
+    "Command": [
+      "6",
+      "A",
+      "B",
+      "B"
+    ],
+    "Stance": [
+      "SC",
+      "GS"
+    ],
+    "HitLevel": [
+      "H",
+      "M",
+      "M"
+    ],
+    "Impact": 22,
+    "Damage": "86",
+    "DamageDec": 86,
+    "Block": "4",
+    "BlockDec": 4,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 22,
+    "Notes": "NCC. :BA:. :SS: chance. Self damage: 10"
+  },
+  {
+    "ID": 4361,
+    "Command": [
+      "B",
+      "B",
+      "B",
+      "B"
+    ],
+    "Stance": [
+      "SC",
+      "GS"
+    ],
+    "HitLevel": [
+      "M",
+      "M",
+      "M",
+      "M"
+    ],
+    "Impact": 14,
+    "Damage": "106",
+    "DamageDec": 106,
+    "Block": "4",
+    "BlockDec": 4,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 22,
+    "Notes": ":SS: chance. Self damage: 8"
+  },
+  {
+    "ID": 4362,
+    "Command": [
+      "1",
+      "B",
+      "B"
+    ],
+    "Stance": [
+      "SC",
+      "GS"
+    ],
+    "HitLevel": [
+      "L",
+      "M"
+    ],
+    "Impact": 26,
+    "Damage": "40",
+    "DamageDec": 40,
+    "Block": "8",
+    "BlockDec": 8,
+    "Hit": "LNC",
+    "HitDec": null,
+    "CounterHit": "LNC",
+    "CounterHitDec": null,
+    "GuardBurst": 15,
+    "Notes": "NCC. :BA:. :SS: chance"
+  },
+  {
+    "ID": 4363,
+    "Command": [
+      "3",
+      "B",
+      "B"
+    ],
+    "Stance": [
+      "SC",
+      "GS"
+    ],
+    "HitLevel": [
+      "M",
+      "M"
+    ],
+    "Impact": 18,
+    "Damage": "45",
+    "DamageDec": 45,
+    "Block": "-16",
+    "BlockDec": -16,
+    "Hit": "LNC",
+    "HitDec": null,
+    "CounterHit": "LNC",
+    "CounterHitDec": null,
+    "GuardBurst": 15,
+    "Notes": "NC. :GC:"
+  },
+  {
+    "ID": 4364,
+    "Command": [
+      "6",
+      "B",
+      "B"
+    ],
+    "Stance": [
+      "SC",
+      "GS"
+    ],
+    "HitLevel": [
+      "M",
+      "M"
+    ],
+    "Impact": 22,
+    "Damage": "64",
+    "DamageDec": 64,
+    "Block": "2",
+    "BlockDec": 2,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 19,
+    "Notes": "TC[22-RC]. NC. :BA:. :SS: chance. Self damage: 8"
+  },
+  {
+    "ID": 4365,
+    "Command": [
+      "(3):_:(6):_:(9)",
+      "A+B"
+    ],
+    "Stance": [
+      "SC",
+      "GS"
+    ],
+    "HitLevel": [
+      "M",
+      "M",
+      "M",
+      "M",
+      "M"
+    ],
+    "Impact": 18,
+    "Damage": "62",
+    "DamageDec": 62,
+    "Block": "4",
+    "BlockDec": 4,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": "KND",
+    "CounterHitDec": null,
+    "GuardBurst": 19,
+    "Notes": ":LNC: on grounded. :BA:. :SS: chance."
+  },
+  {
+    "ID": 4366,
+    "Command": [
+      "6",
+      "A+D"
+    ],
+    "Stance": [
+      "SC",
+      "GS"
+    ],
+    "HitLevel": [
+      "H"
+    ],
+    "Impact": 18,
+    "Damage": "70",
+    "DamageDec": 70,
+    "Block": null,
+    "BlockDec": null,
+    "Hit": "KND",
+    "HitDec": null,
+    "CounterHit": null,
+    "CounterHitDec": null,
+    "GuardBurst": null,
+    "Notes": "not breakable. :SS: on hit. Restores health"
+  }
 ]

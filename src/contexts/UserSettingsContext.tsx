@@ -3,8 +3,6 @@ import React, {
   useContext,
   useState,
   useEffect,
-  useCallback,
-  useMemo,
   ReactNode,
 } from "react";
 
@@ -267,16 +265,13 @@ export const UserSettingsProvider: React.FC<UserSettingsProviderProps> = ({
     }
   }, [columnConfigs]);
 
-  const updateColumnVisibility = useCallback(
-    (columnId: string, visible: boolean) => {
-      setColumnConfigs((prev) =>
-        prev.map((col) => (col.id === columnId ? { ...col, visible } : col)),
-      );
-    },
-    [],
-  );
+  const updateColumnVisibility = (columnId: string, visible: boolean) => {
+    setColumnConfigs((prev) =>
+      prev.map((col) => (col.id === columnId ? { ...col, visible } : col)),
+    );
+  };
 
-  const reorderColumns = useCallback((fromIndex: number, toIndex: number) => {
+  const reorderColumns = (fromIndex: number, toIndex: number) => {
     setColumnConfigs((prev) => {
       const newConfigs = [...prev];
       const [movedColumn] = newConfigs.splice(fromIndex, 1);
@@ -292,46 +287,31 @@ export const UserSettingsProvider: React.FC<UserSettingsProviderProps> = ({
         return col.order === index ? col : { ...col, order: index };
       });
     });
-  }, []);
+  };
 
-  const restoreDefaults = useCallback(() => {
+  const restoreDefaults = () => {
     setColumnConfigs(defaultColumns);
-  }, []);
+  };
 
-  const getVisibleColumns = useMemo(() => {
-    return () =>
-      columnConfigs
-        .filter((col) => col.visible)
-        .sort((a, b) => a.order - b.order);
-  }, [columnConfigs]);
+  const getVisibleColumns = () =>
+    columnConfigs
+      .filter((col) => col.visible)
+      .sort((a, b) => a.order - b.order);
 
-  const getSortedColumns = useMemo(() => {
-    return () => [...columnConfigs].sort((a, b) => a.order - b.order);
-  }, [columnConfigs]);
+  const getSortedColumns = () => [...columnConfigs].sort((a, b) => a.order - b.order);
 
-  const value: UserSettingsContextType = useMemo(
-    () => ({
-      gameNotationMappings,
-      getEnabledNotationMappings,
-      toggleGameNotationMapping,
-      columnConfigs,
-      setColumnConfigs,
-      updateColumnVisibility,
-      reorderColumns,
-      restoreDefaults,
-      getVisibleColumns,
-      getSortedColumns,
-    }),
-    [
-      gameNotationMappings,
-      columnConfigs,
-      updateColumnVisibility,
-      reorderColumns,
-      restoreDefaults,
-      getVisibleColumns,
-      getSortedColumns,
-    ],
-  );
+  const value: UserSettingsContextType = {
+    gameNotationMappings,
+    getEnabledNotationMappings,
+    toggleGameNotationMapping,
+    columnConfigs,
+    setColumnConfigs,
+    updateColumnVisibility,
+    reorderColumns,
+    restoreDefaults,
+    getVisibleColumns,
+    getSortedColumns,
+  };
 
   return (
     <UserSettingsContext.Provider value={value}>

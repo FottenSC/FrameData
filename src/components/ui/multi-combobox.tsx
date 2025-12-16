@@ -36,7 +36,7 @@ export function MultiCombobox({
   maxPreview?: number;
 }) {
   const [open, setOpen] = React.useState(false);
-  const selectedSet = React.useMemo(() => new Set(value), [value]);
+  const selectedSet = new Set(value);
 
   const toggle = (val: string) => {
     const next = new Set(selectedSet);
@@ -45,7 +45,7 @@ export function MultiCombobox({
     onChange(Array.from(next));
   };
 
-  const selectedLabels = React.useMemo(() => {
+  const selectedLabels = (() => {
     const labels = options
       .filter((o) => selectedSet.has(o.value))
       .map((o) => o.label);
@@ -53,7 +53,7 @@ export function MultiCombobox({
     if (labels.length <= maxPreview) return labels.join(", ");
     const shown = labels.slice(0, maxPreview).join(", ");
     return `${shown} +${labels.length - maxPreview}`;
-  }, [options, selectedSet, placeholder, maxPreview]);
+  })();
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

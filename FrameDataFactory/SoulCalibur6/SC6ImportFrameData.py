@@ -107,6 +107,8 @@ def translate_command(cmd):
            .replace('g', 'd')
     )
 
+# Store the original command before translation
+frameData["stringCommand"] = frameData["Command"].copy()
 frameData["Command"] = frameData["Command"].apply(translate_command)
 
 # Compute flag columns as in PostProcess (not used in JSON, but kept here if needed later)
@@ -376,13 +378,47 @@ def toArrayOrNone(v):
         return v
     return None
 
+def split_by_delimiter(value, delimiter="::"):
+    """Split string by delimiter and filter out empty strings, return None if invalid"""
+    try:
+        if pd.isna(value):
+            return None
+    except Exception:
+        pass
+    if not isinstance(value, str):
+        return None
+    # Split by :: first
+    parts = value.split(delimiter)
+    
+    # Process each part, keeping _ as a separate element
+    final_parts = []
+    for part in parts:
+        if part:
+            # Check if this part contains :_: separator
+            if ":_:" in part:
+                sub_parts = part.split(":_:")
+                for i, sub in enumerate(sub_parts):
+                    cleaned = sub.strip().strip(":")
+                    if cleaned:
+                        final_parts.append(cleaned)
+                    # Add _ separator between sub-parts (not after the last one)
+                    if i < len(sub_parts) - 1:
+                        final_parts.append("_")
+            else:
+                cleaned = part.strip().strip(":")
+                if cleaned:
+                    final_parts.append(cleaned)
+    
+    return final_parts if final_parts else None
+
 # Columns mapping to UI Move interface
 def move_row_to_dict(row: pd.Series):
     return {
         "ID": to_int_or_none(row.get("ID")),
-        "Command": to_str_or_none(row.get("Command")),
+        "stringCommand": to_str_or_none(row.get("stringCommand")),
+        "Command": split_by_delimiter(row.get("Command")),
         "Stance": toArrayOrNone(row.get("Stance")),
-        "HitLevel": to_str_or_none(row.get("Hit level")),
+        "HitLevel": split_by_delimiter(row.get("Hit level")),
         "Impact": to_int_or_none(row.get("Impact")),
         "Damage": to_str_or_none(row.get("Damage")),
         "DamageDec": to_int_or_none(row.get("DamageDec")),

@@ -1,9 +1,14 @@
 [
   {
     "ID": 1623,
-    "Command": ":A:",
+    "stringCommand": ":A:",
+    "Command": [
+      "A"
+    ],
     "Stance": null,
-    "HitLevel": ":H:",
+    "HitLevel": [
+      "H"
+    ],
     "Impact": 12,
     "Damage": "12",
     "DamageDec": 12,
@@ -18,9 +23,16 @@
   },
   {
     "ID": 1624,
-    "Command": ":A::A:",
+    "stringCommand": ":A::A:",
+    "Command": [
+      "A",
+      "A"
+    ],
     "Stance": null,
-    "HitLevel": ":H::H:",
+    "HitLevel": [
+      "H",
+      "H"
+    ],
     "Impact": 12,
     "Damage": "12,12",
     "DamageDec": 24,
@@ -35,9 +47,18 @@
   },
   {
     "ID": 1625,
-    "Command": ":A::A::A:",
+    "stringCommand": ":A::A::A:",
+    "Command": [
+      "A",
+      "A",
+      "A"
+    ],
     "Stance": null,
-    "HitLevel": ":H::H::H:",
+    "HitLevel": [
+      "H",
+      "H",
+      "H"
+    ],
     "Impact": 12,
     "Damage": "12,12,24",
     "DamageDec": 48,
@@ -52,9 +73,16 @@
   },
   {
     "ID": 1626,
-    "Command": ":a::6:",
+    "stringCommand": ":a::6:",
+    "Command": [
+      "a",
+      "6"
+    ],
     "Stance": null,
-    "HitLevel": ":H::H:",
+    "HitLevel": [
+      "H",
+      "H"
+    ],
     "Impact": 14,
     "Damage": "12,16",
     "DamageDec": 28,
@@ -69,9 +97,15 @@
   },
   {
     "ID": 1627,
-    "Command": ":6::A:",
+    "stringCommand": ":6::A:",
+    "Command": [
+      "6",
+      "A"
+    ],
     "Stance": null,
-    "HitLevel": ":H:",
+    "HitLevel": [
+      "H"
+    ],
     "Impact": 18,
     "Damage": "12",
     "DamageDec": 12,
@@ -86,9 +120,17 @@
   },
   {
     "ID": 1628,
-    "Command": ":6::A::A:",
+    "stringCommand": ":6::A::A:",
+    "Command": [
+      "6",
+      "A",
+      "A"
+    ],
     "Stance": null,
-    "HitLevel": ":H::H:",
+    "HitLevel": [
+      "H",
+      "H"
+    ],
     "Impact": 18,
     "Damage": "12,18",
     "DamageDec": 30,
@@ -103,11 +145,23 @@
   },
   {
     "ID": 1629,
-    "Command": ":6::A::A::A:",
+    "stringCommand": ":6::A::A::A:",
+    "Command": [
+      "6",
+      "A",
+      "A",
+      "A"
+    ],
     "Stance": [
       "SWR"
     ],
-    "HitLevel": ":H::H::M::M::H:",
+    "HitLevel": [
+      "H",
+      "H",
+      "M",
+      "M",
+      "H"
+    ],
     "Impact": 18,
     "Damage": "12,18,63",
     "DamageDec": 93,
@@ -122,11 +176,21 @@
   },
   {
     "ID": 1630,
-    "Command": ":6::A::A::B:",
+    "stringCommand": ":6::A::A::B:",
+    "Command": [
+      "6",
+      "A",
+      "A",
+      "B"
+    ],
     "Stance": [
       "SPR"
     ],
-    "HitLevel": ":H::H::M:",
+    "HitLevel": [
+      "H",
+      "H",
+      "M"
+    ],
     "Impact": 18,
     "Damage": "12,18,50",
     "DamageDec": 80,
@@ -141,9 +205,17 @@
   },
   {
     "ID": 1631,
-    "Command": ":6::A::C:",
+    "stringCommand": ":6::A::K:",
+    "Command": [
+      "6",
+      "A",
+      "C"
+    ],
     "Stance": null,
-    "HitLevel": ":H::M:",
+    "HitLevel": [
+      "H",
+      "M"
+    ],
     "Impact": 18,
     "Damage": "12,15",
     "DamageDec": 27,
@@ -158,9 +230,19 @@
   },
   {
     "ID": 1632,
-    "Command": ":6::A::C::A:",
+    "stringCommand": ":6::A::K::A:",
+    "Command": [
+      "6",
+      "A",
+      "C",
+      "A"
+    ],
     "Stance": null,
-    "HitLevel": ":H::M::L:",
+    "HitLevel": [
+      "H",
+      "M",
+      "L"
+    ],
     "Impact": 18,
     "Damage": "12,15,25",
     "DamageDec": 52,
@@ -175,9 +257,19 @@
   },
   {
     "ID": 1633,
-    "Command": ":6::A::C::B:",
+    "stringCommand": ":6::A::K::B:",
+    "Command": [
+      "6",
+      "A",
+      "C",
+      "B"
+    ],
     "Stance": null,
-    "HitLevel": ":H::M::M:",
+    "HitLevel": [
+      "H",
+      "M",
+      "M"
+    ],
     "Impact": 18,
     "Damage": "12,15,35",
     "DamageDec": 62,
@@ -192,9 +284,15 @@
   },
   {
     "ID": 1634,
-    "Command": ":3::A:",
+    "stringCommand": ":3::A:",
+    "Command": [
+      "3",
+      "A"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 18,
     "Damage": "18",
     "DamageDec": 18,
@@ -209,9 +307,15 @@
   },
   {
     "ID": 1635,
-    "Command": ":2::A:",
+    "stringCommand": ":2::A:",
+    "Command": [
+      "2",
+      "A"
+    ],
     "Stance": null,
-    "HitLevel": ":SL:",
+    "HitLevel": [
+      "SL"
+    ],
     "Impact": 12,
     "Damage": "10",
     "DamageDec": 10,
@@ -226,9 +330,15 @@
   },
   {
     "ID": 1636,
-    "Command": ":1::A:",
+    "stringCommand": ":1::A:",
+    "Command": [
+      "1",
+      "A"
+    ],
     "Stance": null,
-    "HitLevel": ":L:",
+    "HitLevel": [
+      "L"
+    ],
     "Impact": 22,
     "Damage": "20",
     "DamageDec": 20,
@@ -243,9 +353,15 @@
   },
   {
     "ID": 1637,
-    "Command": ":4::A:",
+    "stringCommand": ":4::A:",
+    "Command": [
+      "4",
+      "A"
+    ],
     "Stance": null,
-    "HitLevel": ":H:",
+    "HitLevel": [
+      "H"
+    ],
     "Impact": 20,
     "Damage": "14",
     "DamageDec": 14,
@@ -260,9 +376,17 @@
   },
   {
     "ID": 1638,
-    "Command": ":4::A::A:",
+    "stringCommand": ":4::A::A:",
+    "Command": [
+      "4",
+      "A",
+      "A"
+    ],
     "Stance": null,
-    "HitLevel": ":H::H:",
+    "HitLevel": [
+      "H",
+      "H"
+    ],
     "Impact": 20,
     "Damage": "14,16",
     "DamageDec": 30,
@@ -277,9 +401,17 @@
   },
   {
     "ID": 1639,
-    "Command": ":4::A::C:",
+    "stringCommand": ":4::A::K:",
+    "Command": [
+      "4",
+      "A",
+      "C"
+    ],
     "Stance": null,
-    "HitLevel": ":H::M:",
+    "HitLevel": [
+      "H",
+      "M"
+    ],
     "Impact": 20,
     "Damage": "14,22",
     "DamageDec": 36,
@@ -294,11 +426,16 @@
   },
   {
     "ID": 1640,
-    "Command": ":A:",
+    "stringCommand": ":A:",
+    "Command": [
+      "A"
+    ],
     "Stance": [
       "FC"
     ],
-    "HitLevel": ":SL:",
+    "HitLevel": [
+      "SL"
+    ],
     "Impact": 12,
     "Damage": "10",
     "DamageDec": 10,
@@ -313,11 +450,16 @@
   },
   {
     "ID": 1641,
-    "Command": ":A:",
+    "stringCommand": ":A:",
+    "Command": [
+      "A"
+    ],
     "Stance": [
       "WR"
     ],
-    "HitLevel": ":H:",
+    "HitLevel": [
+      "H"
+    ],
     "Impact": 20,
     "Damage": "20",
     "DamageDec": 20,
@@ -332,9 +474,15 @@
   },
   {
     "ID": 1642,
-    "Command": ":9::A:",
+    "stringCommand": ":9::A:",
+    "Command": [
+      "9",
+      "A"
+    ],
     "Stance": null,
-    "HitLevel": ":H:",
+    "HitLevel": [
+      "H"
+    ],
     "Impact": 24,
     "Damage": "28",
     "DamageDec": 28,
@@ -349,11 +497,16 @@
   },
   {
     "ID": 1643,
-    "Command": ":A:",
+    "stringCommand": ":A:",
+    "Command": [
+      "A"
+    ],
     "Stance": [
       "BT"
     ],
-    "HitLevel": ":H:",
+    "HitLevel": [
+      "H"
+    ],
     "Impact": 14,
     "Damage": "14",
     "DamageDec": 14,
@@ -368,11 +521,17 @@
   },
   {
     "ID": 1644,
-    "Command": ":2::A:",
+    "stringCommand": ":2::A:",
+    "Command": [
+      "2",
+      "A"
+    ],
     "Stance": [
       "BT"
     ],
-    "HitLevel": ":SL:",
+    "HitLevel": [
+      "SL"
+    ],
     "Impact": 16,
     "Damage": "12",
     "DamageDec": 12,
@@ -387,11 +546,16 @@
   },
   {
     "ID": 1645,
-    "Command": ":A:",
+    "stringCommand": ":A:",
+    "Command": [
+      "A"
+    ],
     "Stance": [
       "c"
     ],
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 18,
     "Damage": "24",
     "DamageDec": 24,
@@ -406,11 +570,17 @@
   },
   {
     "ID": 1646,
-    "Command": ":A::6:",
+    "stringCommand": ":A::6:",
+    "Command": [
+      "A",
+      "6"
+    ],
     "Stance": [
       "c"
     ],
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 18,
     "Damage": "20",
     "DamageDec": 20,
@@ -425,12 +595,20 @@
   },
   {
     "ID": 1647,
-    "Command": ":A::6::A+B:",
+    "stringCommand": ":A::6::A+B:",
+    "Command": [
+      "A",
+      "6",
+      "A+B"
+    ],
     "Stance": [
       "SWR",
       "c"
     ],
-    "HitLevel": ":M::M:",
+    "HitLevel": [
+      "M",
+      "M"
+    ],
     "Impact": 18,
     "Damage": "20,37",
     "DamageDec": 57,
@@ -445,11 +623,17 @@
   },
   {
     "ID": 1648,
-    "Command": ":A::4:",
+    "stringCommand": ":A::4:",
+    "Command": [
+      "A",
+      "4"
+    ],
     "Stance": [
       "c"
     ],
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 40,
     "Damage": "40",
     "DamageDec": 40,
@@ -464,11 +648,17 @@
   },
   {
     "ID": 1649,
-    "Command": ":(A)::4:",
+    "stringCommand": ":(A)::4:",
+    "Command": [
+      "(A)",
+      "4"
+    ],
     "Stance": [
       "c"
     ],
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 40,
     "Damage": "110",
     "DamageDec": 110,
@@ -483,12 +673,17 @@
   },
   {
     "ID": 1650,
-    "Command": ":A:",
+    "stringCommand": ":A:",
+    "Command": [
+      "A"
+    ],
     "Stance": [
       "WR",
       "c"
     ],
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 18,
     "Damage": "22",
     "DamageDec": 22,
@@ -503,9 +698,14 @@
   },
   {
     "ID": 1651,
-    "Command": ":B:",
+    "stringCommand": ":B:",
+    "Command": [
+      "B"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 16,
     "Damage": "14",
     "DamageDec": 14,
@@ -520,9 +720,16 @@
   },
   {
     "ID": 1652,
-    "Command": ":B::B:",
+    "stringCommand": ":B::B:",
+    "Command": [
+      "B",
+      "B"
+    ],
     "Stance": null,
-    "HitLevel": ":M::M:",
+    "HitLevel": [
+      "M",
+      "M"
+    ],
     "Impact": 16,
     "Damage": "14,20",
     "DamageDec": 34,
@@ -537,9 +744,15 @@
   },
   {
     "ID": 1653,
-    "Command": ":6::B:",
+    "stringCommand": ":6::B:",
+    "Command": [
+      "6",
+      "B"
+    ],
     "Stance": null,
-    "HitLevel": ":H:",
+    "HitLevel": [
+      "H"
+    ],
     "Impact": 20,
     "Damage": "16",
     "DamageDec": 16,
@@ -554,9 +767,17 @@
   },
   {
     "ID": 1654,
-    "Command": ":6::B::B:",
+    "stringCommand": ":6::B::B:",
+    "Command": [
+      "6",
+      "B",
+      "B"
+    ],
     "Stance": null,
-    "HitLevel": ":H::M:",
+    "HitLevel": [
+      "H",
+      "M"
+    ],
     "Impact": 20,
     "Damage": "16,12",
     "DamageDec": 28,
@@ -571,9 +792,19 @@
   },
   {
     "ID": 1655,
-    "Command": ":6::B::B::A:",
+    "stringCommand": ":6::B::B::A:",
+    "Command": [
+      "6",
+      "B",
+      "B",
+      "A"
+    ],
     "Stance": null,
-    "HitLevel": ":H::M::M:",
+    "HitLevel": [
+      "H",
+      "M",
+      "M"
+    ],
     "Impact": 20,
     "Damage": "16,12,20",
     "DamageDec": 48,
@@ -588,9 +819,19 @@
   },
   {
     "ID": 1656,
-    "Command": ":6::B::B::B:",
+    "stringCommand": ":6::B::B::B:",
+    "Command": [
+      "6",
+      "B",
+      "B",
+      "B"
+    ],
     "Stance": null,
-    "HitLevel": ":H::M::H:",
+    "HitLevel": [
+      "H",
+      "M",
+      "H"
+    ],
     "Impact": 20,
     "Damage": "16,12,30",
     "DamageDec": 58,
@@ -605,9 +846,15 @@
   },
   {
     "ID": 1657,
-    "Command": ":b::4:",
+    "stringCommand": ":b::4:",
+    "Command": [
+      "b",
+      "4"
+    ],
     "Stance": null,
-    "HitLevel": ":H:",
+    "HitLevel": [
+      "H"
+    ],
     "Impact": 17,
     "Damage": "15",
     "DamageDec": 15,
@@ -622,9 +869,15 @@
   },
   {
     "ID": 1658,
-    "Command": ":b::6:",
+    "stringCommand": ":b::6:",
+    "Command": [
+      "b",
+      "6"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 20,
     "Damage": "18",
     "DamageDec": 18,
@@ -639,9 +892,16 @@
   },
   {
     "ID": 1659,
-    "Command": ":b::6::B:",
+    "stringCommand": ":b::6::B:",
+    "Command": [
+      "b",
+      "6",
+      "B"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 20,
     "Damage": "18,20",
     "DamageDec": 38,
@@ -656,9 +916,15 @@
   },
   {
     "ID": 1660,
-    "Command": ":3::B:",
+    "stringCommand": ":3::B:",
+    "Command": [
+      "3",
+      "B"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 20,
     "Damage": "22",
     "DamageDec": 22,
@@ -673,9 +939,15 @@
   },
   {
     "ID": 1661,
-    "Command": ":2::B:",
+    "stringCommand": ":2::B:",
+    "Command": [
+      "2",
+      "B"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 16,
     "Damage": "16",
     "DamageDec": 16,
@@ -690,9 +962,15 @@
   },
   {
     "ID": 1662,
-    "Command": ":1::B:",
+    "stringCommand": ":1::B:",
+    "Command": [
+      "1",
+      "B"
+    ],
     "Stance": null,
-    "HitLevel": ":L:",
+    "HitLevel": [
+      "L"
+    ],
     "Impact": 22,
     "Damage": "20",
     "DamageDec": 20,
@@ -707,9 +985,15 @@
   },
   {
     "ID": 1663,
-    "Command": ":4::B:",
+    "stringCommand": ":4::B:",
+    "Command": [
+      "4",
+      "B"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 22,
     "Damage": "22",
     "DamageDec": 22,
@@ -724,11 +1008,16 @@
   },
   {
     "ID": 1664,
-    "Command": ":B:",
+    "stringCommand": ":B:",
+    "Command": [
+      "B"
+    ],
     "Stance": [
       "FC"
     ],
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 16,
     "Damage": "16",
     "DamageDec": 16,
@@ -743,11 +1032,17 @@
   },
   {
     "ID": 1665,
-    "Command": ":3::B:",
+    "stringCommand": ":3::B:",
+    "Command": [
+      "3",
+      "B"
+    ],
     "Stance": [
       "FC"
     ],
-    "HitLevel": ":H:",
+    "HitLevel": [
+      "H"
+    ],
     "Impact": 18,
     "Damage": "26",
     "DamageDec": 26,
@@ -762,11 +1057,16 @@
   },
   {
     "ID": 1666,
-    "Command": ":B:",
+    "stringCommand": ":B:",
+    "Command": [
+      "B"
+    ],
     "Stance": [
       "WR"
     ],
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 18,
     "Damage": "18",
     "DamageDec": 18,
@@ -781,11 +1081,18 @@
   },
   {
     "ID": 1667,
-    "Command": ":B::A:",
+    "stringCommand": ":B::A:",
+    "Command": [
+      "B",
+      "A"
+    ],
     "Stance": [
       "WR"
     ],
-    "HitLevel": ":M::H:",
+    "HitLevel": [
+      "M",
+      "H"
+    ],
     "Impact": 18,
     "Damage": "18,18",
     "DamageDec": 36,
@@ -800,11 +1107,18 @@
   },
   {
     "ID": 1668,
-    "Command": ":B::B:",
+    "stringCommand": ":B::B:",
+    "Command": [
+      "B",
+      "B"
+    ],
     "Stance": [
       "WR"
     ],
-    "HitLevel": ":M::M:",
+    "HitLevel": [
+      "M",
+      "M"
+    ],
     "Impact": 18,
     "Damage": "18,13",
     "DamageDec": 31,
@@ -819,9 +1133,15 @@
   },
   {
     "ID": 1669,
-    "Command": ":9::B:",
+    "stringCommand": ":9::B:",
+    "Command": [
+      "9",
+      "B"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 32,
     "Damage": "26",
     "DamageDec": 26,
@@ -836,11 +1156,16 @@
   },
   {
     "ID": 1670,
-    "Command": ":B:",
+    "stringCommand": ":B:",
+    "Command": [
+      "B"
+    ],
     "Stance": [
       "BT"
     ],
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 24,
     "Damage": "20",
     "DamageDec": 20,
@@ -855,11 +1180,17 @@
   },
   {
     "ID": 1671,
-    "Command": ":2::B:",
+    "stringCommand": ":2::B:",
+    "Command": [
+      "2",
+      "B"
+    ],
     "Stance": [
       "BT"
     ],
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 18,
     "Damage": "18",
     "DamageDec": 18,
@@ -874,11 +1205,16 @@
   },
   {
     "ID": 1672,
-    "Command": ":B:",
+    "stringCommand": ":B:",
+    "Command": [
+      "B"
+    ],
     "Stance": [
       "c"
     ],
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 22,
     "Damage": "25",
     "DamageDec": 25,
@@ -893,11 +1229,18 @@
   },
   {
     "ID": 1673,
-    "Command": ":B::6:",
+    "stringCommand": ":B::6:",
+    "Command": [
+      "B",
+      "6"
+    ],
     "Stance": [
       "c"
     ],
-    "HitLevel": ":M::M:",
+    "HitLevel": [
+      "M",
+      "M"
+    ],
     "Impact": 22,
     "Damage": "15,18",
     "DamageDec": 33,
@@ -912,12 +1255,20 @@
   },
   {
     "ID": 1674,
-    "Command": ":B::6::B+C:",
+    "stringCommand": ":B::6::B+K:",
+    "Command": [
+      "B",
+      "6",
+      "B+C"
+    ],
     "Stance": [
       "SPR",
       "c"
     ],
-    "HitLevel": ":M::M:",
+    "HitLevel": [
+      "M",
+      "M"
+    ],
     "Impact": 22,
     "Damage": "15,31",
     "DamageDec": 46,
@@ -932,11 +1283,17 @@
   },
   {
     "ID": 1675,
-    "Command": ":B::4:",
+    "stringCommand": ":B::4:",
+    "Command": [
+      "B",
+      "4"
+    ],
     "Stance": [
       "c"
     ],
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 34,
     "Damage": "45",
     "DamageDec": 45,
@@ -951,11 +1308,17 @@
   },
   {
     "ID": 1676,
-    "Command": ":(B)::4:",
+    "stringCommand": ":(B)::4:",
+    "Command": [
+      "(B)",
+      "4"
+    ],
     "Stance": [
       "c"
     ],
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 34,
     "Damage": "140",
     "DamageDec": 140,
@@ -970,12 +1333,17 @@
   },
   {
     "ID": 1677,
-    "Command": ":B:",
+    "stringCommand": ":B:",
+    "Command": [
+      "B"
+    ],
     "Stance": [
       "WR",
       "c"
     ],
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 20,
     "Damage": "28",
     "DamageDec": 28,
@@ -990,9 +1358,14 @@
   },
   {
     "ID": 1678,
-    "Command": ":C:",
+    "stringCommand": ":K:",
+    "Command": [
+      "C"
+    ],
     "Stance": null,
-    "HitLevel": ":H:",
+    "HitLevel": [
+      "H"
+    ],
     "Impact": 12,
     "Damage": "14",
     "DamageDec": 14,
@@ -1007,9 +1380,15 @@
   },
   {
     "ID": 1679,
-    "Command": ":6::C:",
+    "stringCommand": ":6::K:",
+    "Command": [
+      "6",
+      "C"
+    ],
     "Stance": null,
-    "HitLevel": ":H:",
+    "HitLevel": [
+      "H"
+    ],
     "Impact": 18,
     "Damage": "24",
     "DamageDec": 24,
@@ -1024,9 +1403,15 @@
   },
   {
     "ID": 1680,
-    "Command": ":3::C:",
+    "stringCommand": ":3::K:",
+    "Command": [
+      "3",
+      "C"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 14,
     "Damage": "14",
     "DamageDec": 14,
@@ -1041,11 +1426,20 @@
   },
   {
     "ID": 1681,
-    "Command": ":3::C::A:",
+    "stringCommand": ":3::K::A:",
+    "Command": [
+      "3",
+      "C",
+      "A"
+    ],
     "Stance": [
       "SWR"
     ],
-    "HitLevel": ":M::M::M:",
+    "HitLevel": [
+      "M",
+      "M",
+      "M"
+    ],
     "Impact": 14,
     "Damage": "14,18,22",
     "DamageDec": 54,
@@ -1060,9 +1454,15 @@
   },
   {
     "ID": 1682,
-    "Command": ":2::C:",
+    "stringCommand": ":2::K:",
+    "Command": [
+      "2",
+      "C"
+    ],
     "Stance": null,
-    "HitLevel": ":L:",
+    "HitLevel": [
+      "L"
+    ],
     "Impact": 16,
     "Damage": "12",
     "DamageDec": 12,
@@ -1077,9 +1477,15 @@
   },
   {
     "ID": 1683,
-    "Command": ":1::C:",
+    "stringCommand": ":1::K:",
+    "Command": [
+      "1",
+      "C"
+    ],
     "Stance": null,
-    "HitLevel": ":L:",
+    "HitLevel": [
+      "L"
+    ],
     "Impact": 16,
     "Damage": "10",
     "DamageDec": 10,
@@ -1094,9 +1500,17 @@
   },
   {
     "ID": 1684,
-    "Command": ":1::C::C:",
+    "stringCommand": ":1::K::K:",
+    "Command": [
+      "1",
+      "C",
+      "C"
+    ],
     "Stance": null,
-    "HitLevel": ":L::M:",
+    "HitLevel": [
+      "L",
+      "M"
+    ],
     "Impact": 16,
     "Damage": "10,20",
     "DamageDec": 30,
@@ -1111,9 +1525,17 @@
   },
   {
     "ID": 1685,
-    "Command": ":1::C::B:",
+    "stringCommand": ":1::K::B:",
+    "Command": [
+      "1",
+      "C",
+      "B"
+    ],
     "Stance": null,
-    "HitLevel": ":L::L:",
+    "HitLevel": [
+      "L",
+      "L"
+    ],
     "Impact": 16,
     "Damage": "10,16",
     "DamageDec": 26,
@@ -1128,9 +1550,15 @@
   },
   {
     "ID": 1686,
-    "Command": ":4::C:",
+    "stringCommand": ":4::K:",
+    "Command": [
+      "4",
+      "C"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 22,
     "Damage": "16",
     "DamageDec": 16,
@@ -1145,9 +1573,17 @@
   },
   {
     "ID": 1687,
-    "Command": ":4::C::C:",
+    "stringCommand": ":4::K::K:",
+    "Command": [
+      "4",
+      "C",
+      "C"
+    ],
     "Stance": null,
-    "HitLevel": ":M::H:",
+    "HitLevel": [
+      "M",
+      "H"
+    ],
     "Impact": 22,
     "Damage": "16,24",
     "DamageDec": 40,
@@ -1162,11 +1598,16 @@
   },
   {
     "ID": 1688,
-    "Command": ":C:",
+    "stringCommand": ":K:",
+    "Command": [
+      "C"
+    ],
     "Stance": [
       "FC"
     ],
-    "HitLevel": ":L:",
+    "HitLevel": [
+      "L"
+    ],
     "Impact": 16,
     "Damage": "12",
     "DamageDec": 12,
@@ -1181,11 +1622,17 @@
   },
   {
     "ID": 1689,
-    "Command": ":3::C:",
+    "stringCommand": ":3::K:",
+    "Command": [
+      "3",
+      "C"
+    ],
     "Stance": [
       "FC"
     ],
-    "HitLevel": ":L:",
+    "HitLevel": [
+      "L"
+    ],
     "Impact": 20,
     "Damage": "16",
     "DamageDec": 16,
@@ -1200,12 +1647,23 @@
   },
   {
     "ID": 1690,
-    "Command": ":3::C::B::B:",
+    "stringCommand": ":3::K::B::B:",
+    "Command": [
+      "3",
+      "C",
+      "B",
+      "B"
+    ],
     "Stance": [
       "SPR",
       "FC"
     ],
-    "HitLevel": ":L::SM::SM::H:",
+    "HitLevel": [
+      "L",
+      "SM",
+      "SM",
+      "H"
+    ],
     "Impact": 20,
     "Damage": "16,22,16",
     "DamageDec": 54,
@@ -1220,11 +1678,16 @@
   },
   {
     "ID": 1691,
-    "Command": ":C:",
+    "stringCommand": ":K:",
+    "Command": [
+      "C"
+    ],
     "Stance": [
       "WR"
     ],
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 12,
     "Damage": "20",
     "DamageDec": 20,
@@ -1239,9 +1702,19 @@
   },
   {
     "ID": 1692,
-    "Command": ":7:_:8:_:9::C:",
+    "stringCommand": ":7:_:8:_:9::K:",
+    "Command": [
+      "7",
+      "_",
+      "8",
+      "_",
+      "9",
+      "C"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 22,
     "Damage": "28",
     "DamageDec": 28,
@@ -1256,9 +1729,15 @@
   },
   {
     "ID": 1693,
-    "Command": ":7::C:",
+    "stringCommand": ":7::K:",
+    "Command": [
+      "7",
+      "C"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 22,
     "Damage": "24",
     "DamageDec": 24,
@@ -1273,11 +1752,16 @@
   },
   {
     "ID": 1694,
-    "Command": ":C:",
+    "stringCommand": ":K:",
+    "Command": [
+      "C"
+    ],
     "Stance": [
       "BT"
     ],
-    "HitLevel": ":H:",
+    "HitLevel": [
+      "H"
+    ],
     "Impact": 16,
     "Damage": "16",
     "DamageDec": 16,
@@ -1292,11 +1776,17 @@
   },
   {
     "ID": 1695,
-    "Command": ":2::C:",
+    "stringCommand": ":2::K:",
+    "Command": [
+      "2",
+      "C"
+    ],
     "Stance": [
       "BT"
     ],
-    "HitLevel": ":L:",
+    "HitLevel": [
+      "L"
+    ],
     "Impact": 18,
     "Damage": "14",
     "DamageDec": 14,
@@ -1311,9 +1801,14 @@
   },
   {
     "ID": 1696,
-    "Command": ":A+B:",
+    "stringCommand": ":A+B:",
+    "Command": [
+      "A+B"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 38,
     "Damage": "40",
     "DamageDec": 40,
@@ -1328,9 +1823,16 @@
   },
   {
     "ID": 1697,
-    "Command": ":6::A+B:",
+    "stringCommand": ":6::A+B:",
+    "Command": [
+      "6",
+      "A+B"
+    ],
     "Stance": null,
-    "HitLevel": ":M::M:",
+    "HitLevel": [
+      "M",
+      "M"
+    ],
     "Impact": 22,
     "Damage": "24,30",
     "DamageDec": 54,
@@ -1345,9 +1847,15 @@
   },
   {
     "ID": 1698,
-    "Command": ":2::A+B:",
+    "stringCommand": ":2::A+B:",
+    "Command": [
+      "2",
+      "A+B"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 16,
     "Damage": "35",
     "DamageDec": 35,
@@ -1362,7 +1870,11 @@
   },
   {
     "ID": 1699,
-    "Command": ":4::A+B:",
+    "stringCommand": ":4::A+B:",
+    "Command": [
+      "4",
+      "A+B"
+    ],
     "Stance": null,
     "HitLevel": null,
     "Impact": null,
@@ -1379,11 +1891,19 @@
   },
   {
     "ID": 1700,
-    "Command": ":4::A+B::A:",
+    "stringCommand": ":4::A+B::A:",
+    "Command": [
+      "4",
+      "A+B",
+      "A"
+    ],
     "Stance": [
       "SWR"
     ],
-    "HitLevel": ":M::H:",
+    "HitLevel": [
+      "M",
+      "H"
+    ],
     "Impact": 57,
     "Damage": "25,24",
     "DamageDec": 49,
@@ -1398,9 +1918,15 @@
   },
   {
     "ID": 1701,
-    "Command": ":8::A+B:",
+    "stringCommand": ":8::A+B:",
+    "Command": [
+      "8",
+      "A+B"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 28,
     "Damage": "24",
     "DamageDec": 24,
@@ -1415,9 +1941,14 @@
   },
   {
     "ID": 1702,
-    "Command": ":B+C:",
+    "stringCommand": ":B+K:",
+    "Command": [
+      "B+C"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 20,
     "Damage": "25",
     "DamageDec": 25,
@@ -1432,7 +1963,10 @@
   },
   {
     "ID": 1703,
-    "Command": ":B+C:",
+    "stringCommand": ":B+K:",
+    "Command": [
+      "B+C"
+    ],
     "Stance": [
       "AIR"
     ],
@@ -1451,9 +1985,16 @@
   },
   {
     "ID": 1704,
-    "Command": ":6::B+C:",
+    "stringCommand": ":6::B+K:",
+    "Command": [
+      "6",
+      "B+C"
+    ],
     "Stance": null,
-    "HitLevel": ":M::M:",
+    "HitLevel": [
+      "M",
+      "M"
+    ],
     "Impact": 22,
     "Damage": "16,18",
     "DamageDec": 34,
@@ -1468,9 +2009,15 @@
   },
   {
     "ID": 1705,
-    "Command": ":2::B+C:",
+    "stringCommand": ":2::B+K:",
+    "Command": [
+      "2",
+      "B+C"
+    ],
     "Stance": null,
-    "HitLevel": ":L:",
+    "HitLevel": [
+      "L"
+    ],
     "Impact": 32,
     "Damage": "20",
     "DamageDec": 20,
@@ -1485,9 +2032,17 @@
   },
   {
     "ID": 1706,
-    "Command": ":2::B+C::C:",
+    "stringCommand": ":2::B+K::K:",
+    "Command": [
+      "2",
+      "B+C",
+      "C"
+    ],
     "Stance": null,
-    "HitLevel": ":L::SM:",
+    "HitLevel": [
+      "L",
+      "SM"
+    ],
     "Impact": 32,
     "Damage": "20,20",
     "DamageDec": 40,
@@ -1502,9 +2057,16 @@
   },
   {
     "ID": 1707,
-    "Command": ":4::B+C:",
+    "stringCommand": ":4::B+K:",
+    "Command": [
+      "4",
+      "B+C"
+    ],
     "Stance": null,
-    "HitLevel": ":M::M:",
+    "HitLevel": [
+      "M",
+      "M"
+    ],
     "Impact": 22,
     "Damage": "14,18",
     "DamageDec": 32,
@@ -1519,11 +2081,20 @@
   },
   {
     "ID": 1708,
-    "Command": ":4::B+C::B:",
+    "stringCommand": ":4::B+K::B:",
+    "Command": [
+      "4",
+      "B+C",
+      "B"
+    ],
     "Stance": [
       "SPR"
     ],
-    "HitLevel": ":M::M::M:",
+    "HitLevel": [
+      "M",
+      "M",
+      "M"
+    ],
     "Impact": 22,
     "Damage": "14,18,45",
     "DamageDec": 77,
@@ -1538,9 +2109,16 @@
   },
   {
     "ID": 1709,
-    "Command": ":4::(B)+(C):",
+    "stringCommand": ":4::(B)+(K):",
+    "Command": [
+      "4",
+      "(B)+(C)"
+    ],
     "Stance": null,
-    "HitLevel": ":M::M:",
+    "HitLevel": [
+      "M",
+      "M"
+    ],
     "Impact": 36,
     "Damage": "20,24",
     "DamageDec": 44,
@@ -1555,11 +2133,20 @@
   },
   {
     "ID": 1710,
-    "Command": ":4::(B)+(C)::B:",
+    "stringCommand": ":4::(B)+(K)::B:",
+    "Command": [
+      "4",
+      "(B)+(C)",
+      "B"
+    ],
     "Stance": [
       "SPR"
     ],
-    "HitLevel": ":M::M::M:",
+    "HitLevel": [
+      "M",
+      "M",
+      "M"
+    ],
     "Impact": 36,
     "Damage": "20,24,33",
     "DamageDec": 77,
@@ -1574,9 +2161,15 @@
   },
   {
     "ID": 1711,
-    "Command": ":8::B+C:",
+    "stringCommand": ":8::B+K:",
+    "Command": [
+      "8",
+      "B+C"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 34,
     "Damage": "30",
     "DamageDec": 30,
@@ -1591,11 +2184,16 @@
   },
   {
     "ID": 1712,
-    "Command": ":B+C:",
+    "stringCommand": ":B+K:",
+    "Command": [
+      "B+C"
+    ],
     "Stance": [
       "WR"
     ],
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 16,
     "Damage": "40",
     "DamageDec": 40,
@@ -1610,11 +2208,16 @@
   },
   {
     "ID": 1713,
-    "Command": ":B+C:",
+    "stringCommand": ":B+K:",
+    "Command": [
+      "B+C"
+    ],
     "Stance": [
       "BT"
     ],
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 14,
     "Damage": "16",
     "DamageDec": 16,
@@ -1629,11 +2232,18 @@
   },
   {
     "ID": 1714,
-    "Command": ":B+C::A:",
+    "stringCommand": ":B+K::A:",
+    "Command": [
+      "B+C",
+      "A"
+    ],
     "Stance": [
       "BT"
     ],
-    "HitLevel": ":M::L:",
+    "HitLevel": [
+      "M",
+      "L"
+    ],
     "Impact": 14,
     "Damage": "16,22",
     "DamageDec": 38,
@@ -1648,7 +2258,10 @@
   },
   {
     "ID": 1715,
-    "Command": ":A+D:",
+    "stringCommand": ":A+G:",
+    "Command": [
+      "A+D"
+    ],
     "Stance": null,
     "HitLevel": null,
     "Impact": 18,
@@ -1665,7 +2278,11 @@
   },
   {
     "ID": 1716,
-    "Command": ":4::A+D:",
+    "stringCommand": ":4::A+G:",
+    "Command": [
+      "4",
+      "A+D"
+    ],
     "Stance": null,
     "HitLevel": null,
     "Impact": 18,
@@ -1682,7 +2299,10 @@
   },
   {
     "ID": 1717,
-    "Command": ":A+D:",
+    "stringCommand": ":A+G:",
+    "Command": [
+      "A+D"
+    ],
     "Stance": [
       "Right Side"
     ],
@@ -1701,7 +2321,10 @@
   },
   {
     "ID": 1718,
-    "Command": ":A+D:",
+    "stringCommand": ":A+G:",
+    "Command": [
+      "A+D"
+    ],
     "Stance": [
       "Left Side"
     ],
@@ -1720,7 +2343,10 @@
   },
   {
     "ID": 1719,
-    "Command": ":A+D:",
+    "stringCommand": ":A+G:",
+    "Command": [
+      "A+D"
+    ],
     "Stance": [
       "Back Side"
     ],
@@ -1739,7 +2365,13 @@
   },
   {
     "ID": 1720,
-    "Command": ":2::1::4::A+D:",
+    "stringCommand": ":2::1::4::A+G:",
+    "Command": [
+      "2",
+      "1",
+      "4",
+      "A+D"
+    ],
     "Stance": null,
     "HitLevel": null,
     "Impact": 18,
@@ -1756,7 +2388,14 @@
   },
   {
     "ID": 1721,
-    "Command": ":2::1::4::A+D::B:",
+    "stringCommand": ":2::1::4::A+G::B:",
+    "Command": [
+      "2",
+      "1",
+      "4",
+      "A+D",
+      "B"
+    ],
     "Stance": [
       "SC"
     ],
@@ -1775,9 +2414,19 @@
   },
   {
     "ID": 1722,
-    "Command": ":(3):_:(6):_:(9)::A:",
+    "stringCommand": ":(3):_:(6):_:(9)::A:",
+    "Command": [
+      "(3)",
+      "_",
+      "(6)",
+      "_",
+      "(9)",
+      "A"
+    ],
     "Stance": null,
-    "HitLevel": ":H:",
+    "HitLevel": [
+      "H"
+    ],
     "Impact": 20,
     "Damage": "24",
     "DamageDec": 24,
@@ -1792,9 +2441,17 @@
   },
   {
     "ID": 1723,
-    "Command": ":(2):_:(8)::A:",
+    "stringCommand": ":(2):_:(8)::A:",
+    "Command": [
+      "(2)",
+      "_",
+      "(8)",
+      "A"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 20,
     "Damage": "24",
     "DamageDec": 24,
@@ -1809,9 +2466,19 @@
   },
   {
     "ID": 1724,
-    "Command": ":(1):_:(4):_:(7)::A:",
+    "stringCommand": ":(1):_:(4):_:(7)::A:",
+    "Command": [
+      "(1)",
+      "_",
+      "(4)",
+      "_",
+      "(7)",
+      "A"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 28,
     "Damage": "20,25",
     "DamageDec": 45,
@@ -1826,9 +2493,20 @@
   },
   {
     "ID": 1725,
-    "Command": ":(1):_:(4):_:(7)::(A):",
+    "stringCommand": ":(1):_:(4):_:(7)::(A):",
+    "Command": [
+      "(1)",
+      "_",
+      "(4)",
+      "_",
+      "(7)",
+      "(A)"
+    ],
     "Stance": null,
-    "HitLevel": ":M::M:",
+    "HitLevel": [
+      "M",
+      "M"
+    ],
     "Impact": 46,
     "Damage": "30,25",
     "DamageDec": 55,
@@ -1843,9 +2521,19 @@
   },
   {
     "ID": 1726,
-    "Command": ":(3):_:(6):_:(9)::B:",
+    "stringCommand": ":(3):_:(6):_:(9)::B:",
+    "Command": [
+      "(3)",
+      "_",
+      "(6)",
+      "_",
+      "(9)",
+      "B"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 18,
     "Damage": "22",
     "DamageDec": 22,
@@ -1860,9 +2548,21 @@
   },
   {
     "ID": 1727,
-    "Command": ":(3):_:(6):_:(9)::B::B:",
+    "stringCommand": ":(3):_:(6):_:(9)::B::B:",
+    "Command": [
+      "(3)",
+      "_",
+      "(6)",
+      "_",
+      "(9)",
+      "B",
+      "B"
+    ],
     "Stance": null,
-    "HitLevel": ":M::M:",
+    "HitLevel": [
+      "M",
+      "M"
+    ],
     "Impact": 18,
     "Damage": "22,22",
     "DamageDec": 44,
@@ -1877,9 +2577,17 @@
   },
   {
     "ID": 1728,
-    "Command": ":(2):_:(8)::B:",
+    "stringCommand": ":(2):_:(8)::B:",
+    "Command": [
+      "(2)",
+      "_",
+      "(8)",
+      "B"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 22,
     "Damage": "20",
     "DamageDec": 20,
@@ -1894,9 +2602,19 @@
   },
   {
     "ID": 1729,
-    "Command": ":(2):_:(8)::B::B:",
+    "stringCommand": ":(2):_:(8)::B::B:",
+    "Command": [
+      "(2)",
+      "_",
+      "(8)",
+      "B",
+      "B"
+    ],
     "Stance": null,
-    "HitLevel": ":M::M:",
+    "HitLevel": [
+      "M",
+      "M"
+    ],
     "Impact": 22,
     "Damage": "20,16",
     "DamageDec": 36,
@@ -1911,9 +2629,21 @@
   },
   {
     "ID": 1730,
-    "Command": ":(2):_:(8)::B::B::A:",
+    "stringCommand": ":(2):_:(8)::B::B::A:",
+    "Command": [
+      "(2)",
+      "_",
+      "(8)",
+      "B",
+      "B",
+      "A"
+    ],
     "Stance": null,
-    "HitLevel": ":M::M::H:",
+    "HitLevel": [
+      "M",
+      "M",
+      "H"
+    ],
     "Impact": 22,
     "Damage": "20,16,15",
     "DamageDec": 51,
@@ -1928,9 +2658,19 @@
   },
   {
     "ID": 1731,
-    "Command": ":(1):_:(4):_:(7)::B:",
+    "stringCommand": ":(1):_:(4):_:(7)::B:",
+    "Command": [
+      "(1)",
+      "_",
+      "(4)",
+      "_",
+      "(7)",
+      "B"
+    ],
     "Stance": null,
-    "HitLevel": ":L:",
+    "HitLevel": [
+      "L"
+    ],
     "Impact": 18,
     "Damage": "14",
     "DamageDec": 14,
@@ -1945,9 +2685,19 @@
   },
   {
     "ID": 1732,
-    "Command": ":(3):_:(6):_:(9)::C:",
+    "stringCommand": ":(3):_:(6):_:(9)::K:",
+    "Command": [
+      "(3)",
+      "_",
+      "(6)",
+      "_",
+      "(9)",
+      "C"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 14,
     "Damage": "20",
     "DamageDec": 20,
@@ -1962,9 +2712,17 @@
   },
   {
     "ID": 1733,
-    "Command": ":(2):_:(8)::C:",
+    "stringCommand": ":(2):_:(8)::K:",
+    "Command": [
+      "(2)",
+      "_",
+      "(8)",
+      "C"
+    ],
     "Stance": null,
-    "HitLevel": ":L:",
+    "HitLevel": [
+      "L"
+    ],
     "Impact": 26,
     "Damage": "20",
     "DamageDec": 20,
@@ -1979,9 +2737,19 @@
   },
   {
     "ID": 1734,
-    "Command": ":(1):_:(4):_:(7)::C:",
+    "stringCommand": ":(1):_:(4):_:(7)::K:",
+    "Command": [
+      "(1)",
+      "_",
+      "(4)",
+      "_",
+      "(7)",
+      "C"
+    ],
     "Stance": null,
-    "HitLevel": ":H:",
+    "HitLevel": [
+      "H"
+    ],
     "Impact": 18,
     "Damage": "24",
     "DamageDec": 24,
@@ -1996,11 +2764,16 @@
   },
   {
     "ID": 1735,
-    "Command": ":C:",
+    "stringCommand": ":K:",
+    "Command": [
+      "C"
+    ],
     "Stance": [
       "RUN"
     ],
-    "HitLevel": ":L:",
+    "HitLevel": [
+      "L"
+    ],
     "Impact": 20,
     "Damage": "26",
     "DamageDec": 26,
@@ -2015,9 +2788,20 @@
   },
   {
     "ID": 1736,
-    "Command": ":(3):_:(6):_:(9)::A+B:",
+    "stringCommand": ":(3):_:(6):_:(9)::A+B:",
+    "Command": [
+      "(3)",
+      "_",
+      "(6)",
+      "_",
+      "(9)",
+      "A+B"
+    ],
     "Stance": null,
-    "HitLevel": ":M::M:",
+    "HitLevel": [
+      "M",
+      "M"
+    ],
     "Impact": 24,
     "Damage": "10,15",
     "DamageDec": 25,
@@ -2032,9 +2816,20 @@
   },
   {
     "ID": 1737,
-    "Command": ":(3):_:(6):_:(9)::(A)+(B):",
+    "stringCommand": ":(3):_:(6):_:(9)::(A)+(B):",
+    "Command": [
+      "(3)",
+      "_",
+      "(6)",
+      "_",
+      "(9)",
+      "(A)+(B)"
+    ],
     "Stance": null,
-    "HitLevel": ":M::M:",
+    "HitLevel": [
+      "M",
+      "M"
+    ],
     "Impact": 24,
     "Damage": "10,25",
     "DamageDec": 35,
@@ -2049,9 +2844,19 @@
   },
   {
     "ID": 1738,
-    "Command": ":(3):_:(6):_:(9)::B+C:",
+    "stringCommand": ":(3):_:(6):_:(9)::B+K:",
+    "Command": [
+      "(3)",
+      "_",
+      "(6)",
+      "_",
+      "(9)",
+      "B+C"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 24,
     "Damage": "35",
     "DamageDec": 35,
@@ -2066,9 +2871,18 @@
   },
   {
     "ID": 1739,
-    "Command": ":(2):_:(8)::B+C:",
+    "stringCommand": ":(2):_:(8)::B+K:",
+    "Command": [
+      "(2)",
+      "_",
+      "(8)",
+      "B+C"
+    ],
     "Stance": null,
-    "HitLevel": ":M::M:",
+    "HitLevel": [
+      "M",
+      "M"
+    ],
     "Impact": 30,
     "Damage": "25,18",
     "DamageDec": 43,
@@ -2083,9 +2897,19 @@
   },
   {
     "ID": 1740,
-    "Command": ":(1):_:(4):_:(7)::B+C:",
+    "stringCommand": ":(1):_:(4):_:(7)::B+K:",
+    "Command": [
+      "(1)",
+      "_",
+      "(4)",
+      "_",
+      "(7)",
+      "B+C"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 58,
     "Damage": "65",
     "DamageDec": 65,
@@ -2100,9 +2924,14 @@
   },
   {
     "ID": 1741,
-    "Command": ":A+B+C:",
+    "stringCommand": ":A+B+K:",
+    "Command": [
+      "A+B+C"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 16,
     "Damage": "80",
     "DamageDec": 80,
@@ -2117,9 +2946,15 @@
   },
   {
     "ID": 1742,
-    "Command": ":4::A+B+C:",
+    "stringCommand": ":4::A+B+K:",
+    "Command": [
+      "4",
+      "A+B+C"
+    ],
     "Stance": null,
-    "HitLevel": ":SM:",
+    "HitLevel": [
+      "SM"
+    ],
     "Impact": 6,
     "Damage": "0",
     "DamageDec": 0,
@@ -2134,9 +2969,17 @@
   },
   {
     "ID": 1743,
-    "Command": ":2::3::6::A+B+C:",
+    "stringCommand": ":2::3::6::A+B+K:",
+    "Command": [
+      "2",
+      "3",
+      "6",
+      "A+B+C"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 16,
     "Damage": "24",
     "DamageDec": 24,
@@ -2151,9 +2994,19 @@
   },
   {
     "ID": 1744,
-    "Command": ":2::3::6::A+B+C::A:",
+    "stringCommand": ":2::3::6::A+B+K::A:",
+    "Command": [
+      "2",
+      "3",
+      "6",
+      "A+B+C",
+      "A"
+    ],
     "Stance": null,
-    "HitLevel": ":M::M:",
+    "HitLevel": [
+      "M",
+      "M"
+    ],
     "Impact": 16,
     "Damage": "24,19",
     "DamageDec": 43,
@@ -2168,9 +3021,19 @@
   },
   {
     "ID": 1745,
-    "Command": ":2::3::6::A+B+C::B:",
+    "stringCommand": ":2::3::6::A+B+K::B:",
+    "Command": [
+      "2",
+      "3",
+      "6",
+      "A+B+C",
+      "B"
+    ],
     "Stance": null,
-    "HitLevel": ":M::M:",
+    "HitLevel": [
+      "M",
+      "M"
+    ],
     "Impact": 16,
     "Damage": "24,20",
     "DamageDec": 44,
@@ -2185,11 +3048,22 @@
   },
   {
     "ID": 1746,
-    "Command": ":A::A::A::B:",
+    "stringCommand": ":A::A::A::B:",
+    "Command": [
+      "A",
+      "A",
+      "A",
+      "B"
+    ],
     "Stance": [
       "SC"
     ],
-    "HitLevel": ":H::H::H::M:",
+    "HitLevel": [
+      "H",
+      "H",
+      "H",
+      "M"
+    ],
     "Impact": 12,
     "Damage": "12,13,25,21",
     "DamageDec": 71,
@@ -2204,11 +3078,19 @@
   },
   {
     "ID": 1747,
-    "Command": ":6::A::B:",
+    "stringCommand": ":6::A::B:",
+    "Command": [
+      "6",
+      "A",
+      "B"
+    ],
     "Stance": [
       "SC"
     ],
-    "HitLevel": ":H::M:",
+    "HitLevel": [
+      "H",
+      "M"
+    ],
     "Impact": 18,
     "Damage": "13,33",
     "DamageDec": 46,
@@ -2223,7 +3105,13 @@
   },
   {
     "ID": 1748,
-    "Command": ":2::1::4::A:",
+    "stringCommand": ":2::1::4::A:",
+    "Command": [
+      "2",
+      "1",
+      "4",
+      "A"
+    ],
     "Stance": [
       "SC"
     ],
@@ -2242,11 +3130,18 @@
   },
   {
     "ID": 1749,
-    "Command": ":B::A:",
+    "stringCommand": ":B::A:",
+    "Command": [
+      "B",
+      "A"
+    ],
     "Stance": [
       "SC"
     ],
-    "HitLevel": ":M::M:",
+    "HitLevel": [
+      "M",
+      "M"
+    ],
     "Impact": 16,
     "Damage": "15,13",
     "DamageDec": 28,
@@ -2261,11 +3156,20 @@
   },
   {
     "ID": 1750,
-    "Command": ":B::A::A:",
+    "stringCommand": ":B::A::A:",
+    "Command": [
+      "B",
+      "A",
+      "A"
+    ],
     "Stance": [
       "SC"
     ],
-    "HitLevel": ":M::M::H:",
+    "HitLevel": [
+      "M",
+      "M",
+      "H"
+    ],
     "Impact": 16,
     "Damage": "15,13,22",
     "DamageDec": 50,
@@ -2280,7 +3184,13 @@
   },
   {
     "ID": 1751,
-    "Command": ":2::1::4::B:",
+    "stringCommand": ":2::1::4::B:",
+    "Command": [
+      "2",
+      "1",
+      "4",
+      "B"
+    ],
     "Stance": [
       "SC"
     ],
@@ -2299,12 +3209,19 @@
   },
   {
     "ID": 1752,
-    "Command": ":B::B+C:",
+    "stringCommand": ":B::B+K:",
+    "Command": [
+      "B",
+      "B+C"
+    ],
     "Stance": [
       "SC",
       "WR"
     ],
-    "HitLevel": ":M::M:",
+    "HitLevel": [
+      "M",
+      "M"
+    ],
     "Impact": 18,
     "Damage": "18,21,10",
     "DamageDec": 49,
@@ -2319,11 +3236,23 @@
   },
   {
     "ID": 1753,
-    "Command": ":(3):_:(6):_:(9)::A::B:",
+    "stringCommand": ":(3):_:(6):_:(9)::A::B:",
+    "Command": [
+      "(3)",
+      "_",
+      "(6)",
+      "_",
+      "(9)",
+      "A",
+      "B"
+    ],
     "Stance": [
       "SC"
     ],
-    "HitLevel": ":H::M:",
+    "HitLevel": [
+      "H",
+      "M"
+    ],
     "Impact": 20,
     "Damage": "25,21",
     "DamageDec": 46,
@@ -2338,11 +3267,23 @@
   },
   {
     "ID": 1754,
-    "Command": ":(1):_:(4):_:(7)::A::B:",
+    "stringCommand": ":(1):_:(4):_:(7)::A::B:",
+    "Command": [
+      "(1)",
+      "_",
+      "(4)",
+      "_",
+      "(7)",
+      "A",
+      "B"
+    ],
     "Stance": [
       "SC"
     ],
-    "HitLevel": ":M::M:",
+    "HitLevel": [
+      "M",
+      "M"
+    ],
     "Impact": 28,
     "Damage": "22,33",
     "DamageDec": 55,
@@ -2357,11 +3298,23 @@
   },
   {
     "ID": 1755,
-    "Command": ":(1):_:(4):_:(7)::(A)::B:",
+    "stringCommand": ":(1):_:(4):_:(7)::(A)::B:",
+    "Command": [
+      "(1)",
+      "_",
+      "(4)",
+      "_",
+      "(7)",
+      "(A)",
+      "B"
+    ],
     "Stance": [
       "SC"
     ],
-    "HitLevel": ":M::M:",
+    "HitLevel": [
+      "M",
+      "M"
+    ],
     "Impact": 46,
     "Damage": "33,33",
     "DamageDec": 66,
@@ -2376,11 +3329,25 @@
   },
   {
     "ID": 1756,
-    "Command": ":(3):_:(6):_:(9)::B::B::B:",
+    "stringCommand": ":(3):_:(6):_:(9)::B::B::B:",
+    "Command": [
+      "(3)",
+      "_",
+      "(6)",
+      "_",
+      "(9)",
+      "B",
+      "B",
+      "B"
+    ],
     "Stance": [
       "SC"
     ],
-    "HitLevel": ":M::M::M:",
+    "HitLevel": [
+      "M",
+      "M",
+      "M"
+    ],
     "Impact": 18,
     "Damage": "23,23,14",
     "DamageDec": 60,
@@ -2395,11 +3362,23 @@
   },
   {
     "ID": 1757,
-    "Command": ":(3):_:(6):_:(9)::B+C::B:",
+    "stringCommand": ":(3):_:(6):_:(9)::B+K::B:",
+    "Command": [
+      "(3)",
+      "_",
+      "(6)",
+      "_",
+      "(9)",
+      "B+C",
+      "B"
+    ],
     "Stance": [
       "SC"
     ],
-    "HitLevel": ":M::M:",
+    "HitLevel": [
+      "M",
+      "M"
+    ],
     "Impact": 24,
     "Damage": "36,34",
     "DamageDec": 70,
@@ -2414,9 +3393,14 @@
   },
   {
     "ID": 1758,
-    "Command": ":B+D:",
+    "stringCommand": ":B+G:",
+    "Command": [
+      "B+D"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 35,
     "Damage": "40",
     "DamageDec": 40,
@@ -2431,9 +3415,14 @@
   },
   {
     "ID": 1759,
-    "Command": ":(B)+(D):",
+    "stringCommand": ":(B)+(G):",
+    "Command": [
+      "(B)+(D)"
+    ],
     "Stance": null,
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": 45,
     "Damage": "50",
     "DamageDec": 50,
@@ -2448,11 +3437,16 @@
   },
   {
     "ID": 1760,
-    "Command": ":A:",
+    "stringCommand": ":A:",
+    "Command": [
+      "A"
+    ],
     "Stance": [
       "RE"
     ],
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": null,
     "Damage": "30",
     "DamageDec": 30,
@@ -2467,11 +3461,16 @@
   },
   {
     "ID": 1761,
-    "Command": ":B:",
+    "stringCommand": ":B:",
+    "Command": [
+      "B"
+    ],
     "Stance": [
       "RE"
     ],
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": null,
     "Damage": "57",
     "DamageDec": 57,
@@ -2486,11 +3485,16 @@
   },
   {
     "ID": 1762,
-    "Command": ":C:",
+    "stringCommand": ":K:",
+    "Command": [
+      "C"
+    ],
     "Stance": [
       "RE"
     ],
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": null,
     "Damage": "25",
     "DamageDec": 25,
@@ -2505,11 +3509,16 @@
   },
   {
     "ID": 1763,
-    "Command": ":(A):",
+    "stringCommand": ":(A):",
+    "Command": [
+      "(A)"
+    ],
     "Stance": [
       "RE"
     ],
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": null,
     "Damage": "30",
     "DamageDec": 30,
@@ -2524,11 +3533,16 @@
   },
   {
     "ID": 1764,
-    "Command": ":(C):",
+    "stringCommand": ":(K):",
+    "Command": [
+      "(C)"
+    ],
     "Stance": [
       "RE"
     ],
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": null,
     "Damage": "25",
     "DamageDec": 25,
@@ -2543,11 +3557,16 @@
   },
   {
     "ID": 1765,
-    "Command": ":A:",
+    "stringCommand": ":A:",
+    "Command": [
+      "A"
+    ],
     "Stance": [
       "RE2"
     ],
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": null,
     "Damage": "33",
     "DamageDec": 33,
@@ -2562,11 +3581,16 @@
   },
   {
     "ID": 1766,
-    "Command": ":B:",
+    "stringCommand": ":B:",
+    "Command": [
+      "B"
+    ],
     "Stance": [
       "RE2"
     ],
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": null,
     "Damage": "68",
     "DamageDec": 68,
@@ -2581,11 +3605,16 @@
   },
   {
     "ID": 1767,
-    "Command": ":C:",
+    "stringCommand": ":K:",
+    "Command": [
+      "C"
+    ],
     "Stance": [
       "RE2"
     ],
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": null,
     "Damage": "31",
     "DamageDec": 31,
@@ -2600,11 +3629,16 @@
   },
   {
     "ID": 1768,
-    "Command": ":(A):",
+    "stringCommand": ":(A):",
+    "Command": [
+      "(A)"
+    ],
     "Stance": [
       "RE2"
     ],
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": null,
     "Damage": "33",
     "DamageDec": 33,
@@ -2619,11 +3653,16 @@
   },
   {
     "ID": 1769,
-    "Command": ":(C):",
+    "stringCommand": ":(K):",
+    "Command": [
+      "(C)"
+    ],
     "Stance": [
       "RE2"
     ],
-    "HitLevel": ":M:",
+    "HitLevel": [
+      "M"
+    ],
     "Impact": null,
     "Damage": "31",
     "DamageDec": 31,

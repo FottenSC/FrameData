@@ -25,7 +25,9 @@ const CommandRendererInner: React.FC<{ command: string | null }> = ({
               key={`plus-${i}-${buttonIndex}`}
               className="relative inline-flex items-center justify-center w-3 h-3 border border-black bg-white text-black rounded-full mx-[-5px] z-20 align-middle plus-separator"
             >
-              <span className="text-transparent select-text leading-none">+</span>
+              <span className="text-transparent select-text leading-none">
+                +
+              </span>
               <svg
                 width="10"
                 height="10"

@@ -149,14 +149,18 @@ export const FrameDataTable: React.FC = () => {
 
   // Track if we've done initial URL sync for game
   const initialGameSyncDoneRef = React.useRef(false);
-  
+
   // Handle URL parameters and initial character selection
   useEffect(() => {
     if (!selectedGame.id) return;
 
     // Only sync game from URL on initial load when the component mounts
     // After that, trust the selectedGame state (which is updated by command palette etc.)
-    if (gameId && gameId !== selectedGame.id && !initialGameSyncDoneRef.current) {
+    if (
+      gameId &&
+      gameId !== selectedGame.id &&
+      !initialGameSyncDoneRef.current
+    ) {
       const game = avaliableGames.find((g) => g.id === gameId);
       if (game) {
         setSelectedGameById(gameId);
@@ -164,7 +168,7 @@ export const FrameDataTable: React.FC = () => {
         return;
       }
     }
-    
+
     // Mark initial sync as done even if games matched
     if (!initialGameSyncDoneRef.current) {
       initialGameSyncDoneRef.current = true;
@@ -612,7 +616,9 @@ export const FrameDataTable: React.FC = () => {
   // Keep export handler ref updated
   useEffect(() => {
     exportHandler.current = handleExport;
-    return () => { exportHandler.current = null; };
+    return () => {
+      exportHandler.current = null;
+    };
   }, [handleExport, exportHandler]);
 
   useEffect(() => {
@@ -654,7 +660,12 @@ export const FrameDataTable: React.FC = () => {
             />
           </div>
           <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
-            <div className={cn("flex-1 min-h-0 h-full", isStale && "opacity-70 transition-opacity")}>
+            <div
+              className={cn(
+                "flex-1 min-h-0 h-full",
+                isStale && "opacity-70 transition-opacity",
+              )}
+            >
               <MemoizedDataTableContent
                 moves={deferredMoves}
                 movesLoading={movesLoading || isStale}

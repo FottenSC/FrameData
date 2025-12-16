@@ -8,7 +8,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: Infinity, // Data never goes stale (manual refresh only)
-      gcTime: Infinity,    // Never garbage collect cached data
+      gcTime: Infinity, // Never garbage collect cached data
       refetchOnWindowFocus: false,
       retry: 1,
     },

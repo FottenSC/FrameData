@@ -1,6 +1,14 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Gamepad2, Sword, Command, Download, Settings2, Languages, MoreVertical } from "lucide-react";
+import {
+  Gamepad2,
+  Sword,
+  Command,
+  Download,
+  Settings2,
+  Languages,
+  MoreVertical,
+} from "lucide-react";
 import { useGame } from "../contexts/GameContext";
 import { useCommand } from "../contexts/CommandContext";
 import { useToolbar } from "../contexts/ToolbarContext";
@@ -158,10 +166,11 @@ export const Navbar: React.FC = () => {
                 variant="outline"
                 className={cn(
                   "text-xs font-normal hidden sm:inline-flex",
-                  activeFiltersCount === 0 && "opacity-50"
+                  activeFiltersCount === 0 && "opacity-50",
                 )}
               >
-                {activeFiltersCount} {activeFiltersCount === 1 ? "filter" : "filters"}
+                {activeFiltersCount}{" "}
+                {activeFiltersCount === 1 ? "filter" : "filters"}
               </Badge>
 
               {/* Move count badge */}
@@ -169,10 +178,11 @@ export const Navbar: React.FC = () => {
                 variant="outline"
                 className={cn(
                   "text-xs font-normal hidden sm:inline-flex",
-                  isUpdating && "opacity-50"
+                  isUpdating && "opacity-50",
                 )}
               >
-                {filteredMoves}{totalMoves !== filteredMoves && ` / ${totalMoves}`} moves
+                {filteredMoves}
+                {totalMoves !== filteredMoves && ` / ${totalMoves}`} moves
                 {isUpdating && " ..."}
               </Badge>
 
@@ -204,10 +214,14 @@ export const Navbar: React.FC = () => {
                   align="end"
                   className="bg-card/95 backdrop-blur-sm border-border shadow-lg"
                 >
-                  <DropdownMenuItem onClick={() => exportHandler.current?.("csv")}>
+                  <DropdownMenuItem
+                    onClick={() => exportHandler.current?.("csv")}
+                  >
                     Export to CSV
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => exportHandler.current?.("excel")}>
+                  <DropdownMenuItem
+                    onClick={() => exportHandler.current?.("excel")}
+                  >
                     Export to Excel
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -227,7 +241,10 @@ export const Navbar: React.FC = () => {
                   align="end"
                   className="bg-card/95 backdrop-blur-sm border-border shadow-lg min-w-[180px]"
                 >
-                  <DropdownMenuItem disabled className="text-xs text-muted-foreground">
+                  <DropdownMenuItem
+                    disabled
+                    className="text-xs text-muted-foreground"
+                  >
                     Total Moves: {filteredMoves}{" "}
                     {totalMoves !== filteredMoves
                       ? `(filtered from ${totalMoves})`
@@ -238,15 +255,21 @@ export const Navbar: React.FC = () => {
                     <Settings2 className="h-4 w-4 mr-2" />
                     Table Configuration
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => openView("notationMappings")}>
+                  <DropdownMenuItem
+                    onClick={() => openView("notationMappings")}
+                  >
                     <Languages className="h-4 w-4 mr-2" />
                     Notation Mappings
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => exportHandler.current?.("csv")}>
+                  <DropdownMenuItem
+                    onClick={() => exportHandler.current?.("csv")}
+                  >
                     <Download className="h-4 w-4 mr-2" />
                     Export to CSV
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => exportHandler.current?.("excel")}>
+                  <DropdownMenuItem
+                    onClick={() => exportHandler.current?.("excel")}
+                  >
                     <Download className="h-4 w-4 mr-2" />
                     Export to Excel
                   </DropdownMenuItem>

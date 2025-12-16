@@ -8,7 +8,12 @@ interface ValueBadgeProps {
   badges?: Record<string, { className: string }>;
 }
 
-const ValueBadgeInner: React.FC<ValueBadgeProps> = ({ value, text, forceNoSign = false, badges }) => {
+const ValueBadgeInner: React.FC<ValueBadgeProps> = ({
+  value,
+  text,
+  forceNoSign = false,
+  badges,
+}) => {
   let displayText: string;
   if (text !== null && text !== undefined) {
     displayText = text;

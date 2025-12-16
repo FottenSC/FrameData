@@ -26,9 +26,15 @@ function App() {
                 <CommandPaletteContainer />
                 <main className="flex-grow">
                   <Routes>
-                    <Route path="/" element={<Navigate to="/games" replace />} />
+                    <Route
+                      path="/"
+                      element={<Navigate to="/games" replace />}
+                    />
                     <Route path="/games" element={<GameSelectionPage />} />
-                    <Route path="/:gameId" element={<CharacterSelectionPage />} />
+                    <Route
+                      path="/:gameId"
+                      element={<CharacterSelectionPage />}
+                    />
                     <Route
                       path="/:gameId/:characterName"
                       element={<FrameDataTable />}

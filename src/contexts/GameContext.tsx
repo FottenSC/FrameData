@@ -38,7 +38,7 @@ export type GameNotationMappingConfig = {
 // Helper function to build the final notation map for a game
 export const buildNotationMap = (
   config: GameNotationMappingConfig,
-  enabledNotationMappings: string[]
+  enabledNotationMappings: string[],
 ): NotationMap => {
   let effectiveMap: NotationMap = {};
 
@@ -313,7 +313,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const notationMap = React.useMemo<NotationMap>(() => {
     const enabled = getEnabledNotationMappings(
       selectedGame.id,
-      selectedGame.notationMapping.defaultEnabled
+      selectedGame.notationMapping.defaultEnabled,
     );
     return buildNotationMap(selectedGame.notationMapping, enabled);
   }, [

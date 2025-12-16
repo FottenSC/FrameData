@@ -43,7 +43,9 @@ const NotesRendererInner: React.FC<{ note: string | null }> = ({ note }) => {
       lastIndex = regex.lastIndex;
     }
     if (lastIndex < note.length) {
-      result.push(<span key={`text-${partIndex}`}>{note.slice(lastIndex)}</span>);
+      result.push(
+        <span key={`text-${partIndex}`}>{note.slice(lastIndex)}</span>,
+      );
     }
     return result;
   }, [note, availableIcons, getIconUrl]);

@@ -10,8 +10,11 @@ type ApplyNotationFn = (cmd: string | null) => string | null;
 
 // Fetch functions
 async function fetchCharactersList(gameId: string): Promise<Character[]> {
-  const res = await fetch(`/Games/${encodeURIComponent(gameId)}/Characters.json`);
-  if (!res.ok) throw new Error(`Failed to fetch characters list: ${res.status}`);
+  const res = await fetch(
+    `/Games/${encodeURIComponent(gameId)}/Characters.json`,
+  );
+  if (!res.ok)
+    throw new Error(`Failed to fetch characters list: ${res.status}`);
   const data = await res.json();
   return (Array.isArray(data) ? data : []).map((c: any) => ({
     id: Number(c.id),
@@ -23,27 +26,30 @@ async function fetchCharacterMoves(
   gameId: string,
   characterId: number,
   characterName: string | null,
-  applyNotation: ApplyNotationFn
+  applyNotation: ApplyNotationFn,
 ): Promise<Move[]> {
   const res = await fetch(
-    `/Games/${encodeURIComponent(gameId)}/Characters/${encodeURIComponent(String(characterId))}.json`
+    `/Games/${encodeURIComponent(gameId)}/Characters/${encodeURIComponent(String(characterId))}.json`,
   );
   if (!res.ok) return [];
   const data = await res.json();
   if (!Array.isArray(data)) return [];
-  
-  return data.map((m: any) => processMove(m, characterId, characterName, applyNotation));
+
+  return data.map((m: any) =>
+    processMove(m, characterId, characterName, applyNotation),
+  );
 }
 
 function processMove(
   moveObject: any,
   charId: number | null,
   charName: string | null,
-  applyNotation: ApplyNotationFn
+  applyNotation: ApplyNotationFn,
 ): Move {
-  const originalCommand = moveObject.Command != null ? String(moveObject.Command) : null;
+  const originalCommand =
+    moveObject.Command != null ? String(moveObject.Command) : null;
   const mappedCommand = applyNotation(originalCommand);
-  
+
   return {
     ID: Number(moveObject.ID),
     Command: mappedCommand,
@@ -63,31 +69,37 @@ function processMove(
     HitLevel: moveObject.HitLevel ? String(moveObject.HitLevel) : null,
     Impact: moveObject.Impact != null ? Number(moveObject.Impact) : 0,
     Damage: moveObject.Damage != null ? String(moveObject.Damage) : null,
-    DamageDec: moveObject.DamageDec != null ? Number(moveObject.DamageDec) : null,
+    DamageDec:
+      moveObject.DamageDec != null ? Number(moveObject.DamageDec) : null,
     Block: moveObject.Block != null ? String(moveObject.Block) : null,
     BlockDec: moveObject.BlockDec != null ? Number(moveObject.BlockDec) : null,
     Hit: moveObject.Hit != null ? String(moveObject.Hit) : null,
     HitDec: moveObject.HitDec != null ? Number(moveObject.HitDec) : null,
-    CounterHit: moveObject.CounterHit != null ? String(moveObject.CounterHit) : null,
-    CounterHitDec: moveObject.CounterHitDec != null ? Number(moveObject.CounterHitDec) : null,
-    GuardBurst: moveObject.GuardBurst != null ? Number(moveObject.GuardBurst) : null,
+    CounterHit:
+      moveObject.CounterHit != null ? String(moveObject.CounterHit) : null,
+    CounterHitDec:
+      moveObject.CounterHitDec != null
+        ? Number(moveObject.CounterHitDec)
+        : null,
+    GuardBurst:
+      moveObject.GuardBurst != null ? Number(moveObject.GuardBurst) : null,
     Notes: moveObject.Notes != null ? String(moveObject.Notes) : null,
   } as Move;
 }
 
 async function fetchAllCharactersMoves(
   gameId: string,
-  applyNotation: ApplyNotationFn
+  applyNotation: ApplyNotationFn,
 ): Promise<Move[]> {
   const chars = await fetchCharactersList(gameId);
-  
+
   // Fetch all characters in parallel
   const results = await Promise.all(
     chars.map((char) =>
-      fetchCharacterMoves(gameId, char.id, char.name, applyNotation)
-    )
+      fetchCharacterMoves(gameId, char.id, char.name, applyNotation),
+    ),
   );
-  
+
   return results.flat();
 }
 
@@ -98,19 +110,30 @@ interface UseMoveOptions {
   characters: Character[];
 }
 
-export function useMoves({ gameId, characterId, applyNotation, characters }: UseMoveOptions) {
+export function useMoves({
+  gameId,
+  characterId,
+  applyNotation,
+  characters,
+}: UseMoveOptions) {
   return useQuery({
     queryKey: ["moves", gameId, characterId],
     queryFn: async () => {
       if (!gameId || characterId === null) return [];
-      
+
       if (characterId === -1) {
         // All characters
         return fetchAllCharactersMoves(gameId, applyNotation);
       } else {
         // Single character
-        const charName = characters.find((c) => c.id === characterId)?.name || null;
-        return fetchCharacterMoves(gameId, characterId, charName, applyNotation);
+        const charName =
+          characters.find((c) => c.id === characterId)?.name || null;
+        return fetchCharacterMoves(
+          gameId,
+          characterId,
+          charName,
+          applyNotation,
+        );
       }
     },
     enabled: !!gameId && characterId !== null,

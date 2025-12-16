@@ -64,7 +64,7 @@ const MemoizedTableRow = memo<MemoizedRowProps>(
       prevProps.move.ID === nextProps.move.ID &&
       prevProps.visibleColumns === nextProps.visibleColumns
     );
-  }
+  },
 );
 
 interface DataTableContentProps {
@@ -82,31 +82,34 @@ interface DataTableContentProps {
 }
 
 // Generate page numbers to display with ellipsis
-const getPageNumbers = (currentPage: number, totalPages: number): (number | 'ellipsis')[] => {
-  const pages: (number | 'ellipsis')[] = [];
-  
+const getPageNumbers = (
+  currentPage: number,
+  totalPages: number,
+): (number | "ellipsis")[] => {
+  const pages: (number | "ellipsis")[] = [];
+
   if (totalPages <= 7) {
     for (let i = 0; i < totalPages; i++) pages.push(i);
   } else {
     pages.push(0);
-    
+
     let start = Math.max(1, currentPage - 1);
     let end = Math.min(totalPages - 2, currentPage + 1);
-    
+
     if (currentPage < 3) {
       end = Math.min(totalPages - 2, 3);
     }
     if (currentPage > totalPages - 4) {
       start = Math.max(1, totalPages - 4);
     }
-    
-    if (start > 1) pages.push('ellipsis');
+
+    if (start > 1) pages.push("ellipsis");
     for (let i = start; i <= end; i++) pages.push(i);
-    if (end < totalPages - 2) pages.push('ellipsis');
-    
+    if (end < totalPages - 2) pages.push("ellipsis");
+
     pages.push(totalPages - 1);
   }
-  
+
   return pages;
 };
 
@@ -139,10 +142,10 @@ const PaginationFooter: React.FC<{
               disabled={currentPage === 0}
             />
           </PaginationItem>
-          
+
           {pageNumbers.map((page, idx) => (
             <PaginationItem key={idx}>
-              {page === 'ellipsis' ? (
+              {page === "ellipsis" ? (
                 <PaginationEllipsis />
               ) : (
                 <PaginationLink
@@ -154,7 +157,7 @@ const PaginationFooter: React.FC<{
               )}
             </PaginationItem>
           ))}
-          
+
           <PaginationItem>
             <PaginationNext
               onClick={() => onPageChange(currentPage + 1)}
@@ -190,19 +193,21 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
   isAllCharacters = false,
 }) => {
   // Single scroll container ref - component owns its scroll
-  const [scrollContainer, setScrollContainer] = useState<HTMLDivElement | null>(null);
+  const [scrollContainer, setScrollContainer] = useState<HTMLDivElement | null>(
+    null,
+  );
   const scrollContainerRef = useCallback((node: HTMLDivElement | null) => {
     setScrollContainer(node);
   }, []);
-  
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(0);
-  
+
   // Reset page when moves change
   useEffect(() => {
     setCurrentPage(0);
   }, [moves.length]);
-  
+
   // Pagination logic
   const usePagination = isAllCharacters && moves.length > PAGE_SIZE;
   const totalPages = usePagination ? Math.ceil(moves.length / PAGE_SIZE) : 1;
@@ -211,57 +216,93 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
     const start = currentPage * PAGE_SIZE;
     return moves.slice(start, start + PAGE_SIZE);
   }, [moves, currentPage, usePagination]);
-  
+
   // Page change handler
-  const handlePageChange = useCallback((page: number) => {
-    setCurrentPage(page);
-    scrollContainer?.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [scrollContainer]);
+  const handlePageChange = useCallback(
+    (page: number) => {
+      setCurrentPage(page);
+      scrollContainer?.scrollTo({ top: 0, behavior: "smooth" });
+    },
+    [scrollContainer],
+  );
 
   // Cell content renderer
-  const renderCellContent = useCallback((move: Move, columnId: string) => {
-    switch (columnId) {
-      case "character":
-        return move.CharacterName || "—";
-      case "stance":
-        if (!move.Stance || move.Stance.length === 0) return "—";
-        return (
-          <div className="flex flex-wrap gap-0.5 justify-end">
-            {move.Stance.map((s, i) => (
-              <Badge key={i} variant="secondary" className="whitespace-nowrap border border-gray-500">
-                {s}
-              </Badge>
-            ))}
-          </div>
-        );
-      case "command":
-        return renderCommand(move.Command);
-      case "rawCommand":
-        return move.Command || "—";
-      case "hitLevel":
-        return <ExpandableHitLevels hitLevelString={move.HitLevel} maxIconsToShow={3} />;
-      case "impact":
-        return move.Impact ?? "—";
-      case "damage":
-        return move.DamageDec ?? "—";
-      case "block":
-        return <ValueBadge value={move.BlockDec} text={move.Block} badges={badges} />;
-      case "hit":
-        return <ValueBadge value={move.HitDec} text={move.Hit} badges={badges} />;
-      case "counterHit":
-        return <ValueBadge value={move.CounterHitDec} text={move.CounterHit} badges={badges} />;
-      case "guardBurst":
-        return <ValueBadge value={move.GuardBurst} text={null} forceNoSign badges={badges} />;
-      case "notes":
-        return (
-          <div className="max-w-full truncate overflow-x-hidden overflow-y-visible">
-            {renderNotes(move.Notes)}
-          </div>
-        );
-      default:
-        return "—";
-    }
-  }, [renderCommand, renderNotes, badges]);
+  const renderCellContent = useCallback(
+    (move: Move, columnId: string) => {
+      switch (columnId) {
+        case "character":
+          return move.CharacterName || "—";
+        case "stance":
+          if (!move.Stance || move.Stance.length === 0) return "—";
+          return (
+            <div className="flex flex-wrap gap-0.5 justify-end">
+              {move.Stance.map((s, i) => (
+                <Badge
+                  key={i}
+                  variant="secondary"
+                  className="whitespace-nowrap border border-gray-500"
+                >
+                  {s}
+                </Badge>
+              ))}
+            </div>
+          );
+        case "command":
+          return renderCommand(move.Command);
+        case "rawCommand":
+          return move.Command || "—";
+        case "hitLevel":
+          return (
+            <ExpandableHitLevels
+              hitLevelString={move.HitLevel}
+              maxIconsToShow={3}
+            />
+          );
+        case "impact":
+          return move.Impact ?? "—";
+        case "damage":
+          return move.DamageDec ?? "—";
+        case "block":
+          return (
+            <ValueBadge
+              value={move.BlockDec}
+              text={move.Block}
+              badges={badges}
+            />
+          );
+        case "hit":
+          return (
+            <ValueBadge value={move.HitDec} text={move.Hit} badges={badges} />
+          );
+        case "counterHit":
+          return (
+            <ValueBadge
+              value={move.CounterHitDec}
+              text={move.CounterHit}
+              badges={badges}
+            />
+          );
+        case "guardBurst":
+          return (
+            <ValueBadge
+              value={move.GuardBurst}
+              text={null}
+              forceNoSign
+              badges={badges}
+            />
+          );
+        case "notes":
+          return (
+            <div className="max-w-full truncate overflow-x-hidden overflow-y-visible">
+              {renderNotes(move.Notes)}
+            </div>
+          );
+        default:
+          return "—";
+      }
+    },
+    [renderCommand, renderNotes, badges],
+  );
 
   // Virtualizer setup
   const rowVirtualizer = useVirtualizer({
@@ -302,9 +343,12 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
               <div className="flex items-center justify-between gap-1">
                 <span className="whitespace-nowrap flex-1">{column.label}</span>
                 <span className="inline-flex w-3 justify-center">
-                  {sortColumn === column.id && (
-                    sortDirection === "asc" ? <ArrowUp size={14} /> : <ArrowDown size={14} />
-                  )}
+                  {sortColumn === column.id &&
+                    (sortDirection === "asc" ? (
+                      <ArrowUp size={14} />
+                    ) : (
+                      <ArrowDown size={14} />
+                    ))}
                 </span>
               </div>
             </TableHead>
@@ -319,17 +363,25 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
     if (movesLoading) {
       return (
         <TableRow>
-          <TableCell colSpan={visibleColumns.length} className="text-center h-24 p-2">
-            <div className="flex justify-center items-center">Loading moves...</div>
+          <TableCell
+            colSpan={visibleColumns.length}
+            className="text-center h-24 p-2"
+          >
+            <div className="flex justify-center items-center">
+              Loading moves...
+            </div>
           </TableCell>
         </TableRow>
       );
     }
-    
+
     if (moves.length === 0) {
       return (
         <TableRow>
-          <TableCell colSpan={visibleColumns.length} className="text-center h-24 p-2">
+          <TableCell
+            colSpan={visibleColumns.length}
+            className="text-center h-24 p-2"
+          >
             No moves found for this character or filter criteria.
           </TableCell>
         </TableRow>
@@ -338,7 +390,8 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
 
     const items = virtualItems;
     const paddingTop = items.length > 0 ? items[0]!.start : 0;
-    const paddingBottom = items.length > 0 ? totalSize - items[items.length - 1]!.end : 0;
+    const paddingBottom =
+      items.length > 0 ? totalSize - items[items.length - 1]!.end : 0;
 
     // Fallback before virtualizer is ready
     if (items.length === 0 || !scrollContainer) {
@@ -355,13 +408,34 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
           ))}
           {displayMoves.length > slice.length && (
             <TableRow>
-              <TableCell colSpan={visibleColumns.length} className="text-center py-4">
+              <TableCell
+                colSpan={visibleColumns.length}
+                className="text-center py-4"
+              >
                 <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  <svg
+                    className="animate-spin h-4 w-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
                   </svg>
-                  <span>Loading {displayMoves.length - slice.length} more moves...</span>
+                  <span>
+                    Loading {displayMoves.length - slice.length} more moves...
+                  </span>
                 </div>
               </TableCell>
             </TableRow>
@@ -374,7 +448,10 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
       <>
         {paddingTop > 0 && (
           <TableRow>
-            <TableCell colSpan={visibleColumns.length} style={{ padding: 0, border: 0 }}>
+            <TableCell
+              colSpan={visibleColumns.length}
+              style={{ padding: 0, border: 0 }}
+            >
               <div style={{ height: paddingTop }} aria-hidden />
             </TableCell>
           </TableRow>
@@ -396,7 +473,10 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
         })}
         {paddingBottom > 0 && (
           <TableRow>
-            <TableCell colSpan={visibleColumns.length} style={{ padding: 0, border: 0 }}>
+            <TableCell
+              colSpan={visibleColumns.length}
+              style={{ padding: 0, border: 0 }}
+            >
               <div style={{ height: paddingBottom }} aria-hidden />
             </TableCell>
           </TableRow>
@@ -413,7 +493,7 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
           {tableHeader}
           <TableBody>{tableBody}</TableBody>
         </Table>
-        
+
         {/* Pagination inside scroll area */}
         {usePagination && (
           <PaginationFooter

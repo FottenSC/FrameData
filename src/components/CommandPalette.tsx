@@ -18,10 +18,21 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@/components/ui/command";
-import { Gamepad2, Users, ChevronLeft, Table, Info, Languages, Check } from "lucide-react";
+import {
+  Gamepad2,
+  Users,
+  ChevronLeft,
+  Table,
+  Info,
+  Languages,
+  Check,
+} from "lucide-react";
 import { useGame } from "@/contexts/GameContext";
 import { useCommand } from "@/contexts/CommandContext";
-import { useTableConfig, useUserSettings } from "@/contexts/UserSettingsContext";
+import {
+  useTableConfig,
+  useUserSettings,
+} from "@/contexts/UserSettingsContext";
 import { sharedNotationMapping } from "@/lib/notationMapping";
 import type { ColumnConfig } from "@/contexts/UserSettingsContext";
 import { Button } from "@/components/ui/button";
@@ -44,8 +55,9 @@ export function CommandPalette() {
     setSelectedGameById,
   } = useGame();
 
-  const { } = useTableConfig();
-  const { getEnabledNotationMappings, toggleGameNotationMapping } = useUserSettings();
+  const {} = useTableConfig();
+  const { getEnabledNotationMappings, toggleGameNotationMapping } =
+    useUserSettings();
 
   const [searchValue, setSearchValue] = React.useState("");
 
@@ -226,7 +238,11 @@ export function CommandPalette() {
             ) : showGames ? (
               <>
                 <CommandGroup heading="Games">
-                  <CommandItem onSelect={goBackToMain} className="mb-1" value="back-to-commands">
+                  <CommandItem
+                    onSelect={goBackToMain}
+                    className="mb-1"
+                    value="back-to-commands"
+                  >
                     <ChevronLeft className="mr-2 h-4 w-4" />
                     <span>Back to Commands</span>
                   </CommandItem>
@@ -322,7 +338,7 @@ export function CommandPalette() {
                 ].map((game) => {
                   const enabledForGame = getEnabledNotationMappings(
                     game.id,
-                    game.notationMapping.defaultEnabled
+                    game.notationMapping.defaultEnabled,
                   );
                   return (
                     <CommandGroup
@@ -333,7 +349,11 @@ export function CommandPalette() {
                         <CommandItem
                           key={`${game.id}-${key}`}
                           onSelect={() =>
-                            toggleGameNotationMapping(game.id, key, enabledForGame)
+                            toggleGameNotationMapping(
+                              game.id,
+                              key,
+                              enabledForGame,
+                            )
                           }
                         >
                           <div
@@ -341,7 +361,7 @@ export function CommandPalette() {
                               "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
                               enabledForGame.includes(key)
                                 ? "bg-primary text-primary-foreground"
-                                : "opacity-50 [&_svg]:invisible"
+                                : "opacity-50 [&_svg]:invisible",
                             )}
                           >
                             <Check className={cn("h-4 w-4")} />

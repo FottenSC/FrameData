@@ -1,6 +1,12 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
-export type CommandView = "main" | "tableConfig" | "notationMappings" | "characters" | "games" | "credits";
+export type CommandView =
+  | "main"
+  | "tableConfig"
+  | "notationMappings"
+  | "characters"
+  | "games"
+  | "credits";
 
 interface CommandContextType {
   open: boolean;
@@ -33,7 +39,15 @@ export function CommandProvider({ children }: CommandProviderProps) {
   };
 
   return (
-    <CommandContext.Provider value={{ open, setOpen: handleSetOpen, currentView, setCurrentView, openView }}>
+    <CommandContext.Provider
+      value={{
+        open,
+        setOpen: handleSetOpen,
+        currentView,
+        setCurrentView,
+        openView,
+      }}
+    >
       {children}
     </CommandContext.Provider>
   );

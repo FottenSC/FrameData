@@ -95,6 +95,12 @@ export interface Character {
   name: string;
 }
 
+// Define StanceInfo for tooltip display
+export interface StanceInfo {
+  name: string;
+  description: string;
+}
+
 // Define avaliableGames here
 export const avaliableGames: Game[] = [
   {
@@ -188,6 +194,7 @@ interface GameContextType {
   getIconUrl: (iconName: string, isHeld?: boolean) => string;
   getNotationMap: () => NotationMap;
   applyNotation: (text: string | null) => string | null;
+  getStanceInfo: (stanceCode: string, characterId?: number | null) => StanceInfo | null;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -220,6 +227,10 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const [selectedCharacterId, setSelectedCharacterId] = useState<number | null>(
     null,
   );
+  // Game-level stances (shared across all characters)
+  const [gameStances, setGameStances] = useState<Record<string, StanceInfo>>({});
+  // Character-specific stances: characterId -> stanceCode -> StanceInfo
+  const [characterStances, setCharacterStances] = useState<Record<number, Record<string, StanceInfo>>>({});
 
   useEffect(() => {
     const loadCharacters = async () => {
@@ -235,23 +246,57 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       setCharacters([]);
 
       try {
-        // Load from public/Games/{gameId}/Characters.json
+        // Load from public/Games/{gameId}/Game.json
         const url = `/Games/${encodeURIComponent(
           selectedGame.id,
-        )}/Characters.json`;
+        )}/Game.json`;
         const res = await fetch(url);
         if (!res.ok)
           throw new Error(
-            `Failed to fetch characters (${res.status}): ${res.statusText}`,
+            `Failed to fetch game data (${res.status}): ${res.statusText}`,
           );
         const data = await res.json();
         const charactersData: Character[] = (
-          Array.isArray(data) ? data : []
+          Array.isArray(data?.characters) ? data.characters : []
         ).map((c: any) => ({
           id: Number(c.id),
           name: String(c.name),
         }));
         setCharacters(charactersData);
+
+        // Load game-level stances
+        if (data?.stances && typeof data.stances === "object") {
+          const stances: Record<string, StanceInfo> = {};
+          for (const [code, info] of Object.entries(data.stances)) {
+            const stanceData = info as { name?: string; description?: string };
+            stances[code] = {
+              name: stanceData.name || code,
+              description: stanceData.description || "",
+            };
+          }
+          setGameStances(stances);
+        } else {
+          setGameStances({});
+        }
+
+        // Load character-specific stances
+        const charStances: Record<number, Record<string, StanceInfo>> = {};
+        if (Array.isArray(data?.characters)) {
+          for (const char of data.characters) {
+            if (char.stances && typeof char.stances === "object") {
+              const stances: Record<string, StanceInfo> = {};
+              for (const [code, info] of Object.entries(char.stances)) {
+                const stanceData = info as { name?: string; description?: string };
+                stances[code] = {
+                  name: stanceData.name || code,
+                  description: stanceData.description || "",
+                };
+              }
+              charStances[Number(char.id)] = stances;
+            }
+          }
+        }
+        setCharacterStances(charStances);
       } catch (err) {
         setCharacterError(
           err instanceof Error
@@ -325,6 +370,22 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     return applyNotationMapping(text, notationMap);
   };
 
+  // Get stance info by code, checking character-specific stances first, then game-level
+  const getStanceInfo = (stanceCode: string, characterId?: number | null): StanceInfo | null => {
+    // First check character-specific stances if characterId is provided
+    if (characterId != null && characterId !== -1) {
+      const charStances = characterStances[characterId];
+      if (charStances && charStances[stanceCode]) {
+        return charStances[stanceCode];
+      }
+    }
+    // Fall back to game-level stances
+    if (gameStances[stanceCode]) {
+      return gameStances[stanceCode];
+    }
+    return null;
+  };
+
   const contextValue: GameContextType = {
     selectedGame,
     setSelectedGameById: handleSetSelectedGameById,
@@ -338,6 +399,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     getIconUrl: getIconUrl,
     getNotationMap,
     applyNotation,
+    getStanceInfo,
   };
 
   return (

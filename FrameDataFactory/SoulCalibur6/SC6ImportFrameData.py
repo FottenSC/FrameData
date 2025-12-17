@@ -144,24 +144,24 @@ stanceTranslator = [
     ["right", "Right Side"],
     ["re  second round", "RE2"],
     ["re  2nd round", "RE2"],
-    ["se mid-air opponent", "SE Mid-air Opponent"],
+    ["se mid-air opponent", "SE Midair Opponent"],
     ["downed opponent", "Downed Opponent"],
-    ["manji dragonfly", "Manji Dragonfly"],
+    ["manji dragonfly", ""],
     ["midair opponent", "Midair Opponent"],
     ["even activation", "even activation"],
     ["sky  stage iii", "SKY stage III"],
     ["odd activation", "odd activation"],
     ["during motion", "During Motion"],
-    ["indian stance", "Indian Stance"],
+    ["indian stance", ""],
     ["sky  stage ii", "SKY stage II"],
     ["sky  stage i", "SKY stage I"],
-    ["flea stance", "Flea Stance"],
-    ["short hold", "Short Hold"],
+    ["flea stance", ""],
+    ["short hold", "Short"],
+    ["short hold", "Short"],
+    ["full hold", "Full"],
     ["weaponless", "Weaponless"],
-    ["tip range", "tip range"],
+    ["tip range", "Tip"],
     ["vs crouch", "vs crouch"],
-    ["full hold", "Full Hold"],
-    ["short hold", "Short Hold"],
     ["any stance", "Any Stance"],
     ["grounded", "GROUNDED"],
     ["mcft far", "MCFT far"],
@@ -326,23 +326,98 @@ frameData["Stance"] = frameData["Stance"].apply(caseFixer)
 
 
 
-#region Character export
-characters = sorted(set([c for c in frameData["Character"].dropna().tolist()]))
-characters_manifest = [
-    {"id": idx + 1, "name": name}
-    for idx, name in enumerate(characters)
-]
-char_id_map = {c["name"]: c["id"] for c in characters_manifest}
-frameData["CharacterID"] = frameData["Character"].map(char_id_map)
+#region Character and Stance export
 root = project_root()
 output_base = root / "public" / "Games" / "SoulCalibur6"
 moves_dir = output_base / "Characters"
 os.makedirs(moves_dir, exist_ok=True)
 
-# Write Characters.json
-with open(output_base / "Characters.json", "w", encoding="utf-8") as f:
-    json.dump(characters_manifest, f, ensure_ascii=False, indent=2)
-#endregion Character export
+# Read existing Game.json to preserve user-edited data
+existing_game_data = {}
+game_json_path = output_base / "Game.json"
+if game_json_path.exists():
+    try:
+        with open(game_json_path, "r", encoding="utf-8") as f:
+            existing_game_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Warning: Could not read existing Game.json: {e}")
+
+# Preserve existing game-level stances (shared stances moved from characters)
+existing_game_stances = existing_game_data.get("stances", {})
+
+# Build lookup map from existing characters (including their stances)
+existing_characters = {c["name"]: c for c in existing_game_data.get("characters", [])}
+
+# Get max character ID from existing data for new entries
+max_char_id = max((c.get("id", 0) for c in existing_game_data.get("characters", [])), default=0)
+
+# Build characters manifest with per-character stances
+characters = sorted(set([c for c in frameData["Character"].dropna().tolist()]))
+characters_manifest = []
+
+for name in characters:
+    # Get existing character data if available
+    existing_char = existing_characters.get(name, {})
+    existing_char_stances = existing_char.get("stances", {})
+    # Handle legacy array format
+    if isinstance(existing_char_stances, list):
+        existing_char_stances = {s.get("name", ""): s for s in existing_char_stances}
+    
+    # Get character ID (preserve existing or assign new)
+    if "id" in existing_char:
+        char_id = existing_char["id"]
+    else:
+        max_char_id += 1
+        char_id = max_char_id
+    
+    # Extract stances for this character from the frame data
+    char_moves = frameData[frameData["Character"] == name]
+    char_stances = set()
+    for stance_list in char_moves["Stance"].dropna():
+        if isinstance(stance_list, list):
+            for s in stance_list:
+                if s and isinstance(s, str):
+                    char_stances.add(s)
+    
+    # Build stances dict for this character, preserving existing data
+    # Skip stances that have been moved to game-level stances
+    stances_dict = {}
+    for stance_name in sorted(char_stances):
+        # Skip if this stance exists in game-level stances (it's been moved to shared)
+        if stance_name in existing_game_stances:
+            continue
+            
+        if stance_name in existing_char_stances:
+            # Preserve existing stance data (including user-edited name/description)
+            existing_stance = existing_char_stances[stance_name]
+            stances_dict[stance_name] = {
+                "name": existing_stance.get("name", ""),
+                "description": existing_stance.get("description", "")
+            }
+        else:
+            # New stance with blank name and description
+            stances_dict[stance_name] = {
+                "name": "",
+                "description": ""
+            }
+    
+    characters_manifest.append({
+        "id": char_id,
+        "name": name,
+        "stances": stances_dict
+    })
+
+char_id_map = {c["name"]: c["id"] for c in characters_manifest}
+frameData["CharacterID"] = frameData["Character"].map(char_id_map)
+
+# Write Game.json
+game_manifest = {
+    "stances": existing_game_stances,
+    "characters": characters_manifest
+}
+with open(game_json_path, "w", encoding="utf-8") as f:
+    json.dump(game_manifest, f, ensure_ascii=False, indent=2)
+#endregion Character and Stance export
 
 
 # Helpers to coerce values for JSON

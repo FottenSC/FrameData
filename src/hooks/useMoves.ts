@@ -11,12 +11,12 @@ type ApplyNotationFn = (cmd: string | null) => string | null;
 // Fetch functions
 async function fetchCharactersList(gameId: string): Promise<Character[]> {
   const res = await fetch(
-    `/Games/${encodeURIComponent(gameId)}/Characters.json`,
+    `/Games/${encodeURIComponent(gameId)}/Game.json`,
   );
   if (!res.ok)
-    throw new Error(`Failed to fetch characters list: ${res.status}`);
+    throw new Error(`Failed to fetch game data: ${res.status}`);
   const data = await res.json();
-  return (Array.isArray(data) ? data : []).map((c: any) => ({
+  return (Array.isArray(data?.characters) ? data.characters : []).map((c: any) => ({
     id: Number(c.id),
     name: String(c.name),
   }));
@@ -49,8 +49,8 @@ function processMove(
   const mappedCommand =
     moveObject.Command != null
       ? Array.isArray(moveObject.Command)
-        ? moveObject.Command.map((cmd: any) => String(cmd))
-        : [String(moveObject.Command)]
+        ? moveObject.Command.map((cmd: any) => applyNotation(String(cmd)) ?? String(cmd))
+        : [applyNotation(String(moveObject.Command)) ?? String(moveObject.Command)]
       : null;
 
   return {

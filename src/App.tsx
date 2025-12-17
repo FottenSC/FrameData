@@ -4,6 +4,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
+import { Toaster } from "sonner";
 import { FrameDataTable } from "./components/FrameDataTable";
 import { GameProvider } from "./contexts/GameContext";
 import { CommandProvider } from "./contexts/CommandContext";
@@ -17,6 +18,17 @@ import { CommandPalette } from "./components/CommandPalette";
 function App() {
   return (
     <Router>
+      <Toaster
+        position="top-left"
+        theme="dark"
+        toastOptions={{
+          style: {
+            background: "hsl(0, 0%, 20%)",
+            border: "1px solid hsla(0, 0%, 100%, 0.1)",
+            color: "hsl(0, 0%, 98%)",
+          },
+        }}
+      />
       <UserSettingsProvider>
         <GameProvider>
           <CommandProvider>

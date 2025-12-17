@@ -43,7 +43,7 @@ This is a web application designed to display frame data for characters in fight
 
 ## How it Works
 
-The application fetches the appropriate JSON files based on the selected game and character under `public/Games/{GameID}/Characters.json` and `public/Games/{GameID}/Characters/{CharacterID}.json`. React components render the data directly.
+The application fetches the appropriate JSON files based on the selected game and character under `public/Games/{GameID}/Game.json` and `public/Games/{GameID}/Characters/{CharacterID}.json`. React components render the data directly.
 
 ## Internal Move Notation
 

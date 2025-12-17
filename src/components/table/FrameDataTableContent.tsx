@@ -7,13 +7,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowDown, ArrowUp, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { ArrowDown, ArrowUp, ChevronsLeft, ChevronsRight, Copy } from "lucide-react";
+import { toast } from "sonner";
 import { Move, SortableColumn } from "@/types/Move";
 import { ColumnConfig } from "@/contexts/UserSettingsContext";
 import { ValueBadge } from "@/components/ui/ValueBadge";
 import { ExpandableHitLevels } from "@/components/icons/ExpandableHitLevels";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useGame } from "@/contexts/GameContext";
 import {
   Pagination,
   PaginationContent,
@@ -190,6 +198,9 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
   badges,
   isAllCharacters = false,
 }) => {
+  // Get stance info function from context
+  const { getStanceInfo } = useGame();
+
   // Single scroll container ref - component owns its scroll
   const [scrollContainer, setScrollContainer] = useState<HTMLDivElement | null>(
     null,
@@ -200,6 +211,17 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(0);
+
+  // Copy command to clipboard
+  const copyCommand = (move: Move) => {
+    const stancePart = move.Stance?.join(" ") ?? "";
+    const commandPart = move.Command?.join("") ?? "";
+    const textToCopy = stancePart ? `${stancePart} ${commandPart}` : commandPart;
+    
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      toast("Copied!", { duration: 1000 });
+    });
+  };
 
   // Reset page when moves change
   useEffect(() => {
@@ -232,19 +254,61 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
           if (!move.Stance || move.Stance.length === 0) return "—";
           return (
             <div className="flex flex-wrap gap-0.5 justify-end">
-              {move.Stance.map((s, i) => (
-                <Badge
-                  key={i}
-                  variant="secondary"
-                  className="whitespace-nowrap border border-gray-500"
-                >
-                  {s}
-                </Badge>
-              ))}
+              {move.Stance.map((s, i) => {
+                const stanceInfo = getStanceInfo(s, move.CharacterId);
+                // Only show tooltip if there's a non-empty name (different from the code) or a description
+                const hasTooltipContent = stanceInfo && ((stanceInfo.name && stanceInfo.name !== s) || stanceInfo.description);
+                
+                if (hasTooltipContent) {
+                  return (
+                    <Tooltip key={i}>
+                      <TooltipTrigger asChild>
+                        <Badge
+                          variant="secondary"
+                          className="whitespace-nowrap border border-gray-500"
+                        >
+                          {s}
+                        </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs">
+                        <div className="space-y-1">
+                          <p className="font-semibold">{stanceInfo.name || s}</p>
+                          {stanceInfo.description && (
+                            <p className="text-xs text-muted-foreground whitespace-pre-wrap">
+                              {stanceInfo.description}
+                            </p>
+                          )}
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
+                  );
+                }
+                
+                return (
+                  <Badge
+                    key={i}
+                    variant="secondary"
+                    className="whitespace-nowrap border border-gray-500"
+                  >
+                    {s}
+                  </Badge>
+                );
+              })}
             </div>
           );
         case "command":
-          return renderCommand(move.Command);
+          return (
+            <div className="flex items-center justify-between gap-2">
+              <span className="flex-1">{renderCommand(move.Command)}</span>
+              <button
+                onClick={() => copyCommand(move)}
+                className="flex-shrink-0 p-1 rounded hover:bg-muted transition-colors opacity-50 hover:opacity-100"
+                title="Copy command"
+              >
+                <Copy className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          );
         case "rawCommand":
           return move.stringCommand || "—";
         case "hitLevel":
@@ -500,4 +564,10 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
   );
 };
 
-export const FrameDataTableContent = FrameDataTableContentInner;
+// Wrap with TooltipProvider for stance tooltips
+// disableHoverableContent makes the tooltip close when hovering over the tooltip itself
+export const FrameDataTableContent: React.FC<DataTableContentProps> = (props) => (
+  <TooltipProvider delayDuration={300} disableHoverableContent>
+    <FrameDataTableContentInner {...props} />
+  </TooltipProvider>
+);

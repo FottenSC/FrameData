@@ -67,16 +67,15 @@ export const CharacterSelectionPage: React.FC = () => {
         </Card>
       )}
 
-      {/* Character List - Only show if not loading and no error */}
       {!isCharactersLoading &&
         !characterError &&
         selectedGame &&
         characters.length > 0 && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 animate-fadeIn min-h-[40vh]">
+          <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9 gap-3 animate-fadeIn min-h-[40vh]">
+            {/* All Characters option */}
             {/* All Characters option */}
             <Card
-              key="all-characters"
-              className="hover:shadow-lg transition-shadow duration-200 cursor-pointer flex flex-col items-center p-4 text-center border-primary/40"
+              className="group cursor-pointer flex flex-col items-center overflow-hidden hover:shadow-md hover:border-primary/50 transition-all duration-300 border-muted bg-card"
               onClick={() => {
                 if (selectedGame) {
                   setSelectedCharacterId(-1);
@@ -84,30 +83,44 @@ export const CharacterSelectionPage: React.FC = () => {
                 }
               }}
             >
-              <CardHeader className="p-0 mb-2 flex-grow flex items-center justify-center">
-                <CardTitle className="text-lg">All Characters</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0 mt-auto">
-                <Button variant="outline" size="sm">
-                  View All
-                </Button>
-              </CardContent>
+              <div className="relative w-full aspect-square bg-muted/50 flex items-center justify-center group-hover:bg-muted transition-colors">
+                <span className="text-4xl text-muted-foreground group-hover:scale-110 transition-transform duration-300">
+                  👥
+                </span>
+              </div>
+              <div className="w-full p-2 bg-card border-t border-border/50">
+                <p className="text-xs sm:text-sm font-medium text-center text-card-foreground truncate group-hover:text-primary transition-colors">
+                  All Characters
+                </p>
+              </div>
             </Card>
 
             {characters.map((character) => (
               <Card
                 key={character.id}
-                className="hover:shadow-lg transition-shadow duration-200 cursor-pointer flex flex-col items-center p-4 text-center"
+                className="group cursor-pointer flex flex-col items-center overflow-hidden hover:shadow-md hover:border-primary/50 transition-all duration-300 border-muted bg-card"
                 onClick={() => handleCharacterSelect(character.id)}
               >
-                <CardHeader className="p-0 mb-2 flex-grow flex items-center justify-center">
-                  <CardTitle className="text-lg">{character.name}</CardTitle>
-                </CardHeader>
-                <CardContent className="p-0 mt-auto">
-                  <Button variant="outline" size="sm">
-                    Select
-                  </Button>
-                </CardContent>
+                <div className="relative w-full aspect-square overflow-hidden bg-muted">
+                  {character.image ? (
+                    <img
+                      src={character.image}
+                      alt={character.name}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-muted/50">
+                      <span className="text-muted-foreground text-xs">
+                        No Image
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div className="w-full p-2 bg-card border-t border-border/50">
+                  <p className="text-xs sm:text-sm font-medium text-center text-card-foreground truncate group-hover:text-primary transition-colors">
+                    {character.name}
+                  </p>
+                </div>
               </Card>
             ))}
           </div>

@@ -141,10 +141,18 @@ export const defaultColumns: ColumnConfig[] = [
     maxWidth: 60,
   },
   {
+    id: "properties",
+    label: "Properties",
+    visible: true,
+    order: 10,
+    className: "pt-2 px-2",
+    minWidth: 120,
+  },
+  {
     id: "notes",
     label: "Notes",
     visible: true,
-    order: 10,
+    order: 11,
     className: "pt-2 px-2 overflow-visible",
   },
 ];

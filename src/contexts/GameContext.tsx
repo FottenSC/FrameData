@@ -93,12 +93,20 @@ export interface Game {
 export interface Character {
   id: number;
   name: string;
+  image?: string;
 }
 
 // Define StanceInfo for tooltip display
 export interface StanceInfo {
   name: string;
   description: string;
+}
+
+// Define PropertyInfo for badge styling
+export interface PropertyInfo {
+  name: string;
+  description: string;
+  className: string;
 }
 
 // Define avaliableGames here
@@ -195,6 +203,7 @@ interface GameContextType {
   getNotationMap: () => NotationMap;
   applyNotation: (text: string | null) => string | null;
   getStanceInfo: (stanceCode: string, characterId?: number | null) => StanceInfo | null;
+  getPropertyInfo: (propertyCode: string) => PropertyInfo | null;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -231,6 +240,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const [gameStances, setGameStances] = useState<Record<string, StanceInfo>>({});
   // Character-specific stances: characterId -> stanceCode -> StanceInfo
   const [characterStances, setCharacterStances] = useState<Record<number, Record<string, StanceInfo>>>({});
+  // Game-level properties
+  const [gameProperties, setGameProperties] = useState<Record<string, PropertyInfo>>({});
 
   useEffect(() => {
     const loadCharacters = async () => {
@@ -261,6 +272,9 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
         ).map((c: any) => ({
           id: Number(c.id),
           name: String(c.name),
+          image: c.image
+            ? `/Games/${encodeURIComponent(selectedGame.id)}/Images/${c.image}`
+            : undefined,
         }));
         setCharacters(charactersData);
 
@@ -277,6 +291,22 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
           setGameStances(stances);
         } else {
           setGameStances({});
+        }
+
+        // Load game-level properties
+        if (data?.properties && typeof data.properties === "object") {
+          const properties: Record<string, PropertyInfo> = {};
+          for (const [code, info] of Object.entries(data.properties)) {
+            const propData = info as { name?: string; description?: string; className?: string };
+            properties[code] = {
+              name: propData.name || code,
+              description: propData.description || "",
+              className: propData.className || "",
+            };
+          }
+          setGameProperties(properties);
+        } else {
+          setGameProperties({});
         }
 
         // Load character-specific stances
@@ -386,6 +416,14 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     return null;
   };
 
+  // Get property info by code
+  const getPropertyInfo = (propertyCode: string): PropertyInfo | null => {
+    if (gameProperties[propertyCode]) {
+      return gameProperties[propertyCode];
+    }
+    return null;
+  };
+
   const contextValue: GameContextType = {
     selectedGame,
     setSelectedGameById: handleSetSelectedGameById,
@@ -400,6 +438,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     getNotationMap,
     applyNotation,
     getStanceInfo,
+    getPropertyInfo,
   };
 
   return (

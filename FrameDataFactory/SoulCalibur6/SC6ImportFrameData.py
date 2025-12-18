@@ -111,20 +111,42 @@ def translate_command(cmd):
 frameData["stringCommand"] = frameData["Command"].copy()
 frameData["Command"] = frameData["Command"].apply(translate_command)
 
-# Compute flag columns as in PostProcess (not used in JSON, but kept here if needed later)
+# Extract properties from Notes column into a Properties array
 def note_has(note, token: str) -> bool:
     try:
         return token in str(note)
     except Exception:
         return False
 
-frameData["isUB"] = frameData["Notes"].apply(lambda n: 1 if note_has(n, ":UA:") and True else 0)
-frameData["isBA"] = frameData["Notes"].apply(lambda n: 1 if note_has(n, ":BA:") and True else 0)
-frameData["isGI"] = frameData["Notes"].apply(lambda n: 1 if note_has(n, ":GI:") and True else 0)
-frameData["isTH"] = frameData["Notes"].apply(lambda n: 1 if note_has(n, ":TH:") and True else 0)
-frameData["isSS"] = frameData["Notes"].apply(lambda n: 1 if note_has(n, ":SS:") and True else 0)
-frameData["isRE"] = frameData.apply(lambda r: 1 if note_has(r.get("Notes"), ":RE:") or (isinstance(r.get("Stance"), str) and ("RE" in r.get("Stance"))) else 0, axis=1)
-frameData["isLH"] = frameData["Notes"].apply(lambda n: 1 if note_has(n, ":LH:") and True else 0)
+# Property tokens to check for in Notes
+PROPERTY_TOKENS = {
+    ":UA:": "UA",  # Unblockable
+    ":BA:": "BA",  # Break Attack
+    ":GI:": "GI",  # Guard Impact
+    ":TH:": "TH",  # Throw
+    ":SS:": "SS",  # Soul Strike
+    ":RE:": "RE",  # Reversal Edge
+    ":LH:": "LH",  # Lethal Hit
+}
+
+def extract_properties(row):
+    """Extract properties from Notes and Stance columns into a list."""
+    properties = []
+    notes = row.get("Notes")
+    stance = row.get("Stance")
+    
+    for token, prop_name in PROPERTY_TOKENS.items():
+        if note_has(notes, token):
+            properties.append(prop_name)
+    
+    # Special case: RE can also be detected from Stance
+    if "RE" not in properties:
+        if isinstance(stance, str) and "RE" in stance:
+            properties.append("RE")
+    
+    return properties if properties else None
+
+frameData["Properties"] = frameData.apply(extract_properties, axis=1)
 
 
 # Stance case fixer
@@ -344,8 +366,7 @@ if game_json_path.exists():
 
 # Preserve existing game-level stances (shared stances moved from characters)
 existing_game_stances = existing_game_data.get("stances", {})
-
-# Build lookup map from existing characters (including their stances)
+existing_game_properties = existing_game_data.get("properties", {})
 existing_characters = {c["name"]: c for c in existing_game_data.get("characters", [])}
 
 # Get max character ID from existing data for new entries
@@ -401,17 +422,41 @@ for name in characters:
                 "description": ""
             }
     
-    characters_manifest.append({
+    char_entry = {
         "id": char_id,
         "name": name,
         "stances": stances_dict
-    })
+    }
+    if "image" in existing_char:
+        char_entry["image"] = existing_char["image"]
+        
+    characters_manifest.append(char_entry)
 
 char_id_map = {c["name"]: c["id"] for c in characters_manifest}
 frameData["CharacterID"] = frameData["Character"].map(char_id_map)
 
+# Build properties dict, preserving existing user-edited data
+properties_dict = {}
+for prop_key in PROPERTY_TOKENS.values():
+    if prop_key in existing_game_properties:
+        # Preserve existing property data (including user-edited name/description)
+        existing_prop = existing_game_properties[prop_key]
+        properties_dict[prop_key] = {
+            "name": existing_prop.get("name", ""),
+            "description": existing_prop.get("description", ""),
+            "className": existing_prop.get("className", "")
+        }
+    else:
+        # New property with blank name and description
+        properties_dict[prop_key] = {
+            "name": "",
+            "description": "",
+            "className": ""
+        }
+
 # Write Game.json
 game_manifest = {
+    "properties": properties_dict,
     "stances": existing_game_stances,
     "characters": characters_manifest
 }
@@ -493,6 +538,7 @@ def move_row_to_dict(row: pd.Series):
         "stringCommand": to_str_or_none(row.get("stringCommand")),
         "Command": split_by_delimiter(row.get("Command")),
         "Stance": toArrayOrNone(row.get("Stance")),
+        "Properties": toArrayOrNone(row.get("Properties")),
         "HitLevel": split_by_delimiter(row.get("Hit level")),
         "Impact": to_int_or_none(row.get("Impact")),
         "Damage": to_str_or_none(row.get("Damage")),

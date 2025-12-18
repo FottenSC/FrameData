@@ -1,4 +1,41 @@
 {
+  "properties": {
+    "UA": {
+      "name": "Unblockable",
+      "description": "",
+      "className": "border-white text-zinc-900 bg-red-600"
+    },
+    "BA": {
+      "name": "Break Attack",
+      "description": "",
+      "className": "border-white text-zinc-900 bg-blue-400"
+    },
+    "GI": {
+      "name": "Guard Impact",
+      "description": "",
+      "className": "bg-lime-500 text-zinc-900 border-white"
+    },
+    "TH": {
+      "name": "Throw",
+      "description": "",
+      "className": "bg-fuchsia-300 text-zinc-900 border-white"
+    },
+    "SS": {
+      "name": "Stance Change",
+      "description": "Move can/will transition you into another stance.",
+      "className": "bg-purple-400 text-zinc-900 border-white"
+    },
+    "RE": {
+      "name": "Reversal Edge",
+      "description": "",
+      "className": "bg-rose-800 text-white border-white"
+    },
+    "LH": {
+      "name": "Lethal Hit",
+      "description": "When fulfilling certain criteria this move becomes more powerful.",
+      "className": "bg-orange-500 text-zinc-900 border-white"
+    }
+  },
   "stances": {
     "BT": {
       "name": "Back turned",
@@ -94,7 +131,8 @@
           "name": "Angler Stance",
           "description": ""
         }
-      }
+      },
+      "image": "2b.webp"
     },
     {
       "id": 2,
@@ -124,12 +162,14 @@
           "name": "White Rose Perception",
           "description": "Amy needs to have hit her opponent with 4 white roses"
         }
-      }
+      },
+      "image": "Amy.webp"
     },
     {
       "id": 3,
       "name": "Astaroth",
-      "stances": {}
+      "stances": {},
+      "image": "Astaroth.webp"
     },
     {
       "id": 4,
@@ -175,7 +215,8 @@
           "name": "Sword",
           "description": ""
         }
-      }
+      },
+      "image": "Azwel.webp"
     },
     {
       "id": 5,
@@ -201,7 +242,8 @@
           "name": "",
           "description": ""
         }
-      }
+      },
+      "image": "Cassandra.webp"
     },
     {
       "id": 6,
@@ -219,7 +261,8 @@
           "name": "",
           "description": ""
         }
-      }
+      },
+      "image": "Cervantes.webp"
     },
     {
       "id": 7,
@@ -237,7 +280,8 @@
           "name": "Enemy in Soul Charge",
           "description": ""
         }
-      }
+      },
+      "image": "Geralt.webp"
     },
     {
       "id": 8,
@@ -247,7 +291,8 @@
           "name": "Avenger",
           "description": ""
         }
-      }
+      },
+      "image": "Groh.webp"
     },
     {
       "id": 9,
@@ -281,7 +326,8 @@
           "name": "",
           "description": ""
         }
-      }
+      },
+      "image": "Haohmaru.webp"
     },
     {
       "id": 10,
@@ -299,7 +345,8 @@
           "name": "Charge",
           "description": "Hilde has to hold one or more buttons for a set amount of time to perform these moves."
         }
-      }
+      },
+      "image": "Hilde.webp"
     },
     {
       "id": 11,
@@ -341,7 +388,8 @@
           "name": "",
           "description": ""
         }
-      }
+      },
+      "image": "Hwang.webp"
     },
     {
       "id": 12,
@@ -355,7 +403,8 @@
           "name": "",
           "description": ""
         }
-      }
+      },
+      "image": "Inferno.webp"
     },
     {
       "id": 13,
@@ -385,7 +434,8 @@
           "name": "",
           "description": ""
         }
-      }
+      },
+      "image": "Ivy.webp"
     },
     {
       "id": 14,
@@ -403,7 +453,8 @@
           "name": "",
           "description": ""
         }
-      }
+      },
+      "image": "Kilik.webp"
     },
     {
       "id": 15,
@@ -441,7 +492,8 @@
           "name": "",
           "description": ""
         }
-      }
+      },
+      "image": "Maxi.webp"
     },
     {
       "id": 16,
@@ -463,7 +515,8 @@
           "name": "Shura",
           "description": ""
         }
-      }
+      },
+      "image": "Mitsurugi.webp"
     },
     {
       "id": 17,
@@ -493,7 +546,8 @@
           "name": "",
           "description": ""
         }
-      }
+      },
+      "image": "Nightmare.webp"
     },
     {
       "id": 18,
@@ -519,7 +573,8 @@
           "name": "",
           "description": ""
         }
-      }
+      },
+      "image": "Raphael.webp"
     },
     {
       "id": 19,
@@ -533,7 +588,8 @@
           "name": "",
           "description": ""
         }
-      }
+      },
+      "image": "Seong-mi-na.webp"
     },
     {
       "id": 20,
@@ -559,7 +615,8 @@
           "name": "",
           "description": ""
         }
-      }
+      },
+      "image": "Setsuka.webp"
     },
     {
       "id": 21,
@@ -585,7 +642,8 @@
           "name": "",
           "description": ""
         }
-      }
+      },
+      "image": "Siegfried.webp"
     },
     {
       "id": 22,
@@ -593,7 +651,7 @@
       "stances": {
         "AS": {
           "name": "Angel Step",
-          "description": "Entered by pressing ↓ ↘ →"
+          "description": "Entered by pressing \u2193 \u2198 \u2192"
         },
         "Hit": {
           "name": "",
@@ -601,9 +659,10 @@
         },
         "TAS": {
           "name": "Twin Angel Step",
-          "description": "Entered by pressing ↓ ↘ → →"
+          "description": "Entered by pressing \u2193 \u2198 \u2192 \u2192"
         }
-      }
+      },
+      "image": "Sophitia.webp"
     },
     {
       "id": 23,
@@ -633,7 +692,8 @@
           "name": "",
           "description": ""
         }
-      }
+      },
+      "image": "Taki.webp"
     },
     {
       "id": 24,
@@ -659,7 +719,8 @@
           "name": "",
           "description": ""
         }
-      }
+      },
+      "image": "Talim.webp"
     },
     {
       "id": 25,
@@ -677,7 +738,8 @@
           "name": "Updraft",
           "description": "When Tira flys up into the air."
         }
-      }
+      },
+      "image": "Tira.webp"
     },
     {
       "id": 26,
@@ -719,7 +781,8 @@
           "name": "Vs Crouch",
           "description": "Opponent is crouching"
         }
-      }
+      },
+      "image": "Voldo.webp"
     },
     {
       "id": 27,
@@ -749,7 +812,8 @@
           "name": "",
           "description": ""
         }
-      }
+      },
+      "image": "Xianghua.webp"
     },
     {
       "id": 28,
@@ -775,7 +839,8 @@
           "name": "Super Dragonfly",
           "description": "Enhanced version of Manji Dragonfly that can be performed while in Soulcharge."
         }
-      }
+      },
+      "image": "Yoshimitsu.webp"
     },
     {
       "id": 29,
@@ -805,7 +870,8 @@
           "name": "",
           "description": ""
         }
-      }
+      },
+      "image": "Zasalamel.webp"
     }
   ]
 }

@@ -14,6 +14,7 @@ export interface Move {
   CounterHit: string | null;
   CounterHitDec: number;
   GuardBurst: number;
+  Properties: string[] | null;
   Notes: string | null;
   CharacterName?: string | null;
   CharacterId?: number | null;
@@ -41,4 +42,5 @@ export type SortableColumn =
   | "hit"
   | "counterHit"
   | "guardBurst"
+  | "properties"
   | "notes";

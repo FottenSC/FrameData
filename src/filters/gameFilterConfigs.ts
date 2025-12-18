@@ -14,6 +14,7 @@ export const defaultFields: GameFilterConfig["fields"] = [
   { id: "hit", label: "Hit", type: "number" },
   { id: "counterHit", label: "Counter Hit", type: "number" },
   { id: "guardBurst", label: "Guard Burst", type: "number" },
+  { id: "properties", label: "Properties", type: "text" },
   { id: "notes", label: "Notes", type: "text" },
   { id: "character", label: "Character", type: "text" },
 ];

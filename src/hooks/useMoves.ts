@@ -98,6 +98,16 @@ function processMove(
         : null,
     GuardBurst:
       moveObject.GuardBurst != null ? Number(moveObject.GuardBurst) : null,
+    Properties: (() => {
+      const raw = moveObject.Properties;
+      if (Array.isArray(raw)) {
+        const arr = raw
+          .map((p: any) => (p != null ? String(p) : null))
+          .filter((p): p is string => p !== null);
+        return arr.length > 0 ? arr : null;
+      }
+      return raw ? [String(raw)] : null;
+    })(),
     Notes: moveObject.Notes != null ? String(moveObject.Notes) : null,
   } as Move;
 }

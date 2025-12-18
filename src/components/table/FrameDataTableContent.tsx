@@ -83,7 +83,6 @@ interface DataTableContentProps {
   renderNotes: (note: string | null) => React.ReactNode;
   visibleColumns: ColumnConfig[];
   badges?: Record<string, { className: string }>;
-  // Whether "All Characters" mode is active (enables pagination)
   isAllCharacters?: boolean;
 }
 
@@ -199,7 +198,7 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
   isAllCharacters = false,
 }) => {
   // Get stance info function from context
-  const { getStanceInfo } = useGame();
+  const { getStanceInfo, getPropertyInfo } = useGame();
 
   // Single scroll container ref - component owns its scroll
   const [scrollContainer, setScrollContainer] = useState<HTMLDivElement | null>(
@@ -251,10 +250,12 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
         case "character":
           return move.CharacterName || "—";
         case "stance":
-          if (!move.Stance || move.Stance.length === 0) return "—";
+          if (!move.Stance || move.Stance.length === 0) {
+            return "—";
+          }
           return (
             <div className="flex flex-wrap gap-0.5 justify-end">
-              {move.Stance.map((s, i) => {
+              {move.Stance.filter(s => s && s.trim() !== "").map((s, i) => {
                 const stanceInfo = getStanceInfo(s, move.CharacterId);
                 // Only show tooltip if there's a non-empty name (different from the code) or a description
                 const hasTooltipContent = stanceInfo && ((stanceInfo.name && stanceInfo.name !== s) || stanceInfo.description);
@@ -350,6 +351,49 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
               forceNoSign
               badges={badges}
             />
+          );
+        case "properties":
+          if (!move.Properties || move.Properties.length === 0){
+            return "—";
+          }
+          return (
+            <div className="flex flex-wrap gap-0.5">
+              {move.Properties.map((prop) => {
+                const propInfo = getPropertyInfo(prop);
+                const className = propInfo?.className || "";
+                
+                const badge = (
+                  <Badge
+                    variant="default"
+                    className={`whitespace-nowrap border text-xs w-8 font-semibold inline-flex items-center justify-center ${className}`}
+                  >
+                    {prop}
+                  </Badge>
+                );
+                
+                const hasTooltipContent = (propInfo?.name && propInfo.name !== prop) || propInfo?.description;
+                
+                return (
+                  <Tooltip key={prop}>
+                    <TooltipTrigger asChild>
+                      {badge}
+                    </TooltipTrigger>
+                    {hasTooltipContent && (
+                      <TooltipContent className="max-w-xs">
+                        <div className="space-y-1">
+                          <p className="font-semibold">{propInfo?.name || prop}</p>
+                          {propInfo?.description && (
+                            <p className="text-xs text-muted-foreground whitespace-pre-wrap">
+                              {propInfo.description}
+                            </p>
+                          )}
+                        </div>
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                );
+              })}
+            </div>
           );
         case "notes":
           return (

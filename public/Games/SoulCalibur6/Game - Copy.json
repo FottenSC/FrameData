@@ -26,7 +26,7 @@
     },
     "WR": {
       "name": "While Rising",
-      "description": "While your character is going from crouching to standing. Can be cancelled by pressing a direction."
+      "description": "While your character is going from crouching to standing. Can be cancelled by pressing a forward or back."
     },
     "RUN": {
       "name": "While Running",
@@ -60,9 +60,21 @@
       "name": "Tip",
       "description": "Move hits with the tip of your weapon."
     },
+    "Long": {
+      "name": "Long hold",
+      "description": ""
+    },
+    "Medium": {
+      "name": "Medium hold",
+      "description": ""
+    },
+    "Short": {
+      "name": "Short hold",
+      "description": ""
+    },
     "Revenge": {
-        "name": "Revenge",
-        "description": "Red armor like Astaroth has"
+      "name": "Revenge",
+      "description": "Red armor like Astaroth has"
     }
   },
   "characters": [
@@ -143,16 +155,16 @@
           "name": "",
           "description": ""
         },
-        "even activation": {
-            "name": "",
-            "description": ""
-        },
-        "odd activation": {
-            "name": "",
-            "description": ""
-        },
         "ax": {
           "name": "Axe?",
+          "description": ""
+        },
+        "even activation": {
+          "name": "",
+          "description": ""
+        },
+        "odd activation": {
+          "name": "",
           "description": ""
         },
         "spear": {
@@ -232,7 +244,7 @@
       "name": "Groh",
       "stances": {
         "AVN": {
-          "name": "",
+          "name": "Avenger",
           "description": ""
         }
       }
@@ -384,7 +396,7 @@
           "description": ""
         },
         "MO": {
-          "name": "",
+          "name": "Monument",
           "description": ""
         },
         "WD": {
@@ -448,7 +460,7 @@
           "description": ""
         },
         "Shura": {
-          "name": "",
+          "name": "Shura",
           "description": ""
         }
       }
@@ -513,15 +525,11 @@
       "id": 19,
       "name": "Seong-mi-na",
       "stances": {
-        "Full Hold": {
+        "Full": {
           "name": "",
           "description": ""
         },
         "LS": {
-          "name": "",
-          "description": ""
-        },
-        "Short Hold": {
           "name": "",
           "description": ""
         }
@@ -707,10 +715,6 @@
           "name": "",
           "description": ""
         },
-        "Revenge": {
-          "name": "",
-          "description": ""
-        },
         "vs crouch": {
           "name": "Vs Crouch",
           "description": "Opponent is crouching"
@@ -767,21 +771,9 @@
           "name": "Indian Stance",
           "description": "While Yoshimitsu is sitting on the ground meditating."
         },
-        "Long": {
-          "name": "",
-          "description": ""
-        },
-        "Medium": {
-          "name": "",
-          "description": ""
-        },
         "SGDF": {
           "name": "Super Dragonfly",
           "description": "Enhanced version of Manji Dragonfly that can be performed while in Soulcharge."
-        },
-        "Short": {
-          "name": "",
-          "description": ""
         }
       }
     },

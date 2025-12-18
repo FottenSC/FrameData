@@ -1,0 +1,877 @@
+{
+  "properties": {
+    "UA": {
+      "name": "Unblockable",
+      "description": "",
+      "className": "border-white text-zinc-900 bg-red-600"
+    },
+    "BA": {
+      "name": "Break Attack",
+      "description": "",
+      "className": "border-white text-zinc-900 bg-blue-400"
+    },
+    "GI": {
+      "name": "Guard Impact",
+      "description": "",
+      "className": "bg-lime-500 text-zinc-900 border-white"
+    },
+    "TH": {
+      "name": "Throw",
+      "description": "",
+      "className": "bg-fuchsia-300 text-zinc-900 border-white"
+    },
+    "SS": {
+      "name": "Stance Change",
+      "description": "Move can/will transition you into another stance.",
+      "className": "bg-purple-400 text-zinc-900 border-white"
+    },
+    "RE": {
+      "name": "Reversal Edge",
+      "description": "",
+      "className": "bg-rose-800 text-white border-white"
+    },
+    "LH": {
+      "name": "Lethal Hit",
+      "description": "When fulfilling certain criteria this move becomes more powerful.",
+      "className": "bg-orange-500 text-zinc-900 border-white"
+    }
+  },
+  "stances": {
+    "BT": {
+      "name": "Back turned",
+      "description": "While your character's back is turned to your opponent."
+    },
+    "Back Side": {
+      "name": "Back Side",
+      "description": "Hit against the back side of your opponent."
+    },
+    "Right Side": {
+      "name": "Right Side",
+      "description": "Hit against the right side of your opponent."
+    },
+    "Left Side": {
+      "name": "Left Side",
+      "description": "Hit against the left side of your opponent."
+    },
+    "FC": {
+      "name": "Full Crouch",
+      "description": "While your character is crouching."
+    },
+    "SC": {
+      "name": "Soul Charge",
+      "description": "While your character is soul charged."
+    },
+    "WR": {
+      "name": "While Rising",
+      "description": "While your character is going from crouching to standing. Can be cancelled by pressing a forward or back."
+    },
+    "RUN": {
+      "name": "While Running",
+      "description": "Move is done while your character is running."
+    },
+    "AIR": {
+      "name": "Airborne",
+      "description": "Move is done against an airborne opponent."
+    },
+    "RE": {
+      "name": "Reversal Edge",
+      "description": "In Reversal Edge round 1"
+    },
+    "RE2": {
+      "name": "Reversal Edge Round 2",
+      "description": "In Reversal Edge round 2"
+    },
+    "GROUNDED": {
+      "name": "Grounded",
+      "description": "While your opponent is one the ground."
+    },
+    "GI": {
+      "name": "Guard Impact",
+      "description": ""
+    },
+    "Miss": {
+      "name": "Opponent Missed",
+      "description": ""
+    },
+    "Tip": {
+      "name": "Tip",
+      "description": "Move hits with the tip of your weapon."
+    },
+    "Long": {
+      "name": "Long hold",
+      "description": ""
+    },
+    "Medium": {
+      "name": "Medium hold",
+      "description": ""
+    },
+    "Short": {
+      "name": "Short hold",
+      "description": ""
+    },
+    "Revenge": {
+      "name": "Revenge",
+      "description": "Red armor like Astaroth has"
+    }
+  },
+  "characters": [
+    {
+      "id": 1,
+      "name": "2b",
+      "stances": {
+        "AGS": {
+          "name": "Aggression Shift",
+          "description": ""
+        },
+        "AL": {
+          "name": "Aerial Leap",
+          "description": ""
+        },
+        "ANG": {
+          "name": "Angler Stance",
+          "description": ""
+        }
+      },
+      "image": "2b.webp"
+    },
+    {
+      "id": 2,
+      "name": "Amy",
+      "stances": {
+        "AS": {
+          "name": "",
+          "description": ""
+        },
+        "HP": {
+          "name": "",
+          "description": ""
+        },
+        "LP": {
+          "name": "",
+          "description": ""
+        },
+        "MP": {
+          "name": "",
+          "description": ""
+        },
+        "RRP": {
+          "name": "Red Rose Perception",
+          "description": "Amy needs to have hit her opponent with 4 red roses"
+        },
+        "WRP": {
+          "name": "White Rose Perception",
+          "description": "Amy needs to have hit her opponent with 4 white roses"
+        }
+      },
+      "image": "Amy.webp"
+    },
+    {
+      "id": 3,
+      "name": "Astaroth",
+      "stances": {},
+      "image": "Astaroth.webp"
+    },
+    {
+      "id": 4,
+      "name": "Azwel",
+      "stances": {
+        "BOB": {
+          "name": "",
+          "description": ""
+        },
+        "COE": {
+          "name": "",
+          "description": ""
+        },
+        "TOW": {
+          "name": "",
+          "description": ""
+        },
+        "Weaponless": {
+          "name": "Weaponless",
+          "description": ""
+        },
+        "almighty": {
+          "name": "",
+          "description": ""
+        },
+        "ax": {
+          "name": "Axe?",
+          "description": ""
+        },
+        "even activation": {
+          "name": "",
+          "description": ""
+        },
+        "odd activation": {
+          "name": "",
+          "description": ""
+        },
+        "spear": {
+          "name": "Spear",
+          "description": ""
+        },
+        "sword": {
+          "name": "Sword",
+          "description": ""
+        }
+      },
+      "image": "Azwel.webp"
+    },
+    {
+      "id": 5,
+      "name": "Cassandra",
+      "stances": {
+        "AS": {
+          "name": "",
+          "description": ""
+        },
+        "AT": {
+          "name": "",
+          "description": ""
+        },
+        "DF": {
+          "name": "",
+          "description": ""
+        },
+        "Quake": {
+          "name": "",
+          "description": ""
+        },
+        "TS": {
+          "name": "",
+          "description": ""
+        }
+      },
+      "image": "Cassandra.webp"
+    },
+    {
+      "id": 6,
+      "name": "Cervantes",
+      "stances": {
+        "DC": {
+          "name": "Dread Charge",
+          "description": ""
+        },
+        "DS": {
+          "name": "Dread Storm",
+          "description": ""
+        },
+        "Wall": {
+          "name": "",
+          "description": ""
+        }
+      },
+      "image": "Cervantes.webp"
+    },
+    {
+      "id": 7,
+      "name": "Geralt",
+      "stances": {
+        "CH": {
+          "name": "",
+          "description": ""
+        },
+        "During Motion": {
+          "name": "",
+          "description": ""
+        },
+        "Enemy in SC": {
+          "name": "Enemy in Soul Charge",
+          "description": ""
+        }
+      },
+      "image": "Geralt.webp"
+    },
+    {
+      "id": 8,
+      "name": "Groh",
+      "stances": {
+        "AVN": {
+          "name": "Avenger",
+          "description": ""
+        }
+      },
+      "image": "Groh.webp"
+    },
+    {
+      "id": 9,
+      "name": "Haohmaru",
+      "stances": {
+        "BKN": {
+          "name": "",
+          "description": ""
+        },
+        "LH": {
+          "name": "",
+          "description": ""
+        },
+        "RG": {
+          "name": "",
+          "description": ""
+        },
+        "RT": {
+          "name": "",
+          "description": ""
+        },
+        "RXP": {
+          "name": "",
+          "description": ""
+        },
+        "STG": {
+          "name": "",
+          "description": ""
+        },
+        "WF": {
+          "name": "",
+          "description": ""
+        }
+      },
+      "image": "Haohmaru.webp"
+    },
+    {
+      "id": 10,
+      "name": "Hilde",
+      "stances": {
+        "SPR": {
+          "name": "Spear",
+          "description": ""
+        },
+        "SWR": {
+          "name": "Sword",
+          "description": ""
+        },
+        "c": {
+          "name": "Charge",
+          "description": "Hilde has to hold one or more buttons for a set amount of time to perform these moves."
+        }
+      },
+      "image": "Hilde.webp"
+    },
+    {
+      "id": 11,
+      "name": "Hwang",
+      "stances": {
+        "CH": {
+          "name": "",
+          "description": ""
+        },
+        "DS": {
+          "name": "",
+          "description": ""
+        },
+        "DW": {
+          "name": "",
+          "description": ""
+        },
+        "FJ": {
+          "name": "",
+          "description": ""
+        },
+        "MS": {
+          "name": "",
+          "description": ""
+        },
+        "RS": {
+          "name": "",
+          "description": ""
+        },
+        "WS": {
+          "name": "",
+          "description": ""
+        },
+        "WT": {
+          "name": "",
+          "description": ""
+        },
+        "YYT": {
+          "name": "",
+          "description": ""
+        }
+      },
+      "image": "Hwang.webp"
+    },
+    {
+      "id": 12,
+      "name": "Inferno",
+      "stances": {
+        "VG": {
+          "name": "",
+          "description": ""
+        },
+        "VS": {
+          "name": "",
+          "description": ""
+        }
+      },
+      "image": "Inferno.webp"
+    },
+    {
+      "id": 13,
+      "name": "Ivy",
+      "stances": {
+        "BOB": {
+          "name": "",
+          "description": ""
+        },
+        "Downed Opponent": {
+          "name": "",
+          "description": ""
+        },
+        "Midair Opponent": {
+          "name": "",
+          "description": ""
+        },
+        "SE": {
+          "name": "",
+          "description": ""
+        },
+        "SE Midair Opponent": {
+          "name": "",
+          "description": ""
+        },
+        "SL": {
+          "name": "",
+          "description": ""
+        }
+      },
+      "image": "Ivy.webp"
+    },
+    {
+      "id": 14,
+      "name": "Kilik",
+      "stances": {
+        "BP": {
+          "name": "",
+          "description": ""
+        },
+        "MO": {
+          "name": "Monument",
+          "description": ""
+        },
+        "WD": {
+          "name": "",
+          "description": ""
+        }
+      },
+      "image": "Kilik.webp"
+    },
+    {
+      "id": 15,
+      "name": "Maxi",
+      "stances": {
+        "Any Stance": {
+          "name": "",
+          "description": ""
+        },
+        "BL": {
+          "name": "",
+          "description": ""
+        },
+        "LI": {
+          "name": "",
+          "description": ""
+        },
+        "LO": {
+          "name": "",
+          "description": ""
+        },
+        "NG": {
+          "name": "",
+          "description": ""
+        },
+        "RC": {
+          "name": "",
+          "description": ""
+        },
+        "RO": {
+          "name": "",
+          "description": ""
+        },
+        "SSR": {
+          "name": "",
+          "description": ""
+        }
+      },
+      "image": "Maxi.webp"
+    },
+    {
+      "id": 16,
+      "name": "Mitsurugi",
+      "stances": {
+        "MST": {
+          "name": "",
+          "description": ""
+        },
+        "RLC": {
+          "name": "",
+          "description": ""
+        },
+        "SS": {
+          "name": "",
+          "description": ""
+        },
+        "Shura": {
+          "name": "Shura",
+          "description": ""
+        }
+      },
+      "image": "Mitsurugi.webp"
+    },
+    {
+      "id": 17,
+      "name": "Nightmare",
+      "stances": {
+        "GS": {
+          "name": "",
+          "description": ""
+        },
+        "Hit": {
+          "name": "",
+          "description": ""
+        },
+        "NBS": {
+          "name": "",
+          "description": ""
+        },
+        "NLS": {
+          "name": "",
+          "description": ""
+        },
+        "NSS": {
+          "name": "",
+          "description": ""
+        },
+        "NTC": {
+          "name": "",
+          "description": ""
+        }
+      },
+      "image": "Nightmare.webp"
+    },
+    {
+      "id": 18,
+      "name": "Raphael",
+      "stances": {
+        "AG": {
+          "name": "",
+          "description": ""
+        },
+        "Evade": {
+          "name": "",
+          "description": ""
+        },
+        "PR": {
+          "name": "",
+          "description": ""
+        },
+        "QP": {
+          "name": "",
+          "description": ""
+        },
+        "SE": {
+          "name": "",
+          "description": ""
+        }
+      },
+      "image": "Raphael.webp"
+    },
+    {
+      "id": 19,
+      "name": "Seong-mi-na",
+      "stances": {
+        "Full": {
+          "name": "",
+          "description": ""
+        },
+        "LS": {
+          "name": "",
+          "description": ""
+        }
+      },
+      "image": "Seong-mi-na.webp"
+    },
+    {
+      "id": 20,
+      "name": "Setsuka",
+      "stances": {
+        "SKY stage I": {
+          "name": "",
+          "description": ""
+        },
+        "SKY stage II": {
+          "name": "",
+          "description": ""
+        },
+        "SKY stage III": {
+          "name": "",
+          "description": ""
+        },
+        "Sky": {
+          "name": "",
+          "description": ""
+        },
+        "WoH": {
+          "name": "",
+          "description": ""
+        }
+      },
+      "image": "Setsuka.webp"
+    },
+    {
+      "id": 21,
+      "name": "Siegfried",
+      "stances": {
+        "DL": {
+          "name": "",
+          "description": ""
+        },
+        "SBH": {
+          "name": "",
+          "description": ""
+        },
+        "SCH": {
+          "name": "",
+          "description": ""
+        },
+        "SRSH": {
+          "name": "",
+          "description": ""
+        },
+        "SSH": {
+          "name": "",
+          "description": ""
+        }
+      },
+      "image": "Siegfried.webp"
+    },
+    {
+      "id": 22,
+      "name": "Sophitia",
+      "stances": {
+        "AS": {
+          "name": "Angel Step",
+          "description": "Entered by pressing \u2193 \u2198 \u2192"
+        },
+        "Hit": {
+          "name": "",
+          "description": ""
+        },
+        "TAS": {
+          "name": "Twin Angel Step",
+          "description": "Entered by pressing \u2193 \u2198 \u2192 \u2192"
+        }
+      },
+      "image": "Sophitia.webp"
+    },
+    {
+      "id": 23,
+      "name": "Taki",
+      "stances": {
+        "DB": {
+          "name": "",
+          "description": ""
+        },
+        "DOWN": {
+          "name": "",
+          "description": ""
+        },
+        "PO": {
+          "name": "",
+          "description": ""
+        },
+        "SG": {
+          "name": "",
+          "description": ""
+        },
+        "STK": {
+          "name": "",
+          "description": ""
+        },
+        "WRO": {
+          "name": "",
+          "description": ""
+        }
+      },
+      "image": "Taki.webp"
+    },
+    {
+      "id": 24,
+      "name": "Talim",
+      "stances": {
+        "JUMP": {
+          "name": "",
+          "description": ""
+        },
+        "WNB": {
+          "name": "",
+          "description": ""
+        },
+        "WNC": {
+          "name": "",
+          "description": ""
+        },
+        "WNF": {
+          "name": "",
+          "description": ""
+        },
+        "WNS": {
+          "name": "",
+          "description": ""
+        }
+      },
+      "image": "Talim.webp"
+    },
+    {
+      "id": 25,
+      "name": "Tira",
+      "stances": {
+        "GS": {
+          "name": "Gloomy",
+          "description": "Purple particles are shown when entering this stance. \nIt gets replaced by Gloomy Coda once Tira has switched moodes 9 times."
+        },
+        "JS": {
+          "name": "Jolly",
+          "description": "Yellow particles are shown when entering this stance."
+        },
+        "UD": {
+          "name": "Updraft",
+          "description": "When Tira flys up into the air."
+        }
+      },
+      "image": "Tira.webp"
+    },
+    {
+      "id": 26,
+      "name": "Voldo",
+      "stances": {
+        "BS": {
+          "name": "",
+          "description": ""
+        },
+        "CR": {
+          "name": "",
+          "description": ""
+        },
+        "DOWN": {
+          "name": "",
+          "description": ""
+        },
+        "DR": {
+          "name": "",
+          "description": ""
+        },
+        "MC": {
+          "name": "",
+          "description": ""
+        },
+        "MCFT": {
+          "name": "",
+          "description": ""
+        },
+        "MCFT far": {
+          "name": "",
+          "description": ""
+        },
+        "MCHT": {
+          "name": "",
+          "description": ""
+        },
+        "vs crouch": {
+          "name": "Vs Crouch",
+          "description": "Opponent is crouching"
+        }
+      },
+      "image": "Voldo.webp"
+    },
+    {
+      "id": 27,
+      "name": "Xianghua",
+      "stances": {
+        "BHH": {
+          "name": "",
+          "description": ""
+        },
+        "HL": {
+          "name": "",
+          "description": ""
+        },
+        "PXS": {
+          "name": "",
+          "description": ""
+        },
+        "Quake": {
+          "name": "",
+          "description": ""
+        },
+        "SXS": {
+          "name": "",
+          "description": ""
+        },
+        "WD": {
+          "name": "",
+          "description": ""
+        }
+      },
+      "image": "Xianghua.webp"
+    },
+    {
+      "id": 28,
+      "name": "Yoshimitsu",
+      "stances": {
+        "BE": {
+          "name": "Brave Edge",
+          "description": "Consumes meter to perform the move."
+        },
+        "DGF": {
+          "name": "Manji Dragonfly",
+          "description": "Yoshimitsu uses his blade to fly."
+        },
+        "FLE": {
+          "name": "Flea Stance",
+          "description": "While Yoshimitsu is standing on his blade"
+        },
+        "IND": {
+          "name": "Indian Stance",
+          "description": "While Yoshimitsu is sitting on the ground meditating."
+        },
+        "SGDF": {
+          "name": "Super Dragonfly",
+          "description": "Enhanced version of Manji Dragonfly that can be performed while in Soulcharge."
+        }
+      },
+      "image": "Yoshimitsu.webp"
+    },
+    {
+      "id": 29,
+      "name": "Zasalamel",
+      "stances": {
+        "CH": {
+          "name": "",
+          "description": ""
+        },
+        "Full": {
+          "name": "",
+          "description": ""
+        },
+        "TS1": {
+          "name": "One curse",
+          "description": "One curse is consumed"
+        },
+        "TS2": {
+          "name": "Two curses",
+          "description": "Two curses are consumed"
+        },
+        "TS3": {
+          "name": "Three curses",
+          "description": "Three curses are consumed"
+        },
+        "partial": {
+          "name": "",
+          "description": ""
+        }
+      },
+      "image": "Zasalamel.webp"
+    }
+  ]
+}

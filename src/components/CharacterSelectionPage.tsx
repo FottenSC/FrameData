@@ -109,7 +109,6 @@ export const CharacterSelectionPage: React.FC = () => {
                 <span className="text-4xl text-muted-foreground group-hover:scale-110 transition-transform duration-300">
                   👥
                 </span>
-                <div className="shimmer-overlay" />
               </div>
               <div className="w-full p-2 bg-card border-t border-border/50">
                 <p className="text-xs sm:text-sm font-bold text-center text-card-foreground truncate group-hover:text-primary transition-all">
@@ -126,7 +125,7 @@ export const CharacterSelectionPage: React.FC = () => {
                   isExiting && exitId === character.id && "scale-110 opacity-0 z-10",
                   isExiting && exitId !== character.id && "opacity-20 scale-95",
                 )}
-                style={{ animationDelay: `${(index + 1) * 30}ms` }}
+                style={{ animationDelay: `${(index + 1) * 15}ms` }}
                 onClick={() => handleCharacterSelect(character.id)}
               >
                 <div className="relative w-full aspect-square overflow-hidden bg-muted">
@@ -143,7 +142,6 @@ export const CharacterSelectionPage: React.FC = () => {
                       </span>
                     </div>
                   )}
-                  <div className="shimmer-overlay" />
                 </div>
                 <div className="w-full p-2 bg-card border-t border-border/50">
                   <p className="text-xs sm:text-sm font-bold text-center text-card-foreground truncate group-hover:text-primary transition-all">

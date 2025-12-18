@@ -15,6 +15,7 @@ import { ValueBadge } from "@/components/ui/ValueBadge";
 import { ExpandableHitLevels } from "@/components/icons/ExpandableHitLevels";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Tooltip,
   TooltipContent,
@@ -462,16 +463,17 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
   const tableBody = (() => {
     if (movesLoading) {
       return (
-        <TableRow>
-          <TableCell
-            colSpan={visibleColumns.length}
-            className="text-center h-24 p-2"
-          >
-            <div className="flex justify-center items-center">
-              Loading moves...
-            </div>
-          </TableCell>
-        </TableRow>
+        <>
+          {Array.from({ length: 20 }).map((_, i) => (
+            <TableRow key={i} className="border-b-card-border">
+              {visibleColumns.map((column) => (
+                <TableCell key={column.id} className={column.className}>
+                  <Skeleton className="h-5 w-full max-w-[100px]" />
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </>
       );
     }
 

@@ -12,6 +12,7 @@ import { useGame, avaliableGames } from "../contexts/GameContext";
 import { useTableConfig } from "../contexts/UserSettingsContext";
 import { useCommand } from "../contexts/CommandContext";
 import { useToolbar } from "../contexts/ToolbarContext";
+import { Skeleton } from "./ui/skeleton";
 import { cn } from "@/lib/utils";
 import { FilterBuilder } from "./FilterBuilder";
 import { CommandRenderer } from "@/components/renderers/CommandRenderer";
@@ -618,10 +619,18 @@ export const FrameDataTable: React.FC = () => {
       {selectedCharacterId ? (
         <div className="h-full flex flex-col overflow-hidden">
           <div className="pb-2 flex-shrink-0">
-            <FilterBuilder
-              onFiltersChange={handleFiltersChange}
-              moves={originalMoves}
-            />
+            {movesLoading && originalMoves.length === 0 ? (
+              <div className="flex flex-wrap gap-2 p-4 border rounded-lg bg-card/50">
+                <Skeleton className="h-10 w-32" />
+                <Skeleton className="h-10 w-48" />
+                <Skeleton className="h-10 w-24" />
+              </div>
+            ) : (
+              <FilterBuilder
+                onFiltersChange={handleFiltersChange}
+                moves={originalMoves}
+              />
+            )}
           </div>
           <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
             <div
@@ -646,12 +655,26 @@ export const FrameDataTable: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="flex items-center justify-center h-48 border rounded-lg bg-muted/40">
-          <p className="text-muted-foreground">
-            {characters.length > 0
-              ? "Select a character to view frame data"
-              : "No characters loaded."}
-          </p>
+        <div className="h-full flex flex-col pt-2">
+          <div className="p-4 border rounded-lg bg-card/50 mb-4">
+            <div className="flex flex-wrap gap-2">
+              <Skeleton className="h-10 w-32" />
+              <Skeleton className="h-10 w-48" />
+              <Skeleton className="h-10 w-24" />
+            </div>
+          </div>
+          <div className="flex-1 border rounded-lg overflow-hidden">
+            <div className="p-4 space-y-4">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <div key={i} className="flex gap-4">
+                  <Skeleton className="h-8 flex-1" />
+                  <Skeleton className="h-8 flex-1" />
+                  <Skeleton className="h-8 flex-1" />
+                  <Skeleton className="h-8 flex-1" />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useGame, Character } from "../contexts/GameContext";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Loader2 } from "lucide-react";
+import { Skeleton } from "./ui/skeleton";
 import { cn } from "@/lib/utils";
 
 export const CharacterSelectionPage: React.FC = () => {
@@ -16,18 +16,12 @@ export const CharacterSelectionPage: React.FC = () => {
     characterError,
   } = useGame();
   const navigate = useNavigate();
-  const [isExiting, setIsExiting] = React.useState(false);
-  const [exitId, setExitId] = React.useState<number | null>(null);
 
   const handleCharacterSelect = (characterId: number) => {
     const character = characters.find((c) => c.id === characterId);
     if (character && selectedGame) {
-      setExitId(characterId);
-      setIsExiting(true);
-      setTimeout(() => {
-        setSelectedCharacterId(characterId);
-        navigate(`/${selectedGame.id}/${encodeURIComponent(character.name)}`);
-      }, 300);
+      setSelectedCharacterId(characterId);
+      navigate(`/${selectedGame.id}/${encodeURIComponent(character.name)}`);
     } else {
       console.error("Selected character or game not found during navigation");
       navigate("/games");
@@ -36,12 +30,8 @@ export const CharacterSelectionPage: React.FC = () => {
 
   const handleAllSelect = () => {
     if (selectedGame) {
-      setExitId(-1);
-      setIsExiting(true);
-      setTimeout(() => {
-        setSelectedCharacterId(-1);
-        navigate(`/${selectedGame.id}/All`);
-      }, 300);
+      setSelectedCharacterId(-1);
+      navigate(`/${selectedGame.id}/All`);
     }
   };
 
@@ -53,13 +43,18 @@ export const CharacterSelectionPage: React.FC = () => {
 
       {/* Loading State */}
       {isCharactersLoading && (
-        <div className="flex items-center justify-center h-[40vh]">
-          <div className="flex flex-col items-center gap-2">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="text-sm text-muted-foreground">
-              Loading characters...
-            </p>
-          </div>
+        <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9 gap-3">
+          {Array.from({ length: 28 }).map((_, i) => (
+            <Card
+              key={i}
+              className="flex flex-col items-center overflow-hidden border-muted bg-card"
+            >
+              <Skeleton className="w-full aspect-square rounded-none" />
+              <div className="w-full p-2 bg-card border-t border-border/50">
+                <Skeleton className="h-4 w-3/4 mx-auto" />
+              </div>
+            </Card>
+          ))}
         </div>
       )}
 
@@ -89,19 +84,10 @@ export const CharacterSelectionPage: React.FC = () => {
         !characterError &&
         selectedGame &&
         characters.length > 0 && (
-          <div
-            className={cn(
-              "character-grid-container grid grid-cols-4 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9 gap-3 min-h-[40vh]",
-              isExiting ? "pointer-events-none" : "animate-fadeIn",
-            )}
-          >
+          <div className="character-grid-container grid grid-cols-4 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9 gap-3 min-h-[40vh] animate-fadeIn">
             {/* All Characters option */}
             <Card
-              className={cn(
-                "group cursor-pointer flex flex-col items-center overflow-hidden hover:shadow-md hover:border-primary/50 transition-all duration-300 border-muted bg-card animate-character-in",
-                isExiting && exitId === -1 && "scale-110 opacity-0 z-10",
-                isExiting && exitId !== -1 && "opacity-20 scale-95",
-              )}
+              className="group cursor-pointer flex flex-col items-center overflow-hidden hover:shadow-md hover:border-primary/50 transition-all duration-300 border-muted bg-card animate-character-in"
               style={{ animationDelay: "0ms" }}
               onClick={handleAllSelect}
             >
@@ -120,11 +106,7 @@ export const CharacterSelectionPage: React.FC = () => {
             {characters.map((character, index) => (
               <Card
                 key={character.id}
-                className={cn(
-                  "group cursor-pointer flex flex-col items-center overflow-hidden hover:shadow-md hover:border-primary/50 transition-all duration-300 border-muted bg-card animate-character-in",
-                  isExiting && exitId === character.id && "scale-110 opacity-0 z-10",
-                  isExiting && exitId !== character.id && "opacity-20 scale-95",
-                )}
+                className="group cursor-pointer flex flex-col items-center overflow-hidden hover:shadow-md hover:border-primary/50 transition-all duration-300 border-muted bg-card animate-character-in"
                 style={{ animationDelay: `${(index + 1) * 15}ms` }}
                 onClick={() => handleCharacterSelect(character.id)}
               >

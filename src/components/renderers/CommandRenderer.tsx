@@ -69,7 +69,7 @@ const CommandRendererInner: React.FC<{ command: string[] | null }> = ({
             key={`separator-${i}-${j}`}
             className="inline-flex items-center ml-1 mr-1"
           >
-            →
+            |
           </span>
         );
       }

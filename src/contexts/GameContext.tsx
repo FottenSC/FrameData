@@ -116,7 +116,7 @@ export const avaliableGames: Game[] = [
     name: "SoulCalibur VI",
     icon: <Sword className="h-5 w-5 mr-2" />,
     badges: {
-      KND: { className: "bg-fuchsia-700 text-white" },
+      KND: { className: "bg-fuchsia-800 text-white" },
       STN: { className: "bg-pink-700 text-white" },
       LNC: { className: "bg-rose-700 text-white" },
     },

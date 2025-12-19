@@ -1,38 +1,43 @@
 {
   "properties": {
     "UA": {
-      "name": "Unblockable",
-      "description": "",
-      "className": "border-white text-zinc-900 bg-red-600"
+      "name": "Unblockable Attack",
+      "description": "The Move can't be blocked.",
+      "className": "bg-red-500 text-zinc-900 border-white"
     },
     "BA": {
       "name": "Break Attack",
-      "description": "",
-      "className": "border-white text-zinc-900 bg-blue-400"
+      "description": "Generally plus, inflicts guard damage and counters GI and Reversal edge.",
+      "className": "bg-blue-400 text-zinc-900 border-white"
+    },
+    "GC": {
+      "name": "Guard Crush",
+      "description": "Move that breaks guard.",
+      "className": "bg-blue-400 text-zinc-900 border-white"
     },
     "GI": {
       "name": "Guard Impact",
-      "description": "",
+      "description": "Defensive option that protects against attacks between i2 and i12, giving you frame advantage based on Attack type \n- Heavy +8\n- Medium +16\n- Light +28",
       "className": "bg-lime-500 text-zinc-900 border-white"
     },
     "TH": {
       "name": "Throw",
-      "description": "",
+      "description": "Attacks that can generally be broken by pressing ",
       "className": "bg-fuchsia-300 text-zinc-900 border-white"
     },
     "SS": {
-      "name": "Stance Change",
-      "description": "Move can/will transition you into another stance.",
+      "name": "Stance Shift",
+      "description": "The Move transitions you into another stance.",
       "className": "bg-purple-400 text-zinc-900 border-white"
     },
     "RE": {
       "name": "Reversal Edge",
-      "description": "",
-      "className": "bg-rose-800 text-white border-white"
+      "description": "Rock paper scissors mini-game.",
+      "className": "bg-white text-zinc-900 border-black"
     },
     "LH": {
       "name": "Lethal Hit",
-      "description": "When fulfilling certain criteria this move becomes more powerful.",
+      "description": "The properties of this move is enhanced when fulfilling a certain conditions.",
       "className": "bg-orange-500 text-zinc-900 border-white"
     }
   },

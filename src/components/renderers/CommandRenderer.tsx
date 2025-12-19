@@ -67,9 +67,25 @@ const CommandRendererInner: React.FC<{ command: string[] | null }> = ({
         parts.push(
           <span
             key={`separator-${i}-${j}`}
-            className="inline-flex items-center ml-1 mr-1"
+            className="relative inline-flex items-center justify-center w-3 h-4 mx-[-5px] z-20 align-middle underscore-separator"
           >
-            |
+            <span className="text-transparent select-text leading-none">
+              _
+            </span>
+            <svg
+              width="10"
+              height="10"
+              viewBox="0 0 10 10"
+              className="absolute inset-0 m-auto block pointer-events-none text-muted-foreground"
+              aria-hidden
+            >
+              <path
+                d="M5 2 v6"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+            </svg>
           </span>
         );
       }

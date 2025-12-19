@@ -36,7 +36,7 @@ const ValueBadgeInner: React.FC<ValueBadgeProps> = ({
 
   if (value === null || value === undefined) {
     return (
-      <Badge className="bg-gray-500 hover:bg-gray-600 text-white w-12 inline-flex items-center justify-center">
+      <Badge className="bg-gray-700 hover:bg-gray-600 text-white w-12 inline-flex items-center justify-center">
         {displayText}
       </Badge>
     );

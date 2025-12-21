@@ -326,6 +326,12 @@ export const FrameDataTable: React.FC = () => {
           number: move.GuardBurst ?? null,
           type,
         };
+      case "properties":
+        return {
+          string: move.Properties ? move.Properties.join(" ") : null,
+          number: null,
+          type,
+        };
       case "notes":
         return { string: move.Notes, number: null, type };
       default:
@@ -385,7 +391,7 @@ export const FrameDataTable: React.FC = () => {
       type: "string" as const,
     },
     hitLevel: {
-      getter: (move: Move) => move.HitLevel,
+      getter: (move: Move) => (move.HitLevel ? move.HitLevel.join(" ") : null),
       type: "string" as const,
     },
     impact: {
@@ -411,6 +417,10 @@ export const FrameDataTable: React.FC = () => {
     guardBurst: {
       getter: (move: Move) => move.GuardBurst,
       type: "number" as const,
+    },
+    properties: {
+      getter: (move: Move) => (move.Properties ? move.Properties.join(" ") : null),
+      type: "string" as const,
     },
     notes: {
       getter: (move: Move) => move.Notes,

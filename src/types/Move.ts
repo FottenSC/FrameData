@@ -16,8 +16,8 @@ export interface Move {
   GuardBurst: number;
   Properties: string[] | null;
   Notes: string | null;
-  CharacterName?: string | null;
-  CharacterId?: number | null;
+  CharacterName: string;
+  CharacterId: number;
 }
 
 export interface FilterCondition {

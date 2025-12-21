@@ -25,7 +25,7 @@ async function fetchCharactersList(gameId: string): Promise<Character[]> {
 async function fetchCharacterMoves(
   gameId: string,
   characterId: number,
-  characterName: string | null,
+  characterName: string,
   applyNotation: ApplyNotationFn,
 ): Promise<Move[]> {
   const res = await fetch(
@@ -42,8 +42,8 @@ async function fetchCharacterMoves(
 
 function processMove(
   moveObject: any,
-  charId: number | null,
-  charName: string | null,
+  charId: number,
+  charName: string,
   applyNotation: ApplyNotationFn,
 ): Move {
   const mappedCommand =
@@ -152,7 +152,7 @@ export function useMoves({
       } else {
         // Single character
         const charName =
-          characters.find((c) => c.id === characterId)?.name || null;
+          characters.find((c) => c.id === characterId)?.name || "Unknown";
         return fetchCharacterMoves(
           gameId,
           characterId,

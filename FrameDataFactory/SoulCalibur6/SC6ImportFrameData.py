@@ -11,7 +11,7 @@ def project_root() -> Path:
     return Path(sys.path[0]).parent.parent
 
 
-print("Loading SoulCalibur6 Frame Data from Google Sheets...")
+print("Loading SoulCalibur 6 Frame Data from Google Sheets...")
 frameDataSheetLink = "https://docs.google.com/spreadsheets/d/1R3I_LXfqhvFjlHTuj-wSWwwqYmlUf299a3VY9pVyGEw/export?exportFormat=csv"
 frameData = pd.read_csv(
     filepath_or_buffer=frameDataSheetLink,

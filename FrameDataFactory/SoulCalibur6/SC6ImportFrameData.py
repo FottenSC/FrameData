@@ -11,7 +11,7 @@ def project_root() -> Path:
     return Path(sys.path[0]).parent.parent
 
 
-print("Loading SoulCalibur 6 Frame Data from Google Sheets...")
+print("Loading Soulcalibur 6 Frame Data from Google Sheets...")
 frameDataSheetLink = "https://docs.google.com/spreadsheets/d/1R3I_LXfqhvFjlHTuj-wSWwwqYmlUf299a3VY9pVyGEw/export?exportFormat=csv"
 frameData = pd.read_csv(
     filepath_or_buffer=frameDataSheetLink,
@@ -350,7 +350,7 @@ frameData["Stance"] = frameData["Stance"].apply(caseFixer)
 
 #region Character and Stance export
 root = project_root()
-output_base = root / "public" / "Games" / "SoulCalibur6"
+output_base = root / "public" / "Games" / "Soulcalibur6"
 moves_dir = output_base / "Characters"
 os.makedirs(moves_dir, exist_ok=True)
 
@@ -564,4 +564,4 @@ for c in characters_manifest:
         json.dump(moves_list, f, ensure_ascii=False, indent=2)
 
 
-print("SoulCalibur6 frame data export complete.")
+print("Soulcalibur6 frame data export complete.")

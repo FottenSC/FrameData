@@ -54,15 +54,15 @@ function processMove(
       : null;
 
   return {
-    ID: Number(moveObject.ID),
+    id: Number(moveObject.ID),
     stringCommand:
       moveObject.stringCommand != null
         ? String(moveObject.stringCommand)
         : null,
-    Command: mappedCommand,
-    CharacterId: charId,
-    CharacterName: charName,
-    Stance: (() => {
+    command: mappedCommand,
+    characterId: charId,
+    characterName: charName,
+    stance: (() => {
       const raw = moveObject.Stance;
       if (Array.isArray(raw)) {
         const arr = raw
@@ -72,7 +72,7 @@ function processMove(
       }
       return raw ? [String(raw)] : null;
     })(),
-    HitLevel: (() => {
+    hitLevel: (() => {
       const raw = moveObject.HitLevel;
       if (Array.isArray(raw)) {
         const arr = raw
@@ -82,23 +82,23 @@ function processMove(
       }
       return raw ? [String(raw)] : null;
     })(),
-    Impact: moveObject.Impact != null ? Number(moveObject.Impact) : 0,
-    Damage: moveObject.Damage != null ? String(moveObject.Damage) : null,
-    DamageDec:
+    impact: moveObject.Impact != null ? Number(moveObject.Impact) : 0,
+    damage: moveObject.Damage != null ? String(moveObject.Damage) : null,
+    damageDec:
       moveObject.DamageDec != null ? Number(moveObject.DamageDec) : null,
-    Block: moveObject.Block != null ? String(moveObject.Block) : null,
-    BlockDec: moveObject.BlockDec != null ? Number(moveObject.BlockDec) : null,
-    Hit: moveObject.Hit != null ? String(moveObject.Hit) : null,
-    HitDec: moveObject.HitDec != null ? Number(moveObject.HitDec) : null,
-    CounterHit:
+    block: moveObject.Block != null ? String(moveObject.Block) : null,
+    blockDec: moveObject.BlockDec != null ? Number(moveObject.BlockDec) : null,
+    hit: moveObject.Hit != null ? String(moveObject.Hit) : null,
+    hitDec: moveObject.HitDec != null ? Number(moveObject.HitDec) : null,
+    counterHit:
       moveObject.CounterHit != null ? String(moveObject.CounterHit) : null,
-    CounterHitDec:
+    counterHitDec:
       moveObject.CounterHitDec != null
         ? Number(moveObject.CounterHitDec)
         : null,
-    GuardBurst:
+    guardBurst:
       moveObject.GuardBurst != null ? Number(moveObject.GuardBurst) : null,
-    Properties: (() => {
+    properties: (() => {
       const raw = moveObject.Properties;
       if (Array.isArray(raw)) {
         const arr = raw
@@ -108,7 +108,7 @@ function processMove(
       }
       return raw ? [String(raw)] : null;
     })(),
-    Notes: moveObject.Notes != null ? String(moveObject.Notes) : null,
+    notes: moveObject.Notes != null ? String(moveObject.Notes) : null,
   } as Move;
 }
 

@@ -20,7 +20,7 @@ export const defaultFields: GameFilterConfig["fields"] = [
 ];
 
 // ------------------------------
-// Soul Calibur 6 specific config
+// Soulcalibur 6 specific config
 // ------------------------------
 
 // Enumerated Hit Level options (keep the original values for compatibility)
@@ -92,14 +92,14 @@ const inListOperator: FilterOperator = {
   },
 };
 
-// Construct Soul Calibur fields with hitLevel overridden
-const soulCaliburFields: GameFilterConfig["fields"] = cloneDefaultFields().map(
+// Construct Soulcalibur fields with hitLevel overridden
+const soulcaliburFields: GameFilterConfig["fields"] = cloneDefaultFields().map(
   (f) => (f.id === "hitLevel" ? createHitLevelField(f) : f),
 );
 
 export const gameFilterConfigs: Record<string, GameFilterConfig> = {
-  SoulCalibur6: {
-    fields: soulCaliburFields,
+  Soulcalibur6: {
+    fields: soulcaliburFields,
     customOperators: [inListOperator],
   },
   Tekken8: {

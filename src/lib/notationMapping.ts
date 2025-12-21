@@ -2,7 +2,7 @@ export type NotationMap = Record<string, string>;
 
 // Define reusable notation mappings
 export const sharedNotationMapping: Record<string, NotationMap> = {
-  soulCaliburButtons: {
+  soulcaliburButtons: {
     "(B+C)": "(B+K)",
     "(B+D)": "(B+G)",
     "(C+D)": "(K+G)",

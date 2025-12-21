@@ -112,8 +112,8 @@ export interface PropertyInfo {
 // Define avaliableGames here
 export const avaliableGames: Game[] = [
   {
-    id: "SoulCalibur6",
-    name: "SoulCalibur VI",
+    id: "Soulcalibur6",
+    name: "Soulcalibur VI",
     icon: <Sword className="h-5 w-5 mr-2" />,
     badges: {
       KND: { className: "bg-fuchsia-800 text-white" },
@@ -122,7 +122,7 @@ export const avaliableGames: Game[] = [
     },
     notationMapping: {
       specific: {},
-      defaultEnabled: ["soulCaliburButtons"],
+      defaultEnabled: ["soulcaliburButtons"],
     },
     icons: [
       // 2x1 icons

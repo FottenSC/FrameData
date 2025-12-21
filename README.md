@@ -1,10 +1,10 @@
 # Fighting Game Frame Data Viewer
 
-This is a web application designed to display frame data for characters in fighting games like Soul Calibur VI and Tekken 8. It uses React, Vite, and TypeScript to load and display move lists from static JSON files in the browser.
+This is a web application designed to display frame data for characters in fighting games like Soulcalibur VI and Tekken 8. It uses React, Vite, and TypeScript to load and display move lists from static JSON files in the browser.
 
 ## Features
 
-- Displays character move lists for multiple supported games (Soul Calibur VI, Tekken 8).
+- Displays character move lists for multiple supported games (Soulcalibur VI, Tekken 8).
 - Sortable and filterable frame data tables.
 - Loads data from local game-specific JSON files under `public/Games/{Game}/...`.
 - Built with modern web technologies for a fast and responsive experience.
@@ -30,7 +30,7 @@ This is a web application designed to display frame data for characters in fight
     npm install
     ```
 3.  **Database:**
-    - Ensure you have the required database files in the `public/` directory, organized by game ID (e.g., `public/SoulCalibur6/FrameData.db`, `public/Tekken8/FrameData.db`).
+    - Ensure you have the required database files in the `public/` directory, organized by game ID (e.g., `public/Soulcalibur6/FrameData.db`, `public/Tekken8/FrameData.db`).
     - No WebAssembly or SQL.js needed. Ensure the JSON files are present under `public/Games`.
 
 ## Available Scripts
@@ -54,7 +54,7 @@ Moves are stored internally using a generalized notation:
 
 ### Example Mappings (Internal -> Game):
 
-- **SoulCalibur VI:** 8-way run directions, A=A, B=B, K=C, G=D
+- **Soulcalibur VI:** 8-way run directions, A=A, B=B, K=C, G=D
 - **Tekken 8:** (Define mapping as needed)
 
 The goal is to translate this internal notation to the familiar format for each game within the frontend components, allowing players to see inputs as they expect (e.g., Tekken's 1, 2, 3, 4).

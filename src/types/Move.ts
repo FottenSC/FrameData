@@ -1,23 +1,23 @@
 export interface Move {
-  ID: number;
+  id: number;
   stringCommand: string | null;
-  Command: string[] | null;
-  Stance: string[] | null;
-  HitLevel: string[] | null;
-  Impact: number;
-  Damage: string | null;
-  DamageDec: number;
-  Block: string | null;
-  BlockDec: number;
-  Hit: string | null;
-  HitDec: number;
-  CounterHit: string | null;
-  CounterHitDec: number;
-  GuardBurst: number;
-  Properties: string[] | null;
-  Notes: string | null;
-  CharacterName: string;
-  CharacterId: number;
+  command: string[] | null;
+  stance: string[] | null;
+  hitLevel: string[] | null;
+  impact: number;
+  damage: string | null;
+  damageDec: number;
+  block: string | null;
+  blockDec: number;
+  hit: string | null;
+  hitDec: number;
+  counterHit: string | null;
+  counterHitDec: number;
+  guardBurst: number;
+  properties: string[] | null;
+  notes: string | null;
+  characterName: string;
+  characterId: number;
 }
 
 export interface FilterCondition {

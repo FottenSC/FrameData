@@ -262,78 +262,78 @@ export const FrameDataTable: React.FC = () => {
     switch (fieldId) {
       case "character":
         return {
-          string: move.CharacterName || null,
+          string: move.characterName || null,
           number: null,
           type,
         };
       case "stance":
         return {
-          string: move.Stance ? move.Stance.join(", ") : null,
+          string: move.stance ? move.stance.join(", ") : null,
           number: null,
           type,
         };
       case "command":
-        return { string: move.Command ? move.Command.join(" ") : null, number: null, type };
+        return { string: move.command ? move.command.join(" ") : null, number: null, type };
       case "rawCommand":
         return { string: move.stringCommand, number: null, type };
       case "input": {
         // combined stance + command
-        const stanceStr = move.Stance ? move.Stance.join(" ") : null;
-        const commandStr = move.Command ? move.Command.join(" ") : null;
+        const stanceStr = move.stance ? move.stance.join(" ") : null;
+        const commandStr = move.command ? move.command.join(" ") : null;
         const combined =
           [stanceStr, commandStr].filter(Boolean).join(" ") || null;
         return { string: combined, number: null, type };
       }
       case "hitLevel":
-        return { string: move.HitLevel ? move.HitLevel.join(" ") : null, number: null, type };
+        return { string: move.hitLevel ? move.hitLevel.join(" ") : null, number: null, type };
       case "impact":
         return {
-          string: move.Impact != null ? String(move.Impact) : null,
-          number: move.Impact ?? null,
+          string: move.impact != null ? String(move.impact) : null,
+          number: move.impact ?? null,
           type,
         };
       case "damage":
         return {
           string:
-            move.DamageDec != null ? String(move.DamageDec) : move.Damage,
-          number: move.DamageDec ?? null,
+            move.damageDec != null ? String(move.damageDec) : move.damage,
+          number: move.damageDec ?? null,
           type,
         };
       case "block":
         return {
-          string: move.BlockDec != null ? String(move.BlockDec) : move.Block,
-          number: move.BlockDec ?? null,
+          string: move.blockDec != null ? String(move.blockDec) : move.block,
+          number: move.blockDec ?? null,
           type,
         };
       case "hit":
         return {
-          string: move.HitDec != null ? String(move.HitDec) : move.Hit,
-          number: move.HitDec ?? null,
+          string: move.hitDec != null ? String(move.hitDec) : move.hit,
+          number: move.hitDec ?? null,
           type,
         };
       case "counterHit":
         return {
           string:
-            move.CounterHitDec != null
-              ? String(move.CounterHitDec)
-              : move.CounterHit,
-          number: move.CounterHitDec ?? null,
+            move.counterHitDec != null
+              ? String(move.counterHitDec)
+              : move.counterHit,
+          number: move.counterHitDec ?? null,
           type,
         };
       case "guardBurst":
         return {
-          string: move.GuardBurst != null ? String(move.GuardBurst) : null,
-          number: move.GuardBurst ?? null,
+          string: move.guardBurst != null ? String(move.guardBurst) : null,
+          number: move.guardBurst ?? null,
           type,
         };
       case "properties":
         return {
-          string: move.Properties ? move.Properties.join(" ") : null,
+          string: move.properties ? move.properties.join(" ") : null,
           number: null,
           type,
         };
       case "notes":
-        return { string: move.Notes, number: null, type };
+        return { string: move.notes, number: null, type };
       default:
         return { string: null, number: null, type };
     }
@@ -368,15 +368,15 @@ export const FrameDataTable: React.FC = () => {
 
   const SORT_FIELD_MAP = {
     character: {
-      getter: (move: Move) => move.CharacterName,
+      getter: (move: Move) => move.characterName,
       type: "string" as const,
     },
     stance: {
-      getter: (move: Move) => (move.Stance ? move.Stance.join(", ") : null),
+      getter: (move: Move) => (move.stance ? move.stance.join(", ") : null),
       type: "string" as const,
     },
     command: {
-      getter: (move: Move) => move.Command ? move.Command.join(" ") : null,
+      getter: (move: Move) => move.command ? move.command.join(" ") : null,
       type: "string" as const,
     },
     rawCommand: {
@@ -385,45 +385,45 @@ export const FrameDataTable: React.FC = () => {
     },
     input: {
       getter: (move: Move) =>
-        [move.Stance ? move.Stance.join(" ") : null, move.Command ? move.Command.join(" ") : null]
+        [move.stance ? move.stance.join(" ") : null, move.command ? move.command.join(" ") : null]
           .filter(Boolean)
           .join(" "),
       type: "string" as const,
     },
     hitLevel: {
-      getter: (move: Move) => (move.HitLevel ? move.HitLevel.join(" ") : null),
+      getter: (move: Move) => (move.hitLevel ? move.hitLevel.join(" ") : null),
       type: "string" as const,
     },
     impact: {
-      getter: (move: Move) => move.Impact,
+      getter: (move: Move) => move.impact,
       type: "number" as const,
     },
     damage: {
-      getter: (move: Move) => move.DamageDec,
+      getter: (move: Move) => move.damageDec,
       type: "number" as const,
     },
     block: {
-      getter: (move: Move) => move.BlockDec,
+      getter: (move: Move) => move.blockDec,
       type: "number" as const,
     },
     hit: {
-      getter: (move: Move) => move.HitDec,
+      getter: (move: Move) => move.hitDec,
       type: "number" as const,
     },
     counterHit: {
-      getter: (move: Move) => move.CounterHitDec,
+      getter: (move: Move) => move.counterHitDec,
       type: "number" as const,
     },
     guardBurst: {
-      getter: (move: Move) => move.GuardBurst,
+      getter: (move: Move) => move.guardBurst,
       type: "number" as const,
     },
     properties: {
-      getter: (move: Move) => (move.Properties ? move.Properties.join(" ") : null),
+      getter: (move: Move) => (move.properties ? move.properties.join(" ") : null),
       type: "string" as const,
     },
     notes: {
-      getter: (move: Move) => move.Notes,
+      getter: (move: Move) => move.notes,
       type: "string" as const,
     },
   };
@@ -526,33 +526,35 @@ export const FrameDataTable: React.FC = () => {
         .map((fid) => {
           switch (fid) {
             case "character":
-              return m.CharacterName;
+              return m.characterName;
             case "stance":
-              return m.Stance ? m.Stance.join(", ") : "";
+              return m.stance ? m.stance.join(", ") : "";
             case "command":
-              return m.Command ? m.Command.join(" ") : "";
+              return m.command ? m.command.join(" ") : "";
             case "rawCommand":
-              return m.Command ? m.Command.join("::") : "";
+              return m.stringCommand;
             case "input":
-              return [m.Stance ? m.Stance.join(" ") : null, m.Command ? m.Command.join(" ") : null]
+              return [m.stance ? m.stance.join(" ") : null, m.command ? m.command.join(" ") : null]
                 .filter(Boolean)
                 .join(" ");
             case "hitLevel":
-              return m.HitLevel ? m.HitLevel.join(" ") : "";
+              return m.hitLevel ? m.hitLevel.join(" ") : "";
             case "impact":
-              return m.Impact;
+              return m.impact;
             case "damage":
-              return m.DamageDec ?? m.Damage;
+              return m.damageDec ?? m.damage;
             case "block":
-              return m.BlockDec ?? m.Block;
+              return m.blockDec ?? m.block;
             case "hit":
-              return m.HitDec ?? m.Hit;
+              return m.hitDec ?? m.hit;
             case "counterHit":
-              return m.CounterHitDec ?? m.CounterHit;
+              return m.counterHitDec ?? m.counterHit;
             case "guardBurst":
-              return m.GuardBurst;
+              return m.guardBurst;
+            case "properties":
+              return m.properties ? m.properties.join(", ") : "";
             case "notes":
-              return m.Notes;
+              return m.notes;
             default:
               return "";
           }

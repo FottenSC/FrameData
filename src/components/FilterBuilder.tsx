@@ -98,17 +98,17 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
         const getFieldValue = (move: Move, field: string): number | null => {
           switch (field) {
             case "impact":
-              return move.Impact ?? null;
+              return move.impact ?? null;
             case "damage":
-              return move.DamageDec ?? null;
+              return move.damageDec ?? null;
             case "block":
-              return move.BlockDec ?? null;
+              return move.blockDec ?? null;
             case "hit":
-              return move.HitDec ?? null;
+              return move.hitDec ?? null;
             case "counterHit":
-              return move.CounterHitDec ?? null;
+              return move.counterHitDec ?? null;
             case "guardBurst":
-              return move.GuardBurst ?? null;
+              return move.guardBurst ?? null;
             default:
               return null;
           }

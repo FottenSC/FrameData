@@ -42,7 +42,7 @@ export const TableRow: React.FC<TableRowProps> = React.memo(
         if (column.maxWidth) style.maxWidth = column.maxWidth;
         return (
           <TableCell
-            key={`${move.ID}-${column.id}`}
+            key={`${move.id}-${column.id}`}
             className={column.className}
             style={style}
           >

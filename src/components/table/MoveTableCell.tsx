@@ -33,15 +33,15 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = ({
 }) => {
   switch (columnId) {
     case "character":
-      return <>{move.CharacterName || "—"}</>;
+      return <>{move.characterName || "—"}</>;
     case "stance":
-      if (!move.Stance || move.Stance.length === 0) {
+      if (!move.stance || move.stance.length === 0) {
         return <>—</>;
       }
       return (
         <div className="flex flex-wrap gap-0.5 justify-end">
-          {move.Stance.filter((s) => s && s.trim() !== "").map((s, i) => {
-            const stanceInfo = getStanceInfo(s, move.CharacterId);
+          {move.stance.filter((s) => s && s.trim() !== "").map((s, i) => {
+            const stanceInfo = getStanceInfo(s, move.characterId);
             const hasTooltipContent =
               stanceInfo &&
               ((stanceInfo.name && stanceInfo.name !== s) ||
@@ -87,7 +87,7 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = ({
     case "command":
       return (
         <div className="flex items-center justify-between gap-2">
-          <span className="flex-1">{renderCommand(move.Command)}</span>
+          <span className="flex-1">{renderCommand(move.command)}</span>
           <button
             onClick={() => copyCommand(move)}
             className="flex-shrink-0 p-1 rounded hover:bg-muted transition-colors opacity-50 hover:opacity-100"
@@ -102,44 +102,44 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = ({
     case "hitLevel":
       return (
         <ExpandableHitLevels
-          hitLevelString={move.HitLevel}
+          hitLevelString={move.hitLevel}
           maxIconsToShow={3}
         />
       );
     case "impact":
-      return <>{move.Impact ?? "—"}</>;
+      return <>{move.impact ?? "—"}</>;
     case "damage":
-      return <>{move.DamageDec ?? "—"}</>;
+      return <>{move.damageDec ?? "—"}</>;
     case "block":
       return (
-        <ValueBadge value={move.BlockDec} text={move.Block} badges={badges} />
+        <ValueBadge value={move.blockDec} text={move.block} badges={badges} />
       );
     case "hit":
-      return <ValueBadge value={move.HitDec} text={move.Hit} badges={badges} />;
+      return <ValueBadge value={move.hitDec} text={move.hit} badges={badges} />;
     case "counterHit":
       return (
         <ValueBadge
-          value={move.CounterHitDec}
-          text={move.CounterHit}
+          value={move.counterHitDec}
+          text={move.counterHit}
           badges={badges}
         />
       );
     case "guardBurst":
       return (
         <ValueBadge
-          value={move.GuardBurst}
+          value={move.guardBurst}
           text={null}
           forceNoSign
           badges={badges}
         />
       );
     case "properties":
-      if (!move.Properties || move.Properties.length === 0) {
+      if (!move.properties || move.properties.length === 0) {
         return <>—</>;
       }
       return (
         <div className="flex flex-wrap gap-0.5">
-          {move.Properties.map((prop) => {
+          {move.properties.map((prop) => {
             const propInfo = getPropertyInfo(prop);
             const className = propInfo?.className || "";
 
@@ -179,7 +179,7 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = ({
     case "notes":
       return (
         <div className="max-w-full truncate overflow-x-hidden overflow-y-visible">
-          {renderNotes(move.Notes)}
+          {renderNotes(move.notes)}
         </div>
       );
     default:

@@ -59,8 +59,8 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
 
   // Copy command to clipboard
   const copyCommand = (move: Move) => {
-    const stancePart = move.Stance?.join(" ") ?? "";
-    const commandPart = move.Command?.join("") ?? "";
+    const stancePart = move.stance?.join(" ") ?? "";
+    const commandPart = move.command?.join("") ?? "";
     const textToCopy = stancePart ? `${stancePart} ${commandPart}` : commandPart;
     
     navigator.clipboard.writeText(textToCopy).then(() => {
@@ -152,7 +152,7 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
         <>
           {slice.map((move) => (
             <TableRow
-              key={move.ID}
+              key={move.id}
               move={move}
               visibleColumns={visibleColumns}
               renderCommand={renderCommand}
@@ -217,7 +217,7 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
           const move = displayMoves[virtualRow.index]!;
           return (
             <TableRow
-              key={move.ID}
+              key={move.id}
               move={move}
               visibleColumns={visibleColumns}
               renderCommand={renderCommand}

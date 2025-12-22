@@ -122,4 +122,4 @@ const CommandRendererInner: React.FC<{ command: string[] | null }> = ({
 };
 
 // Memoize to prevent re-renders during table virtualization transitions
-export const CommandRenderer = CommandRendererInner;
+export const CommandRenderer = React.memo(CommandRendererInner);

@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient, QueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, QueryClient, keepPreviousData } from "@tanstack/react-query";
 import { Move } from "@/types/Move";
 
 interface Character {
@@ -14,6 +14,10 @@ const notationCache = new Map<string, string | null>();
 
 export function clearStringCache() {
   stringCache.clear();
+  notationCache.clear();
+}
+
+export function clearNotationCache() {
   notationCache.clear();
 }
 
@@ -55,7 +59,7 @@ async function fetchCharactersList(gameId: string): Promise<Character[]> {
   }));
 }
 
-async function fetchCharacterMoves(
+export async function fetchCharacterMoves(
   gameId: string,
   characterId: number,
   characterName: string,
@@ -68,9 +72,11 @@ async function fetchCharacterMoves(
   const data = await res.json();
   if (!Array.isArray(data)) return [];
 
+  const internedCharName = intern(characterName)!;
+
   // Process moves and then clear the raw data reference
   const processed = data.map((m: any) =>
-    processMove(m, characterId, characterName, applyNotation),
+    processMove(m, characterId, internedCharName, applyNotation),
   );
   return processed;
 }
@@ -81,45 +87,50 @@ function processMove(
   charName: string,
   applyNotation: ApplyNotationFn,
 ): Move {
+  const rawCommand = moveObject.Command;
   const mappedCommand =
-    moveObject.Command != null
-      ? Array.isArray(moveObject.Command)
-        ? moveObject.Command.map((cmd: any) =>
-            intern(cachedApplyNotation(String(cmd), applyNotation) ?? String(cmd)),
+    rawCommand != null
+      ? Array.isArray(rawCommand)
+        ? rawCommand.map((cmd: any) =>
+            intern(cachedApplyNotation(String(cmd), applyNotation) ?? String(cmd))!,
           )
         : [
             intern(
-              cachedApplyNotation(String(moveObject.Command), applyNotation) ??
-                String(moveObject.Command),
-            ),
+              cachedApplyNotation(String(rawCommand), applyNotation) ??
+                String(rawCommand),
+            )!,
           ]
       : null;
 
-  return {
+  const move: Move = {
     id: Number(moveObject.ID),
     stringCommand: moveObject.stringCommand != null ? String(moveObject.stringCommand) : null,
     command: mappedCommand,
     characterId: charId,
-    characterName: intern(charName)!,
+    characterName: charName,
     stance: (() => {
       const raw = moveObject.Stance;
+      if (!raw) return null;
       if (Array.isArray(raw)) {
-        const arr = raw
-          .map((s: any) => (s != null ? intern(String(s)) : null))
-          .filter((s): s is string => s !== null);
+        const arr = [];
+        for (const s of raw) {
+          if (s != null) arr.push(intern(String(s))!);
+        }
         return arr.length > 0 ? arr : null;
       }
-      return raw ? [intern(String(raw))!] : null;
+      return [intern(String(raw))!];
     })(),
     hitLevel: (() => {
       const raw = moveObject.HitLevel;
+      if (!raw) return null;
       if (Array.isArray(raw)) {
-        const arr = raw
-          .map((s: any) => (s != null ? intern(String(s)) : null))
-          .filter((s): s is string => s !== null);
+        const arr = [];
+        for (const s of raw) {
+          if (s != null) arr.push(intern(String(s))!);
+        }
         return arr.length > 0 ? arr : null;
       }
-      return raw ? [intern(String(raw))!] : null;
+      return [intern(String(raw))!];
     })(),
     impact: moveObject.Impact != null ? Number(moveObject.Impact) : 0,
     damage: moveObject.Damage != null ? String(moveObject.Damage) : null,
@@ -139,16 +150,32 @@ function processMove(
       moveObject.GuardBurst != null ? Number(moveObject.GuardBurst) : 0,
     properties: (() => {
       const raw = moveObject.Properties;
+      if (!raw) return null;
       if (Array.isArray(raw)) {
-        const arr = raw
-          .map((p: any) => (p != null ? intern(String(p)) : null))
-          .filter((p): p is string => p !== null);
+        const arr = [];
+        for (const p of raw) {
+          if (p != null) arr.push(intern(String(p))!);
+        }
         return arr.length > 0 ? arr : null;
       }
-      return raw ? [intern(String(raw))!] : null;
+      return [intern(String(raw))!];
     })(),
     notes: moveObject.Notes != null ? String(moveObject.Notes) : null,
-  } as Move;
+  };
+
+  // Pre-calculate searchable strings for performance
+  move._searchStance = move.stance ? move.stance.join(", ") : "";
+  move._searchCommand = move.command ? move.command.join(" ") : "";
+  move._searchHitLevel = move.hitLevel ? move.hitLevel.join(" ") : "";
+  move._searchProperties = move.properties ? move.properties.join(" ") : "";
+  move._searchInput = [
+    move.stance ? move.stance.join(" ") : null,
+    move.command ? move.command.join(" ") : null,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return move;
 }
 
 async function fetchAllCharactersMoves(
@@ -212,5 +239,6 @@ export function useMoves({
     enabled: !!gameId && characterId !== null,
     staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 1000 * 60 * 30, // 30 minutes
+    placeholderData: keepPreviousData,
   });
 }

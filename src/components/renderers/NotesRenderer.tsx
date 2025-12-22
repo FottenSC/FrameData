@@ -5,15 +5,23 @@ import { cn } from "@/lib/utils";
 const NotesRendererInner: React.FC<{ note: string | null }> = ({ note }) => {
   const { availableIcons, getIconUrl } = useGame();
 
+  const regex = React.useMemo(() => {
+    const codes = availableIcons.map((ic) => ic.code).join("|");
+    if (!codes) return null;
+    return new RegExp(`:(${codes}):`, "g");
+  }, [availableIcons]);
+
   const parts = (() => {
-    if (!note) return null;
+    if (!note || !regex) return null;
 
     const result: React.ReactNode[] = [];
-    const codes = availableIcons.map((ic) => ic.code).join("|");
-    const regex = new RegExp(`:(${codes}):`, "g");
     let lastIndex = 0;
     let match: RegExpExecArray | null;
     let partIndex = 0;
+    
+    // Reset regex lastIndex because it's global
+    regex.lastIndex = 0;
+    
     while ((match = regex.exec(note))) {
       const start = match.index;
       const iconName = match[1];
@@ -54,4 +62,4 @@ const NotesRendererInner: React.FC<{ note: string | null }> = ({ note }) => {
   return <>{parts}</>;
 };
 
-export const NotesRenderer = NotesRendererInner;
+export const NotesRenderer = React.memo(NotesRendererInner);

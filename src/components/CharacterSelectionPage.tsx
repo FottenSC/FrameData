@@ -5,6 +5,8 @@ import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Skeleton } from "./ui/skeleton";
 import { cn } from "@/lib/utils";
+import { useQueryClient } from "@tanstack/react-query";
+import { fetchCharacterMoves } from "@/hooks/useMoves";
 
 export const CharacterSelectionPage: React.FC = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -14,8 +16,26 @@ export const CharacterSelectionPage: React.FC = () => {
     setSelectedCharacterId,
     isCharactersLoading,
     characterError,
+    applyNotation,
   } = useGame();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const prefetchCharacter = (character: Character) => {
+    if (!selectedGame) return;
+    
+    queryClient.prefetchQuery({
+      queryKey: ["moves", selectedGame.id, character.id],
+      queryFn: () =>
+        fetchCharacterMoves(
+          selectedGame.id,
+          character.id,
+          character.name,
+          applyNotation,
+        ),
+      staleTime: 1000 * 60 * 5, // 5 minutes
+    });
+  };
 
   const handleCharacterSelect = (characterId: number) => {
     const character = characters.find((c) => c.id === characterId);
@@ -108,8 +128,7 @@ export const CharacterSelectionPage: React.FC = () => {
                 key={character.id}
                 className="group cursor-pointer flex flex-col items-center overflow-hidden hover:shadow-md hover:border-primary/50 transition-all duration-300 border-muted bg-card animate-character-in"
                 style={{ animationDelay: `${(index + 1) * 15}ms` }}
-                onClick={() => handleCharacterSelect(character.id)}
-              >
+                onClick={() => handleCharacterSelect(character.id)}                onMouseEnter={() => prefetchCharacter(character)}              >
                 <div className="relative w-full aspect-square overflow-hidden bg-muted">
                   {character.image ? (
                     <img

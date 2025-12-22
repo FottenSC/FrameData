@@ -40,12 +40,15 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { TableConfigurator } from "@/components/TableConfigurator";
 import { avaliableGames } from "@/contexts/GameContext";
+import { useQueryClient } from "@tanstack/react-query";
+import { fetchCharacterMoves } from "@/hooks/useMoves";
 
 // Local type for credits entries (per-game, optional file in public/Games/<GameId>/Credits.json)
 type CreditEntry = { name: string; role?: string; link?: string };
 
 export function CommandPalette() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { open, setOpen, currentView, setCurrentView } = useCommand();
   const {
     characters,
@@ -53,6 +56,7 @@ export function CommandPalette() {
     setSelectedCharacterId,
     selectedCharacterId,
     setSelectedGameById,
+    applyNotation,
   } = useGame();
 
   const {} = useTableConfig();
@@ -60,6 +64,22 @@ export function CommandPalette() {
     useUserSettings();
 
   const [searchValue, setSearchValue] = React.useState("");
+
+  const prefetchCharacter = (character: { id: number; name: string }) => {
+    if (!selectedGame) return;
+    
+    queryClient.prefetchQuery({
+      queryKey: ["moves", selectedGame.id, character.id],
+      queryFn: () =>
+        fetchCharacterMoves(
+          selectedGame.id,
+          character.id,
+          character.name,
+          applyNotation,
+        ),
+      staleTime: 1000 * 60 * 5, // 5 minutes
+    });
+  };
 
   // Derived booleans for cleaner JSX
   const showCharacters = currentView === "characters";
@@ -228,6 +248,7 @@ export function CommandPalette() {
                       onSelect={() =>
                         handleCharacterSelect(character.id, character.name)
                       }
+                      onMouseEnter={() => prefetchCharacter(character)}
                     >
                       <Users className="mr-2 h-4 w-4" />
                       <span>{character.name}</span>

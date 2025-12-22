@@ -18,6 +18,12 @@ export interface Move {
   notes: string | null;
   characterName: string;
   characterId: number;
+  // Pre-calculated searchable strings for performance
+  _searchStance?: string;
+  _searchCommand?: string;
+  _searchHitLevel?: string;
+  _searchProperties?: string;
+  _searchInput?: string;
 }
 
 export interface FilterCondition {

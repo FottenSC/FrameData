@@ -58,7 +58,7 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
   const [currentPage, setCurrentPage] = useState(0);
 
   // Copy command to clipboard
-  const copyCommand = (move: Move) => {
+  const copyCommand = React.useCallback((move: Move) => {
     const stancePart = move.stance?.join(" ") ?? "";
     const commandPart = move.command?.join("") ?? "";
     const textToCopy = stancePart ? `${stancePart} ${commandPart}` : commandPart;
@@ -66,7 +66,7 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
     navigator.clipboard.writeText(textToCopy).then(() => {
       toast("Copied!", { duration: 1000 });
     });
-  };
+  }, []);
 
   // Reset page when moves change
   useEffect(() => {

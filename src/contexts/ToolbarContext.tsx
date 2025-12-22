@@ -3,6 +3,7 @@ import React, {
   useContext,
   useState,
   useRef,
+  useMemo,
   ReactNode,
 } from "react";
 
@@ -35,20 +36,20 @@ export function ToolbarProvider({ children }: ToolbarProviderProps) {
   const [filteredMoves, setFilteredMoves] = useState(0);
   const [isUpdating, setIsUpdating] = useState(false);
 
+  const value = useMemo(() => ({
+    activeFiltersCount,
+    setActiveFiltersCount,
+    exportHandler,
+    totalMoves,
+    setTotalMoves,
+    filteredMoves,
+    setFilteredMoves,
+    isUpdating,
+    setIsUpdating,
+  }), [activeFiltersCount, totalMoves, filteredMoves, isUpdating]);
+
   return (
-    <ToolbarContext.Provider
-      value={{
-        activeFiltersCount,
-        setActiveFiltersCount,
-        exportHandler,
-        totalMoves,
-        setTotalMoves,
-        filteredMoves,
-        setFilteredMoves,
-        isUpdating,
-        setIsUpdating,
-      }}
-    >
+    <ToolbarContext.Provider value={value}>
       {children}
     </ToolbarContext.Provider>
   );

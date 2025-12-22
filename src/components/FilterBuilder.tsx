@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { X, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 import {
   Select,
@@ -49,19 +49,26 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
   className,
   moves = [],
 }) => {
-  const { selectedGame, hitLevels } = useGame();
-  const gameConfig: GameFilterConfig = getGameFilterConfig(selectedGame.id, hitLevels);
-  const allOperators: FilterOperator[] = (() => {
+  const { selectedGame, hitLevels, applyNotation } = useGame();
+  
+  const gameConfig: GameFilterConfig = useMemo(() => 
+    getGameFilterConfig(selectedGame.id, hitLevels),
+    [selectedGame.id, hitLevels]
+  );
+
+  const allOperators: FilterOperator[] = useMemo(() => {
     const customs = gameConfig.customOperators ?? [];
     const map = new Map<string, FilterOperator>();
     for (const op of builtinOperators) map.set(op.id, op);
     for (const op of customs) map.set(op.id, op);
     return Array.from(map.values());
-  })();
-  const operatorsById = operatorById(allOperators);
-  const fieldMap = new Map(
+  }, [gameConfig]);
+
+  const operatorsById = useMemo(() => operatorById(allOperators), [allOperators]);
+  
+  const fieldMap = useMemo(() => new Map(
     gameConfig.fields.map((f) => [f.id, f as FieldConfig]),
-  );
+  ), [gameConfig]);
 
   const [filters, setFilters] = useState<FilterItem[]>([]);
   const [rootOperator, setRootOperator] = useState<FilterGroupOperator>("and");
@@ -458,8 +465,7 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
   );
 };
 
-interface FilterItemComponentProps {
-  item: FilterItem;
+interface BaseFilterProps {
   fields: FieldConfig[];
   getFieldType: (id: string) => FieldType;
   getAvailableConditions: (id: string) => FilterOperator[];
@@ -467,10 +473,23 @@ interface FilterItemComponentProps {
   onUpdateCondition: (id: string, property: keyof FilterCondition, value: any) => void;
   onUpdateGroup: (id: string, operator: FilterGroupOperator) => void;
   onRemove: (id: string) => void;
-  onAdd: (parentId: string, type: "condition" | "group") => void;
+  onAdd: (parentId: string | null, type: "condition" | "group") => void;
   onIndent: (id: string) => void;
   onOutdent: (id: string) => void;
   depth: number;
+}
+
+interface FilterItemComponentProps extends BaseFilterProps {
+  item: FilterItem;
+}
+
+interface FilterGroupRowProps extends BaseFilterProps {
+  group: FilterGroup;
+  isRoot: boolean;
+}
+
+interface FilterRowProps extends BaseFilterProps {
+  filter: FilterCondition;
 }
 
 const FilterItemComponent: React.FC<FilterItemComponentProps> = (props) => {
@@ -483,7 +502,7 @@ const FilterItemComponent: React.FC<FilterItemComponentProps> = (props) => {
   return <FilterRow {...props} filter={item} />;
 };
 
-const FilterGroupRow: React.FC<FilterItemComponentProps & { group: FilterGroup; isRoot: boolean }> = (props) => {
+const FilterGroupRow: React.FC<FilterGroupRowProps> = (props) => {
   const { group, onUpdateGroup, onRemove, onAdd, depth, isRoot } = props;
 
   const content = (
@@ -574,7 +593,7 @@ const FilterGroupRow: React.FC<FilterItemComponentProps & { group: FilterGroup; 
   );
 };
 
-const FilterRow: React.FC<FilterItemComponentProps & { filter: FilterCondition }> = ({
+const FilterRow: React.FC<FilterRowProps> = ({
   filter,
   fields,
   getFieldType,

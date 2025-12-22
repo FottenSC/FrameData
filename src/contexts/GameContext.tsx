@@ -394,18 +394,37 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const handleSetSelectedGameById = (gameId: string) => {
     const game = avaliableGames.find((g) => g.id === gameId);
     if (game && game.id !== selectedGame?.id) {
-      setSelectedGame(game);
-      setSelectedCharacterId(null);
+      if (typeof React.startTransition === "function") {
+        React.startTransition(() => {
+          setSelectedGame(game);
+          setSelectedCharacterId(null);
+        });
+      } else {
+        setSelectedGame(game);
+        setSelectedCharacterId(null);
+      }
       navigate(`/${game.id}`);
     } else if (game && game.id === selectedGame?.id) {
-      setSelectedCharacterId(null);
+      if (typeof React.startTransition === "function") {
+        React.startTransition(() => {
+          setSelectedCharacterId(null);
+        });
+      } else {
+        setSelectedCharacterId(null);
+      }
       navigate(`/${game.id}`);
     }
   };
 
   const handleSetSelectedCharacterId = (id: number | null) => {
     if (id !== selectedCharacterId) {
-      setSelectedCharacterId(id);
+      if (typeof React.startTransition === "function") {
+        React.startTransition(() => {
+          setSelectedCharacterId(id);
+        });
+      } else {
+        setSelectedCharacterId(id);
+      }
     }
   };
 
@@ -477,7 +496,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     [gameProperties],
   );
 
-  const contextValue: GameContextType = {
+  const contextValue: GameContextType = useMemo(() => ({
     selectedGame,
     setSelectedGameById: handleSetSelectedGameById,
     isCharactersLoading,
@@ -493,7 +512,22 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     getStanceInfo,
     getPropertyInfo,
     hitLevels,
-  };
+  }), [
+    selectedGame,
+    handleSetSelectedGameById,
+    isCharactersLoading,
+    characterError,
+    characters,
+    selectedCharacterId,
+    handleSetSelectedCharacterId,
+    combinedIcons,
+    getIconUrl,
+    getNotationMap,
+    applyNotation,
+    getStanceInfo,
+    getPropertyInfo,
+    hitLevels,
+  ]);
 
   return (
     <GameContext.Provider value={contextValue}>{children}</GameContext.Provider>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useDeferredValue, useMemo } from "react";
+import React, { useEffect, useState, useDeferredValue, useMemo, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -22,7 +22,7 @@ import { Move, FilterCondition, FilterItem, SortableColumn } from "../types/Move
 import { builtinOperators, operatorById } from "../filters/operators";
 import { getGameFilterConfig } from "../filters/gameFilterConfigs";
 import type { FieldConfig, FieldType, FilterOperator } from "../filters/types";
-import { useMoves } from "@/hooks/useMoves";
+import { useMoves, clearNotationCache } from "@/hooks/useMoves";
 
 export const FrameDataTable: React.FC = () => {
   const params = useParams<{ gameId?: string; characterName?: string }>();
@@ -58,6 +58,7 @@ export const FrameDataTable: React.FC = () => {
   const {
     data: originalMoves = [],
     isLoading: movesLoading,
+    isPlaceholderData,
     error: movesError,
   } = useMoves({
     gameId: selectedGame?.id,
@@ -218,6 +219,7 @@ export const FrameDataTable: React.FC = () => {
   const prevApplyNotationRef = React.useRef(applyNotation);
   useEffect(() => {
     if (prevApplyNotationRef.current !== applyNotation) {
+      clearNotationCache();
       queryClient.invalidateQueries({ queryKey: ["moves"] });
       prevApplyNotationRef.current = applyNotation;
     }
@@ -232,25 +234,31 @@ export const FrameDataTable: React.FC = () => {
     }
   };
 
-  const renderCommand = (command: string[] | null) => (
+  const renderCommand = useCallback((command: string[] | null) => (
     <CommandRenderer command={command} />
-  );
-  const renderNotes = (note: string | null) => <NotesRenderer note={note} />;
+  ), []);
+  
+  const renderNotes = useCallback((note: string | null) => (
+    <NotesRenderer note={note} />
+  ), []);
 
-  const gameFilterConfig = getGameFilterConfig(selectedGame.id, hitLevels);
-  const fieldMap = new Map<string, FieldConfig>(
+  const gameFilterConfig = useMemo(() => getGameFilterConfig(selectedGame.id, hitLevels), [selectedGame.id, hitLevels]);
+  
+  const fieldMap = useMemo(() => new Map<string, FieldConfig>(
     gameFilterConfig.fields.map((f) => [f.id, f]),
-  );
-  const allOperators: FilterOperator[] = (() => {
+  ), [gameFilterConfig]);
+
+  const allOperators: FilterOperator[] = useMemo(() => {
     const customs = gameFilterConfig.customOperators ?? [];
     const map = new Map<string, FilterOperator>();
     for (const op of builtinOperators) map.set(op.id, op);
     for (const op of customs) map.set(op.id, op);
     return Array.from(map.values());
-  })();
-  const opsById = operatorById(allOperators);
+  }, [gameFilterConfig]);
 
-  const getFieldAs = (
+  const opsById = useMemo(() => operatorById(allOperators), [allOperators]);
+
+  const getFieldAs = useCallback((
     move: Move,
     fieldId: string,
   ): {
@@ -269,24 +277,19 @@ export const FrameDataTable: React.FC = () => {
         };
       case "stance":
         return {
-          string: move.stance ? move.stance.join(", ") : null,
+          string: move._searchStance ?? (move.stance ? move.stance.join(", ") : null),
           number: null,
           type,
         };
       case "command":
-        return { string: move.command ? move.command.join(" ") : null, number: null, type };
+        return { string: move._searchCommand ?? (move.command ? move.command.join(" ") : null), number: null, type };
       case "rawCommand":
         return { string: move.stringCommand, number: null, type };
       case "input": {
-        // combined stance + command
-        const stanceStr = move.stance ? move.stance.join(" ") : null;
-        const commandStr = move.command ? move.command.join(" ") : null;
-        const combined =
-          [stanceStr, commandStr].filter(Boolean).join(" ") || null;
-        return { string: combined, number: null, type };
+        return { string: move._searchInput ?? null, number: null, type };
       }
       case "hitLevel":
-        return { string: move.hitLevel ? move.hitLevel.join(" ") : null, number: null, type };
+        return { string: move._searchHitLevel ?? (move.hitLevel ? move.hitLevel.join(" ") : null), number: null, type };
       case "impact":
         return {
           string: move.impact != null ? String(move.impact) : null,
@@ -329,7 +332,7 @@ export const FrameDataTable: React.FC = () => {
         };
       case "properties":
         return {
-          string: move.properties ? move.properties.join(" ") : null,
+          string: move._searchProperties ?? (move.properties ? move.properties.join(" ") : null),
           number: null,
           type,
         };
@@ -338,9 +341,9 @@ export const FrameDataTable: React.FC = () => {
       default:
         return { string: null, number: null, type };
     }
-  };
+  }, [fieldMap]);
 
-  const applyFilterItem = (move: Move, item: FilterItem): boolean => {
+  const applyFilterItem = useCallback((move: Move, item: FilterItem): boolean => {
     if (item.type === "group") {
       if (item.operator === "and") {
         return item.filters.every((f) => applyFilterItem(move, f));
@@ -359,7 +362,7 @@ export const FrameDataTable: React.FC = () => {
         value2: item.value2,
       });
     }
-  };
+  }, [opsById, getFieldAs]);
 
   const SORT_FIELD_MAP = {
     character: {
@@ -367,11 +370,11 @@ export const FrameDataTable: React.FC = () => {
       type: "string" as const,
     },
     stance: {
-      getter: (move: Move) => (move.stance ? move.stance.join(", ") : null),
+      getter: (move: Move) => move._searchStance ?? (move.stance ? move.stance.join(", ") : null),
       type: "string" as const,
     },
     command: {
-      getter: (move: Move) => move.command ? move.command.join(" ") : null,
+      getter: (move: Move) => move._searchCommand ?? (move.command ? move.command.join(" ") : null),
       type: "string" as const,
     },
     rawCommand: {
@@ -379,14 +382,11 @@ export const FrameDataTable: React.FC = () => {
       type: "string" as const,
     },
     input: {
-      getter: (move: Move) =>
-        [move.stance ? move.stance.join(" ") : null, move.command ? move.command.join(" ") : null]
-          .filter(Boolean)
-          .join(" "),
+      getter: (move: Move) => move._searchInput ?? "",
       type: "string" as const,
     },
     hitLevel: {
-      getter: (move: Move) => (move.hitLevel ? move.hitLevel.join(" ") : null),
+      getter: (move: Move) => move._searchHitLevel ?? (move.hitLevel ? move.hitLevel.join(" ") : null),
       type: "string" as const,
     },
     impact: {
@@ -414,7 +414,7 @@ export const FrameDataTable: React.FC = () => {
       type: "number" as const,
     },
     properties: {
-      getter: (move: Move) => (move.properties ? move.properties.join(" ") : null),
+      getter: (move: Move) => move._searchProperties ?? (move.properties ? move.properties.join(" ") : null),
       type: "string" as const,
     },
     notes: {
@@ -423,46 +423,25 @@ export const FrameDataTable: React.FC = () => {
     },
   };
 
-  const movesWithSortValues = useMemo(
-    () =>
-      !sortColumn || originalMoves.length === 0
-        ? originalMoves
-        : (() => {
-            const fieldConfig =
-              SORT_FIELD_MAP[sortColumn as keyof typeof SORT_FIELD_MAP];
-            if (!fieldConfig) return originalMoves;
-            return originalMoves.map((move) => ({
-              ...move,
-              _sortValue: fieldConfig.getter(move),
-            }));
-          })(),
-    [sortColumn, originalMoves],
-  );
-
   const createOptimizedComparator = (
     direction: "asc" | "desc",
     fieldType: "string" | "number",
+    getter: (move: Move) => any,
   ) => {
     const order = direction === "asc" ? 1 : -1;
     if (fieldType === "number") {
-      return (
-        a: Move & { _sortValue?: any },
-        b: Move & { _sortValue?: any },
-      ): number => {
-        const valA = a._sortValue;
-        const valB = b._sortValue;
+      return (a: Move, b: Move): number => {
+        const valA = getter(a);
+        const valB = getter(b);
         if (valA == null && valB == null) return 0;
         if (valA == null) return order;
         if (valB == null) return -order;
         return (valA - valB) * order;
       };
     } else {
-      return (
-        a: Move & { _sortValue?: any },
-        b: Move & { _sortValue?: any },
-      ): number => {
-        const valA = a._sortValue;
-        const valB = b._sortValue;
+      return (a: Move, b: Move): number => {
+        const valA = getter(a);
+        const valB = getter(b);
         if (valA == null && valB == null) return 0;
         if (valA == null) return order;
         if (valB == null) return -order;
@@ -472,33 +451,36 @@ export const FrameDataTable: React.FC = () => {
   };
 
   const displayedMoves = useMemo(() => {
-    const sourceMoves = sortColumn ? movesWithSortValues : originalMoves;
-    if (sourceMoves.length === 0) return [];
-    let result = sourceMoves;
+    if (originalMoves.length === 0) return [];
+    let result = originalMoves;
+
     if (activeFilters.length > 0) {
       result = result.filter((move) =>
         activeFilters.every((filter) => applyFilterItem(move, filter)),
       );
     }
+
     if (sortColumn) {
-      if (result === sourceMoves) {
-        result = [...result];
-      }
       const fieldConfig =
         SORT_FIELD_MAP[sortColumn as keyof typeof SORT_FIELD_MAP];
       if (fieldConfig) {
+        // Create a copy before sorting to avoid mutating originalMoves or cached data
+        result = [...result];
         const comparator = createOptimizedComparator(
           sortDirection,
           fieldConfig.type,
+          fieldConfig.getter,
         );
         result.sort(comparator);
       }
     }
     return result;
-  }, [sortColumn, movesWithSortValues, originalMoves, activeFilters, sortDirection]);
+  }, [sortColumn, originalMoves, activeFilters, sortDirection, applyFilterItem]);
 
   // Use deferred value to prevent blocking UI during heavy data processing
   const deferredMoves = useDeferredValue(displayedMoves);
+  const deferredSelectedCharacterId = useDeferredValue(selectedCharacterId);
+  const deferredVisibleColumns = useDeferredValue(visibleColumns);
   const isStale = deferredMoves !== displayedMoves;
 
   const handleExport = (format: "csv" | "excel") => {
@@ -602,8 +584,8 @@ export const FrameDataTable: React.FC = () => {
   }, [deferredMoves.length, setFilteredMoves]);
 
   useEffect(() => {
-    setIsUpdating(isStale);
-  }, [isStale, setIsUpdating]);
+    setIsUpdating(isStale || isPlaceholderData);
+  }, [isStale, isPlaceholderData, setIsUpdating]);
 
   if (error) {
     return (
@@ -643,20 +625,20 @@ export const FrameDataTable: React.FC = () => {
             <div
               className={cn(
                 "flex-1 min-h-0 h-full",
-                isStale && "opacity-70 transition-opacity",
+                (isStale || isPlaceholderData) && "opacity-70 transition-opacity",
               )}
             >
               <FrameDataTableContent
                 moves={deferredMoves}
-                movesLoading={movesLoading || isStale}
+                movesLoading={movesLoading || isStale || isPlaceholderData}
                 sortColumn={sortColumn}
                 sortDirection={sortDirection}
                 handleSort={handleSort}
                 renderCommand={renderCommand}
                 renderNotes={renderNotes}
-                visibleColumns={visibleColumns}
+                visibleColumns={deferredVisibleColumns}
                 badges={selectedGame.badges}
-                isAllCharacters={selectedCharacterId === -1}
+                isAllCharacters={deferredSelectedCharacterId === -1}
               />
             </div>
           </div>

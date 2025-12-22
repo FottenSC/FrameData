@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode, useCallback, useMemo } from "react";
 
 export type CommandView =
   | "main"
@@ -26,28 +26,28 @@ export function CommandProvider({ children }: CommandProviderProps) {
   const [open, setOpen] = useState(false);
   const [currentView, setCurrentView] = useState<CommandView>("main");
 
-  const openView = (view: CommandView) => {
+  const openView = useCallback((view: CommandView) => {
     setCurrentView(view);
     setOpen(true);
-  };
+  }, []);
 
-  const handleSetOpen = (newOpen: boolean) => {
+  const handleSetOpen = useCallback((newOpen: boolean) => {
     if (!newOpen) {
       setCurrentView("main");
     }
     setOpen(newOpen);
-  };
+  }, []);
+
+  const value = useMemo(() => ({
+    open,
+    setOpen: handleSetOpen,
+    currentView,
+    setCurrentView,
+    openView,
+  }), [open, handleSetOpen, currentView, openView]);
 
   return (
-    <CommandContext.Provider
-      value={{
-        open,
-        setOpen: handleSetOpen,
-        currentView,
-        setCurrentView,
-        openView,
-      }}
-    >
+    <CommandContext.Provider value={value}>
       {children}
     </CommandContext.Provider>
   );

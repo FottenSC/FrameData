@@ -14,50 +14,53 @@ import { Navbar } from "./components/Navbar";
 import { GameSelectionPage } from "./components/GameSelectionPage";
 import { CharacterSelectionPage } from "./components/CharacterSelectionPage";
 import { CommandPalette } from "./components/CommandPalette";
+import { TooltipProvider } from "./components/ui/tooltip";
 
 function App() {
   return (
     <Router>
-      <Toaster
-        position="top-left"
-        theme="dark"
-        toastOptions={{
-          style: {
-            background: "hsl(0, 0%, 20%)",
-            border: "1px solid hsla(0, 0%, 100%, 0.1)",
-            color: "hsl(0, 0%, 98%)",
-          },
-        }}
-      />
-      <UserSettingsProvider>
-        <GameProvider>
-          <CommandProvider>
-            <ToolbarProvider>
-              <div className="min-h-screen flex flex-col bg-[hsl(var(--background))] text-[hsl(var(--foreground))]">
-                <Navbar />
-                <CommandPaletteContainer />
-                <main className="flex-grow">
-                  <Routes>
-                    <Route
-                      path="/"
-                      element={<Navigate to="/games" replace />}
-                    />
-                    <Route path="/games" element={<GameSelectionPage />} />
-                    <Route
-                      path="/:gameId"
-                      element={<CharacterSelectionPage />}
-                    />
-                    <Route
-                      path="/:gameId/:characterName"
-                      element={<FrameDataTable />}
-                    />
-                  </Routes>
-                </main>
-              </div>
-            </ToolbarProvider>
-          </CommandProvider>
-        </GameProvider>
-      </UserSettingsProvider>
+      <TooltipProvider>
+        <Toaster
+          position="top-left"
+          theme="dark"
+          toastOptions={{
+            style: {
+              background: "hsl(0, 0%, 20%)",
+              border: "1px solid hsla(0, 0%, 100%, 0.1)",
+              color: "hsl(0, 0%, 98%)",
+            },
+          }}
+        />
+        <UserSettingsProvider>
+          <GameProvider>
+            <CommandProvider>
+              <ToolbarProvider>
+                <div className="min-h-screen flex flex-col bg-[hsl(var(--background))] text-[hsl(var(--foreground))]">
+                  <Navbar />
+                  <CommandPaletteContainer />
+                  <main className="flex-grow">
+                    <Routes>
+                      <Route
+                        path="/"
+                        element={<Navigate to="/games" replace />}
+                      />
+                      <Route path="/games" element={<GameSelectionPage />} />
+                      <Route
+                        path="/:gameId"
+                        element={<CharacterSelectionPage />}
+                      />
+                      <Route
+                        path="/:gameId/:characterName"
+                        element={<FrameDataTable />}
+                      />
+                    </Routes>
+                  </main>
+                </div>
+              </ToolbarProvider>
+            </CommandProvider>
+          </GameProvider>
+        </UserSettingsProvider>
+      </TooltipProvider>
     </Router>
   );
 }

@@ -18,9 +18,9 @@ import { FilterBuilder } from "./FilterBuilder";
 import { CommandRenderer } from "@/components/renderers/CommandRenderer";
 import { NotesRenderer } from "@/components/renderers/NotesRenderer";
 import { FrameDataTableContent } from "@/components/table/FrameDataTableContent";
-import { Move, FilterCondition, SortableColumn } from "../types/Move";
+import { Move, FilterCondition, FilterItem, SortableColumn } from "../types/Move";
 import { builtinOperators, operatorById } from "../filters/operators";
-import { gameFilterConfigs } from "../filters/gameFilterConfigs";
+import { getGameFilterConfig } from "../filters/gameFilterConfigs";
 import type { FieldConfig, FieldType, FilterOperator } from "../filters/types";
 import { useMoves } from "@/hooks/useMoves";
 
@@ -39,6 +39,7 @@ export const FrameDataTable: React.FC = () => {
     availableIcons,
     getIconUrl,
     applyNotation,
+    hitLevels,
   } = useGame();
 
   // Add table configuration context
@@ -72,7 +73,7 @@ export const FrameDataTable: React.FC = () => {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   // Add state for filters
-  const [activeFilters, setActiveFilters] = useState<FilterCondition[]>([]);
+  const [activeFilters, setActiveFilters] = useState<FilterItem[]>([]);
 
   // Get visible columns from table configuration
   const baseColumns = getVisibleColumns();
@@ -236,7 +237,7 @@ export const FrameDataTable: React.FC = () => {
   );
   const renderNotes = (note: string | null) => <NotesRenderer note={note} />;
 
-  const gameFilterConfig = gameFilterConfigs[selectedGame.id] ?? { fields: [] };
+  const gameFilterConfig = getGameFilterConfig(selectedGame.id, hitLevels);
   const fieldMap = new Map<string, FieldConfig>(
     gameFilterConfig.fields.map((f) => [f.id, f]),
   );
@@ -339,31 +340,25 @@ export const FrameDataTable: React.FC = () => {
     }
   };
 
-  type ProcessedFilter = FilterCondition & {
-    value1?: string;
-    value2?: string;
-  };
-  const processedFilters: ProcessedFilter[] = useMemo(
-    () =>
-      activeFilters.map((f) => ({
-        ...f,
-        value1: f.value,
-        value2: f.value2,
-      })),
-    [activeFilters],
-  );
-
-  const applyFilter = (move: Move, filter: ProcessedFilter): boolean => {
-    const op = opsById.get(filter.condition);
-    if (!op) return true;
-    const f = getFieldAs(move, filter.field);
-    return op.test({
-      fieldType: f.type,
-      fieldString: f.string,
-      fieldNumber: f.number,
-      value: filter.value1,
-      value2: filter.value2,
-    });
+  const applyFilterItem = (move: Move, item: FilterItem): boolean => {
+    if (item.type === "group") {
+      if (item.operator === "and") {
+        return item.filters.every((f) => applyFilterItem(move, f));
+      } else {
+        return item.filters.some((f) => applyFilterItem(move, f));
+      }
+    } else {
+      const op = opsById.get(item.condition);
+      if (!op) return true;
+      const f = getFieldAs(move, item.field);
+      return op.test({
+        fieldType: f.type,
+        fieldString: f.string,
+        fieldNumber: f.number,
+        value: item.value,
+        value2: item.value2,
+      });
+    }
   };
 
   const SORT_FIELD_MAP = {
@@ -480,9 +475,9 @@ export const FrameDataTable: React.FC = () => {
     const sourceMoves = sortColumn ? movesWithSortValues : originalMoves;
     if (sourceMoves.length === 0) return [];
     let result = sourceMoves;
-    if (processedFilters.length > 0) {
+    if (activeFilters.length > 0) {
       result = result.filter((move) =>
-        processedFilters.every((filter) => applyFilter(move, filter)),
+        activeFilters.every((filter) => applyFilterItem(move, filter)),
       );
     }
     if (sortColumn) {
@@ -500,7 +495,7 @@ export const FrameDataTable: React.FC = () => {
       }
     }
     return result;
-  }, [sortColumn, movesWithSortValues, originalMoves, processedFilters, sortDirection]);
+  }, [sortColumn, movesWithSortValues, originalMoves, activeFilters, sortDirection]);
 
   // Use deferred value to prevent blocking UI during heavy data processing
   const deferredMoves = useDeferredValue(displayedMoves);
@@ -581,7 +576,7 @@ export const FrameDataTable: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
-  const handleFiltersChange = (filters: FilterCondition[]) => {
+  const handleFiltersChange = (filters: FilterItem[]) => {
     setActiveFilters(filters);
   };
 
@@ -630,7 +625,7 @@ export const FrameDataTable: React.FC = () => {
     <div className="h-full flex flex-col pl-4 pr-4 flex-grow">
       {selectedCharacterId ? (
         <div className="h-full flex flex-col overflow-hidden">
-          <div className="pb-2 flex-shrink-0">
+          <div className="pb-0 flex-shrink-0">
             {movesLoading && originalMoves.length === 0 ? (
               <div className="flex flex-wrap gap-2 p-4 border rounded-lg bg-card/50">
                 <Skeleton className="h-10 w-32" />

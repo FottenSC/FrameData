@@ -20,6 +20,7 @@ import { HitLevelIcon } from "@/components/icons/HitLevelIcon";
 
 export interface HitLevelOption {
   value: string;
+  label?: string;
 }
 
 interface HitLevelMultiComboboxProps {
@@ -104,7 +105,7 @@ export const HitLevelMultiCombobox: React.FC<HitLevelMultiComboboxProps> = ({
                       )}
                     />
                     <HitLevelIcon level={token} />
-                    <span className="text-xs font-medium">{token}</span>
+                    <span className="text-xs font-medium">{opt.label || token}</span>
                   </CommandItem>
                 );
               })}

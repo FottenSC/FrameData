@@ -22,12 +22,23 @@ export interface Move {
 
 export interface FilterCondition {
   id: string;
+  type?: "condition";
   field: string;
-  numericField: string | null;
   condition: string;
   value: string;
   value2?: string;
 }
+
+export type FilterGroupOperator = "and" | "or";
+
+export interface FilterGroup {
+  id: string;
+  type: "group";
+  operator: FilterGroupOperator;
+  filters: FilterItem[];
+}
+
+export type FilterItem = FilterCondition | FilterGroup;
 
 export type SortableColumn =
   | "character"

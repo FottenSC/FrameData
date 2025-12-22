@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Table,
   TableBody,
@@ -76,13 +76,12 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
   // Pagination logic
   const usePagination = isAllCharacters && moves.length > PAGE_SIZE;
   const totalPages = usePagination ? Math.ceil(moves.length / PAGE_SIZE) : 1;
-  const displayMoves =
-    !usePagination
-      ? moves
-      : (() => {
-          const start = currentPage * PAGE_SIZE;
-          return moves.slice(start, start + PAGE_SIZE);
-        })();
+  
+  const displayMoves = useMemo(() => {
+    if (!usePagination) return moves;
+    const start = currentPage * PAGE_SIZE;
+    return moves.slice(start, start + PAGE_SIZE);
+  }, [moves, usePagination, currentPage]);
 
   // Page change handler
   const handlePageChange = (page: number) => {
@@ -111,23 +110,70 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
 
   // Render table body content
   const tableBody = (() => {
-    if (movesLoading) {
+    // Only show skeletons if we are loading and have no data to show
+    if (movesLoading && moves.length === 0) {
       return (
         <>
           {Array.from({ length: 20 }).map((_, i) => (
             <UITableRow key={i} className="border-b-card-border">
-              {visibleColumns.map((column) => (
-                <TableCell key={column.id} className={column.className}>
-                  <Skeleton className="h-5 w-full max-w-[100px]" />
-                </TableCell>
-              ))}
+              {visibleColumns.map((column) => {
+                const style: React.CSSProperties = {};
+                if (column.width) style.width = column.width;
+                if (column.minWidth) style.minWidth = column.minWidth;
+                if (column.maxWidth) style.maxWidth = column.maxWidth;
+
+                // Customize skeleton based on column type
+                const skeletonContent = (() => {
+                  switch (column.id) {
+                    case "command":
+                    case "hitLevel":
+                      return (
+                        <div className="flex gap-1">
+                          <Skeleton className="h-5 w-5 rounded-full" />
+                          <Skeleton className="h-5 w-5 rounded-full" />
+                          <Skeleton className="h-5 w-8 rounded-md" />
+                        </div>
+                      );
+                    case "impact":
+                    case "damage":
+                    case "block":
+                    case "hit":
+                    case "counterHit":
+                    case "guardBurst":
+                      return <Skeleton className="h-5 w-8 mx-auto" />;
+                    case "properties":
+                      return (
+                        <div className="flex gap-1">
+                          <Skeleton className="h-4 w-10 rounded-full" />
+                          <Skeleton className="h-4 w-10 rounded-full" />
+                        </div>
+                      );
+                    case "character":
+                      return <Skeleton className="h-5 w-20" />;
+                    case "stance":
+                      return <Skeleton className="h-5 w-24 ml-auto" />;
+                    default:
+                      return <Skeleton className="h-5 w-full" />;
+                  }
+                })();
+
+                return (
+                  <TableCell
+                    key={column.id}
+                    className={column.className}
+                    style={style}
+                  >
+                    {skeletonContent}
+                  </TableCell>
+                );
+              })}
             </UITableRow>
           ))}
         </>
       );
     }
 
-    if (moves.length === 0) {
+    if (moves.length === 0 && !movesLoading) {
       return (
         <UITableRow>
           <TableCell

@@ -10,11 +10,6 @@
       "description": "Generally plus, inflicts guard damage and counters GI and Reversal edge.",
       "className": "bg-blue-400 text-zinc-900 border-white"
     },
-    "GC": {
-      "name": "Guard Crush",
-      "description": "Move that breaks guard.",
-      "className": "bg-blue-400 text-zinc-900 border-white"
-    },
     "GI": {
       "name": "Guard Impact",
       "description": "Defensive option that protects against attacks between i2 and i12, giving you frame advantage based on Attack type \n- Heavy +8\n- Medium +16\n- Light +28",
@@ -117,6 +112,33 @@
     "Revenge": {
       "name": "Revenge",
       "description": "Red armor like Astaroth has"
+    }
+  },
+  "hitLevels": {
+    "H": {
+      "name": "High",
+      "description": "Hits standing opponents and whiffs against crouching opponents.",
+      "className": "bg-pink-500"
+    },
+    "M": {
+      "name": "Mid",
+      "description": "Hits standing and crouching opponents. Must be blocked standing.",
+      "className": "bg-yellow-500"
+    },
+    "L": {
+      "name": "Low",
+      "description": "Must be blocked low and will hit both standing and crouching opponents.",
+      "className": "bg-cyan-500"
+    },
+    "SM": {
+      "name": "Special Mid",
+      "description": "Can be blocked both standing and crouching.",
+      "className": "bg-purple-500"
+    },
+    "SL": {
+      "name": "Special Low",
+      "description": "Can be blocked both standing and crouching.",
+      "className": "bg-cyan-500"
     }
   },
   "characters": [
@@ -656,7 +678,7 @@
       "stances": {
         "AS": {
           "name": "Angel Step",
-          "description": "Entered by pressing \u2193 \u2198 \u2192"
+          "description": "Entered by pressing ↓ ↘ →"
         },
         "Hit": {
           "name": "",
@@ -664,7 +686,7 @@
         },
         "TAS": {
           "name": "Twin Angel Step",
-          "description": "Entered by pressing \u2193 \u2198 \u2192 \u2192"
+          "description": "Entered by pressing ↓ ↘ → →"
         }
       },
       "image": "Sophitia.webp"

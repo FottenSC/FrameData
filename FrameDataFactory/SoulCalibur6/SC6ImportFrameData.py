@@ -458,6 +458,13 @@ for prop_key in PROPERTY_TOKENS.values():
 game_manifest = {
     "properties": properties_dict,
     "stances": existing_game_stances,
+    "hitLevels": existing_game_data.get("hitLevels", {
+        "H": {"name": "High", "description": "", "className": "bg-pink-500"},
+        "M": {"name": "Mid", "description": "", "className": "bg-yellow-500"},
+        "L": {"name": "Low", "description": "", "className": "bg-cyan-500"},
+        "SM": {"name": "Special Mid", "description": "", "className": "bg-purple-500"},
+        "SL": {"name": "Special Low", "description": "", "className": "bg-cyan-500"}
+    }),
     "characters": characters_manifest
 }
 with open(game_json_path, "w", encoding="utf-8") as f:

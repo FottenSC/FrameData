@@ -1,4 +1,31 @@
 {
+  "hitLevels": {
+    "H": {
+      "name": "High",
+      "description": "Can be blocked standing or ducked.",
+      "className": "bg-pink-500"
+    },
+    "M": {
+      "name": "Mid",
+      "description": "Must be blocked standing. Hits crouching opponents.",
+      "className": "bg-yellow-500"
+    },
+    "L": {
+      "name": "Low",
+      "description": "Must be blocked crouching. Hits standing opponents.",
+      "className": "bg-cyan-500"
+    },
+    "SM": {
+      "name": "Special Mid",
+      "description": "Can be blocked standing or crouching.",
+      "className": "bg-purple-500"
+    },
+    "SL": {
+      "name": "Special Low",
+      "description": "Can be blocked standing or crouching.",
+      "className": "bg-cyan-500"
+    }
+  },
   "characters": [
     {
       "id": 1,

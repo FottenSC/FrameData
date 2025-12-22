@@ -3,12 +3,15 @@ import React, {
   useContext,
   useState,
   useEffect,
+  useMemo,
+  useCallback,
   ReactNode,
 } from "react";
 import { Gamepad2, Sword } from "lucide-react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { sharedNotationMapping, NotationMap } from "@/lib/notationMapping";
 import { useUserSettings } from "./UserSettingsContext";
+import { clearStringCache } from "@/hooks/useMoves";
 
 // Define configuration for a game-specific icon with its alt text
 export interface IconConfig {
@@ -58,6 +61,9 @@ export const buildNotationMap = (
   return effectiveMap;
 };
 
+// Cache for pre-compiled notation RegExps to avoid expensive re-compilation
+const notationRegexCache = new Map<NotationMap, { regex: RegExp }>();
+
 // Helper function to apply notation mappings
 export const applyNotationMapping = (
   text: string | null,
@@ -66,17 +72,21 @@ export const applyNotationMapping = (
   if (text === null) {
     return null;
   }
-  let translatedText = text;
-  // Sort keys by length descending to replace longer sequences first
-  const sortedKeys = Object.keys(map).sort((a, b) => b.length - a.length);
+  
+  const keys = Object.keys(map);
+  if (keys.length === 0) return text;
 
-  for (const key of sortedKeys) {
-    const escapedKey = key.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
-    const regex = new RegExp(escapedKey, "g");
-    translatedText = translatedText.replace(regex, map[key]);
+  let cache = notationRegexCache.get(map);
+  if (!cache) {
+    // Sort keys by length descending to replace longer sequences first
+    const sortedKeys = [...keys].sort((a, b) => b.length - a.length);
+    const escapedKeys = sortedKeys.map(key => key.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"));
+    const regex = new RegExp(escapedKeys.join("|"), "g");
+    cache = { regex };
+    notationRegexCache.set(map, cache);
   }
 
-  return translatedText;
+  return text.replace(cache.regex, (matched) => map[matched] ?? matched);
 };
 
 // Define Game interface here
@@ -104,6 +114,13 @@ export interface StanceInfo {
 
 // Define PropertyInfo for badge styling
 export interface PropertyInfo {
+  name: string;
+  description: string;
+  className: string;
+}
+
+// Define HitLevelInfo for styling
+export interface HitLevelInfo {
   name: string;
   description: string;
   className: string;
@@ -204,6 +221,7 @@ interface GameContextType {
   applyNotation: (text: string | null) => string | null;
   getStanceInfo: (stanceCode: string, characterId?: number | null) => StanceInfo | null;
   getPropertyInfo: (propertyCode: string) => PropertyInfo | null;
+  hitLevels: Record<string, HitLevelInfo>;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -242,6 +260,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const [characterStances, setCharacterStances] = useState<Record<number, Record<string, StanceInfo>>>({});
   // Game-level properties
   const [gameProperties, setGameProperties] = useState<Record<string, PropertyInfo>>({});
+  // Game-level hit levels
+  const [hitLevels, setHitLevels] = useState<Record<string, HitLevelInfo>>({});
 
   useEffect(() => {
     const loadCharacters = async () => {
@@ -251,6 +271,9 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
         setCharacterError("No game selected.");
         return;
       }
+
+      // Clear interning caches when switching games to free memory
+      clearStringCache();
 
       setIsCharactersLoading(true);
       setCharacterError(null);
@@ -327,6 +350,26 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
           }
         }
         setCharacterStances(charStances);
+
+        // Load game-level hit levels
+        if (data?.hitLevels && typeof data.hitLevels === "object") {
+          const levels: Record<string, HitLevelInfo> = {};
+          for (const [code, info] of Object.entries(data.hitLevels)) {
+            if (typeof info === "string") {
+              levels[code] = { name: info, description: "", className: "" };
+            } else {
+              const levelData = info as { name?: string; description?: string; className?: string };
+              levels[code] = {
+                name: levelData.name || code,
+                description: levelData.description || "",
+                className: levelData.className || "",
+              };
+            }
+          }
+          setHitLevels(levels);
+        } else {
+          setHitLevels({});
+        }
       } catch (err) {
         setCharacterError(
           err instanceof Error
@@ -367,62 +410,72 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   };
 
   // Combine game-specific icons with universal directional icons
-  const combinedIconsMap = new Map<string, IconConfig>();
-  DIRECTIONAL_ICONS.forEach((icon) =>
-    combinedIconsMap.set(icon.code, icon as IconConfig),
-  ); // Add directionals first
-  (selectedGame.icons || []).forEach((icon) =>
-    combinedIconsMap.set(icon.code, icon),
-  ); // Game-specific override/add
+  const combinedIcons = useMemo(() => {
+    const combinedIconsMap = new Map<string, IconConfig>();
+    DIRECTIONAL_ICONS.forEach((icon) =>
+      combinedIconsMap.set(icon.code, icon as IconConfig),
+    ); // Add directionals first
+    (selectedGame.icons || []).forEach((icon) =>
+      combinedIconsMap.set(icon.code, icon),
+    ); // Game-specific override/add
+    return Array.from(combinedIconsMap.values());
+  }, [selectedGame.icons]);
 
-  const combinedIcons = Array.from(combinedIconsMap.values());
-
-  const getIconUrl = (iconName: string, isHeld: boolean = false): string => {
+  const getIconUrl = useCallback((iconName: string, isHeld: boolean = false): string => {
     const upperIconName = iconName.toUpperCase();
     const heldSuffix = isHeld ? "-" : "";
     return `/Games/${selectedGame.id}/Icons/${upperIconName}${heldSuffix}.svg`;
-  };
+  }, [selectedGame.id]);
 
   const { getEnabledNotationMappings } = useUserSettings();
 
   // Memoize notation map for the selected game
-  const notationMap: NotationMap = (() => {
+  const notationMap: NotationMap = useMemo(() => {
     const enabled = getEnabledNotationMappings(
       selectedGame.id,
       selectedGame.notationMapping.defaultEnabled,
     );
     return buildNotationMap(selectedGame.notationMapping, enabled);
-  })();
+  }, [selectedGame.id, selectedGame.notationMapping, getEnabledNotationMappings]);
 
-  const getNotationMap = (): NotationMap => notationMap;
+  const getNotationMap = useCallback((): NotationMap => notationMap, [notationMap]);
 
-  const applyNotation = (text: string | null): string | null => {
-    return applyNotationMapping(text, notationMap);
-  };
+  const applyNotation = useCallback(
+    (text: string | null): string | null => {
+      return applyNotationMapping(text, notationMap);
+    },
+    [notationMap],
+  );
 
   // Get stance info by code, checking character-specific stances first, then game-level
-  const getStanceInfo = (stanceCode: string, characterId?: number | null): StanceInfo | null => {
-    // First check character-specific stances if characterId is provided
-    if (characterId != null && characterId !== -1) {
-      const charStances = characterStances[characterId];
-      if (charStances && charStances[stanceCode]) {
-        return charStances[stanceCode];
+  const getStanceInfo = useCallback(
+    (stanceCode: string, characterId?: number | null): StanceInfo | null => {
+      // First check character-specific stances if characterId is provided
+      if (characterId != null && characterId !== -1) {
+        const charStances = characterStances[characterId];
+        if (charStances && charStances[stanceCode]) {
+          return charStances[stanceCode];
+        }
       }
-    }
-    // Fall back to game-level stances
-    if (gameStances[stanceCode]) {
-      return gameStances[stanceCode];
-    }
-    return null;
-  };
+      // Fall back to game-level stances
+      if (gameStances[stanceCode]) {
+        return gameStances[stanceCode];
+      }
+      return null;
+    },
+    [characterStances, gameStances],
+  );
 
   // Get property info by code
-  const getPropertyInfo = (propertyCode: string): PropertyInfo | null => {
-    if (gameProperties[propertyCode]) {
-      return gameProperties[propertyCode];
-    }
-    return null;
-  };
+  const getPropertyInfo = useCallback(
+    (propertyCode: string): PropertyInfo | null => {
+      if (gameProperties[propertyCode]) {
+        return gameProperties[propertyCode];
+      }
+      return null;
+    },
+    [gameProperties],
+  );
 
   const contextValue: GameContextType = {
     selectedGame,
@@ -439,6 +492,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     applyNotation,
     getStanceInfo,
     getPropertyInfo,
+    hitLevels,
   };
 
   return (

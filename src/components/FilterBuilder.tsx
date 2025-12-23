@@ -41,13 +41,11 @@ export type {
 interface FilterBuilderProps {
   onFiltersChange: (filters: FilterItem[]) => void;
   className?: string;
-  moves?: Move[];
 }
 
 export const FilterBuilder: React.FC<FilterBuilderProps> = ({
   onFiltersChange,
   className,
-  moves = [],
 }) => {
   const { selectedGame, hitLevels, applyNotation } = useGame();
   

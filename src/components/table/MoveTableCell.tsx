@@ -21,7 +21,7 @@ interface MoveTableCellProps {
   badges?: Record<string, { className: string }>;
 }
 
-export const MoveTableCell: React.FC<MoveTableCellProps> = ({
+export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(({
   move,
   columnId,
   renderCommand,
@@ -185,4 +185,6 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = ({
     default:
       return <>—</>;
   }
-};
+});
+
+MoveTableCell.displayName = "MoveTableCell";

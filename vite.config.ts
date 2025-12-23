@@ -13,7 +13,7 @@ export default defineConfig({
           [
             "babel-plugin-react-compiler",
             {
-              /* Options (if any) */
+              target: "19",
             },
           ],
         ],
@@ -53,6 +53,6 @@ export default defineConfig({
     },
   },
   esbuild: {
-    drop: process.env.NODE_ENV === "production" ? ["debugger"] : [],
+    drop: process.env.NODE_ENV === "production" ? ["debugger", "console"] : [],
   },
 });

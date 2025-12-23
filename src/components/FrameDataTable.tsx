@@ -24,6 +24,98 @@ import { getGameFilterConfig } from "../filters/gameFilterConfigs";
 import type { FieldConfig, FieldType, FilterOperator } from "../filters/types";
 import { useMoves, clearNotationCache } from "@/hooks/useMoves";
 
+const SORT_FIELD_MAP = {
+  character: {
+    getter: (move: Move) => move.characterName,
+    type: "string" as const,
+  },
+  stance: {
+    getter: (move: Move) => (move.stance ? move.stance.join(", ") : null),
+    type: "string" as const,
+  },
+  command: {
+    getter: (move: Move) => (move.command ? move.command.join(" ") : null),
+    type: "string" as const,
+  },
+  rawCommand: {
+    getter: (move: Move) => (move.stringCommand ? move.stringCommand : null),
+    type: "string" as const,
+  },
+  input: {
+    getter: (move: Move) =>
+      [
+        move.stance ? move.stance.join(" ") : null,
+        move.command ? move.command.join(" ") : null,
+      ]
+        .filter(Boolean)
+        .join(" "),
+    type: "string" as const,
+  },
+  hitLevel: {
+    getter: (move: Move) => (move.hitLevel ? move.hitLevel.join(" ") : null),
+    type: "string" as const,
+  },
+  impact: {
+    getter: (move: Move) => move.impact,
+    type: "number" as const,
+  },
+  damage: {
+    getter: (move: Move) => move.damageDec,
+    type: "number" as const,
+  },
+  block: {
+    getter: (move: Move) => move.blockDec,
+    type: "number" as const,
+  },
+  hit: {
+    getter: (move: Move) => move.hitDec,
+    type: "number" as const,
+  },
+  counterHit: {
+    getter: (move: Move) => move.counterHitDec,
+    type: "number" as const,
+  },
+  guardBurst: {
+    getter: (move: Move) => move.guardBurst,
+    type: "number" as const,
+  },
+  properties: {
+    getter: (move: Move) => (move.properties ? move.properties.join(" ") : null),
+    type: "string" as const,
+  },
+  notes: {
+    getter: (move: Move) => move.notes,
+    type: "string" as const,
+  },
+};
+
+const createOptimizedComparator = (
+  direction: "asc" | "desc",
+  fieldType: "string" | "number",
+  getter: (move: Move) => any,
+) => {
+  const order = direction === "asc" ? 1 : -1;
+  if (fieldType === "number") {
+    return (a: Move, b: Move): number => {
+      const valA = getter(a);
+      const valB = getter(b);
+      if (valA == null && valB == null) return 0;
+      if (valA == null) return order;
+      if (valB == null) return -order;
+      return (valA - valB) * order;
+    };
+  } else {
+    return (a: Move, b: Move): number => {
+      const valA = getter(a);
+      const valB = getter(b);
+      if (valA == null && valB == null) return 0;
+      if (valA == null) return order;
+      if (valB == null) return -order;
+      return String(valA).localeCompare(String(valB)) * order;
+    };
+  }
+};
+
 export const FrameDataTable: React.FC = () => {
   const params = useParams<{ gameId?: string; characterName?: string }>();
   const { gameId, characterName } = params;
@@ -79,10 +171,12 @@ export const FrameDataTable: React.FC = () => {
   // Get visible columns from table configuration
   const baseColumns = getVisibleColumns();
   // Only show the Character column when viewing "All Characters"
-  const visibleColumns =
+  const visibleColumns = useMemo(() => 
     selectedCharacterId !== -1
       ? baseColumns.filter((c) => c.id !== "character")
-      : baseColumns;
+      : baseColumns,
+    [selectedCharacterId, baseColumns]
+  );
 
   // Persist column visibility preference so it auto-toggles with page mode
   useEffect(() => {
@@ -225,14 +319,14 @@ export const FrameDataTable: React.FC = () => {
     }
   }, [applyNotation, queryClient]);
 
-  const handleSort = (column: SortableColumn) => {
+  const handleSort = useCallback((column: SortableColumn) => {
     if (sortColumn === column) {
       setSortDirection((prevDir) => (prevDir === "asc" ? "desc" : "asc"));
     } else {
       setSortColumn(column);
       setSortDirection("asc");
     }
-  };
+  }, [sortColumn]);
 
   const renderCommand = useCallback((command: string[] | null) => (
     <CommandRenderer command={command} />
@@ -277,19 +371,23 @@ export const FrameDataTable: React.FC = () => {
         };
       case "stance":
         return {
-          string: move._searchStance ?? (move.stance ? move.stance.join(", ") : null),
+          string: move.stance ? move.stance.join(", ") : null,
           number: null,
           type,
         };
       case "command":
-        return { string: move._searchCommand ?? (move.command ? move.command.join(" ") : null), number: null, type };
+        return { string: move.command ? move.command.join(" ") : null, number: null, type };
       case "rawCommand":
         return { string: move.stringCommand, number: null, type };
       case "input": {
-        return { string: move._searchInput ?? null, number: null, type };
+        const val = [
+          move.stance ? move.stance.join(" ") : null,
+          move.command ? move.command.join(" ") : null,
+        ].filter(Boolean).join(" ");
+        return { string: val, number: null, type };
       }
       case "hitLevel":
-        return { string: move._searchHitLevel ?? (move.hitLevel ? move.hitLevel.join(" ") : null), number: null, type };
+        return { string: move.hitLevel ? move.hitLevel.join(" ") : null, number: null, type };
       case "impact":
         return {
           string: move.impact != null ? String(move.impact) : null,
@@ -332,7 +430,7 @@ export const FrameDataTable: React.FC = () => {
         };
       case "properties":
         return {
-          string: move._searchProperties ?? (move.properties ? move.properties.join(" ") : null),
+          string: move.properties ? move.properties.join(" ") : null,
           number: null,
           type,
         };
@@ -363,92 +461,6 @@ export const FrameDataTable: React.FC = () => {
       });
     }
   }, [opsById, getFieldAs]);
-
-  const SORT_FIELD_MAP = {
-    character: {
-      getter: (move: Move) => move.characterName,
-      type: "string" as const,
-    },
-    stance: {
-      getter: (move: Move) => move._searchStance ?? (move.stance ? move.stance.join(", ") : null),
-      type: "string" as const,
-    },
-    command: {
-      getter: (move: Move) => move._searchCommand ?? (move.command ? move.command.join(" ") : null),
-      type: "string" as const,
-    },
-    rawCommand: {
-      getter: (move: Move) => move.stringCommand ? move.stringCommand : null,
-      type: "string" as const,
-    },
-    input: {
-      getter: (move: Move) => move._searchInput ?? "",
-      type: "string" as const,
-    },
-    hitLevel: {
-      getter: (move: Move) => move._searchHitLevel ?? (move.hitLevel ? move.hitLevel.join(" ") : null),
-      type: "string" as const,
-    },
-    impact: {
-      getter: (move: Move) => move.impact,
-      type: "number" as const,
-    },
-    damage: {
-      getter: (move: Move) => move.damageDec,
-      type: "number" as const,
-    },
-    block: {
-      getter: (move: Move) => move.blockDec,
-      type: "number" as const,
-    },
-    hit: {
-      getter: (move: Move) => move.hitDec,
-      type: "number" as const,
-    },
-    counterHit: {
-      getter: (move: Move) => move.counterHitDec,
-      type: "number" as const,
-    },
-    guardBurst: {
-      getter: (move: Move) => move.guardBurst,
-      type: "number" as const,
-    },
-    properties: {
-      getter: (move: Move) => move._searchProperties ?? (move.properties ? move.properties.join(" ") : null),
-      type: "string" as const,
-    },
-    notes: {
-      getter: (move: Move) => move.notes,
-      type: "string" as const,
-    },
-  };
-
-  const createOptimizedComparator = (
-    direction: "asc" | "desc",
-    fieldType: "string" | "number",
-    getter: (move: Move) => any,
-  ) => {
-    const order = direction === "asc" ? 1 : -1;
-    if (fieldType === "number") {
-      return (a: Move, b: Move): number => {
-        const valA = getter(a);
-        const valB = getter(b);
-        if (valA == null && valB == null) return 0;
-        if (valA == null) return order;
-        if (valB == null) return -order;
-        return (valA - valB) * order;
-      };
-    } else {
-      return (a: Move, b: Move): number => {
-        const valA = getter(a);
-        const valB = getter(b);
-        if (valA == null && valB == null) return 0;
-        if (valA == null) return order;
-        if (valB == null) return -order;
-        return String(valA).localeCompare(String(valB)) * order;
-      };
-    }
-  };
 
   const displayedMoves = useMemo(() => {
     if (originalMoves.length === 0) return [];
@@ -558,9 +570,9 @@ export const FrameDataTable: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
-  const handleFiltersChange = (filters: FilterItem[]) => {
+  const handleFiltersChange = useCallback((filters: FilterItem[]) => {
     setActiveFilters(filters);
-  };
+  }, []);
 
   // Sync toolbar context with current state
   useEffect(() => {
@@ -617,7 +629,6 @@ export const FrameDataTable: React.FC = () => {
             ) : (
               <FilterBuilder
                 onFiltersChange={handleFiltersChange}
-                moves={originalMoves}
               />
             )}
           </div>

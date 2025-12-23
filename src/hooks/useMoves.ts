@@ -133,15 +133,15 @@ function processMove(
       return [intern(String(raw))!];
     })(),
     impact: moveObject.Impact != null ? Number(moveObject.Impact) : 0,
-    damage: moveObject.Damage != null ? String(moveObject.Damage) : null,
+    damage: moveObject.Damage != null ? intern(String(moveObject.Damage)) : null,
     damageDec:
       moveObject.DamageDec != null ? Number(moveObject.DamageDec) : 0,
-    block: moveObject.Block != null ? String(moveObject.Block) : null,
+    block: moveObject.Block != null ? intern(String(moveObject.Block)) : null,
     blockDec: moveObject.BlockDec != null ? Number(moveObject.BlockDec) : 0,
-    hit: moveObject.Hit != null ? String(moveObject.Hit) : null,
+    hit: moveObject.Hit != null ? intern(String(moveObject.Hit)) : null,
     hitDec: moveObject.HitDec != null ? Number(moveObject.HitDec) : 0,
     counterHit:
-      moveObject.CounterHit != null ? String(moveObject.CounterHit) : null,
+      moveObject.CounterHit != null ? intern(String(moveObject.CounterHit)) : null,
     counterHitDec:
       moveObject.CounterHitDec != null
         ? Number(moveObject.CounterHitDec)
@@ -162,18 +162,6 @@ function processMove(
     })(),
     notes: moveObject.Notes != null ? String(moveObject.Notes) : null,
   };
-
-  // Pre-calculate searchable strings for performance
-  move._searchStance = move.stance ? move.stance.join(", ") : "";
-  move._searchCommand = move.command ? move.command.join(" ") : "";
-  move._searchHitLevel = move.hitLevel ? move.hitLevel.join(" ") : "";
-  move._searchProperties = move.properties ? move.properties.join(" ") : "";
-  move._searchInput = [
-    move.stance ? move.stance.join(" ") : null,
-    move.command ? move.command.join(" ") : null,
-  ]
-    .filter(Boolean)
-    .join(" ");
 
   return move;
 }
@@ -238,7 +226,7 @@ export function useMoves({
     },
     enabled: !!gameId && characterId !== null,
     staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 1000 * 60 * 30, // 30 minutes
+    gcTime: characterId === -1 ? 1000 * 60 * 5 : 1000 * 60 * 15, // 5 mins for All, 15 mins for single
     placeholderData: keepPreviousData,
   });
 }

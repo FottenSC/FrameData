@@ -65,21 +65,38 @@ export function CommandPalette() {
 
   const [searchValue, setSearchValue] = React.useState("");
 
+  const prefetchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
   const prefetchCharacter = (character: { id: number; name: string }) => {
     if (!selectedGame) return;
     
-    queryClient.prefetchQuery({
-      queryKey: ["moves", selectedGame.id, character.id],
-      queryFn: () =>
-        fetchCharacterMoves(
-          selectedGame.id,
-          character.id,
-          character.name,
-          applyNotation,
-        ),
-      staleTime: 1000 * 60 * 5, // 5 minutes
-    });
+    if (prefetchTimeoutRef.current) {
+      clearTimeout(prefetchTimeoutRef.current);
+    }
+
+    prefetchTimeoutRef.current = setTimeout(() => {
+      queryClient.prefetchQuery({
+        queryKey: ["moves", selectedGame.id, character.id],
+        queryFn: () =>
+          fetchCharacterMoves(
+            selectedGame.id,
+            character.id,
+            character.name,
+            applyNotation,
+          ),
+        staleTime: 1000 * 60 * 5, // 5 minutes
+      });
+    }, 150); // 150ms delay to avoid prefetching while scrolling/moving mouse quickly
   };
+
+  // Cleanup timeout on unmount
+  React.useEffect(() => {
+    return () => {
+      if (prefetchTimeoutRef.current) {
+        clearTimeout(prefetchTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Derived booleans for cleaner JSX
   const showCharacters = currentView === "characters";

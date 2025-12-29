@@ -10,15 +10,18 @@ type ApplyNotationFn = (cmd: string | null) => string | null;
 
 // Simple interning for common strings to save memory
 const stringCache = new Map<string, string>();
-const notationCache = new Map<string, string | null>();
+// Use WeakMap to cache notation results per applyNotation function instance
+// This ensures that when notation settings change (new function), we get a fresh cache
+// and the old cache is garbage collected.
+const notationCache = new WeakMap<ApplyNotationFn, Map<string, string | null>>();
 
 export function clearStringCache() {
   stringCache.clear();
-  notationCache.clear();
+  // notationCache is self-cleaning via WeakMap
 }
 
 export function clearNotationCache() {
-  notationCache.clear();
+  // No-op with WeakMap implementation
 }
 
 function intern(s: string | null): string | null {
@@ -38,10 +41,18 @@ function cachedApplyNotation(
   applyNotation: ApplyNotationFn,
 ): string | null {
   if (cmd === null) return null;
-  const cached = notationCache.get(cmd);
+  
+  let fnCache = notationCache.get(applyNotation);
+  if (!fnCache) {
+    fnCache = new Map();
+    notationCache.set(applyNotation, fnCache);
+  }
+  
+  const cached = fnCache.get(cmd);
   if (cached !== undefined) return cached;
+  
   const result = applyNotation(cmd);
-  notationCache.set(cmd, result);
+  fnCache.set(cmd, result);
   return result;
 }
 

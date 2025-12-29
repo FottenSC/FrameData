@@ -62,7 +62,8 @@ export const buildNotationMap = (
 };
 
 // Cache for pre-compiled notation RegExps to avoid expensive re-compilation
-const notationRegexCache = new Map<NotationMap, { regex: RegExp }>();
+// Use WeakMap to allow NotationMap objects to be garbage collected
+const notationRegexCache = new WeakMap<NotationMap, { regex: RegExp }>();
 
 // Helper function to apply notation mappings
 export const applyNotationMapping = (

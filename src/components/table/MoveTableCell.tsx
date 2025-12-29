@@ -10,6 +10,29 @@ import { Copy } from "lucide-react";
 import { ExpandableHitLevels } from "@/components/icons/ExpandableHitLevels";
 import { ValueBadge } from "@/components/ui/ValueBadge";
 
+// Memoize the tooltip content to avoid re-creating it on every render
+const StanceTooltipContent = React.memo(({ stanceInfo, s }: { stanceInfo: any, s: string }) => (
+  <div className="space-y-1">
+    <p className="font-semibold">{stanceInfo.name || s}</p>
+    {stanceInfo.description && (
+      <p className="text-xs text-muted-foreground whitespace-pre-wrap">
+        {stanceInfo.description}
+      </p>
+    )}
+  </div>
+));
+
+const PropertyTooltipContent = React.memo(({ propInfo, p }: { propInfo: any, p: string }) => (
+  <div className="space-y-1">
+    <p className="font-semibold">{propInfo.name || p}</p>
+    {propInfo.description && (
+      <p className="text-xs text-muted-foreground whitespace-pre-wrap">
+        {propInfo.description}
+      </p>
+    )}
+  </div>
+));
+
 interface MoveTableCellProps {
   move: Move;
   columnId: string;
@@ -59,14 +82,7 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(({
                     </Badge>
                   </TooltipTrigger>
                   <TooltipContent className="max-w-xs">
-                    <div className="space-y-1">
-                      <p className="font-semibold">{stanceInfo.name || s}</p>
-                      {stanceInfo.description && (
-                        <p className="text-xs text-muted-foreground whitespace-pre-wrap">
-                          {stanceInfo.description}
-                        </p>
-                      )}
-                    </div>
+                    <StanceTooltipContent stanceInfo={stanceInfo} s={s} />
                   </TooltipContent>
                 </Tooltip>
               );
@@ -161,14 +177,7 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(({
                 <TooltipTrigger asChild>{badge}</TooltipTrigger>
                 {hasTooltipContent && (
                   <TooltipContent className="max-w-xs">
-                    <div className="space-y-1">
-                      <p className="font-semibold">{propInfo?.name || prop}</p>
-                      {propInfo?.description && (
-                        <p className="text-xs text-muted-foreground whitespace-pre-wrap">
-                          {propInfo.description}
-                        </p>
-                      )}
-                    </div>
+                    <PropertyTooltipContent propInfo={propInfo} p={prop} />
                   </TooltipContent>
                 )}
               </Tooltip>

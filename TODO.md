@@ -1,10 +1,10 @@
 # Todo list
 
-- [ ] create indexes on soulcalibur db
-- [ ] hitlevel minwidth
 - [ ] Build icons in source data
 - [ ] Load back into the previous character
-- [ ] think more about how the url will work feks talim = framedata2.horseface.no
+- [ ] fix pictures for
+  - Zas, Sophie, Mitsu, Geralt, Cass, Inferno, Hwang
+  - Grøh? 
 
   63214
   6

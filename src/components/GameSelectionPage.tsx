@@ -1,5 +1,4 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { useGame, avaliableGames } from "../contexts/GameContext";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
@@ -7,7 +6,6 @@ import { Gamepad2 } from "lucide-react"; // Fallback icon
 
 export const GameSelectionPage: React.FC = () => {
   const { setSelectedGameById } = useGame();
-  const navigate = useNavigate();
 
   const handleGameSelect = (gameId: string) => {
     setSelectedGameById(gameId);

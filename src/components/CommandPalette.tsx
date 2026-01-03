@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 
 import {
   Dialog,
@@ -194,7 +194,7 @@ export function CommandPalette() {
   ) => {
     setSelectedCharacterId(characterId);
     const nameForUrl = characterId === -1 ? "All" : characterName;
-    navigate(`/${selectedGame.id}/${encodeURIComponent(nameForUrl)}`);
+    navigate({ to: `/${selectedGame.id}/${encodeURIComponent(nameForUrl)}` });
     setOpen(false);
   };
 

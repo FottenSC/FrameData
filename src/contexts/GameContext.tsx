@@ -8,7 +8,7 @@ import React, {
   ReactNode,
 } from "react";
 import { Gamepad2, Sword } from "lucide-react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "@tanstack/react-router";
 import { sharedNotationMapping, NotationMap } from "@/lib/notationMapping";
 import { useUserSettings } from "./UserSettingsContext";
 import { clearStringCache } from "@/hooks/useMoves";
@@ -130,7 +130,7 @@ export interface HitLevelInfo {
 // Define avaliableGames here
 export const avaliableGames: Game[] = [
   {
-    id: "Soulcalibur6",
+    id: "SoulCalibur6",
     name: "Soulcalibur VI",
     icon: <Sword className="h-5 w-5 mr-2" />,
     badges: {
@@ -233,7 +233,7 @@ interface GameProviderProps {
 
 export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const navigate = useNavigate();
-  const params = useParams<{ gameId?: string; characterName?: string }>();
+  const params = useParams({ strict: false }) as { gameId?: string; characterName?: string };
   const location = useLocation();
 
   const [selectedGame, setSelectedGame] = useState<Game>(() => {
@@ -404,7 +404,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
         setSelectedGame(game);
         setSelectedCharacterId(null);
       }
-      navigate(`/${game.id}`);
+      navigate({ to: `/${game.id}` });
     } else if (game && game.id === selectedGame?.id) {
       if (typeof React.startTransition === "function") {
         React.startTransition(() => {
@@ -413,7 +413,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       } else {
         setSelectedCharacterId(null);
       }
-      navigate(`/${game.id}`);
+      navigate({ to: `/${game.id}` });
     }
   };
 

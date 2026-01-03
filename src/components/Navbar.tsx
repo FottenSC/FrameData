@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
   Gamepad2,
   Sword,
@@ -32,8 +32,8 @@ import {
 import { cn } from "@/lib/utils";
 
 const gameIcons: Record<string, React.ReactNode> = {
-  soulcalibur6: <Sword className="h-4 w-4 mr-1.5" />,
-  tekken8: <Gamepad2 className="h-4 w-4 mr-1.5" />,
+  SoulCalibur6: <Sword className="h-4 w-4 mr-1.5" />,
+  Tekken8: <Gamepad2 className="h-4 w-4 mr-1.5" />,
 };
 
 export const Navbar: React.FC = () => {
@@ -63,7 +63,7 @@ export const Navbar: React.FC = () => {
     if (!value) {
       // Handle case where selection is cleared (empty value)
       setSelectedCharacterId(null);
-      navigate(`/${selectedGame.id}`);
+      navigate({ to: `/${selectedGame.id}` });
       return;
     }
 
@@ -83,11 +83,11 @@ export const Navbar: React.FC = () => {
       }
       setSelectedCharacterId(selectedId); // Set the ID in context
       // Navigate using the name directly from the parsed value
-      navigate(`/${selectedGame.id}/${encodeURIComponent(name)}`);
+      navigate({ to: `/${selectedGame.id}/${encodeURIComponent(name)}` });
     } else {
       // Failed to parse selection, no debug logging
       setSelectedCharacterId(null);
-      navigate(`/${selectedGame.id}`);
+      navigate({ to: `/${selectedGame.id}` });
     }
   };
 
@@ -95,7 +95,7 @@ export const Navbar: React.FC = () => {
     <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-14 items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center">
-          <Link to="/games" className="mr-4 flex items-center">
+          <Link to="/" className="mr-4 flex items-center">
             <img
               src="/Horseface.png"
               alt="Horseface Logo"
@@ -110,7 +110,7 @@ export const Navbar: React.FC = () => {
                   <BreadcrumbItem>
                     <BreadcrumbLink asChild>
                       <Link
-                        to="/games"
+                        to="/"
                         className="flex items-center hover:text-foreground/80 transition-colors"
                       >
                         {gameIcons[selectedGame.id] || (

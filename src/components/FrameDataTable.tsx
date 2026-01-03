@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useDeferredValue, useMemo, useCallback } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   Card,
@@ -117,7 +117,7 @@ const createOptimizedComparator = (
 };
 
 export const FrameDataTable: React.FC = () => {
-  const params = useParams<{ gameId?: string; characterName?: string }>();
+  const params = useParams({ strict: false }) as { gameId?: string; characterName?: string };
   const { gameId, characterName } = params;
 
   const navigate = useNavigate();
@@ -209,9 +209,7 @@ export const FrameDataTable: React.FC = () => {
           : undefined;
 
         if (expectedUrlName !== currentUrlName) {
-          navigate(`/${selectedGame.id}/${expectedUrlName}`, {
-            replace: true,
-          });
+          navigate({ to: `/${selectedGame.id}/${expectedUrlName}`, replace: true });
         }
       } else if (selectedChar) {
         const expectedUrlName = encodeURIComponent(selectedChar.name);
@@ -220,9 +218,7 @@ export const FrameDataTable: React.FC = () => {
           : undefined;
 
         if (expectedUrlName !== currentUrlName) {
-          navigate(`/${selectedGame.id}/${expectedUrlName}`, {
-            replace: true,
-          });
+          navigate({ to: `/${selectedGame.id}/${expectedUrlName}`, replace: true });
         }
       }
     }
@@ -239,7 +235,7 @@ export const FrameDataTable: React.FC = () => {
 
   // Handle URL parameters and initial character selection
   useEffect(() => {
-    if (!selectedGame.id) return;
+    if (!selectedGame) return;
 
     // Only sync game from URL on initial load when the component mounts
     // After that, trust the selectedGame state (which is updated by command palette etc.)

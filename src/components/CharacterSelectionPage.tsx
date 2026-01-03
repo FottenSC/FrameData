@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "@tanstack/react-router";
 import { useGame, Character } from "../contexts/GameContext";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
@@ -9,7 +9,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { fetchCharacterMoves } from "@/hooks/useMoves";
 
 export const CharacterSelectionPage: React.FC = () => {
-  const { gameId } = useParams<{ gameId: string }>();
+  const { gameId } = useParams({ strict: false }) as { gameId: string };
   const {
     selectedGame,
     characters,
@@ -41,17 +41,17 @@ export const CharacterSelectionPage: React.FC = () => {
     const character = characters.find((c) => c.id === characterId);
     if (character && selectedGame) {
       setSelectedCharacterId(characterId);
-      navigate(`/${selectedGame.id}/${encodeURIComponent(character.name)}`);
+      navigate({ to: `/${selectedGame.id}/${encodeURIComponent(character.name)}` });
     } else {
       console.error("Selected character or game not found during navigation");
-      navigate("/games");
+      navigate({ to: "/" });
     }
   };
 
   const handleAllSelect = () => {
     if (selectedGame) {
       setSelectedCharacterId(-1);
-      navigate(`/${selectedGame.id}/All`);
+      navigate({ to: `/${selectedGame.id}/All` });
     }
   };
 
@@ -91,7 +91,7 @@ export const CharacterSelectionPage: React.FC = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => navigate("/games")}
+              onClick={() => navigate({ to: "/" })}
               className="mt-4"
             >
               Back to Game Selection
@@ -163,7 +163,7 @@ export const CharacterSelectionPage: React.FC = () => {
             <p>No characters found for {selectedGame.name}.</p>
             <Button
               variant="link"
-              onClick={() => navigate("/games")}
+              onClick={() => navigate({ to: "/" })}
               className="mt-2"
             >
               Back to Game Selection

@@ -5,12 +5,13 @@ export type CommandView =
   | "tableConfig"
   | "notationMappings"
   | "characters"
-  | "games"
-  | "credits";
+  | "games";
 
 interface CommandContextType {
   open: boolean;
   setOpen: (open: boolean) => void;
+  creditsOpen: boolean;
+  setCreditsOpen: (open: boolean) => void;
   currentView: CommandView;
   setCurrentView: (view: CommandView) => void;
   openView: (view: CommandView) => void;
@@ -24,6 +25,7 @@ interface CommandProviderProps {
 
 export function CommandProvider({ children }: CommandProviderProps) {
   const [open, setOpen] = useState(false);
+  const [creditsOpen, setCreditsOpen] = useState(false);
   const [currentView, setCurrentView] = useState<CommandView>("main");
 
   const openView = useCallback((view: CommandView) => {
@@ -41,10 +43,12 @@ export function CommandProvider({ children }: CommandProviderProps) {
   const value = useMemo(() => ({
     open,
     setOpen: handleSetOpen,
+    creditsOpen,
+    setCreditsOpen,
     currentView,
     setCurrentView,
     openView,
-  }), [open, handleSetOpen, currentView, openView]);
+  }), [open, handleSetOpen, creditsOpen, currentView, openView]);
 
   return (
     <CommandContext.Provider value={value}>

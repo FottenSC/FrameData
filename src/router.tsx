@@ -1,6 +1,7 @@
 import { createRouter, createRoute, createRootRoute, Outlet, Navigate } from '@tanstack/react-router'
 import { Navbar } from './components/Navbar'
 import { CommandPalette } from './components/CommandPalette'
+import { CreditsModal } from './components/CreditsModal'
 import { GameSelectionPage } from './components/GameSelectionPage'
 import { CharacterSelectionPage } from './components/CharacterSelectionPage'
 import { FrameDataTable } from './components/FrameDataTable'
@@ -19,6 +20,7 @@ export const rootRoute = createRootRoute({
             <div className="min-h-screen flex flex-col bg-[hsl(var(--background))] text-[hsl(var(--foreground))]">
               <Navbar />
               <CommandPalette />
+              <CreditsModal />
               <main className="flex-grow">
                 <Outlet />
               </main>

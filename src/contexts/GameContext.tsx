@@ -100,11 +100,18 @@ export interface Game {
   badges?: Record<string, { className: string }>;
 }
 
+export interface CreditEntry {
+  name: string;
+  url?: string;
+  role?: string;
+}
+
 // Define Character interface here
 export interface Character {
   id: number;
   name: string;
   image?: string;
+  credits?: CreditEntry[];
 }
 
 // Define StanceInfo for tooltip display
@@ -223,6 +230,8 @@ interface GameContextType {
   getStanceInfo: (stanceCode: string, characterId?: number | null) => StanceInfo | null;
   getPropertyInfo: (propertyCode: string) => PropertyInfo | null;
   hitLevels: Record<string, HitLevelInfo>;
+  gameCredits: CreditEntry[];
+  gameCreditsDescription: string | null;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -263,6 +272,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const [gameProperties, setGameProperties] = useState<Record<string, PropertyInfo>>({});
   // Game-level hit levels
   const [hitLevels, setHitLevels] = useState<Record<string, HitLevelInfo>>({});
+  const [gameCreditsDescription, setGameCreditsDescription] = useState<string | null>(null);
+  const [gameCredits, setGameCredits] = useState<CreditEntry[]>([]);
 
   useEffect(() => {
     const loadCharacters = async () => {
@@ -299,8 +310,29 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
           image: c.image
             ? `/Games/${encodeURIComponent(selectedGame.id)}/Images/${c.image}`
             : undefined,
+          credits: Array.isArray(c.credits) ? c.credits : undefined,
         }));
         setCharacters(charactersData);
+
+        if (data?.credits) {
+          if (Array.isArray(data.credits)) {
+            setGameCredits(data.credits);
+            setGameCreditsDescription(data.creditsDescription || null);
+          } else if (typeof data.credits === "object") {
+            setGameCredits(
+              Array.isArray(data.credits.contributors)
+                ? data.credits.contributors
+                : [],
+            );
+            setGameCreditsDescription(data.credits.description || null);
+          } else {
+            setGameCredits([]);
+            setGameCreditsDescription(null);
+          }
+        } else {
+          setGameCredits([]);
+          setGameCreditsDescription(null);
+        }
 
         // Load game-level stances
         if (data?.stances && typeof data.stances === "object") {
@@ -507,12 +539,14 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     selectedCharacterId,
     setSelectedCharacterId: handleSetSelectedCharacterId,
     availableIcons: combinedIcons,
+    gameCreditsDescription,
     getIconUrl: getIconUrl,
     getNotationMap,
     applyNotation,
     getStanceInfo,
     getPropertyInfo,
     hitLevels,
+    gameCredits,
   }), [
     selectedGame,
     handleSetSelectedGameById,
@@ -521,6 +555,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     characters,
     selectedCharacterId,
     handleSetSelectedCharacterId,
+    gameCreditsDescription,
     combinedIcons,
     getIconUrl,
     getNotationMap,
@@ -528,6 +563,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     getStanceInfo,
     getPropertyInfo,
     hitLevels,
+    gameCredits,
   ]);
 
   return (

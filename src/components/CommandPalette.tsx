@@ -43,13 +43,10 @@ import { avaliableGames } from "@/contexts/GameContext";
 import { useQueryClient } from "@tanstack/react-query";
 import { fetchCharacterMoves } from "@/hooks/useMoves";
 
-// Local type for credits entries (per-game, optional file in public/Games/<GameId>/Credits.json)
-type CreditEntry = { name: string; role?: string; link?: string };
-
 export function CommandPalette() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { open, setOpen, currentView, setCurrentView } = useCommand();
+  const { open, setOpen, currentView, setCurrentView, setCreditsOpen } = useCommand();
   const {
     characters,
     selectedGame,
@@ -102,16 +99,7 @@ export function CommandPalette() {
   const showCharacters = currentView === "characters";
   const showTableConfig = currentView === "tableConfig";
   const showGames = currentView === "games";
-  const showCredits = currentView === "credits";
   const showNotationMappings = currentView === "notationMappings";
-
-  // Credits state (lazy per game)
-  const creditsCacheRef = React.useRef<Map<string, CreditEntry[] | null>>(
-    new Map(),
-  );
-  const [creditsLoading, setCreditsLoading] = React.useState(false);
-  const [creditsError, setCreditsError] = React.useState<string | null>(null);
-  const [credits, setCredits] = React.useState<CreditEntry[] | null>(null);
 
   // TableConfigurator manages its own state
 
@@ -126,67 +114,6 @@ export function CommandPalette() {
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
   }, [open, setOpen]);
-
-  // Load credits lazily when the credits view is first opened for a game
-  React.useEffect(() => {
-    if (showCredits) {
-      const gameId = selectedGame.id;
-      if (creditsCacheRef.current.has(gameId)) {
-        setCredits(creditsCacheRef.current.get(gameId) || null);
-        setCreditsError(null);
-        return;
-      }
-      let cancelled = false;
-      setCreditsLoading(true);
-      setCreditsError(null);
-      fetch(`/Games/${encodeURIComponent(gameId)}/Credits.json`)
-        .then(async (res) => {
-          if (!res.ok) {
-            if (res.status === 404) {
-              return null; // No credits file provided
-            }
-            throw new Error(`Failed to load credits (${res.status})`);
-          }
-          const data = await res.json();
-          if (!Array.isArray(data)) return null;
-          return data.map(
-            (e: any): CreditEntry => ({
-              name: String(e.name ?? "Unknown"),
-              role: e.role ? String(e.role) : undefined,
-              link: e.link ? String(e.link) : undefined,
-            }),
-          );
-        })
-        .then((list) => {
-          if (cancelled) return;
-          creditsCacheRef.current.set(gameId, list);
-          setCredits(list);
-        })
-        .catch((err) => {
-          if (cancelled) return;
-          setCreditsError(
-            err instanceof Error
-              ? err.message
-              : "Unknown error loading credits",
-          );
-          creditsCacheRef.current.set(gameId, null);
-          setCredits(null);
-        })
-        .finally(() => {
-          if (!cancelled) setCreditsLoading(false);
-        });
-      return () => {
-        cancelled = true;
-      };
-    }
-  }, [showCredits, selectedGame.id]);
-
-  // Reset search when closing
-  React.useEffect(() => {
-    if (!open) {
-      setSearchValue("");
-    }
-  }, [open]);
 
   const handleCharacterSelect = (
     characterId: number,
@@ -205,13 +132,13 @@ export function CommandPalette() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="overflow-hidden p-0 top-[30%] translate-y-[-30%] max-w-2xl">
+      <DialogContent style={{ backgroundColor: "var(--background)" }} className="overflow-hidden p-0 top-[30%] translate-y-[-30%] max-w-2xl border-border">
         <DialogTitle className="sr-only">Command Palette</DialogTitle>
         <DialogDescription className="sr-only">
           Navigate through the application using keyboard shortcuts and commands
         </DialogDescription>
         <Command
-          style={{ backgroundColor: "hsl(0, 0%, 20%)" }}
+          style={{ backgroundColor: "var(--background)" }}
           className="[&_[cmdk-group-heading]]:text-muted-foreground **:data-[slot=command-input-wrapper]:h-12 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5"
         >
           <CommandInput
@@ -222,9 +149,7 @@ export function CommandPalette() {
                   ? `Search ${characters.length} characters...`
                   : showGames
                     ? `Search ${avaliableGames.length} games...`
-                    : showCredits
-                      ? "View credits..."
-                      : showNotationMappings
+                    : showNotationMappings
                         ? "Toggle notation mappings..."
                         : "Type a command or search..."
             }
@@ -303,65 +228,6 @@ export function CommandPalette() {
                       <span>{game.name}</span>
                     </CommandItem>
                   ))}
-                </CommandGroup>
-              </>
-            ) : showCredits ? (
-              <>
-                <CommandGroup heading="Credits">
-                  <CommandItem onSelect={goBackToMain} className="mb-1">
-                    <ChevronLeft className="mr-2 h-4 w-4" />
-                    <span>Back to Commands</span>
-                  </CommandItem>
-                  <div className="px-2 py-2 space-y-2 text-sm max-h-[400px] overflow-auto">
-                    {creditsLoading && (
-                      <div className="text-muted-foreground">
-                        Loading credits...
-                      </div>
-                    )}
-                    {creditsError && (
-                      <div className="text-destructive">{creditsError}</div>
-                    )}
-                    {!creditsLoading && !creditsError && credits === null && (
-                      <div className="text-muted-foreground">
-                        No credits available for this game.
-                      </div>
-                    )}
-                    {!creditsLoading &&
-                      !creditsError &&
-                      credits &&
-                      credits.length === 0 && (
-                        <div className="text-muted-foreground">
-                          Credits file is empty.
-                        </div>
-                      )}
-                    {credits &&
-                      credits.map((c, i) => (
-                        <div
-                          key={i}
-                          className="flex flex-col rounded border border-border/50 p-2 bg-background/40"
-                        >
-                          <span className="font-medium">
-                            {c.link ? (
-                              <a
-                                href={c.link}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="underline hover:no-underline"
-                              >
-                                {c.name}
-                              </a>
-                            ) : (
-                              c.name
-                            )}
-                          </span>
-                          {c.role && (
-                            <span className="text-xs text-muted-foreground">
-                              {c.role}
-                            </span>
-                          )}
-                        </div>
-                      ))}
-                  </div>
                 </CommandGroup>
               </>
             ) : showNotationMappings ? (
@@ -446,8 +312,8 @@ export function CommandPalette() {
                   </CommandItem>
                   <CommandItem
                     onSelect={() => {
-                      setCurrentView("credits");
-                      setSearchValue("");
+                      setCreditsOpen(true);
+                      setOpen(false);
                     }}
                   >
                     <Info className="mr-2 h-4 w-4" />

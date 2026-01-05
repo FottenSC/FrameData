@@ -582,6 +582,7 @@ const FilterGroupRow: React.FC<FilterGroupRowProps> = (props) => {
           size="icon"
           className="h-6 w-6 absolute top-1 right-1 hover:bg-destructive/20"
           onClick={() => onRemove(group.id)}
+          aria-label="Remove group"
         >
           <X className="h-3 w-3" />
         </Button>
@@ -622,13 +623,14 @@ const FilterRow: React.FC<FilterRowProps> = ({
           }))}
           placeholder="Data"
           className="w-[160px] border-red-500/50 focus:border-red-500 focus:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+          aria-label="Select data field"
         />
 
         <Select
           value={filter.condition}
           onValueChange={(value) => onUpdateCondition(filter.id, "condition", value)}
         >
-          <SelectTrigger className="w-[140px] h-8 border-green-500/50 focus:border-green-500 focus:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0" disabled={availableConditions.length <= 1}>
+          <SelectTrigger className="w-[140px] h-8 border-green-500/50 focus:border-green-500 focus:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0" disabled={availableConditions.length <= 1} aria-label="Select condition">
             <SelectValue placeholder="Condition" />
           </SelectTrigger>
           <SelectContent>
@@ -667,6 +669,7 @@ const FilterRow: React.FC<FilterRowProps> = ({
                 options={(field?.options ?? []).map((o) => ({ value: o.value }))}
                 placeholder="Value"
                 className="border-blue-500/50 focus:border-blue-500 focus:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+                aria-label="Select hit levels"
               />
             ) : (
               <MultiCombobox
@@ -678,6 +681,7 @@ const FilterRow: React.FC<FilterRowProps> = ({
                 }))}
                 placeholder="Value"
                 className="border-blue-500/50 focus:border-blue-500 focus:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+                aria-label="Select values"
               />
             )
           ) : (
@@ -685,7 +689,7 @@ const FilterRow: React.FC<FilterRowProps> = ({
               value={filter.value}
               onValueChange={(value) => onUpdateCondition(filter.id, "value", value)}
             >
-              <SelectTrigger className="w-[180px] h-8 border-blue-500/50 focus:border-blue-500 focus:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0">
+              <SelectTrigger className="w-[180px] h-8 border-blue-500/50 focus:border-blue-500 focus:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0" aria-label="Select value">
                 <SelectValue placeholder="Value" />
               </SelectTrigger>
               <SelectContent>
@@ -713,8 +717,7 @@ const FilterRow: React.FC<FilterRowProps> = ({
           <Button
             variant="secondary"
             size="icon"
-            className="h-8 w-8 bg-muted/50 hover:bg-muted"
-            onClick={() => onOutdent(filter.id)}
+            aria-label="Outdent"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -724,6 +727,7 @@ const FilterRow: React.FC<FilterRowProps> = ({
           size="icon"
           className="h-8 w-8 bg-muted/50 hover:bg-muted"
           onClick={() => onIndent(filter.id)}
+          aria-label="Indent"
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
@@ -732,6 +736,7 @@ const FilterRow: React.FC<FilterRowProps> = ({
           size="icon"
           className="h-8 w-8 bg-muted/50 hover:bg-muted hover:text-destructive"
           onClick={() => onRemove(filter.id)}
+          aria-label="Remove filter"
         >
           <X className="h-4 w-4" />
         </Button>

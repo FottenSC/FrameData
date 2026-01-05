@@ -27,6 +27,7 @@ export function Combobox({
   className,
   buttonVariant = "outline",
   buttonClassName,
+  "aria-label": ariaLabel,
 }: {
   value: string | null;
   onChange: (value: string | null) => void;
@@ -36,6 +37,7 @@ export function Combobox({
   className?: string;
   buttonVariant?: string;
   buttonClassName?: string;
+  "aria-label"?: string;
 }) {
   const [open, setOpen] = React.useState(false);
   const triggerRef = React.useRef<HTMLButtonElement | null>(null);
@@ -61,6 +63,7 @@ export function Combobox({
           variant={buttonVariant as any}
           role="combobox"
           aria-expanded={open}
+          aria-label={ariaLabel}
           className={cn(
             "h-10 px-3 text-sm justify-between w-[200px]",
             className,

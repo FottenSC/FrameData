@@ -30,6 +30,7 @@ interface HitLevelMultiComboboxProps {
   placeholder?: string;
   className?: string;
   maxPreview?: number;
+  "aria-label"?: string;
 }
 
 export const HitLevelMultiCombobox: React.FC<HitLevelMultiComboboxProps> = ({
@@ -39,6 +40,7 @@ export const HitLevelMultiCombobox: React.FC<HitLevelMultiComboboxProps> = ({
   placeholder = "Select...",
   className,
   maxPreview = 5,
+  "aria-label": ariaLabel,
 }) => {
   const [open, setOpen] = React.useState(false);
   const selected = new Set(value);
@@ -64,6 +66,7 @@ export const HitLevelMultiCombobox: React.FC<HitLevelMultiComboboxProps> = ({
           variant="outline"
           role="combobox"
           aria-expanded={open}
+          aria-label={ariaLabel}
           className={cn(
             "h-10 px-3 text-sm justify-between w-[180px] custom-select-trigger bg-secondary border border-input rounded-md",
             className,

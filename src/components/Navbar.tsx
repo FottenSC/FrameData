@@ -147,6 +147,7 @@ export const Navbar: React.FC = () => {
                           className="w-[200px] font-medium"
                           buttonVariant="ghost"
                           buttonClassName="border-0 shadow-none hover:bg-muted/40 focus:ring-0 focus-visible:ring-0 focus:outline-none"
+                          aria-label="Select character"
                         />
                       </BreadcrumbItem>
                     </>

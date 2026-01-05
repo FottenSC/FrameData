@@ -26,6 +26,7 @@ export function MultiCombobox({
   emptyText = "No results found.",
   className,
   maxPreview = 3,
+  "aria-label": ariaLabel,
 }: {
   value: string[];
   onChange: (value: string[]) => void;
@@ -34,6 +35,7 @@ export function MultiCombobox({
   emptyText?: string;
   className?: string;
   maxPreview?: number;
+  "aria-label"?: string;
 }) {
   const [open, setOpen] = React.useState(false);
   const selectedSet = new Set(value);
@@ -62,6 +64,7 @@ export function MultiCombobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
+          aria-label={ariaLabel}
           className={cn(
             "h-10 px-3 text-sm justify-between w-[180px] custom-select-trigger bg-secondary border border-input rounded-md",
             className,

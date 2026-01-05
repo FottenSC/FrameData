@@ -58,9 +58,11 @@
 }
 
 /* Basic Firefox scrollbar styling */
-html {
-  scrollbar-color: hsl(0, 0%, 50%) hsl(0, 0%, 20%);
-  scrollbar-width: thin;
+@supports (scrollbar-color: auto) {
+  html {
+    scrollbar-color: hsl(0, 0%, 50%) hsl(0, 0%, 20%);
+    scrollbar-width: thin;
+  }
 }
 
 /* Animations */

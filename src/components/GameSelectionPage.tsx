@@ -23,10 +23,10 @@ export const GameSelectionPage: React.FC = () => {
             onClick={() => handleGameSelect(game.id)}
           >
             <CardHeader className="flex-grow">
-              <CardTitle className="flex items-center justify-center text-xl">
+              <h2 className="font-semibold leading-none tracking-tight flex items-center justify-center text-xl">
                 {game.icon || <Gamepad2 className="h-5 w-5 mr-2 opacity-70" />}
                 {game.name}
-              </CardTitle>
+              </h2>
             </CardHeader>
             <CardContent className="flex justify-center mt-auto pt-4">
               {/* Optionally add more game info here */}

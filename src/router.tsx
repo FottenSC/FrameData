@@ -1,14 +1,17 @@
 import { createRouter, createRoute, createRootRoute, Outlet, Navigate } from '@tanstack/react-router'
 import { Navbar } from './components/Navbar'
-import { CommandPalette } from './components/CommandPalette'
-import { CreditsModal } from './components/CreditsModal'
-import { GameSelectionPage } from './components/GameSelectionPage'
-import { CharacterSelectionPage } from './components/CharacterSelectionPage'
-import { FrameDataTable } from './components/FrameDataTable'
 import { GameProvider } from "./contexts/GameContext";
 import { CommandProvider } from "./contexts/CommandContext";
 import { UserSettingsProvider } from "./contexts/UserSettingsContext";
 import { ToolbarProvider } from "./contexts/ToolbarContext";
+import React, { Suspense } from 'react';
+
+// Lazy load components
+const CommandPalette = React.lazy(() => import('./components/CommandPalette').then(m => ({ default: m.CommandPalette })))
+const CreditsModal = React.lazy(() => import('./components/CreditsModal').then(m => ({ default: m.CreditsModal })))
+const GameSelectionPage = React.lazy(() => import('./components/GameSelectionPage').then(m => ({ default: m.GameSelectionPage })))
+const CharacterSelectionPage = React.lazy(() => import('./components/CharacterSelectionPage').then(m => ({ default: m.CharacterSelectionPage })))
+const FrameDataTable = React.lazy(() => import('./components/FrameDataTable').then(m => ({ default: m.FrameDataTable })))
 
 // Root Route (Layout)
 export const rootRoute = createRootRoute({
@@ -19,10 +22,16 @@ export const rootRoute = createRootRoute({
           <ToolbarProvider>
             <div className="min-h-screen flex flex-col bg-[hsl(var(--background))] text-[hsl(var(--foreground))]">
               <Navbar />
-              <CommandPalette />
-              <CreditsModal />
+              <Suspense fallback={null}>
+                <CommandPalette />
+              </Suspense>
+              <Suspense fallback={null}>
+                <CreditsModal />
+              </Suspense>
               <main className="flex-grow">
-                <Outlet />
+                <Suspense fallback={<div className="p-4">Loading...</div>}>
+                  <Outlet />
+                </Suspense>
               </main>
             </div>
           </ToolbarProvider>

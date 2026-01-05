@@ -2,6 +2,7 @@
 
 - [ ] Build icons in source data
 - [ ] Load back into the previous character
+- [ ] Mobile fixes
 - [ ] fix pictures for
   - Zas, Sophie, Mitsu, Geralt, Cass, Inferno, Hwang
   - Grøh? 

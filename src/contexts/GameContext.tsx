@@ -12,6 +12,7 @@ import { useNavigate, useParams, useLocation } from "@tanstack/react-router";
 import { sharedNotationMapping, NotationMap } from "@/lib/notationMapping";
 import { useUserSettings } from "./UserSettingsContext";
 import { clearStringCache } from "@/hooks/useMoves";
+import { loadGameData } from "@/lib/loadGameData";
 
 // Define configuration for a game-specific icon with its alt text
 export interface IconConfig {
@@ -304,7 +305,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const [gameCredits, setGameCredits] = useState<CreditEntry[]>([]);
 
   useEffect(() => {
-    const loadCharacters = async () => {
+    let cancelled = false;
+    const run = async () => {
       if (!selectedGame) {
         setCharacters([]);
         setIsCharactersLoading(false);
@@ -320,148 +322,19 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       setCharacters([]);
 
       try {
-        // Load from public/Games/{gameId}/Game.json
-        const url = `/Games/${encodeURIComponent(selectedGame.id)}/Game.json`;
-        const res = await fetch(url);
-        if (!res.ok)
-          throw new Error(
-            `Failed to fetch game data (${res.status}): ${res.statusText}`,
-          );
-        const data = await res.json();
-        const charactersData: Character[] = (
-          Array.isArray(data?.characters) ? data.characters : []
-        ).map((c: any) => ({
-          id: Number(c.id),
-          name: String(c.name),
-          image: c.image
-            ? `/Games/${encodeURIComponent(selectedGame.id)}/Images/${c.image}`
-            : undefined,
-          credits: Array.isArray(c.credits) ? c.credits : undefined,
-        }));
-        setCharacters(charactersData);
+        const data = await loadGameData(selectedGame.id);
+        if (cancelled) return;
 
-        if (data?.credits) {
-          if (Array.isArray(data.credits)) {
-            setGameCredits(data.credits);
-            setGameCreditsDescription(data.creditsDescription || null);
-          } else if (typeof data.credits === "object") {
-            setGameCredits(
-              Array.isArray(data.credits.contributors)
-                ? data.credits.contributors
-                : [],
-            );
-            setGameCreditsDescription(data.credits.description || null);
-          } else {
-            setGameCredits([]);
-            setGameCreditsDescription(null);
-          }
-        } else {
-          setGameCredits([]);
-          setGameCreditsDescription(null);
-        }
-
-        // Load game-level stances
-        if (data?.stances && typeof data.stances === "object") {
-          const stances: Record<string, StanceInfo> = {};
-          for (const [code, info] of Object.entries(data.stances)) {
-            const stanceData = info as { name?: string; description?: string };
-            stances[code] = {
-              name: stanceData.name || code,
-              description: stanceData.description || "",
-            };
-          }
-          setGameStances(stances);
-        } else {
-          setGameStances({});
-        }
-
-        // Load game-level properties
-        if (data?.properties && typeof data.properties === "object") {
-          const properties: Record<string, PropertyInfo> = {};
-          for (const [code, info] of Object.entries(data.properties)) {
-            const propData = info as {
-              name?: string;
-              description?: string;
-              className?: string;
-            };
-            properties[code] = {
-              name: propData.name || code,
-              description: propData.description || "",
-              className: propData.className || "",
-            };
-          }
-          setGameProperties(properties);
-        } else {
-          setGameProperties({});
-        }
-
-        // Load game-level outcome tags. These describe KND / LNC / STN / etc —
-        // the "what happens on hit" vocabulary shared by block / hit / counterHit.
-        if (data?.outcomeTags && typeof data.outcomeTags === "object") {
-          const tags: Record<string, PropertyInfo> = {};
-          for (const [code, info] of Object.entries(data.outcomeTags)) {
-            const tagData = info as {
-              name?: string;
-              description?: string;
-              className?: string;
-            };
-            tags[code] = {
-              name: tagData.name || code,
-              description: tagData.description || "",
-              className: tagData.className || "",
-            };
-          }
-          setOutcomeTags(tags);
-        } else {
-          setOutcomeTags({});
-        }
-
-        // Load character-specific stances
-        const charStances: Record<number, Record<string, StanceInfo>> = {};
-        if (Array.isArray(data?.characters)) {
-          for (const char of data.characters) {
-            if (char.stances && typeof char.stances === "object") {
-              const stances: Record<string, StanceInfo> = {};
-              for (const [code, info] of Object.entries(char.stances)) {
-                const stanceData = info as {
-                  name?: string;
-                  description?: string;
-                };
-                stances[code] = {
-                  name: stanceData.name || code,
-                  description: stanceData.description || "",
-                };
-              }
-              charStances[Number(char.id)] = stances;
-            }
-          }
-        }
-        setCharacterStances(charStances);
-
-        // Load game-level hit levels
-        if (data?.hitLevels && typeof data.hitLevels === "object") {
-          const levels: Record<string, HitLevelInfo> = {};
-          for (const [code, info] of Object.entries(data.hitLevels)) {
-            if (typeof info === "string") {
-              levels[code] = { name: info, description: "", className: "" };
-            } else {
-              const levelData = info as {
-                name?: string;
-                description?: string;
-                className?: string;
-              };
-              levels[code] = {
-                name: levelData.name || code,
-                description: levelData.description || "",
-                className: levelData.className || "",
-              };
-            }
-          }
-          setHitLevels(levels);
-        } else {
-          setHitLevels({});
-        }
+        setCharacters(data.characters);
+        setGameCredits(data.credits);
+        setGameCreditsDescription(data.creditsDescription);
+        setGameStances(data.gameStances);
+        setGameProperties(data.gameProperties);
+        setOutcomeTags(data.outcomeTags);
+        setCharacterStances(data.characterStances);
+        setHitLevels(data.hitLevels);
       } catch (err) {
+        if (cancelled) return;
         setCharacterError(
           err instanceof Error
             ? err.message
@@ -469,11 +342,15 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
         );
         setCharacters([]);
       } finally {
-        setIsCharactersLoading(false);
+        if (!cancelled) setIsCharactersLoading(false);
       }
     };
 
-    loadCharacters();
+    run();
+    return () => {
+      // Guard against a late-arriving response after the user switches games.
+      cancelled = true;
+    };
   }, [selectedGame?.id]);
 
   useEffect(() => {

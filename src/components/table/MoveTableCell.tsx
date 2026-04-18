@@ -47,12 +47,12 @@ interface MoveTableCellProps {
   renderNotes: (note: string | null) => React.ReactNode;
   copyCommand: (move: Move) => void;
   getStanceInfo: (stance: string, characterId: number) => any;
-  getPropertyInfo: (prop: string) => PropertyInfo | null;
   /**
-   * Map of outcome-tag code (KND, LNC, STN…) → styling + description. Optional;
-   * when present it's merged with `badges` for the final tag colour lookup.
+   * Property / outcome-tag lookup. The same `properties` registry from Game.json
+   * drives both the Properties column and the tag chips shown inside outcome
+   * cells (KND/LNC/STN/etc).
    */
-  getOutcomeTagInfo?: (tag: string) => PropertyInfo | null;
+  getPropertyInfo: (prop: string) => PropertyInfo | null;
   badges?: BadgeMap;
 }
 
@@ -65,7 +65,6 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
     copyCommand,
     getStanceInfo,
     getPropertyInfo,
-    getOutcomeTagInfo,
     badges,
   }) => {
     switch (columnId) {
@@ -144,7 +143,7 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
           <OutcomeBadge
             outcome={move.block}
             badges={badges}
-            getTagInfo={getOutcomeTagInfo ?? undefined}
+            getTagInfo={getPropertyInfo}
           />
         );
 
@@ -153,7 +152,7 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
           <OutcomeBadge
             outcome={move.hit}
             badges={badges}
-            getTagInfo={getOutcomeTagInfo ?? undefined}
+            getTagInfo={getPropertyInfo}
           />
         );
 
@@ -162,7 +161,7 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
           <OutcomeBadge
             outcome={move.counterHit}
             badges={badges}
-            getTagInfo={getOutcomeTagInfo ?? undefined}
+            getTagInfo={getPropertyInfo}
           />
         );
 

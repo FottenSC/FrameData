@@ -234,15 +234,14 @@ interface GameContextType {
     stanceCode: string,
     characterId?: number | null,
   ) => StanceInfo | null;
-  getPropertyInfo: (propertyCode: string) => PropertyInfo | null;
   /**
-   * Lookup descriptive info for an outcome tag (KND/LNC/STN/etc). Returns null
-   * when the game does not declare the tag — callers should fall back to
-   * rendering the raw tag code.
+   * Lookup descriptive info for a property / outcome-tag code (UA, BA, KND,
+   * LNC, STN, …). The same registry — `game.properties` from Game.json — backs
+   * both the Properties column and the tag chips rendered inside outcome
+   * cells. Returns null when the code isn't in the registry; callers should
+   * fall back to rendering the raw code.
    */
-  getOutcomeTagInfo: (tagCode: string) => PropertyInfo | null;
-  /** All outcome tags declared by the active game, keyed by code. */
-  outcomeTags: Record<string, PropertyInfo>;
+  getPropertyInfo: (propertyCode: string) => PropertyInfo | null;
   hitLevels: Record<string, HitLevelInfo>;
   gameCredits: CreditEntry[];
   gameCreditsDescription: string | null;
@@ -289,14 +288,11 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const [characterStances, setCharacterStances] = useState<
     Record<number, Record<string, StanceInfo>>
   >({});
-  // Game-level properties
+  // Game-level properties. Doubles as the registry consulted when rendering
+  // outcome-tag chips (KND/LNC/STN/…) — a single list in Game.json drives both.
   const [gameProperties, setGameProperties] = useState<
     Record<string, PropertyInfo>
   >({});
-  // Game-level outcome tags (KND, LNC, STN, ...) — shared by hit/counterHit/block.
-  const [outcomeTags, setOutcomeTags] = useState<Record<string, PropertyInfo>>(
-    {},
-  );
   // Game-level hit levels
   const [hitLevels, setHitLevels] = useState<Record<string, HitLevelInfo>>({});
   const [gameCreditsDescription, setGameCreditsDescription] = useState<
@@ -330,7 +326,6 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
         setGameCreditsDescription(data.creditsDescription);
         setGameStances(data.gameStances);
         setGameProperties(data.gameProperties);
-        setOutcomeTags(data.outcomeTags);
         setCharacterStances(data.characterStances);
         setHitLevels(data.hitLevels);
       } catch (err) {
@@ -463,27 +458,12 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     [characterStances, gameStances],
   );
 
-  // Get property info by code
+  // Look up a property by code. Used both by the Properties column and by the
+  // outcome-cell tag chips — Game.json's `properties` registry drives both.
   const getPropertyInfo = useCallback(
-    (propertyCode: string): PropertyInfo | null => {
-      if (gameProperties[propertyCode]) {
-        return gameProperties[propertyCode];
-      }
-      return null;
-    },
+    (propertyCode: string): PropertyInfo | null =>
+      gameProperties[propertyCode] ?? null,
     [gameProperties],
-  );
-
-  // Outcome-tag info. We look at the dedicated outcomeTags registry first, then
-  // fall back to gameProperties (so an existing property like "LH" is still
-  // described when it appears in an outcome column) before giving up.
-  const getOutcomeTagInfo = useCallback(
-    (tagCode: string): PropertyInfo | null => {
-      if (outcomeTags[tagCode]) return outcomeTags[tagCode];
-      if (gameProperties[tagCode]) return gameProperties[tagCode];
-      return null;
-    },
-    [outcomeTags, gameProperties],
   );
 
   const contextValue: GameContextType = useMemo(
@@ -503,8 +483,6 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       applyNotation,
       getStanceInfo,
       getPropertyInfo,
-      getOutcomeTagInfo,
-      outcomeTags,
       hitLevels,
       gameCredits,
     }),
@@ -523,8 +501,6 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       applyNotation,
       getStanceInfo,
       getPropertyInfo,
-      getOutcomeTagInfo,
-      outcomeTags,
       hitLevels,
       gameCredits,
     ],

@@ -44,7 +44,7 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
   isAllCharacters = false,
 }) => {
   // Get stance info function from context
-  const { getStanceInfo, getPropertyInfo, getOutcomeTagInfo } = useGame();
+  const { getStanceInfo, getPropertyInfo } = useGame();
 
   // Single scroll container ref - component owns its scroll
   const [scrollContainer, setScrollContainer] = useState<HTMLDivElement | null>(
@@ -208,7 +208,6 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
               copyCommand={copyCommand}
               getStanceInfo={getStanceInfo}
               getPropertyInfo={getPropertyInfo}
-              getOutcomeTagInfo={getOutcomeTagInfo}
               badges={badges}
             />
           ))}
@@ -274,7 +273,6 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
               copyCommand={copyCommand}
               getStanceInfo={getStanceInfo}
               getPropertyInfo={getPropertyInfo}
-              getOutcomeTagInfo={getOutcomeTagInfo}
               badges={badges}
               dataIndex={virtualRow.index}
               measureRef={(el) => {

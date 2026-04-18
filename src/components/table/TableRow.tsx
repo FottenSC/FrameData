@@ -13,7 +13,6 @@ interface TableRowProps {
   copyCommand: (move: Move) => void;
   getStanceInfo: (stance: string, characterId: number) => any;
   getPropertyInfo: (prop: string) => PropertyInfo | null;
-  getOutcomeTagInfo?: (tag: string) => PropertyInfo | null;
   badges?: Record<string, { className: string }>;
   measureRef?: (el: HTMLTableRowElement | null) => void;
   dataIndex?: number;
@@ -28,7 +27,6 @@ export const TableRow: React.FC<TableRowProps> = React.memo(
     copyCommand,
     getStanceInfo,
     getPropertyInfo,
-    getOutcomeTagInfo,
     badges,
     measureRef,
     dataIndex,
@@ -57,7 +55,6 @@ export const TableRow: React.FC<TableRowProps> = React.memo(
               copyCommand={copyCommand}
               getStanceInfo={getStanceInfo}
               getPropertyInfo={getPropertyInfo}
-              getOutcomeTagInfo={getOutcomeTagInfo}
               badges={badges}
             />
           </TableCell>

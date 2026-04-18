@@ -27,10 +27,12 @@ export interface GameData {
   gameStances: Record<string, StanceInfo>;
   /** Per-character stances keyed by characterId then stance code. */
   characterStances: Record<number, Record<string, StanceInfo>>;
-  /** Move-wide properties (UA, BA, GI, SS, TH, RE, LH). */
+  /**
+   * Move-wide + outcome properties (UA, BA, GI, SS, TH, RE, LH, KND, LNC, …).
+   * The same registry is used both for the Properties column and for the tag
+   * chips rendered inside outcome cells — authors maintain a single list.
+   */
   gameProperties: Record<string, PropertyInfo>;
-  /** Outcome tags (KND, LNC, STN, …) shared by block / hit / counterHit. */
-  outcomeTags: Record<string, PropertyInfo>;
   /** Hit level vocabulary (H, M, L, SM, SL). */
   hitLevels: Record<string, HitLevelInfo>;
   /** Credits block. Accepts either a legacy array or the object form. */
@@ -167,7 +169,6 @@ export async function loadGameData(gameId: string): Promise<GameData> {
     gameStances: parseStances(data?.stances),
     characterStances: parseCharacterStances(data?.characters),
     gameProperties: parsePropLike(data?.properties),
-    outcomeTags: parsePropLike(data?.outcomeTags),
     hitLevels: parseHitLevels(data?.hitLevels),
     credits: credits.list,
     creditsDescription: credits.description,

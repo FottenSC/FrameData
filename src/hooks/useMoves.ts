@@ -70,18 +70,6 @@ function cachedApplyNotation(
 
 // ---------- Data fetching ----------
 
-async function fetchCharactersList(gameId: string): Promise<Character[]> {
-  const res = await fetch(`/Games/${encodeURIComponent(gameId)}/Game.json`);
-  if (!res.ok) throw new Error(`Failed to fetch game data: ${res.status}`);
-  const data = await res.json();
-  return (Array.isArray(data?.characters) ? data.characters : []).map(
-    (c: any) => ({
-      id: Number(c.id),
-      name: intern(String(c.name))!,
-    }),
-  );
-}
-
 export async function fetchCharacterMoves(
   gameId: string,
   characterId: number,

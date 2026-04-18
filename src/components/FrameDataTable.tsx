@@ -16,7 +16,6 @@ import {
 } from "./ui/card";
 import { useGame, avaliableGames } from "../contexts/GameContext";
 import { useTableConfig } from "../contexts/UserSettingsContext";
-import { useCommand } from "../contexts/CommandContext";
 import { useToolbar } from "../contexts/ToolbarContext";
 import { Skeleton } from "./ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -24,97 +23,28 @@ import { FilterBuilder } from "./FilterBuilder";
 import { CommandRenderer } from "@/components/renderers/CommandRenderer";
 import { NotesRenderer } from "@/components/renderers/NotesRenderer";
 import { FrameDataTableContent } from "@/components/table/FrameDataTableContent";
-import { Move, FilterItem, MoveOutcome, SortableColumn } from "../types/Move";
+import { Move, FilterItem, SortableColumn } from "../types/Move";
 import { builtinOperators, operatorById } from "../filters/operators";
 import { getGameFilterConfig } from "../filters/gameFilterConfigs";
 import type { FieldConfig, FieldType, FilterOperator } from "../filters/types";
 import { useMoves, clearNotationCache } from "@/hooks/useMoves";
-import { formatOutcome } from "@/lib/parseOutcome";
+import { getAccessor } from "@/lib/moveAccessors";
 
-// --------------------------------------------------------------------------
-// Sort field map.
-//
-// Keys that previously read `move.hitDec`/`move.counterHitDec`/etc. now read
-// `move.hit.advantage`/`move.counterHit.advantage`/etc. String sorts fall back
-// to the formatted outcome so that a KND row still sorts sensibly relative to
-// a "+28 KND" row.
-// --------------------------------------------------------------------------
-const SORT_FIELD_MAP = {
-  character: {
-    getter: (move: Move) => move.characterName,
-    type: "string" as const,
-  },
-  stance: {
-    getter: (move: Move) => (move.stance ? move.stance.join(", ") : null),
-    type: "string" as const,
-  },
-  command: {
-    getter: (move: Move) => (move.command ? move.command.join(" ") : null),
-    type: "string" as const,
-  },
-  rawCommand: {
-    getter: (move: Move) => move.stringCommand,
-    type: "string" as const,
-  },
-  input: {
-    getter: (move: Move) =>
-      [
-        move.stance ? move.stance.join(" ") : null,
-        move.command ? move.command.join(" ") : null,
-      ]
-        .filter(Boolean)
-        .join(" "),
-    type: "string" as const,
-  },
-  hitLevel: {
-    getter: (move: Move) => (move.hitLevel ? move.hitLevel.join(" ") : null),
-    type: "string" as const,
-  },
-  impact: {
-    getter: (move: Move) => move.impact,
-    type: "number" as const,
-  },
-  damage: {
-    getter: (move: Move) => move.damage.total,
-    type: "number" as const,
-  },
-  block: {
-    getter: (move: Move) => move.block.advantage,
-    type: "number" as const,
-  },
-  hit: {
-    getter: (move: Move) => move.hit.advantage,
-    type: "number" as const,
-  },
-  counterHit: {
-    getter: (move: Move) => move.counterHit.advantage,
-    type: "number" as const,
-  },
-  guardBurst: {
-    getter: (move: Move) => move.guardBurst,
-    type: "number" as const,
-  },
-  properties: {
-    getter: (move: Move) =>
-      move.properties.length > 0 ? move.properties.join(" ") : null,
-    type: "string" as const,
-  },
-  notes: {
-    getter: (move: Move) => move.notes,
-    type: "string" as const,
-  },
-};
-
-const createOptimizedComparator = (
+/**
+ * Generic comparator factory. Accepts a primitive-valued getter and produces
+ * a `(a, b) => number` suitable for `Array.prototype.sort`. null values always
+ * sort to the end regardless of direction.
+ */
+const createComparator = (
   direction: "asc" | "desc",
   fieldType: "string" | "number",
-  getter: (move: Move) => any,
+  getter: (move: Move) => number | string | null,
 ) => {
   const order = direction === "asc" ? 1 : -1;
   if (fieldType === "number") {
     return (a: Move, b: Move): number => {
-      const valA = getter(a);
-      const valB = getter(b);
+      const valA = getter(a) as number | null;
+      const valB = getter(b) as number | null;
       if (valA == null && valB == null) return 0;
       if (valA == null) return order;
       if (valB == null) return -order;
@@ -131,18 +61,6 @@ const createOptimizedComparator = (
   };
 };
 
-/**
- * Outcome-tag string used by filters for "contains" / "inList" matching.
- * Joins both the parsed tags and the raw string so author-only variations
- * (e.g. "BREAK") still match.
- */
-function outcomeTagSearchString(o: MoveOutcome): string {
-  const parts: string[] = [];
-  if (o.tags.length > 0) parts.push(o.tags.join(" "));
-  if (o.raw) parts.push(o.raw);
-  return parts.join(" ");
-}
-
 export const FrameDataTable: React.FC = () => {
   const params = useParams({ strict: false }) as {
     gameId?: string;
@@ -155,17 +73,13 @@ export const FrameDataTable: React.FC = () => {
     selectedGame,
     setSelectedGameById,
     characters,
-    setCharacters,
     selectedCharacterId,
     setSelectedCharacterId,
-    availableIcons,
-    getIconUrl,
     applyNotation,
     hitLevels,
   } = useGame();
 
   const { getVisibleColumns, updateColumnVisibility } = useTableConfig();
-  const { openView } = useCommand();
   const {
     setActiveFiltersCount,
     exportHandler,
@@ -382,11 +296,9 @@ export const FrameDataTable: React.FC = () => {
 
   // ---------- Field extraction for filter evaluation ----------
   //
-  // When an outcome column is queried for a numeric value we return
-  // `advantage`; when queried for a string we return a "tags+raw" blob so that
-  // "contains KND" works against both structured tags and raw strings.
-  // Dedicated "*Tags" virtual fields exist for users who want explicit
-  // tag-only matching.
+  // Backed by the central column registry in `lib/moveAccessors.ts`. The
+  // registry defines — for each column id — a `filterString` and (optionally)
+  // a `filterNumber` projection. We just look up the bundle and call through.
   const getFieldAs = useCallback(
     (
       move: Move,
@@ -398,114 +310,13 @@ export const FrameDataTable: React.FC = () => {
     } => {
       const field = fieldMap.get(fieldId);
       const type: FieldType = field?.type ?? "text";
-      switch (fieldId) {
-        case "character":
-          return { string: move.characterName || null, number: null, type };
-        case "stance":
-          return {
-            string: move.stance ? move.stance.join(", ") : null,
-            number: null,
-            type,
-          };
-        case "command":
-          return {
-            string: move.command ? move.command.join(" ") : null,
-            number: null,
-            type,
-          };
-        case "rawCommand":
-          return { string: move.stringCommand, number: null, type };
-        case "input": {
-          const val = [
-            move.stance ? move.stance.join(" ") : null,
-            move.command ? move.command.join(" ") : null,
-          ]
-            .filter(Boolean)
-            .join(" ");
-          return { string: val, number: null, type };
-        }
-        case "hitLevel":
-          return {
-            string: move.hitLevel ? move.hitLevel.join(" ") : null,
-            number: null,
-            type,
-          };
-        case "impact":
-          return {
-            string: move.impact != null ? String(move.impact) : null,
-            number: move.impact ?? null,
-            type,
-          };
-        case "damage":
-          return {
-            string:
-              move.damage.total != null
-                ? String(move.damage.total)
-                : move.damage.raw,
-            number: move.damage.total ?? null,
-            type,
-          };
-
-        // Outcome columns: numeric path uses advantage, string path uses
-        // the formatted representation (e.g. "+28 KND").
-        case "block":
-          return {
-            string: formatOutcome(move.block) || null,
-            number: move.block.advantage,
-            type,
-          };
-        case "hit":
-          return {
-            string: formatOutcome(move.hit) || null,
-            number: move.hit.advantage,
-            type,
-          };
-        case "counterHit":
-          return {
-            string: formatOutcome(move.counterHit) || null,
-            number: move.counterHit.advantage,
-            type,
-          };
-
-        // Tag-only virtual fields. Useful for queries like
-        // "hitTags contains KND" that don't conflate the numeric channel.
-        case "blockTags":
-          return {
-            string: outcomeTagSearchString(move.block) || null,
-            number: null,
-            type,
-          };
-        case "hitTags":
-          return {
-            string: outcomeTagSearchString(move.hit) || null,
-            number: null,
-            type,
-          };
-        case "counterHitTags":
-          return {
-            string: outcomeTagSearchString(move.counterHit) || null,
-            number: null,
-            type,
-          };
-
-        case "guardBurst":
-          return {
-            string: move.guardBurst != null ? String(move.guardBurst) : null,
-            number: move.guardBurst ?? null,
-            type,
-          };
-        case "properties":
-          return {
-            string:
-              move.properties.length > 0 ? move.properties.join(" ") : null,
-            number: null,
-            type,
-          };
-        case "notes":
-          return { string: move.notes, number: null, type };
-        default:
-          return { string: null, number: null, type };
-      }
+      const acc = getAccessor(fieldId);
+      if (!acc) return { string: null, number: null, type };
+      return {
+        string: acc.filterString(move),
+        number: acc.filterNumber ? acc.filterNumber(move) : null,
+        type,
+      };
     },
     [fieldMap],
   );
@@ -543,14 +354,13 @@ export const FrameDataTable: React.FC = () => {
     }
 
     if (sortColumn) {
-      const fieldConfig =
-        SORT_FIELD_MAP[sortColumn as keyof typeof SORT_FIELD_MAP];
-      if (fieldConfig) {
+      const acc = getAccessor(sortColumn);
+      if (acc) {
         result = [...result];
-        const comparator = createOptimizedComparator(
+        const comparator = createComparator(
           sortDirection,
-          fieldConfig.type,
-          fieldConfig.getter,
+          acc.sortType,
+          acc.sortValue,
         );
         result.sort(comparator);
       }
@@ -574,7 +384,7 @@ export const FrameDataTable: React.FC = () => {
     if (!rows || rows.length === 0) return;
     const headers = visibleColumns.map((c) => c.label);
     const fieldIds = visibleColumns.map((c) => c.id);
-    const escape = (v: any) => {
+    const escape = (v: unknown) => {
       if (v == null) return "";
       const s = String(v);
       if (/[,"\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
@@ -585,43 +395,8 @@ export const FrameDataTable: React.FC = () => {
     for (const m of rows) {
       const line = fieldIds
         .map((fid) => {
-          switch (fid) {
-            case "character":
-              return m.characterName;
-            case "stance":
-              return m.stance ? m.stance.join(", ") : "";
-            case "command":
-              return m.command ? m.command.join(" ") : "";
-            case "rawCommand":
-              return m.stringCommand;
-            case "input":
-              return [
-                m.stance ? m.stance.join(" ") : null,
-                m.command ? m.command.join(" ") : null,
-              ]
-                .filter(Boolean)
-                .join(" ");
-            case "hitLevel":
-              return m.hitLevel ? m.hitLevel.join(" ") : "";
-            case "impact":
-              return m.impact;
-            case "damage":
-              return m.damage.total ?? m.damage.raw ?? "";
-            case "block":
-              return formatOutcome(m.block);
-            case "hit":
-              return formatOutcome(m.hit);
-            case "counterHit":
-              return formatOutcome(m.counterHit);
-            case "guardBurst":
-              return m.guardBurst ?? "";
-            case "properties":
-              return m.properties.length > 0 ? m.properties.join(", ") : "";
-            case "notes":
-              return m.notes;
-            default:
-              return "";
-          }
+          const acc = getAccessor(fid);
+          return acc ? acc.exportValue(m) : "";
         })
         .map(escape)
         .join(",");

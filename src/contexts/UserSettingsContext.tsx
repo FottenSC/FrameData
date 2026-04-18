@@ -100,15 +100,18 @@ export const defaultColumns: ColumnConfig[] = [
     minWidth: 80,
     maxWidth: 80,
   },
+  // Outcome columns carry an advantage pill AND up to a few tag chips
+  // (e.g. "+28 KND"). 60px was enough when only one or the other could appear;
+  // the new outcome renderer needs breathing room.
   {
     id: "block",
     label: "Block",
     visible: true,
     order: 6,
     className: "pt-2 px-2",
-    width: 60,
-    minWidth: 60,
-    maxWidth: 60,
+    width: 120,
+    minWidth: 80,
+    maxWidth: 160,
   },
   {
     id: "hit",
@@ -116,9 +119,9 @@ export const defaultColumns: ColumnConfig[] = [
     visible: true,
     order: 7,
     className: "pt-2 px-2",
-    width: 60,
-    minWidth: 60,
-    maxWidth: 60,
+    width: 140,
+    minWidth: 80,
+    maxWidth: 200,
   },
   {
     id: "counterHit",
@@ -127,9 +130,9 @@ export const defaultColumns: ColumnConfig[] = [
     visible: true,
     order: 8,
     className: "pt-2 px-2",
-    width: 60,
-    minWidth: 60,
-    maxWidth: 60,
+    width: 140,
+    minWidth: 80,
+    maxWidth: 200,
   },
   {
     id: "guardBurst",
@@ -213,27 +216,26 @@ export const UserSettingsProvider: React.FC<UserSettingsProviderProps> = ({
     );
   }, [gameNotationMappings]);
 
-  const getEnabledNotationMappings = useCallback((
-    gameId: string,
-    defaults: string[] = [],
-  ) => {
-    return gameNotationMappings[gameId] ?? defaults;
-  }, [gameNotationMappings]);
+  const getEnabledNotationMappings = useCallback(
+    (gameId: string, defaults: string[] = []) => {
+      return gameNotationMappings[gameId] ?? defaults;
+    },
+    [gameNotationMappings],
+  );
 
-  const toggleGameNotationMapping = useCallback((
-    gameId: string,
-    key: string,
-    currentEnabled: string[],
-  ) => {
-    setGameNotationMappings((prev) => {
-      const isEnabled = currentEnabled.includes(key);
-      const newEnabled = isEnabled
-        ? currentEnabled.filter((k) => k !== key)
-        : [...currentEnabled, key];
+  const toggleGameNotationMapping = useCallback(
+    (gameId: string, key: string, currentEnabled: string[]) => {
+      setGameNotationMappings((prev) => {
+        const isEnabled = currentEnabled.includes(key);
+        const newEnabled = isEnabled
+          ? currentEnabled.filter((k) => k !== key)
+          : [...currentEnabled, key];
 
-      return { ...prev, [gameId]: newEnabled };
-    });
-  }, []);
+        return { ...prev, [gameId]: newEnabled };
+      });
+    },
+    [],
+  );
 
   // Table config state
   const [columnConfigs, setColumnConfigs] = useState<ColumnConfig[]>(() => {
@@ -277,11 +279,14 @@ export const UserSettingsProvider: React.FC<UserSettingsProviderProps> = ({
     }
   }, [columnConfigs]);
 
-  const updateColumnVisibility = useCallback((columnId: string, visible: boolean) => {
-    setColumnConfigs((prev) =>
-      prev.map((col) => (col.id === columnId ? { ...col, visible } : col)),
-    );
-  }, []);
+  const updateColumnVisibility = useCallback(
+    (columnId: string, visible: boolean) => {
+      setColumnConfigs((prev) =>
+        prev.map((col) => (col.id === columnId ? { ...col, visible } : col)),
+      );
+    },
+    [],
+  );
 
   const reorderColumns = useCallback((fromIndex: number, toIndex: number) => {
     setColumnConfigs((prev) => {
@@ -305,35 +310,44 @@ export const UserSettingsProvider: React.FC<UserSettingsProviderProps> = ({
     setColumnConfigs(defaultColumns);
   }, []);
 
-  const getVisibleColumns = useCallback(() =>
-    columnConfigs
-      .filter((col) => col.visible)
-      .sort((a, b) => a.order - b.order), [columnConfigs]);
+  const getVisibleColumns = useCallback(
+    () =>
+      columnConfigs
+        .filter((col) => col.visible)
+        .sort((a, b) => a.order - b.order),
+    [columnConfigs],
+  );
 
-  const getSortedColumns = useCallback(() => [...columnConfigs].sort((a, b) => a.order - b.order), [columnConfigs]);
+  const getSortedColumns = useCallback(
+    () => [...columnConfigs].sort((a, b) => a.order - b.order),
+    [columnConfigs],
+  );
 
-  const value: UserSettingsContextType = useMemo(() => ({
-    gameNotationMappings,
-    getEnabledNotationMappings,
-    toggleGameNotationMapping,
-    columnConfigs,
-    setColumnConfigs,
-    updateColumnVisibility,
-    reorderColumns,
-    restoreDefaults,
-    getVisibleColumns,
-    getSortedColumns,
-  }), [
-    gameNotationMappings,
-    getEnabledNotationMappings,
-    toggleGameNotationMapping,
-    columnConfigs,
-    updateColumnVisibility,
-    reorderColumns,
-    restoreDefaults,
-    getVisibleColumns,
-    getSortedColumns,
-  ]);
+  const value: UserSettingsContextType = useMemo(
+    () => ({
+      gameNotationMappings,
+      getEnabledNotationMappings,
+      toggleGameNotationMapping,
+      columnConfigs,
+      setColumnConfigs,
+      updateColumnVisibility,
+      reorderColumns,
+      restoreDefaults,
+      getVisibleColumns,
+      getSortedColumns,
+    }),
+    [
+      gameNotationMappings,
+      getEnabledNotationMappings,
+      toggleGameNotationMapping,
+      columnConfigs,
+      updateColumnVisibility,
+      reorderColumns,
+      restoreDefaults,
+      getVisibleColumns,
+      getSortedColumns,
+    ],
+  );
 
   return (
     <UserSettingsContext.Provider value={value}>

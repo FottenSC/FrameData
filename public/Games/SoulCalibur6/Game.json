@@ -1,4 +1,61 @@
 {
+  "outcomeTags": {
+    "KND": {
+      "name": "Knockdown",
+      "description": "Puts the opponent on the ground. Typically grants an oki / wakeup situation.",
+      "className": "bg-fuchsia-800 text-white border-white"
+    },
+    "LNC": {
+      "name": "Launch",
+      "description": "Sends the opponent into the air for a juggle.",
+      "className": "bg-rose-700 text-white border-white"
+    },
+    "STN": {
+      "name": "Stun",
+      "description": "Opponent is stunned and cannot act for a period — lets you confirm into a follow-up.",
+      "className": "bg-pink-700 text-white border-white"
+    },
+    "JGL": {
+      "name": "Juggle",
+      "description": "Hits an airborne opponent; extends a combo.",
+      "className": "bg-amber-700 text-white border-white"
+    },
+    "LH": {
+      "name": "Lethal Hit",
+      "description": "Move qualified for its lethal-hit bonus (enhanced properties).",
+      "className": "bg-orange-500 text-zinc-900 border-white"
+    },
+    "UB": {
+      "name": "Un-techable",
+      "description": "The resulting hit state cannot be teched / ukemi'd.",
+      "className": "bg-red-700 text-white border-white"
+    },
+    "GB": {
+      "name": "Guard Break",
+      "description": "Breaks the opponent's guard and leaves them in a punishable state.",
+      "className": "bg-blue-500 text-zinc-900 border-white"
+    },
+    "BREAK": {
+      "name": "Guard Break",
+      "description": "Guard-breaks the opponent.",
+      "className": "bg-blue-500 text-zinc-900 border-white"
+    },
+    "DZY": {
+      "name": "Dizzy",
+      "description": "Opponent is dizzied and vulnerable to an extended follow-up.",
+      "className": "bg-purple-700 text-white border-white"
+    },
+    "SLC": {
+      "name": "Slice",
+      "description": "Partial-whiff slice hit state.",
+      "className": "bg-cyan-700 text-white border-white"
+    },
+    "RE": {
+      "name": "Reversal Edge",
+      "description": "Triggers the Reversal Edge mini-game.",
+      "className": "bg-white text-zinc-900 border-black"
+    }
+  },
   "properties": {
     "UA": {
       "name": "Unblockable Attack",

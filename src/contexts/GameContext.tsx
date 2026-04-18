@@ -73,7 +73,7 @@ export const applyNotationMapping = (
   if (text === null) {
     return null;
   }
-  
+
   const keys = Object.keys(map);
   if (keys.length === 0) return text;
 
@@ -81,7 +81,9 @@ export const applyNotationMapping = (
   if (!cache) {
     // Sort keys by length descending to replace longer sequences first
     const sortedKeys = [...keys].sort((a, b) => b.length - a.length);
-    const escapedKeys = sortedKeys.map(key => key.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"));
+    const escapedKeys = sortedKeys.map((key) =>
+      key.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"),
+    );
     const regex = new RegExp(escapedKeys.join("|"), "g");
     cache = { regex };
     notationRegexCache.set(map, cache);
@@ -227,8 +229,19 @@ interface GameContextType {
   getIconUrl: (iconName: string, isHeld?: boolean) => string;
   getNotationMap: () => NotationMap;
   applyNotation: (text: string | null) => string | null;
-  getStanceInfo: (stanceCode: string, characterId?: number | null) => StanceInfo | null;
+  getStanceInfo: (
+    stanceCode: string,
+    characterId?: number | null,
+  ) => StanceInfo | null;
   getPropertyInfo: (propertyCode: string) => PropertyInfo | null;
+  /**
+   * Lookup descriptive info for an outcome tag (KND/LNC/STN/etc). Returns null
+   * when the game does not declare the tag — callers should fall back to
+   * rendering the raw tag code.
+   */
+  getOutcomeTagInfo: (tagCode: string) => PropertyInfo | null;
+  /** All outcome tags declared by the active game, keyed by code. */
+  outcomeTags: Record<string, PropertyInfo>;
   hitLevels: Record<string, HitLevelInfo>;
   gameCredits: CreditEntry[];
   gameCreditsDescription: string | null;
@@ -242,7 +255,10 @@ interface GameProviderProps {
 
 export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const navigate = useNavigate();
-  const params = useParams({ strict: false }) as { gameId?: string; characterName?: string };
+  const params = useParams({ strict: false }) as {
+    gameId?: string;
+    characterName?: string;
+  };
   const location = useLocation();
 
   const [selectedGame, setSelectedGame] = useState<Game>(() => {
@@ -265,14 +281,26 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     null,
   );
   // Game-level stances (shared across all characters)
-  const [gameStances, setGameStances] = useState<Record<string, StanceInfo>>({});
+  const [gameStances, setGameStances] = useState<Record<string, StanceInfo>>(
+    {},
+  );
   // Character-specific stances: characterId -> stanceCode -> StanceInfo
-  const [characterStances, setCharacterStances] = useState<Record<number, Record<string, StanceInfo>>>({});
+  const [characterStances, setCharacterStances] = useState<
+    Record<number, Record<string, StanceInfo>>
+  >({});
   // Game-level properties
-  const [gameProperties, setGameProperties] = useState<Record<string, PropertyInfo>>({});
+  const [gameProperties, setGameProperties] = useState<
+    Record<string, PropertyInfo>
+  >({});
+  // Game-level outcome tags (KND, LNC, STN, ...) — shared by hit/counterHit/block.
+  const [outcomeTags, setOutcomeTags] = useState<Record<string, PropertyInfo>>(
+    {},
+  );
   // Game-level hit levels
   const [hitLevels, setHitLevels] = useState<Record<string, HitLevelInfo>>({});
-  const [gameCreditsDescription, setGameCreditsDescription] = useState<string | null>(null);
+  const [gameCreditsDescription, setGameCreditsDescription] = useState<
+    string | null
+  >(null);
   const [gameCredits, setGameCredits] = useState<CreditEntry[]>([]);
 
   useEffect(() => {
@@ -293,9 +321,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
       try {
         // Load from public/Games/{gameId}/Game.json
-        const url = `/Games/${encodeURIComponent(
-          selectedGame.id,
-        )}/Game.json`;
+        const url = `/Games/${encodeURIComponent(selectedGame.id)}/Game.json`;
         const res = await fetch(url);
         if (!res.ok)
           throw new Error(
@@ -353,7 +379,11 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
         if (data?.properties && typeof data.properties === "object") {
           const properties: Record<string, PropertyInfo> = {};
           for (const [code, info] of Object.entries(data.properties)) {
-            const propData = info as { name?: string; description?: string; className?: string };
+            const propData = info as {
+              name?: string;
+              description?: string;
+              className?: string;
+            };
             properties[code] = {
               name: propData.name || code,
               description: propData.description || "",
@@ -365,6 +395,27 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
           setGameProperties({});
         }
 
+        // Load game-level outcome tags. These describe KND / LNC / STN / etc —
+        // the "what happens on hit" vocabulary shared by block / hit / counterHit.
+        if (data?.outcomeTags && typeof data.outcomeTags === "object") {
+          const tags: Record<string, PropertyInfo> = {};
+          for (const [code, info] of Object.entries(data.outcomeTags)) {
+            const tagData = info as {
+              name?: string;
+              description?: string;
+              className?: string;
+            };
+            tags[code] = {
+              name: tagData.name || code,
+              description: tagData.description || "",
+              className: tagData.className || "",
+            };
+          }
+          setOutcomeTags(tags);
+        } else {
+          setOutcomeTags({});
+        }
+
         // Load character-specific stances
         const charStances: Record<number, Record<string, StanceInfo>> = {};
         if (Array.isArray(data?.characters)) {
@@ -372,7 +423,10 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
             if (char.stances && typeof char.stances === "object") {
               const stances: Record<string, StanceInfo> = {};
               for (const [code, info] of Object.entries(char.stances)) {
-                const stanceData = info as { name?: string; description?: string };
+                const stanceData = info as {
+                  name?: string;
+                  description?: string;
+                };
                 stances[code] = {
                   name: stanceData.name || code,
                   description: stanceData.description || "",
@@ -391,7 +445,11 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
             if (typeof info === "string") {
               levels[code] = { name: info, description: "", className: "" };
             } else {
-              const levelData = info as { name?: string; description?: string; className?: string };
+              const levelData = info as {
+                name?: string;
+                description?: string;
+                className?: string;
+              };
               levels[code] = {
                 name: levelData.name || code,
                 description: levelData.description || "",
@@ -473,11 +531,14 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     return Array.from(combinedIconsMap.values());
   }, [selectedGame.icons]);
 
-  const getIconUrl = useCallback((iconName: string, isHeld: boolean = false): string => {
-    const upperIconName = iconName.toUpperCase();
-    const heldSuffix = isHeld ? "-" : "";
-    return `/Games/${selectedGame.id}/Icons/${upperIconName}${heldSuffix}.svg`;
-  }, [selectedGame.id]);
+  const getIconUrl = useCallback(
+    (iconName: string, isHeld: boolean = false): string => {
+      const upperIconName = iconName.toUpperCase();
+      const heldSuffix = isHeld ? "-" : "";
+      return `/Games/${selectedGame.id}/Icons/${upperIconName}${heldSuffix}.svg`;
+    },
+    [selectedGame.id],
+  );
 
   const { getEnabledNotationMappings } = useUserSettings();
 
@@ -488,9 +549,16 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       selectedGame.notationMapping.defaultEnabled,
     );
     return buildNotationMap(selectedGame.notationMapping, enabled);
-  }, [selectedGame.id, selectedGame.notationMapping, getEnabledNotationMappings]);
+  }, [
+    selectedGame.id,
+    selectedGame.notationMapping,
+    getEnabledNotationMappings,
+  ]);
 
-  const getNotationMap = useCallback((): NotationMap => notationMap, [notationMap]);
+  const getNotationMap = useCallback(
+    (): NotationMap => notationMap,
+    [notationMap],
+  );
 
   const applyNotation = useCallback(
     (text: string | null): string | null => {
@@ -529,42 +597,61 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     [gameProperties],
   );
 
-  const contextValue: GameContextType = useMemo(() => ({
-    selectedGame,
-    setSelectedGameById: handleSetSelectedGameById,
-    isCharactersLoading,
-    characterError,
-    characters,
-    setCharacters,
-    selectedCharacterId,
-    setSelectedCharacterId: handleSetSelectedCharacterId,
-    availableIcons: combinedIcons,
-    gameCreditsDescription,
-    getIconUrl: getIconUrl,
-    getNotationMap,
-    applyNotation,
-    getStanceInfo,
-    getPropertyInfo,
-    hitLevels,
-    gameCredits,
-  }), [
-    selectedGame,
-    handleSetSelectedGameById,
-    isCharactersLoading,
-    characterError,
-    characters,
-    selectedCharacterId,
-    handleSetSelectedCharacterId,
-    gameCreditsDescription,
-    combinedIcons,
-    getIconUrl,
-    getNotationMap,
-    applyNotation,
-    getStanceInfo,
-    getPropertyInfo,
-    hitLevels,
-    gameCredits,
-  ]);
+  // Outcome-tag info. We look at the dedicated outcomeTags registry first, then
+  // fall back to gameProperties (so an existing property like "LH" is still
+  // described when it appears in an outcome column) before giving up.
+  const getOutcomeTagInfo = useCallback(
+    (tagCode: string): PropertyInfo | null => {
+      if (outcomeTags[tagCode]) return outcomeTags[tagCode];
+      if (gameProperties[tagCode]) return gameProperties[tagCode];
+      return null;
+    },
+    [outcomeTags, gameProperties],
+  );
+
+  const contextValue: GameContextType = useMemo(
+    () => ({
+      selectedGame,
+      setSelectedGameById: handleSetSelectedGameById,
+      isCharactersLoading,
+      characterError,
+      characters,
+      setCharacters,
+      selectedCharacterId,
+      setSelectedCharacterId: handleSetSelectedCharacterId,
+      availableIcons: combinedIcons,
+      gameCreditsDescription,
+      getIconUrl: getIconUrl,
+      getNotationMap,
+      applyNotation,
+      getStanceInfo,
+      getPropertyInfo,
+      getOutcomeTagInfo,
+      outcomeTags,
+      hitLevels,
+      gameCredits,
+    }),
+    [
+      selectedGame,
+      handleSetSelectedGameById,
+      isCharactersLoading,
+      characterError,
+      characters,
+      selectedCharacterId,
+      handleSetSelectedCharacterId,
+      gameCreditsDescription,
+      combinedIcons,
+      getIconUrl,
+      getNotationMap,
+      applyNotation,
+      getStanceInfo,
+      getPropertyInfo,
+      getOutcomeTagInfo,
+      outcomeTags,
+      hitLevels,
+      gameCredits,
+    ],
+  );
 
   return (
     <GameContext.Provider value={contextValue}>{children}</GameContext.Provider>

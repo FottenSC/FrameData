@@ -2,7 +2,12 @@ import { GameFilterConfig, FieldConfig } from "./types";
 import type { FilterOperator } from "./types";
 import { HitLevelInfo } from "../contexts/GameContext";
 
-// Default field configs shared if a game doesn't override
+// Default field configs shared if a game doesn't override.
+//
+// Note the addition of `blockTags` / `hitTags` / `counterHitTags`. The
+// `block`/`hit`/`counterHit` fields remain numeric (matching frame advantage);
+// the *Tags fields are text-only and let users explicitly query outcome tags
+// like KND, LNC or STN independent of the numeric advantage.
 export const defaultFields: FieldConfig[] = [
   { id: "input", label: "Stance + Command", type: "text" },
   { id: "stance", label: "Stance", type: "text" },
@@ -10,9 +15,12 @@ export const defaultFields: FieldConfig[] = [
   { id: "hitLevel", label: "Hit Level", type: "text" },
   { id: "impact", label: "Impact", type: "number" },
   { id: "damage", label: "Damage", type: "number" },
-  { id: "block", label: "Block", type: "number" },
-  { id: "hit", label: "Hit", type: "number" },
-  { id: "counterHit", label: "Counter Hit", type: "number" },
+  { id: "block", label: "Block (adv)", type: "number" },
+  { id: "blockTags", label: "Block tags", type: "text" },
+  { id: "hit", label: "Hit (adv)", type: "number" },
+  { id: "hitTags", label: "Hit tags", type: "text" },
+  { id: "counterHit", label: "Counter Hit (adv)", type: "number" },
+  { id: "counterHitTags", label: "Counter Hit tags", type: "text" },
   { id: "guardBurst", label: "Guard Burst", type: "number" },
   { id: "properties", label: "Properties", type: "text" },
   { id: "notes", label: "Notes", type: "text" },
@@ -26,7 +34,7 @@ export const defaultFields: FieldConfig[] = [
  */
 export function getGameFilterConfig(
   gameId: string,
-  hitLevels: Record<string, HitLevelInfo> = {}
+  hitLevels: Record<string, HitLevelInfo> = {},
 ): GameFilterConfig {
   // Create options for the hitLevel enum filter using the tokens as values
   const hitLevelOptions = Object.entries(hitLevels).map(([token, info]) => ({
@@ -98,4 +106,3 @@ export function getGameFilterConfig(
 
   return config;
 }
-

@@ -44,7 +44,7 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
   isAllCharacters = false,
 }) => {
   // Get stance info function from context
-  const { getStanceInfo, getPropertyInfo } = useGame();
+  const { getStanceInfo, getPropertyInfo, getOutcomeTagInfo } = useGame();
 
   // Single scroll container ref - component owns its scroll
   const [scrollContainer, setScrollContainer] = useState<HTMLDivElement | null>(
@@ -61,8 +61,10 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
   const copyCommand = React.useCallback((move: Move) => {
     const stancePart = move.stance?.join(" ") ?? "";
     const commandPart = move.command?.join("") ?? "";
-    const textToCopy = stancePart ? `${stancePart} ${commandPart}` : commandPart;
-    
+    const textToCopy = stancePart
+      ? `${stancePart} ${commandPart}`
+      : commandPart;
+
     navigator.clipboard.writeText(textToCopy).then(() => {
       toast("Copied!", { duration: 1000 });
     });
@@ -76,7 +78,7 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
   // Pagination logic
   const usePagination = isAllCharacters && moves.length > PAGE_SIZE;
   const totalPages = usePagination ? Math.ceil(moves.length / PAGE_SIZE) : 1;
-  
+
   const displayMoves = useMemo(() => {
     if (!usePagination) return moves;
     const start = currentPage * PAGE_SIZE;
@@ -206,6 +208,7 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
               copyCommand={copyCommand}
               getStanceInfo={getStanceInfo}
               getPropertyInfo={getPropertyInfo}
+              getOutcomeTagInfo={getOutcomeTagInfo}
               badges={badges}
             />
           ))}
@@ -271,6 +274,7 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
               copyCommand={copyCommand}
               getStanceInfo={getStanceInfo}
               getPropertyInfo={getPropertyInfo}
+              getOutcomeTagInfo={getOutcomeTagInfo}
               badges={badges}
               dataIndex={virtualRow.index}
               measureRef={(el) => {
@@ -323,7 +327,9 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
 
 // Wrap with TooltipProvider for stance tooltips
 // disableHoverableContent makes the tooltip close when hovering over the tooltip itself
-export const FrameDataTableContent: React.FC<DataTableContentProps> = (props) => (
+export const FrameDataTableContent: React.FC<DataTableContentProps> = (
+  props,
+) => (
   <TooltipProvider delayDuration={300} disableHoverableContent>
     <FrameDataTableContentInner {...props} />
   </TooltipProvider>

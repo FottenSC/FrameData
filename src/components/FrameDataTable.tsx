@@ -1,4 +1,10 @@
-import React, { useEffect, useState, useDeferredValue, useMemo, useCallback } from "react";
+import React, {
+  useEffect,
+  useState,
+  useDeferredValue,
+  useMemo,
+  useCallback,
+} from "react";
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -18,12 +24,21 @@ import { FilterBuilder } from "./FilterBuilder";
 import { CommandRenderer } from "@/components/renderers/CommandRenderer";
 import { NotesRenderer } from "@/components/renderers/NotesRenderer";
 import { FrameDataTableContent } from "@/components/table/FrameDataTableContent";
-import { Move, FilterCondition, FilterItem, SortableColumn } from "../types/Move";
+import { Move, FilterItem, MoveOutcome, SortableColumn } from "../types/Move";
 import { builtinOperators, operatorById } from "../filters/operators";
 import { getGameFilterConfig } from "../filters/gameFilterConfigs";
 import type { FieldConfig, FieldType, FilterOperator } from "../filters/types";
 import { useMoves, clearNotationCache } from "@/hooks/useMoves";
+import { formatOutcome } from "@/lib/parseOutcome";
 
+// --------------------------------------------------------------------------
+// Sort field map.
+//
+// Keys that previously read `move.hitDec`/`move.counterHitDec`/etc. now read
+// `move.hit.advantage`/`move.counterHit.advantage`/etc. String sorts fall back
+// to the formatted outcome so that a KND row still sorts sensibly relative to
+// a "+28 KND" row.
+// --------------------------------------------------------------------------
 const SORT_FIELD_MAP = {
   character: {
     getter: (move: Move) => move.characterName,
@@ -38,7 +53,7 @@ const SORT_FIELD_MAP = {
     type: "string" as const,
   },
   rawCommand: {
-    getter: (move: Move) => (move.stringCommand ? move.stringCommand : null),
+    getter: (move: Move) => move.stringCommand,
     type: "string" as const,
   },
   input: {
@@ -60,19 +75,19 @@ const SORT_FIELD_MAP = {
     type: "number" as const,
   },
   damage: {
-    getter: (move: Move) => move.damageDec,
+    getter: (move: Move) => move.damage.total,
     type: "number" as const,
   },
   block: {
-    getter: (move: Move) => move.blockDec,
+    getter: (move: Move) => move.block.advantage,
     type: "number" as const,
   },
   hit: {
-    getter: (move: Move) => move.hitDec,
+    getter: (move: Move) => move.hit.advantage,
     type: "number" as const,
   },
   counterHit: {
-    getter: (move: Move) => move.counterHitDec,
+    getter: (move: Move) => move.counterHit.advantage,
     type: "number" as const,
   },
   guardBurst: {
@@ -80,7 +95,8 @@ const SORT_FIELD_MAP = {
     type: "number" as const,
   },
   properties: {
-    getter: (move: Move) => (move.properties ? move.properties.join(" ") : null),
+    getter: (move: Move) =>
+      move.properties.length > 0 ? move.properties.join(" ") : null,
     type: "string" as const,
   },
   notes: {
@@ -104,20 +120,34 @@ const createOptimizedComparator = (
       if (valB == null) return -order;
       return (valA - valB) * order;
     };
-  } else {
-    return (a: Move, b: Move): number => {
-      const valA = getter(a);
-      const valB = getter(b);
-      if (valA == null && valB == null) return 0;
-      if (valA == null) return order;
-      if (valB == null) return -order;
-      return String(valA).localeCompare(String(valB)) * order;
-    };
   }
+  return (a: Move, b: Move): number => {
+    const valA = getter(a);
+    const valB = getter(b);
+    if (valA == null && valB == null) return 0;
+    if (valA == null) return order;
+    if (valB == null) return -order;
+    return String(valA).localeCompare(String(valB)) * order;
+  };
 };
 
+/**
+ * Outcome-tag string used by filters for "contains" / "inList" matching.
+ * Joins both the parsed tags and the raw string so author-only variations
+ * (e.g. "BREAK") still match.
+ */
+function outcomeTagSearchString(o: MoveOutcome): string {
+  const parts: string[] = [];
+  if (o.tags.length > 0) parts.push(o.tags.join(" "));
+  if (o.raw) parts.push(o.raw);
+  return parts.join(" ");
+}
+
 export const FrameDataTable: React.FC = () => {
-  const params = useParams({ strict: false }) as { gameId?: string; characterName?: string };
+  const params = useParams({ strict: false }) as {
+    gameId?: string;
+    characterName?: string;
+  };
   const { gameId, characterName } = params;
 
   const navigate = useNavigate();
@@ -134,7 +164,6 @@ export const FrameDataTable: React.FC = () => {
     hitLevels,
   } = useGame();
 
-  // Add table configuration context
   const { getVisibleColumns, updateColumnVisibility } = useTableConfig();
   const { openView } = useCommand();
   const {
@@ -146,7 +175,6 @@ export const FrameDataTable: React.FC = () => {
   } = useToolbar();
   const queryClient = useQueryClient();
 
-  // Use TanStack Query for data fetching with automatic caching
   const {
     data: originalMoves = [],
     isLoading: movesLoading,
@@ -161,24 +189,21 @@ export const FrameDataTable: React.FC = () => {
 
   const error = movesError ? (movesError as Error).message : null;
 
-  // --- Sorting State ---
+  // --- Sorting state ---
   const [sortColumn, setSortColumn] = useState<SortableColumn | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
-  // Add state for filters
   const [activeFilters, setActiveFilters] = useState<FilterItem[]>([]);
 
-  // Get visible columns from table configuration
   const baseColumns = getVisibleColumns();
-  // Only show the Character column when viewing "All Characters"
-  const visibleColumns = useMemo(() => 
-    selectedCharacterId !== -1
-      ? baseColumns.filter((c) => c.id !== "character")
-      : baseColumns,
-    [selectedCharacterId, baseColumns]
+  const visibleColumns = useMemo(
+    () =>
+      selectedCharacterId !== -1
+        ? baseColumns.filter((c) => c.id !== "character")
+        : baseColumns,
+    [selectedCharacterId, baseColumns],
   );
 
-  // Persist column visibility preference so it auto-toggles with page mode
   useEffect(() => {
     if (selectedCharacterId === -1) {
       updateColumnVisibility("character", true);
@@ -187,7 +212,6 @@ export const FrameDataTable: React.FC = () => {
     }
   }, [selectedCharacterId, updateColumnVisibility]);
 
-  // If leaving All Characters view, clear sorting on the hidden 'character' column
   useEffect(() => {
     if (selectedCharacterId !== -1 && sortColumn === "character") {
       setSortColumn(null);
@@ -207,18 +231,22 @@ export const FrameDataTable: React.FC = () => {
         const currentUrlName = characterName
           ? encodeURIComponent(decodeURIComponent(characterName))
           : undefined;
-
         if (expectedUrlName !== currentUrlName) {
-          navigate({ to: `/${selectedGame.id}/${expectedUrlName}`, replace: true });
+          navigate({
+            to: `/${selectedGame.id}/${expectedUrlName}`,
+            replace: true,
+          });
         }
       } else if (selectedChar) {
         const expectedUrlName = encodeURIComponent(selectedChar.name);
         const currentUrlName = characterName
           ? encodeURIComponent(decodeURIComponent(characterName))
           : undefined;
-
         if (expectedUrlName !== currentUrlName) {
-          navigate({ to: `/${selectedGame.id}/${expectedUrlName}`, replace: true });
+          navigate({
+            to: `/${selectedGame.id}/${expectedUrlName}`,
+            replace: true,
+          });
         }
       }
     }
@@ -230,15 +258,11 @@ export const FrameDataTable: React.FC = () => {
     characterName,
   ]);
 
-  // Track if we've done initial URL sync for game
   const initialGameSyncDoneRef = React.useRef(false);
 
-  // Handle URL parameters and initial character selection
   useEffect(() => {
     if (!selectedGame) return;
 
-    // Only sync game from URL on initial load when the component mounts
-    // After that, trust the selectedGame state (which is updated by command palette etc.)
     if (
       gameId &&
       gameId !== selectedGame.id &&
@@ -252,7 +276,6 @@ export const FrameDataTable: React.FC = () => {
       }
     }
 
-    // Mark initial sync as done even if games matched
     if (!initialGameSyncDoneRef.current) {
       initialGameSyncDoneRef.current = true;
     }
@@ -271,7 +294,6 @@ export const FrameDataTable: React.FC = () => {
         const characterFromName = characters.find(
           (c) => c.name.toLowerCase() === decodedName.toLowerCase(),
         );
-
         if (characterFromName) {
           setSelectedCharacterId(characterFromName.id);
         } else {
@@ -305,7 +327,6 @@ export const FrameDataTable: React.FC = () => {
     setSelectedCharacterId,
   ]);
 
-  // Invalidate query cache when notation changes
   const prevApplyNotationRef = React.useRef(applyNotation);
   useEffect(() => {
     if (prevApplyNotationRef.current !== applyNotation) {
@@ -315,28 +336,39 @@ export const FrameDataTable: React.FC = () => {
     }
   }, [applyNotation, queryClient]);
 
-  const handleSort = useCallback((column: SortableColumn) => {
-    if (sortColumn === column) {
-      setSortDirection((prevDir) => (prevDir === "asc" ? "desc" : "asc"));
-    } else {
-      setSortColumn(column);
-      setSortDirection("asc");
-    }
-  }, [sortColumn]);
+  const handleSort = useCallback(
+    (column: SortableColumn) => {
+      if (sortColumn === column) {
+        setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+      } else {
+        setSortColumn(column);
+        setSortDirection("asc");
+      }
+    },
+    [sortColumn],
+  );
 
-  const renderCommand = useCallback((command: string[] | null) => (
-    <CommandRenderer command={command} />
-  ), []);
-  
-  const renderNotes = useCallback((note: string | null) => (
-    <NotesRenderer note={note} />
-  ), []);
+  const renderCommand = useCallback(
+    (command: string[] | null) => <CommandRenderer command={command} />,
+    [],
+  );
+  const renderNotes = useCallback(
+    (note: string | null) => <NotesRenderer note={note} />,
+    [],
+  );
 
-  const gameFilterConfig = useMemo(() => getGameFilterConfig(selectedGame.id, hitLevels), [selectedGame.id, hitLevels]);
-  
-  const fieldMap = useMemo(() => new Map<string, FieldConfig>(
-    gameFilterConfig.fields.map((f) => [f.id, f]),
-  ), [gameFilterConfig]);
+  const gameFilterConfig = useMemo(
+    () => getGameFilterConfig(selectedGame.id, hitLevels),
+    [selectedGame.id, hitLevels],
+  );
+
+  const fieldMap = useMemo(
+    () =>
+      new Map<string, FieldConfig>(
+        gameFilterConfig.fields.map((f) => [f.id, f]),
+      ),
+    [gameFilterConfig],
+  );
 
   const allOperators: FilterOperator[] = useMemo(() => {
     const customs = gameFilterConfig.customOperators ?? [];
@@ -348,103 +380,144 @@ export const FrameDataTable: React.FC = () => {
 
   const opsById = useMemo(() => operatorById(allOperators), [allOperators]);
 
-  const getFieldAs = useCallback((
-    move: Move,
-    fieldId: string,
-  ): {
-    string: string | null;
-    number: number | null;
-    type: FieldType;
-  } => {
-    const field = fieldMap.get(fieldId);
-    const type: FieldType = field?.type ?? "text";
-    switch (fieldId) {
-      case "character":
-        return {
-          string: move.characterName || null,
-          number: null,
-          type,
-        };
-      case "stance":
-        return {
-          string: move.stance ? move.stance.join(", ") : null,
-          number: null,
-          type,
-        };
-      case "command":
-        return { string: move.command ? move.command.join(" ") : null, number: null, type };
-      case "rawCommand":
-        return { string: move.stringCommand, number: null, type };
-      case "input": {
-        const val = [
-          move.stance ? move.stance.join(" ") : null,
-          move.command ? move.command.join(" ") : null,
-        ].filter(Boolean).join(" ");
-        return { string: val, number: null, type };
-      }
-      case "hitLevel":
-        return { string: move.hitLevel ? move.hitLevel.join(" ") : null, number: null, type };
-      case "impact":
-        return {
-          string: move.impact != null ? String(move.impact) : null,
-          number: move.impact ?? null,
-          type,
-        };
-      case "damage":
-        return {
-          string:
-            move.damageDec != null ? String(move.damageDec) : move.damage,
-          number: move.damageDec ?? null,
-          type,
-        };
-      case "block":
-        return {
-          string: move.blockDec != null ? String(move.blockDec) : move.block,
-          number: move.blockDec ?? null,
-          type,
-        };
-      case "hit":
-        return {
-          string: move.hitDec != null ? String(move.hitDec) : move.hit,
-          number: move.hitDec ?? null,
-          type,
-        };
-      case "counterHit":
-        return {
-          string:
-            move.counterHitDec != null
-              ? String(move.counterHitDec)
-              : move.counterHit,
-          number: move.counterHitDec ?? null,
-          type,
-        };
-      case "guardBurst":
-        return {
-          string: move.guardBurst != null ? String(move.guardBurst) : null,
-          number: move.guardBurst ?? null,
-          type,
-        };
-      case "properties":
-        return {
-          string: move.properties ? move.properties.join(" ") : null,
-          number: null,
-          type,
-        };
-      case "notes":
-        return { string: move.notes, number: null, type };
-      default:
-        return { string: null, number: null, type };
-    }
-  }, [fieldMap]);
+  // ---------- Field extraction for filter evaluation ----------
+  //
+  // When an outcome column is queried for a numeric value we return
+  // `advantage`; when queried for a string we return a "tags+raw" blob so that
+  // "contains KND" works against both structured tags and raw strings.
+  // Dedicated "*Tags" virtual fields exist for users who want explicit
+  // tag-only matching.
+  const getFieldAs = useCallback(
+    (
+      move: Move,
+      fieldId: string,
+    ): {
+      string: string | null;
+      number: number | null;
+      type: FieldType;
+    } => {
+      const field = fieldMap.get(fieldId);
+      const type: FieldType = field?.type ?? "text";
+      switch (fieldId) {
+        case "character":
+          return { string: move.characterName || null, number: null, type };
+        case "stance":
+          return {
+            string: move.stance ? move.stance.join(", ") : null,
+            number: null,
+            type,
+          };
+        case "command":
+          return {
+            string: move.command ? move.command.join(" ") : null,
+            number: null,
+            type,
+          };
+        case "rawCommand":
+          return { string: move.stringCommand, number: null, type };
+        case "input": {
+          const val = [
+            move.stance ? move.stance.join(" ") : null,
+            move.command ? move.command.join(" ") : null,
+          ]
+            .filter(Boolean)
+            .join(" ");
+          return { string: val, number: null, type };
+        }
+        case "hitLevel":
+          return {
+            string: move.hitLevel ? move.hitLevel.join(" ") : null,
+            number: null,
+            type,
+          };
+        case "impact":
+          return {
+            string: move.impact != null ? String(move.impact) : null,
+            number: move.impact ?? null,
+            type,
+          };
+        case "damage":
+          return {
+            string:
+              move.damage.total != null
+                ? String(move.damage.total)
+                : move.damage.raw,
+            number: move.damage.total ?? null,
+            type,
+          };
 
-  const applyFilterItem = useCallback((move: Move, item: FilterItem): boolean => {
-    if (item.type === "group") {
-      if (item.operator === "and") {
-        return item.filters.every((f) => applyFilterItem(move, f));
-      } else {
+        // Outcome columns: numeric path uses advantage, string path uses
+        // the formatted representation (e.g. "+28 KND").
+        case "block":
+          return {
+            string: formatOutcome(move.block) || null,
+            number: move.block.advantage,
+            type,
+          };
+        case "hit":
+          return {
+            string: formatOutcome(move.hit) || null,
+            number: move.hit.advantage,
+            type,
+          };
+        case "counterHit":
+          return {
+            string: formatOutcome(move.counterHit) || null,
+            number: move.counterHit.advantage,
+            type,
+          };
+
+        // Tag-only virtual fields. Useful for queries like
+        // "hitTags contains KND" that don't conflate the numeric channel.
+        case "blockTags":
+          return {
+            string: outcomeTagSearchString(move.block) || null,
+            number: null,
+            type,
+          };
+        case "hitTags":
+          return {
+            string: outcomeTagSearchString(move.hit) || null,
+            number: null,
+            type,
+          };
+        case "counterHitTags":
+          return {
+            string: outcomeTagSearchString(move.counterHit) || null,
+            number: null,
+            type,
+          };
+
+        case "guardBurst":
+          return {
+            string: move.guardBurst != null ? String(move.guardBurst) : null,
+            number: move.guardBurst ?? null,
+            type,
+          };
+        case "properties":
+          return {
+            string:
+              move.properties.length > 0 ? move.properties.join(" ") : null,
+            number: null,
+            type,
+          };
+        case "notes":
+          return { string: move.notes, number: null, type };
+        default:
+          return { string: null, number: null, type };
+      }
+    },
+    [fieldMap],
+  );
+
+  const applyFilterItem = useCallback(
+    (move: Move, item: FilterItem): boolean => {
+      if (item.type === "group") {
+        if (item.operator === "and") {
+          return item.filters.every((f) => applyFilterItem(move, f));
+        }
         return item.filters.some((f) => applyFilterItem(move, f));
       }
-    } else {
       const op = opsById.get(item.condition);
       if (!op) return true;
       const f = getFieldAs(move, item.field);
@@ -455,8 +528,9 @@ export const FrameDataTable: React.FC = () => {
         value: item.value,
         value2: item.value2,
       });
-    }
-  }, [opsById, getFieldAs]);
+    },
+    [opsById, getFieldAs],
+  );
 
   const displayedMoves = useMemo(() => {
     if (originalMoves.length === 0) return [];
@@ -472,7 +546,6 @@ export const FrameDataTable: React.FC = () => {
       const fieldConfig =
         SORT_FIELD_MAP[sortColumn as keyof typeof SORT_FIELD_MAP];
       if (fieldConfig) {
-        // Create a copy before sorting to avoid mutating originalMoves or cached data
         result = [...result];
         const comparator = createOptimizedComparator(
           sortDirection,
@@ -483,19 +556,22 @@ export const FrameDataTable: React.FC = () => {
       }
     }
     return result;
-  }, [sortColumn, originalMoves, activeFilters, sortDirection, applyFilterItem]);
+  }, [
+    sortColumn,
+    originalMoves,
+    activeFilters,
+    sortDirection,
+    applyFilterItem,
+  ]);
 
-  // Use deferred value to prevent blocking UI during heavy data processing
   const deferredMoves = useDeferredValue(displayedMoves);
   const deferredSelectedCharacterId = useDeferredValue(selectedCharacterId);
   const deferredVisibleColumns = useDeferredValue(visibleColumns);
   const isStale = deferredMoves !== displayedMoves;
 
   const handleExport = (format: "csv" | "excel") => {
-    // Use currently visible (filtered + sorted) moves
     const rows = displayedMoves;
     if (!rows || rows.length === 0) return;
-    // Build headers from visible columns (skip non-data if any)
     const headers = visibleColumns.map((c) => c.label);
     const fieldIds = visibleColumns.map((c) => c.id);
     const escape = (v: any) => {
@@ -519,7 +595,10 @@ export const FrameDataTable: React.FC = () => {
             case "rawCommand":
               return m.stringCommand;
             case "input":
-              return [m.stance ? m.stance.join(" ") : null, m.command ? m.command.join(" ") : null]
+              return [
+                m.stance ? m.stance.join(" ") : null,
+                m.command ? m.command.join(" ") : null,
+              ]
                 .filter(Boolean)
                 .join(" ");
             case "hitLevel":
@@ -527,17 +606,17 @@ export const FrameDataTable: React.FC = () => {
             case "impact":
               return m.impact;
             case "damage":
-              return m.damageDec ?? m.damage;
+              return m.damage.total ?? m.damage.raw ?? "";
             case "block":
-              return m.blockDec ?? m.block;
+              return formatOutcome(m.block);
             case "hit":
-              return m.hitDec ?? m.hit;
+              return formatOutcome(m.hit);
             case "counterHit":
-              return m.counterHitDec ?? m.counterHit;
+              return formatOutcome(m.counterHit);
             case "guardBurst":
-              return m.guardBurst;
+              return m.guardBurst ?? "";
             case "properties":
-              return m.properties ? m.properties.join(", ") : "";
+              return m.properties.length > 0 ? m.properties.join(", ") : "";
             case "notes":
               return m.notes;
             default:
@@ -559,7 +638,9 @@ export const FrameDataTable: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${selectedGame.id || "export"}_${selectedCharacterId === -1 ? "All" : selectedCharacterId}.${ext}`;
+    a.download = `${selectedGame.id || "export"}_${
+      selectedCharacterId === -1 ? "All" : selectedCharacterId
+    }.${ext}`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -570,12 +651,10 @@ export const FrameDataTable: React.FC = () => {
     setActiveFilters(filters);
   }, []);
 
-  // Sync toolbar context with current state
   useEffect(() => {
     setActiveFiltersCount(activeFilters.length);
   }, [activeFilters.length, setActiveFiltersCount]);
 
-  // Keep export handler ref updated
   useEffect(() => {
     exportHandler.current = handleExport;
     return () => {
@@ -623,16 +702,15 @@ export const FrameDataTable: React.FC = () => {
                 <Skeleton className="h-10 w-24" />
               </div>
             ) : (
-              <FilterBuilder
-                onFiltersChange={handleFiltersChange}
-              />
+              <FilterBuilder onFiltersChange={handleFiltersChange} />
             )}
           </div>
           <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
             <div
               className={cn(
                 "flex-1 min-h-0 h-full",
-                (isStale || isPlaceholderData) && "opacity-70 transition-opacity",
+                (isStale || isPlaceholderData) &&
+                  "opacity-70 transition-opacity",
               )}
             >
               <FrameDataTableContent

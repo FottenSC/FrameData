@@ -1,5 +1,11 @@
-import { useQuery, useQueryClient, QueryClient, keepPreviousData } from "@tanstack/react-query";
+import {
+  useQuery,
+  useQueryClient,
+  QueryClient,
+  keepPreviousData,
+} from "@tanstack/react-query";
 import { Move } from "@/types/Move";
+import { DEFAULT_OUTCOME_TAGS, parseOutcome } from "@/lib/parseOutcome";
 
 interface Character {
   id: number;
@@ -8,28 +14,37 @@ interface Character {
 
 type ApplyNotationFn = (cmd: string | null) => string | null;
 
-// Simple interning for common strings to save memory
+// ---------- String interning ----------
+//
+// Large characters generate thousands of Move objects whose stance/command/hit-level
+// strings are overwhelmingly drawn from a small vocabulary. Interning those common
+// short strings collapses them to a single JS heap object and cuts allocation churn
+// dramatically.
+//
+// We deliberately do NOT intern notes or unique commands (length > 40) — those
+// are almost always unique and interning them would defeat GC.
 const stringCache = new Map<string, string>();
-// Use WeakMap to cache notation results per applyNotation function instance
-// This ensures that when notation settings change (new function), we get a fresh cache
-// and the old cache is garbage collected.
-const notationCache = new WeakMap<ApplyNotationFn, Map<string, string | null>>();
+
+// Notation-application cache. Keyed by the applyNotation function *identity* so
+// that changing notation settings (which creates a new function) invalidates the
+// old cache automatically via WeakMap.
+const notationCache = new WeakMap<
+  ApplyNotationFn,
+  Map<string, string | null>
+>();
 
 export function clearStringCache() {
   stringCache.clear();
-  // notationCache is self-cleaning via WeakMap
 }
 
+/** @deprecated the notation cache now self-cleans via WeakMap. */
 export function clearNotationCache() {
-  // No-op with WeakMap implementation
+  // no-op retained for call-site compatibility
 }
 
 function intern(s: string | null): string | null {
   if (s === null) return null;
-  // Only intern short strings that are likely to be repeated (stances, hit levels, buttons)
-  // Long strings like notes or unique commands should not be interned as it prevents GC
   if (s.length > 40) return s;
-  
   const cached = stringCache.get(s);
   if (cached !== undefined) return cached;
   stringCache.set(s, s);
@@ -41,33 +56,30 @@ function cachedApplyNotation(
   applyNotation: ApplyNotationFn,
 ): string | null {
   if (cmd === null) return null;
-  
   let fnCache = notationCache.get(applyNotation);
   if (!fnCache) {
     fnCache = new Map();
     notationCache.set(applyNotation, fnCache);
   }
-  
   const cached = fnCache.get(cmd);
   if (cached !== undefined) return cached;
-  
   const result = applyNotation(cmd);
   fnCache.set(cmd, result);
   return result;
 }
 
-// Fetch functions
+// ---------- Data fetching ----------
+
 async function fetchCharactersList(gameId: string): Promise<Character[]> {
-  const res = await fetch(
-    `/Games/${encodeURIComponent(gameId)}/Game.json`,
-  );
-  if (!res.ok)
-    throw new Error(`Failed to fetch game data: ${res.status}`);
+  const res = await fetch(`/Games/${encodeURIComponent(gameId)}/Game.json`);
+  if (!res.ok) throw new Error(`Failed to fetch game data: ${res.status}`);
   const data = await res.json();
-  return (Array.isArray(data?.characters) ? data.characters : []).map((c: any) => ({
-    id: Number(c.id),
-    name: intern(String(c.name))!,
-  }));
+  return (Array.isArray(data?.characters) ? data.characters : []).map(
+    (c: any) => ({
+      id: Number(c.id),
+      name: intern(String(c.name))!,
+    }),
+  );
 }
 
 export async function fetchCharacterMoves(
@@ -77,105 +89,108 @@ export async function fetchCharacterMoves(
   applyNotation: ApplyNotationFn,
 ): Promise<Move[]> {
   const res = await fetch(
-    `/Games/${encodeURIComponent(gameId)}/Characters/${encodeURIComponent(String(characterId))}.json`,
+    `/Games/${encodeURIComponent(gameId)}/Characters/${encodeURIComponent(
+      String(characterId),
+    )}.json`,
   );
   if (!res.ok) return [];
   const data = await res.json();
   if (!Array.isArray(data)) return [];
 
   const internedCharName = intern(characterName)!;
-
-  // Process moves and then clear the raw data reference
-  const processed = data.map((m: any) =>
+  return data.map((m: any) =>
     processMove(m, characterId, internedCharName, applyNotation),
   );
-  return processed;
 }
 
+// ---------- Normalization ----------
+
+/** Normalize a string-or-array-of-strings source field into a string[]|null. */
+function toStringArray(raw: unknown): string[] | null {
+  if (raw == null) return null;
+  const arr = Array.isArray(raw) ? raw : [raw];
+  const out: string[] = [];
+  for (const v of arr) {
+    if (v != null && String(v).length > 0) {
+      out.push(intern(String(v))!);
+    }
+  }
+  return out.length > 0 ? out : null;
+}
+
+/** Normalize the `Properties` field — never null, always a string[]. */
+function toPropertyArray(raw: unknown): string[] {
+  return toStringArray(raw) ?? [];
+}
+
+/**
+ * Convert a single raw JSON move object into the rich in-memory {@link Move}.
+ *
+ * The raw shape uses SC6-era field names ("HitDec", "CounterHit", etc.) and
+ * represents an outcome as either a string or number. We parse these into
+ * structured {@link MoveOutcome} values.
+ */
 function processMove(
-  moveObject: any,
+  raw: any,
   charId: number,
   charName: string,
   applyNotation: ApplyNotationFn,
 ): Move {
-  const rawCommand = moveObject.Command;
-  const mappedCommand =
-    rawCommand != null
-      ? Array.isArray(rawCommand)
-        ? rawCommand.map((cmd: any) =>
-            intern(cachedApplyNotation(String(cmd), applyNotation) ?? String(cmd))!,
-          )
-        : [
-            intern(
-              cachedApplyNotation(String(rawCommand), applyNotation) ??
-                String(rawCommand),
-            )!,
-          ]
-      : null;
+  const mappedCommand = (() => {
+    const cmd = raw.Command;
+    if (cmd == null) return null;
+    const arr = Array.isArray(cmd) ? cmd : [cmd];
+    const out: string[] = [];
+    for (const c of arr) {
+      const mapped = cachedApplyNotation(String(c), applyNotation) ?? String(c);
+      out.push(intern(mapped)!);
+    }
+    return out.length > 0 ? out : null;
+  })();
 
-  const move: Move = {
-    id: Number(moveObject.ID),
-    stringCommand: moveObject.stringCommand != null ? String(moveObject.stringCommand) : null,
-    command: mappedCommand,
+  // Parse outcomes. Note: the raw JSON stores both the string form (e.g. "Hit")
+  // and the pre-parsed numeric form (e.g. "HitDec"). We feed both to parseOutcome
+  // so we get the benefit of the authoritative numeric hint while still
+  // recovering tags like KND/LNC from the string.
+  const block = parseOutcome(
+    typeof raw.Block === "string" ? raw.Block : null,
+    raw.BlockDec != null ? Number(raw.BlockDec) : null,
+    DEFAULT_OUTCOME_TAGS,
+  );
+  const hit = parseOutcome(
+    typeof raw.Hit === "string" ? raw.Hit : null,
+    raw.HitDec != null ? Number(raw.HitDec) : null,
+    DEFAULT_OUTCOME_TAGS,
+  );
+  const counterHit = parseOutcome(
+    typeof raw.CounterHit === "string" ? raw.CounterHit : null,
+    raw.CounterHitDec != null ? Number(raw.CounterHitDec) : null,
+    DEFAULT_OUTCOME_TAGS,
+  );
+
+  return {
+    id: Number(raw.ID),
     characterId: charId,
     characterName: charName,
-    stance: (() => {
-      const raw = moveObject.Stance;
-      if (!raw) return null;
-      if (Array.isArray(raw)) {
-        const arr = [];
-        for (const s of raw) {
-          if (s != null) arr.push(intern(String(s))!);
-        }
-        return arr.length > 0 ? arr : null;
-      }
-      return [intern(String(raw))!];
-    })(),
-    hitLevel: (() => {
-      const raw = moveObject.HitLevel;
-      if (!raw) return null;
-      if (Array.isArray(raw)) {
-        const arr = [];
-        for (const s of raw) {
-          if (s != null) arr.push(intern(String(s))!);
-        }
-        return arr.length > 0 ? arr : null;
-      }
-      return [intern(String(raw))!];
-    })(),
-    impact: moveObject.Impact != null ? Number(moveObject.Impact) : 0,
-    damage: moveObject.Damage != null ? intern(String(moveObject.Damage)) : null,
-    damageDec:
-      moveObject.DamageDec != null ? Number(moveObject.DamageDec) : 0,
-    block: moveObject.Block != null ? intern(String(moveObject.Block)) : null,
-    blockDec: moveObject.BlockDec != null ? Number(moveObject.BlockDec) : 0,
-    hit: moveObject.Hit != null ? intern(String(moveObject.Hit)) : null,
-    hitDec: moveObject.HitDec != null ? Number(moveObject.HitDec) : 0,
-    counterHit:
-      moveObject.CounterHit != null ? intern(String(moveObject.CounterHit)) : null,
-    counterHitDec:
-      moveObject.CounterHitDec != null
-        ? Number(moveObject.CounterHitDec)
-        : 0,
-    guardBurst:
-      moveObject.GuardBurst != null ? Number(moveObject.GuardBurst) : 0,
-    properties: (() => {
-      const raw = moveObject.Properties;
-      if (!raw) return null;
-      if (Array.isArray(raw)) {
-        const arr = [];
-        for (const p of raw) {
-          if (p != null) arr.push(intern(String(p))!);
-        }
-        return arr.length > 0 ? arr : null;
-      }
-      return [intern(String(raw))!];
-    })(),
-    notes: moveObject.Notes != null ? String(moveObject.Notes) : null,
+    stringCommand: raw.stringCommand != null ? String(raw.stringCommand) : null,
+    command: mappedCommand,
+    stance: toStringArray(raw.Stance),
+    hitLevel: toStringArray(raw.HitLevel),
+    impact: raw.Impact != null ? Number(raw.Impact) : null,
+    damage: {
+      raw: raw.Damage != null ? intern(String(raw.Damage)) : null,
+      total: raw.DamageDec != null ? Number(raw.DamageDec) : null,
+    },
+    block,
+    hit,
+    counterHit,
+    guardBurst: raw.GuardBurst != null ? Number(raw.GuardBurst) : null,
+    properties: toPropertyArray(raw.Properties),
+    notes: raw.Notes != null ? String(raw.Notes) : null,
   };
-
-  return move;
 }
+
+// ---------- Query hook ----------
 
 async function fetchAllCharactersMoves(
   gameId: string,
@@ -183,20 +198,16 @@ async function fetchAllCharactersMoves(
   queryClient: QueryClient,
   characters: Character[],
 ): Promise<Move[]> {
-  // Fetch all characters in parallel. Browsers will handle connection pooling (usually 6-10 at a time).
-  // This is significantly faster than sequential chunking while still being memory-efficient
-  // because JSON parsing and processing are interleaved with network requests.
   const allResults = await Promise.all(
     characters.map((char) =>
       queryClient.fetchQuery({
         queryKey: ["moves", gameId, char.id],
         queryFn: () =>
           fetchCharacterMoves(gameId, char.id, char.name, applyNotation),
-        staleTime: 1000 * 60 * 30, // 30 minutes
+        staleTime: 1000 * 60 * 30,
       }),
     ),
   );
-
   return allResults.flat();
 }
 
@@ -219,25 +230,21 @@ export function useMoves({
     queryKey: ["moves", gameId, characterId],
     queryFn: async () => {
       if (!gameId || characterId === null) return [];
-
       if (characterId === -1) {
-        // All characters
-        return fetchAllCharactersMoves(gameId, applyNotation, queryClient, characters);
-      } else {
-        // Single character
-        const charName =
-          characters.find((c) => c.id === characterId)?.name || "Unknown";
-        return fetchCharacterMoves(
+        return fetchAllCharactersMoves(
           gameId,
-          characterId,
-          charName,
           applyNotation,
+          queryClient,
+          characters,
         );
       }
+      const charName =
+        characters.find((c) => c.id === characterId)?.name || "Unknown";
+      return fetchCharacterMoves(gameId, characterId, charName, applyNotation);
     },
     enabled: !!gameId && characterId !== null,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: characterId === -1 ? 1000 * 60 * 5 : 1000 * 60 * 15, // 5 mins for All, 15 mins for single
+    staleTime: 1000 * 60 * 5,
+    gcTime: characterId === -1 ? 1000 * 60 * 5 : 1000 * 60 * 15,
     placeholderData: keepPreviousData,
   });
 }

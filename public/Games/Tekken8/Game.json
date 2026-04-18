@@ -1,4 +1,26 @@
 {
+  "outcomeTags": {
+    "KND": {
+      "name": "Knockdown",
+      "description": "Puts the opponent on the ground.",
+      "className": "bg-indigo-700 text-white border-white"
+    },
+    "LNC": {
+      "name": "Launch",
+      "description": "Sends the opponent into the air for a juggle.",
+      "className": "bg-rose-700 text-white border-white"
+    },
+    "STN": {
+      "name": "Stun",
+      "description": "Opponent is stunned and cannot act for a period.",
+      "className": "bg-amber-700 text-white border-white"
+    },
+    "JGL": {
+      "name": "Juggle",
+      "description": "Hits an airborne opponent.",
+      "className": "bg-amber-800 text-white border-white"
+    }
+  },
   "hitLevels": {
     "H": {
       "name": "High",

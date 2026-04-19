@@ -9,7 +9,6 @@ import {
   ChipTooltipContent,
   type SourceChannel,
 } from "@/components/ui/chip-tooltip";
-import { DEFAULT_OUTCOME_TAGS } from "@/lib/parseOutcome";
 
 type BadgeMap = Record<string, { className: string }>;
 
@@ -47,15 +46,12 @@ interface AdvantagePillProps {
 }
 
 const pillBackground = (advantage: number | null, tone: PillTone): string => {
-  // Null = "no numeric data" — uses the project's unified neutral grey.
-  // Any tag information (KND / LNC / STN / …) lives in the Properties column
-  // with its own stone-600 chip; we deliberately don't echo the raw tag into
-  // this pill so players never see the same value styled two different ways.
-  if (advantage === null) return "bg-zinc-700";
-  // Guard damage is a non-negative counter — colour needs to be visually
-  // distinct from advantage pills (so it doesn't read as "positive") without
-  // competing for attention. Stone sits between the cool neutral zinc and
-  // the outcome-tag chips for a subtle differentiation.
+  // Null "—" pill shares the project's single neutral grey (stone-600) with
+  // guard-damage and the outcome-tag chips. One grey across the whole app so
+  // "no data" in one column and an outcome tag in another don't read as two
+  // different states. Contrast with green/rose advantage pills is plenty to
+  // tell null apart from a real number at a glance.
+  if (advantage === null) return "bg-stone-600";
   if (tone === "guard") return "bg-stone-600";
   return advantage >= 0 ? "bg-green-700" : "bg-rose-700";
 };
@@ -143,16 +139,13 @@ export const PropertyChip = memo<PropertyChipProps>(
     // Colour resolution, in priority order:
     //   1. explicit className from Game.json#properties (authored per-tag)
     //   2. per-game `badges` fallback map (legacy override path)
-    //   3. stone-600 "outcome tag family" colour when the code is a known
-    //      outcome tag — so JGL / UB / GB / BREAK / DZY / SLC match the
-    //      KND / STN / LNC look without each game having to list them
-    //   4. zinc-700 neutral for truly unknown codes
+    //   3. stone-600 neutral — same grey used by null advantage pills and
+    //      guard damage. Unknown codes and outcome tags without a specific
+    //      style both land here so the whole app shares one neutral grey.
     const className =
       (info?.className && info.className.trim()) ||
       badges?.[tag]?.className ||
-      (DEFAULT_OUTCOME_TAGS.has(tag)
-        ? "bg-stone-600 text-white"
-        : "bg-zinc-700 text-white");
+      "bg-stone-600 text-white";
 
     const chip = (
       <Badge

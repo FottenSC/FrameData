@@ -22,39 +22,58 @@ type BadgeMap = Record<string, { className: string }>;
 // move do" vocabulary lives together. That leaves these cells with a single
 // job: show the frame advantage.
 
+/**
+ * Visual tone of an {@link AdvantagePill}.
+ *
+ *   - `"advantage"` (default) — bi-polar frame advantage: green when ≥ 0,
+ *     rose when < 0, gray when null. Used by Block / Hit / Counter-hit.
+ *   - `"guard"` — neutral counter (guard damage etc.) that's always a positive
+ *     integer. Rendered in amber so it's visually distinct from frame
+ *     advantage cells and still has colour instead of dead gray.
+ */
+type PillTone = "advantage" | "guard";
+
 interface AdvantagePillProps {
-  /** Numeric frame advantage, or null when unspecified. */
+  /** Numeric value, or null when unspecified. */
   advantage: number | null;
   /**
-   * Fallback string shown when there's no numeric advantage (e.g. moves
-   * authored as "KND" with no number). Typically `outcome.raw`.
+   * Fallback string shown when there's no numeric value (e.g. moves authored
+   * as "KND" with no number). Typically `outcome.raw`.
    */
   fallbackText?: string | null;
-  /** Drop the +/- sign (for counters like guard burst). */
+  /**
+   * Drop the +/- sign from the label. Independent of colour — use `tone` for
+   * visual variant. Enabled automatically when `tone="guard"`.
+   */
   forceNoSign?: boolean;
+  /** Visual variant; see {@link PillTone}. */
+  tone?: PillTone;
 }
 
-const pillClass = (advantage: number | null, forceNoSign: boolean): string => {
+const pillBackground = (advantage: number | null, tone: PillTone): string => {
   if (advantage === null) return "bg-gray-700";
-  if (forceNoSign) return "bg-zinc-700";
+  if (tone === "guard") return "bg-amber-700";
   return advantage >= 0 ? "bg-green-700" : "bg-rose-700";
 };
 
 export const AdvantagePill = memo<AdvantagePillProps>(
-  ({ advantage, fallbackText, forceNoSign = false }) => {
+  ({ advantage, fallbackText, forceNoSign, tone = "advantage" }) => {
+    // Guard tone always uses the bare number — signs would be nonsensical
+    // (guard damage is a non-negative counter).
+    const suppressSign = forceNoSign ?? tone === "guard";
     const hasAdvantage = advantage !== null;
 
     const label = hasAdvantage
-      ? !forceNoSign && advantage! > 0
+      ? !suppressSign && advantage! > 0
         ? "+" + advantage
         : String(advantage)
       : (fallbackText ?? "—");
 
     return (
       <Badge
-        className={`${pillClass(
+        className={`${pillBackground(
           advantage,
-          forceNoSign,
+          tone,
         )} text-white w-12 inline-flex items-center justify-center`}
       >
         {label}

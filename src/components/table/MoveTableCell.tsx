@@ -184,7 +184,7 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
 
       case "guardBurst":
         return (
-          <AdvantagePill advantage={move.guardBurst ?? null} forceNoSign />
+          <AdvantagePill advantage={move.guardBurst ?? null} tone="guard" />
         );
 
       // --- Properties column: one chip per unique property. Chips aggregate

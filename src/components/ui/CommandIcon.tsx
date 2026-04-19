@@ -5,12 +5,21 @@ interface CommandIconProps {
   input: string;
   isHeld: boolean;
   isSlide: boolean;
+  /**
+   * Only meaningful when `isSlide` is true. When set, the slide pill pulls
+   * its right-hand neighbour ~half a slide-width leftward so the two overlap.
+   * Should only be passed when the caller has confirmed the next element is
+   * a regular button — otherwise (slide-next-to-slide, trailing slide, slide
+   * before a separator) we leave them side-by-side.
+   */
+  overlapNext?: boolean;
 }
 
 export const CommandIcon: React.FC<CommandIconProps> = ({
   input,
   isHeld,
   isSlide,
+  overlapNext = false,
 }) => {
   let baseClasses = "border border-black bg-white text-black rounded";
   let heldClasses = "bg-black text-white border border-white rounded";
@@ -19,12 +28,14 @@ export const CommandIcon: React.FC<CommandIconProps> = ({
   const sizeClasses = isSlide
     ? "w-3.5 h-3.5 text-[11px]"
     : "w-5 h-5 text-[16px]";
-  // A negative right-margin tucks the slide's right half *under* whatever
-  // follows. In practice the thing following a slide is a normal button
-  // (e.g. `aB`, `bK`), which then sits half-overlapping the slide — visually
-  // communicating "this small input leads into that main press". When a
-  // slide happens to be the last element the negative margin is a no-op.
-  const marginClasses = isSlide ? "-mr-2" : "mx-0.25";
+  // Negative right-margin pulls the next element ~half a slide-width to the
+  // left so they overlap. Only applied when caller confirmed the next thing
+  // is a regular button; a slide followed by another slide stays tidy.
+  const marginClasses = isSlide ? (overlapNext ? "-mr-2" : "") : "mx-0.25";
+  // Slides render ABOVE their overlapping normal neighbour so the full slide
+  // pill stays visible — the normal button's left edge sits underneath the
+  // slide's right edge, not vice versa.
+  const zClasses = isSlide ? "z-20" : "z-10";
 
   return (
     <div
@@ -34,7 +45,8 @@ export const CommandIcon: React.FC<CommandIconProps> = ({
         marginClasses,
         isSlide ? "self-end" : "",
         "button-icon",
-        "relative z-10",
+        "relative",
+        zClasses,
         isHeld ? heldClasses : baseClasses,
       )}
       title={`${input} Button${isHeld ? " (Held)" : ""}`}

@@ -44,13 +44,46 @@ const CommandRendererInner: React.FC<{ command: string[] | null }> = ({
 
   if (!command || command.length === 0) return <>—</>;
 
+  /**
+   * Peek at the token that will be rendered *after* the one at (i, j), and
+   * tell the caller whether it's a normal button. Used exclusively to decide
+   * whether a slide pill should pull its right-hand neighbour leftward for
+   * the overlap look — slide → normal overlaps, slide → anything else does
+   * not (so slide-next-to-slide, trailing slide, slide-before-separator all
+   * render tidily side-by-side).
+   */
+  const peekNextIsNormalButton = (i: number, j: number): boolean => {
+    let nextRaw: string | undefined;
+    // First try the next "+"-separated chunk within the same command part.
+    if (j + 1 < buttons.length) {
+      nextRaw = buttons[j + 1];
+    } else if (i + 1 < command.length) {
+      // Fall through to the first chunk of the next command part.
+      const nextPart = command[i + 1];
+      nextRaw = nextPart?.split("+")[0];
+    }
+    if (!nextRaw) return false;
+    // Strip held-button parens.
+    const stripped = nextRaw.replace(/[()]/g, "");
+    if (!stripped || stripped === "_") return false;
+    // Directions in the active style aren't buttons.
+    if (directionSet.has(stripped)) return false;
+    // Slides are flagged by lowercase first char.
+    const c = stripped[0];
+    if (c >= "a" && c <= "z") return false;
+    return true;
+  };
+
   const parts: React.ReactNode[] = [];
+  let buttons: string[] = [];
 
   for (let i = 0; i < command.length; i++) {
     const commandPart = command[i];
 
-    // Split by + to get individual buttons in this command part
-    const buttons = commandPart.split("+");
+    // Split by + to get individual buttons in this command part. Assigning
+    // (not re-declaring) so `peekNextIsNormalButton` above can close over
+    // the current iteration's array.
+    buttons = commandPart.split("+");
 
     for (let j = 0; j < buttons.length; j++) {
       const buttonStr = buttons[j];
@@ -160,6 +193,7 @@ const CommandRendererInner: React.FC<{ command: string[] | null }> = ({
           input={button}
           isHeld={isHeld}
           isSlide={isSlide}
+          overlapNext={isSlide && peekNextIsNormalButton(i, j)}
         />,
       );
     }

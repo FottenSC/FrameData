@@ -9,6 +9,7 @@ import {
   ChipTooltipContent,
   type SourceChannel,
 } from "@/components/ui/chip-tooltip";
+import { DEFAULT_OUTCOME_TAGS } from "@/lib/parseOutcome";
 
 type BadgeMap = Record<string, { className: string }>;
 
@@ -139,12 +140,19 @@ function sourceChannels(sources: PropertySources): SourceChannel[] {
 
 export const PropertyChip = memo<PropertyChipProps>(
   ({ tag, info, badges, sources }) => {
-    // Fallback matches the AdvantagePill null pill so an untagged / unknown
-    // outcome chip sits in the same neutral grey as the rest of the app.
+    // Colour resolution, in priority order:
+    //   1. explicit className from Game.json#properties (authored per-tag)
+    //   2. per-game `badges` fallback map (legacy override path)
+    //   3. stone-600 "outcome tag family" colour when the code is a known
+    //      outcome tag — so JGL / UB / GB / BREAK / DZY / SLC match the
+    //      KND / STN / LNC look without each game having to list them
+    //   4. zinc-700 neutral for truly unknown codes
     const className =
       (info?.className && info.className.trim()) ||
       badges?.[tag]?.className ||
-      "bg-zinc-700 text-white";
+      (DEFAULT_OUTCOME_TAGS.has(tag)
+        ? "bg-stone-600 text-white"
+        : "bg-zinc-700 text-white");
 
     const chip = (
       <Badge

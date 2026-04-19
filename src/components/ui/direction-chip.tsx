@@ -22,8 +22,11 @@ export const DirectionChip = React.memo(
           className={cn(
             "inline-flex items-center justify-center font-bold align-middle font-sans rounded cursor-default",
             "min-w-5 h-5 px-1 text-[13px] relative z-10 border",
+            // Held state mirrors CommandIcon's held button (bg-black + white
+            // border), so "press and hold this input" reads the same visual
+            // way whether the token is a direction or a button.
             isHeld
-              ? "bg-sky-600 text-white border-white"
+              ? "bg-black text-white border-white"
               : "bg-zinc-800 text-zinc-100 border-zinc-500",
           )}
         >

@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { ChevronDown, ChevronRight, X } from "lucide-react";
+import { ChevronDown, ChevronRight, Search, X } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -700,6 +700,11 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
           )}
         />
         <h3 className="text-sm font-medium">Advanced filters</h3>
+        {activeCount > 0 && (
+          <span className="text-xs text-muted-foreground">
+            {activeCount} active
+          </span>
+        )}
       </div>
 
       <div
@@ -712,6 +717,30 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
       >
         <div className="overflow-hidden">
           <div className="space-y-2 pt-1">
+            {/*
+              Pinned chip surfaces the active quick-search inside the
+              advanced view so the two aren't visually disconnected. Editing
+              the query still happens in the top search box — this chip is
+              just a "reminder you have this on" with a one-click clear.
+            */}
+            {quickSearch.trim() !== "" && (
+              <div className="flex items-center gap-2 rounded-md border border-primary/30 bg-primary/5 px-3 py-1.5 text-xs">
+                <Search className="h-3.5 w-3.5 text-primary shrink-0" />
+                <span className="text-muted-foreground">Quick search:</span>
+                <span className="font-mono text-foreground truncate">
+                  “{quickSearch}”
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setQuickSearch("")}
+                  className="ml-auto inline-flex h-5 w-5 items-center justify-center rounded hover:bg-primary/15 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="Clear quick search"
+                  title="Clear quick search"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            )}
             <FilterGroupRow
               group={{
                 id: "root",

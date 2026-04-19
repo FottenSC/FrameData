@@ -29,6 +29,7 @@ import { getGameFilterConfig } from "../filters/gameFilterConfigs";
 import type { FieldConfig, FieldType, FilterOperator } from "../filters/types";
 import { useMoves, clearNotationCache } from "@/hooks/useMoves";
 import { getAccessor } from "@/lib/moveAccessors";
+import { matchesQuickSearch, parseQuickSearch } from "@/lib/quickSearch";
 
 /**
  * Generic comparator factory. Accepts a primitive-valued getter and produces
@@ -108,6 +109,12 @@ export const FrameDataTable: React.FC = () => {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const [activeFilters, setActiveFilters] = useState<FilterItem[]>([]);
+  const [quickSearchRaw, setQuickSearchRaw] = useState("");
+  // Parse the quick-search once per change and reuse across every row.
+  const parsedQuickSearch = useMemo(
+    () => parseQuickSearch(quickSearchRaw),
+    [quickSearchRaw],
+  );
 
   const baseColumns = getVisibleColumns();
   const visibleColumns = useMemo(
@@ -347,6 +354,15 @@ export const FrameDataTable: React.FC = () => {
     if (originalMoves.length === 0) return [];
     let result = originalMoves;
 
+    // Quick-search runs BEFORE the advanced-filter pipeline because it's
+    // usually the biggest narrowing step (e.g. `char:amy` drops 90%+ of All
+    // Characters before any structured filters need to evaluate).
+    if (!parsedQuickSearch.isEmpty) {
+      result = result.filter((move) =>
+        matchesQuickSearch(move, parsedQuickSearch),
+      );
+    }
+
     if (activeFilters.length > 0) {
       result = result.filter((move) =>
         activeFilters.every((filter) => applyFilterItem(move, filter)),
@@ -370,6 +386,7 @@ export const FrameDataTable: React.FC = () => {
     sortColumn,
     originalMoves,
     activeFilters,
+    parsedQuickSearch,
     sortDirection,
     applyFilterItem,
   ]);
@@ -426,9 +443,16 @@ export const FrameDataTable: React.FC = () => {
     setActiveFilters(filters);
   }, []);
 
+  const handleQuickSearchChange = useCallback((q: string) => {
+    setQuickSearchRaw(q);
+  }, []);
+
+  // The toolbar badge counts everything that's actively narrowing the list —
+  // advanced filters and a non-empty quick-search (as one).
   useEffect(() => {
-    setActiveFiltersCount(activeFilters.length);
-  }, [activeFilters.length, setActiveFiltersCount]);
+    const quickActive = parsedQuickSearch.isEmpty ? 0 : 1;
+    setActiveFiltersCount(activeFilters.length + quickActive);
+  }, [activeFilters.length, parsedQuickSearch, setActiveFiltersCount]);
 
   useEffect(() => {
     exportHandler.current = handleExport;
@@ -477,7 +501,10 @@ export const FrameDataTable: React.FC = () => {
                 <Skeleton className="h-10 w-24" />
               </div>
             ) : (
-              <FilterBuilder onFiltersChange={handleFiltersChange} />
+              <FilterBuilder
+                onFiltersChange={handleFiltersChange}
+                onQuickSearchChange={handleQuickSearchChange}
+              />
             )}
           </div>
           <div className="flex-1 min-h-0 flex flex-col overflow-hidden">

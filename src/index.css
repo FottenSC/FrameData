@@ -104,9 +104,14 @@
 /*
  * Toast countdown progress bar.
  *
- * Drives the little bar that slides from full-width to zero over a toast's
- * lifetime. The duration is injected via the inline `animation-duration`
- * style, so a single class handles any length.
+ * Any Sonner toast that carries the `copied-toast` class (see
+ * `showCopiedToast` in src/components/ui/copy-toast.tsx) gets a 2px progress
+ * rail at the bottom that scales from full → zero over the toast's lifetime.
+ *
+ * The animation duration is driven by the `--toast-duration` custom property
+ * set inline per toast, so a single CSS rule handles any length. We target
+ * the Sonner wrapper (`[data-sonner-toast]`) so the rule works regardless of
+ * Sonner's `unstyled` / `richColors` state.
  */
 @keyframes toastProgress {
   from {
@@ -116,11 +121,22 @@
     transform: scaleX(0);
   }
 }
-.animate-toast-progress {
-  animation-name: toastProgress;
-  animation-timing-function: linear;
-  animation-fill-mode: forwards;
+
+[data-sonner-toast].copied-toast {
+  position: relative;
+  overflow: hidden;
+}
+[data-sonner-toast].copied-toast::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: currentColor;
+  opacity: 0.55;
   transform-origin: left center;
+  animation: toastProgress var(--toast-duration, 1800ms) linear forwards;
 }
 
 .character-grid-container {

@@ -7,11 +7,12 @@ function App() {
   return (
     <TooltipProvider>
       {/*
-        Toaster is rendered unstyled — individual call sites produce their own
-        JSX (see `showCopiedToast`) so every toast can carry its own visual
-        language, icon and countdown.
+        `richColors` opts into Sonner's success/info/warning/error palettes so
+        copied / saved / error toasts get the appropriate accent automatically.
+        Per-toast extras (like the countdown bar on `showCopiedToast`) are
+        applied via classNames + CSS custom properties in `index.css`.
       */}
-      <Toaster position="top-left" theme="dark" />
+      <Toaster position="top-left" theme="dark" richColors />
       <RouterProvider router={router} />
     </TooltipProvider>
   );

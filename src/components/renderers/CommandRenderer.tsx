@@ -89,13 +89,19 @@ const CommandRendererInner: React.FC<{ command: string[][] | null }> = ({
     // Split by + to get individual buttons within this alternative token.
     const buttons = token.split("+");
 
+    // Local buffer so a compound like "A+G" becomes ONE flex-child at the
+    // outer level. Without this, each button and each "+" icon is its own
+    // flex item, and the outer flex-wrap will happily break "A" to one
+    // line and "+G" to the next.
+    const tokenChildren: React.ReactNode[] = [];
+
     for (let j = 0; j < buttons.length; j++) {
       const buttonStr = buttons[j];
       if (!buttonStr) continue;
 
       // "+" separator between buttons in the same "A+G" / "B+K" chunk.
       if (j > 0) {
-        parts.push(
+        tokenChildren.push(
           <span
             key={`plus-${tokenBranchKey}-${j}`}
             className="relative inline-flex items-center justify-center w-3 h-3 border border-black bg-white text-black rounded-full mx-[-5px] z-20 align-middle plus-separator"
@@ -135,7 +141,7 @@ const CommandRendererInner: React.FC<{ command: string[][] | null }> = ({
       // direction set rather than naively "starts with a digit".
       if (directionSet.has(button)) {
         if (directionMode === "text") {
-          parts.push(
+          tokenChildren.push(
             <DirectionChip
               key={`direction-${tokenBranchKey}-${j}-${button}`}
               token={button}
@@ -144,7 +150,7 @@ const CommandRendererInner: React.FC<{ command: string[][] | null }> = ({
           );
         } else {
           const iconUrl = getIconUrl(button, isHeld);
-          parts.push(
+          tokenChildren.push(
             <img
               key={`direction-${tokenBranchKey}-${j}-${button}`}
               src={iconUrl}
@@ -161,7 +167,7 @@ const CommandRendererInner: React.FC<{ command: string[][] | null }> = ({
       if (first >= "a" && first <= "z") {
         isSlide = true;
       }
-      parts.push(
+      tokenChildren.push(
         <CommandIcon
           key={`command-${tokenBranchKey}-${j}-${button}`}
           input={button}
@@ -173,6 +179,20 @@ const CommandRendererInner: React.FC<{ command: string[][] | null }> = ({
         />,
       );
     }
+
+    if (tokenChildren.length === 0) return;
+
+    // One flex-child per TOKEN. `whitespace-nowrap` keeps "A+G" intact
+    // when the outer flex-wrap kicks in; everything inside this span
+    // stays on one line.
+    parts.push(
+      <span
+        key={`token-${tokenBranchKey}`}
+        className="inline-flex items-center whitespace-nowrap"
+      >
+        {tokenChildren}
+      </span>,
+    );
   };
 
   for (let i = 0; i < styledCommand.length; i++) {

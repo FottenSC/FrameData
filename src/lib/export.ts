@@ -1,25 +1,25 @@
 /**
  * Export helpers for the frame-data table.
  *
- * Two formats are supported:
+ *   CSV   — UTF-8 with BOM so Excel / Sheets honour non-ASCII characters
+ *           (the em-dash we use for "no data" cells was previously rendered
+ *           as mojibake under Excel's default cp1252 interpretation).
+ *           RFC-4180 quoting.
  *
- *   CSV   — plain text, UTF-8 with BOM so Excel / Google Sheets correctly
- *           interpret non-ASCII characters (e.g. the em-dash we use for
- *           "no data" cells). RFC-4180 quoting for fields that contain
- *           commas, newlines, or double-quotes.
- *
- *   Excel — an HTML table with .xls extension and the office MIME type.
- *           Excel and Google Sheets both parse this correctly as a proper
- *           spreadsheet, with numeric cells staying numeric (via the
- *           `x:num` attribute from the office namespace). No external
- *           library dependency — the previous implementation saved a
- *           CSV with the `.xls` extension, which caused Excel to throw
- *           "file not in recognised format" warnings.
+ *   XLSX  — a real Office Open XML workbook (ZIP of 5 tiny XML files),
+ *           zipped with `fflate`. Excel / Sheets open it as a native
+ *           spreadsheet, no "file format doesn't match extension" warning.
+ *           Numeric cells stay numeric (so sort / formulas work).
  */
+
+import { zipSync, strToU8 } from "fflate";
 
 export type ExportCell = string | number | null | undefined;
 
-/** Shared: trigger a browser download for a Blob. */
+// ---------------------------------------------------------------------------
+// Download helper
+// ---------------------------------------------------------------------------
+
 function downloadBlob(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob);
   try {
@@ -53,7 +53,6 @@ export function exportCsv(
   const lines: string[] = [];
   lines.push(headers.map(csvEscape).join(","));
   for (const row of rows) lines.push(row.map(csvEscape).join(","));
-  // U+FEFF BOM so Excel recognises the file as UTF-8.
   const blob = new Blob(["\uFEFF" + lines.join("\r\n")], {
     type: "text/csv;charset=utf-8",
   });
@@ -61,65 +60,136 @@ export function exportCsv(
 }
 
 // ---------------------------------------------------------------------------
-// Excel (HTML table)
+// XLSX
 // ---------------------------------------------------------------------------
+//
+// XLSX is a ZIP archive of XML files following the Office Open XML spec
+// (ECMA-376). We emit the absolute minimum set Excel / Sheets will accept:
+//
+//   [Content_Types].xml         — MIME map for the parts inside
+//   _rels/.rels                 — relationship: package → main document
+//   xl/workbook.xml             — lists worksheets
+//   xl/_rels/workbook.xml.rels  — relationship: workbook → sheet1.xml
+//   xl/worksheets/sheet1.xml    — the actual cell data
+//
+// No shared-strings table, no styles, no defined names — just data. Excel
+// is happy.
 
-const htmlEscape = (v: ExportCell): string => {
-  if (v == null) return "";
-  return String(v)
+const XML_ESC = (s: string): string =>
+  s
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-};
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+
+/** Convert a 0-indexed column number to its Excel letter (0→A, 25→Z, 26→AA …). */
+function columnLetter(index: number): string {
+  let n = index;
+  let out = "";
+  do {
+    out = String.fromCharCode((n % 26) + 65) + out;
+    n = Math.floor(n / 26) - 1;
+  } while (n >= 0);
+  return out;
+}
 
 const isFiniteNumber = (v: ExportCell): v is number =>
   typeof v === "number" && Number.isFinite(v);
 
-/**
- * Render one `<td>`. Numeric values use the `x:num` hint from the
- * `urn:schemas-microsoft-com:office:excel` namespace so Excel keeps them
- * numeric rather than coercing them to text (without this hint, "+0" /
- * "-6" would be treated as strings and break sorting inside Excel).
- */
-const cellHtml = (v: ExportCell): string => {
-  if (isFiniteNumber(v)) return `<td x:num="${v}">${v}</td>`;
-  return `<td>${htmlEscape(v)}</td>`;
-};
+function buildSheetXml(headers: string[], rows: ExportCell[][]): string {
+  // Merge header row + data rows — header is just the first row with string cells.
+  const allRows: ExportCell[][] = [headers, ...rows];
+  const xmlRows: string[] = [];
+  for (let r = 0; r < allRows.length; r++) {
+    const row = allRows[r];
+    const cells: string[] = [];
+    for (let c = 0; c < row.length; c++) {
+      const ref = `${columnLetter(c)}${r + 1}`;
+      const v = row[c];
+      if (v == null || v === "") continue; // empty cells can be omitted
+      if (isFiniteNumber(v)) {
+        cells.push(`<c r="${ref}"><v>${v}</v></c>`);
+      } else {
+        // Inline string — no need for a shared-strings table for a one-off export.
+        cells.push(
+          `<c r="${ref}" t="inlineStr"><is><t xml:space="preserve">${XML_ESC(String(v))}</t></is></c>`,
+        );
+      }
+    }
+    xmlRows.push(`<row r="${r + 1}">${cells.join("")}</row>`);
+  }
+  return [
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',
+    '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">',
+    "<sheetData>",
+    xmlRows.join(""),
+    "</sheetData>",
+    "</worksheet>",
+  ].join("");
+}
+
+const WORKBOOK_XML = [
+  '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',
+  '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"',
+  ' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">',
+  '<sheets><sheet name="Frame data" sheetId="1" r:id="rId1"/></sheets>',
+  "</workbook>",
+].join("");
+
+const WORKBOOK_RELS = [
+  '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',
+  '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">',
+  '<Relationship Id="rId1"',
+  ' Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet"',
+  ' Target="worksheets/sheet1.xml"/>',
+  "</Relationships>",
+].join("");
+
+const PACKAGE_RELS = [
+  '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',
+  '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">',
+  '<Relationship Id="rId1"',
+  ' Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument"',
+  ' Target="xl/workbook.xml"/>',
+  "</Relationships>",
+].join("");
+
+const CONTENT_TYPES = [
+  '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',
+  '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">',
+  '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>',
+  '<Default Extension="xml" ContentType="application/xml"/>',
+  '<Override PartName="/xl/workbook.xml"',
+  ' ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>',
+  '<Override PartName="/xl/worksheets/sheet1.xml"',
+  ' ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>',
+  "</Types>",
+].join("");
 
 export function exportExcel(
   headers: string[],
   rows: ExportCell[][],
   filename: string,
 ): void {
-  const head = headers.map((h) => `<th>${htmlEscape(h)}</th>`).join("");
-  const body = rows
-    .map((r) => "<tr>" + r.map(cellHtml).join("") + "</tr>")
-    .join("");
-
-  const html = [
-    "<!DOCTYPE html>",
-    '<html xmlns:x="urn:schemas-microsoft-com:office:excel">',
-    '<head><meta charset="UTF-8" />',
-    // Hint to Excel / Sheets about which worksheet name to use.
-    "<!--[if gte mso 9]><xml>",
-    "<x:ExcelWorkbook><x:ExcelWorksheets>",
-    "<x:ExcelWorksheet><x:Name>Frame data</x:Name>",
-    "<x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>",
-    "</x:ExcelWorksheet>",
-    "</x:ExcelWorksheets></x:ExcelWorkbook>",
-    "</xml><![endif]-->",
-    // Minimal styling so the header row stands out when opened directly.
-    "<style>th{background:#e8e8e8;font-weight:bold;border:1px solid #999;}td{border:1px solid #ccc;}table{border-collapse:collapse;}</style>",
-    "</head><body>",
-    '<table border="1">',
-    `<thead><tr>${head}</tr></thead>`,
-    `<tbody>${body}</tbody>`,
-    "</table>",
-    "</body></html>",
-  ].join("");
-
-  const blob = new Blob(["\uFEFF" + html], {
-    type: "application/vnd.ms-excel",
+  const sheet = buildSheetXml(headers, rows);
+  const zipped = zipSync(
+    {
+      "[Content_Types].xml": strToU8(CONTENT_TYPES),
+      "_rels/.rels": strToU8(PACKAGE_RELS),
+      "xl/workbook.xml": strToU8(WORKBOOK_XML),
+      "xl/_rels/workbook.xml.rels": strToU8(WORKBOOK_RELS),
+      "xl/worksheets/sheet1.xml": strToU8(sheet),
+    },
+    // DEFLATE compression; level 6 is a reasonable balance.
+    { level: 6 },
+  );
+  // Cast to BlobPart — Uint8Array is always a valid BlobPart at runtime,
+  // but TS's ArrayBufferLike includes SharedArrayBuffer which isn't.
+  const blob = new Blob([zipped as unknown as BlobPart], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   });
-  downloadBlob(blob, filename.endsWith(".xls") ? filename : `${filename}.xls`);
+  downloadBlob(
+    blob,
+    filename.endsWith(".xlsx") ? filename : `${filename}.xlsx`,
+  );
 }

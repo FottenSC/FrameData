@@ -1,5 +1,11 @@
 import React from "react";
 import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { ChipTooltipContent } from "@/components/ui/chip-tooltip";
 
 interface CommandIconProps {
   input: string;
@@ -15,14 +21,47 @@ interface CommandIconProps {
   overlapNext?: boolean;
 }
 
+/** Human-readable description of what a given button variant means. */
+function tooltipCopy(
+  code: string,
+  isSlide: boolean,
+  isHeld: boolean,
+): { title: string; description?: string } {
+  if (isSlide && isHeld) {
+    return {
+      title: `Slide ${code} (held)`,
+      description:
+        "Fast, held secondary input. Lowercase + parentheses in the source " +
+        "notation. Leads straight into the next press.",
+    };
+  }
+  if (isSlide) {
+    return {
+      title: `Slide ${code}`,
+      description:
+        "Slide input — a quick secondary tap that chains directly into the " +
+        "button that follows. Shown here at reduced size and overlapping " +
+        "the next pill.",
+    };
+  }
+  if (isHeld) {
+    return {
+      title: `Held ${code}`,
+      description:
+        "Hold the button until the move comes out. Release to commit.",
+    };
+  }
+  return { title: `${code} button` };
+}
+
 export const CommandIcon: React.FC<CommandIconProps> = ({
   input,
   isHeld,
   isSlide,
   overlapNext = false,
 }) => {
-  let baseClasses = "border border-black bg-white text-black rounded";
-  let heldClasses = "bg-black text-white border border-white rounded";
+  const baseClasses = "border border-black bg-white text-black rounded";
+  const heldClasses = "bg-black text-white border border-white rounded";
   // Slide inputs (lowercase letters in the source) render at a smaller size
   // so they read as a secondary / chained input next to regular button pills.
   const sizeClasses = isSlide
@@ -37,21 +76,34 @@ export const CommandIcon: React.FC<CommandIconProps> = ({
   // slide's right edge, not vice versa.
   const zClasses = isSlide ? "z-20" : "z-10";
 
+  const code = input.toUpperCase();
+  const { title, description } = tooltipCopy(code, isSlide, isHeld);
+
   return (
-    <div
-      className={cn(
-        "inline-flex items-center justify-center font-bold align-middle font-sans",
-        sizeClasses,
-        marginClasses,
-        isSlide ? "self-end" : "",
-        "button-icon",
-        "relative",
-        zClasses,
-        isHeld ? heldClasses : baseClasses,
-      )}
-      title={`${input} Button${isHeld ? " (Held)" : ""}`}
-    >
-      {input.toUpperCase()}
-    </div>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div
+          className={cn(
+            "inline-flex items-center justify-center font-bold align-middle font-sans cursor-default",
+            sizeClasses,
+            marginClasses,
+            isSlide ? "self-end" : "",
+            "button-icon",
+            "relative",
+            zClasses,
+            isHeld ? heldClasses : baseClasses,
+          )}
+        >
+          {code}
+        </div>
+      </TooltipTrigger>
+      <TooltipContent>
+        <ChipTooltipContent
+          code={code}
+          title={title}
+          description={description}
+        />
+      </TooltipContent>
+    </Tooltip>
   );
 };

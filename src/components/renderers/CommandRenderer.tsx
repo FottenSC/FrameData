@@ -2,6 +2,12 @@ import React, { useMemo } from "react";
 import { useGame } from "@/contexts/GameContext";
 import { CommandIcon } from "@/components/ui/CommandIcon";
 import { getDirectionSet } from "@/lib/notation";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { ChipTooltipContent } from "@/components/ui/chip-tooltip";
 import { cn } from "@/lib/utils";
 
 /**
@@ -10,20 +16,32 @@ import { cn } from "@/lib/utils";
  */
 const DirectionChip = React.memo(
   ({ token, isHeld }: { token: string; isHeld: boolean }) => (
-    <div
-      className={cn(
-        "inline-flex items-center justify-center font-bold align-middle font-sans rounded",
-        "min-w-5 h-5 px-1 text-[13px] relative z-10 border",
-        // Direction pill uses a distinct, quieter palette so it reads as
-        // input-flavoured but doesn't compete with bright button pills.
-        isHeld
-          ? "bg-sky-600 text-white border-white"
-          : "bg-zinc-800 text-zinc-100 border-zinc-500",
-      )}
-      title={`${token}${isHeld ? " (held)" : ""}`}
-    >
-      {token}
-    </div>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div
+          className={cn(
+            "inline-flex items-center justify-center font-bold align-middle font-sans rounded cursor-default",
+            "min-w-5 h-5 px-1 text-[13px] relative z-10 border",
+            // Direction pill uses a distinct, quieter palette so it reads as
+            // input-flavoured but doesn't compete with bright button pills.
+            isHeld
+              ? "bg-sky-600 text-white border-white"
+              : "bg-zinc-800 text-zinc-100 border-zinc-500",
+          )}
+        >
+          {token}
+        </div>
+      </TooltipTrigger>
+      <TooltipContent>
+        <ChipTooltipContent
+          code={token}
+          title={isHeld ? `Held ${token}` : `${token} direction`}
+          description={
+            isHeld ? "Hold the direction until the move comes out." : undefined
+          }
+        />
+      </TooltipContent>
+    </Tooltip>
   ),
 );
 DirectionChip.displayName = "DirectionChip";

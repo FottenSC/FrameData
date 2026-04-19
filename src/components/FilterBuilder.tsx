@@ -597,7 +597,7 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
       {/* Quick search + clear-all action */}
       <div className="py-2 mb-2 flex items-center gap-2">
         <DebouncedInput
-          placeholder="Quick search — stance + command (e.g. “ws 2k”)"
+          placeholder="Quick search — stance + command (spaces ignored)"
           value={quickSearch}
           onDebouncedChange={setQuickSearch}
           className="flex-1 h-10 text-base border-primary/20 focus-visible:border-primary focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"

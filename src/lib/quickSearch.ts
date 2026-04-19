@@ -6,51 +6,51 @@
  * stance + command only — structured filters (character, tags, impact,
  * advantage, etc.) belong to the advanced filter builder below.
  *
- * The one upgrade over a plain `contains`: multi-word AND. Typing `ws 2k`
- * means "rows whose stance+command contains both `ws` and `2k`" — much
- * friendlier than having to get the exact concatenation right. Each term is
- * a case-insensitive substring match.
+ * Whitespace is **ignored entirely** on both the query and the move's
+ * stance/command text. That means:
+ *
+ *   query "ws 2k"  → matches "WS 2 K"
+ *   query "ws2k"   → same thing
+ *   query "2 k"    → matches "2K"
+ *
+ * Players shouldn't have to think about whether the source data has spaces
+ * between stance and command; they just type what they see.
  */
 
 import type { Move } from "@/types/Move";
 
 export interface ParsedQuery {
-  /** Lowercased whitespace-separated terms. All must match (AND). */
-  terms: string[];
+  /** Whitespace-stripped, lowercased search text. */
+  term: string;
   /** True when the user typed nothing meaningful. */
   isEmpty: boolean;
 }
 
+const stripSpaces = (s: string): string => s.replace(/\s+/g, "");
+
 export function parseQuickSearch(raw: string): ParsedQuery {
-  const trimmed = raw.trim();
-  if (!trimmed) return { terms: [], isEmpty: true };
-  const terms = trimmed.toLowerCase().split(/\s+/).filter(Boolean);
-  return { terms, isEmpty: terms.length === 0 };
+  const term = stripSpaces(raw).toLowerCase();
+  return { term, isEmpty: term === "" };
 }
 
 /**
- * Build the search haystack for a move. Stance + translated command +
- * the raw `stringCommand` so either "ws" / "WS" / `:6::A:` / `6A`
- * style inputs all work intuitively.
+ * Build the search haystack for a move. Stance + translated command + the raw
+ * `stringCommand` so `ws`, `WS`, `:6::A:`, `6A` style inputs all work.
  */
 function moveHaystack(move: Move): string {
   const parts: string[] = [];
-  if (move.stance && move.stance.length > 0) parts.push(move.stance.join(" "));
-  if (move.command && move.command.length > 0)
-    parts.push(move.command.join(" "));
+  if (move.stance && move.stance.length > 0) parts.push(move.stance.join(""));
+  if (move.command && move.command.length > 0) parts.push(move.command.join(""));
   if (move.stringCommand) parts.push(move.stringCommand);
-  return parts.join(" ").toLowerCase();
+  return stripSpaces(parts.join("")).toLowerCase();
 }
 
 /**
- * True when the move's stance+command matches every term in the parsed query.
- * Empty query always matches.
+ * True when the move's stance+command matches the query. Empty query always
+ * matches. Whitespace is already stripped from both sides so `"ws 2k"` and
+ * `"ws2k"` behave identically.
  */
 export function matchesQuickSearch(move: Move, query: ParsedQuery): boolean {
   if (query.isEmpty) return true;
-  const hay = moveHaystack(move);
-  for (const t of query.terms) {
-    if (!hay.includes(t)) return false;
-  }
-  return true;
+  return moveHaystack(move).includes(query.term);
 }

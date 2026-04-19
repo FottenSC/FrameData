@@ -8,7 +8,11 @@ import {
 } from "@/components/ui/tooltip";
 import { Copy } from "lucide-react";
 import { ExpandableHitLevels } from "@/components/icons/ExpandableHitLevels";
-import { OutcomeBadge, OutcomeTagBadge } from "@/components/ui/ValueBadge";
+import {
+  AdvantagePill,
+  PropertyChip,
+  type PropertySources,
+} from "@/components/ui/ValueBadge";
 import type { PropertyInfo } from "@/contexts/GameContext";
 
 // Memoised tooltip content — avoids re-creating nodes during virtualisation.
@@ -19,19 +23,6 @@ const StanceTooltipContent = React.memo(
       {stanceInfo.description && (
         <p className="text-xs text-muted-foreground whitespace-pre-wrap">
           {stanceInfo.description}
-        </p>
-      )}
-    </div>
-  ),
-);
-
-const PropertyTooltipContent = React.memo(
-  ({ propInfo, p }: { propInfo: any; p: string }) => (
-    <div className="space-y-1">
-      <p className="font-semibold">{propInfo.name || p}</p>
-      {propInfo.description && (
-        <p className="text-xs text-muted-foreground whitespace-pre-wrap">
-          {propInfo.description}
         </p>
       )}
     </div>
@@ -54,6 +45,41 @@ interface MoveTableCellProps {
    */
   getPropertyInfo: (prop: string) => PropertyInfo | null;
   badges?: BadgeMap;
+}
+
+/**
+ * Aggregate the four possible sources of "this move has property X" into a
+ * single ordered list of chip descriptors. A property that appears on, say,
+ * both hit and counter-hit is collapsed into ONE chip whose tooltip lists
+ * both channels.
+ *
+ * Order: move-wide properties first (so UA / BA / GI etc. stay stable at the
+ * left), then outcome-only tags in insertion order.
+ */
+function aggregateProperties(move: Move): Array<{
+  tag: string;
+  sources: PropertySources;
+}> {
+  const map = new Map<string, PropertySources>();
+
+  for (const p of move.properties) {
+    const prev = map.get(p) ?? {};
+    map.set(p, { ...prev, asMoveProperty: true });
+  }
+  for (const t of move.hit.tags) {
+    const prev = map.get(t) ?? {};
+    map.set(t, { ...prev, onHit: true });
+  }
+  for (const t of move.counterHit.tags) {
+    const prev = map.get(t) ?? {};
+    map.set(t, { ...prev, onCounterHit: true });
+  }
+  for (const t of move.block.tags) {
+    const prev = map.get(t) ?? {};
+    map.set(t, { ...prev, onBlock: true });
+  }
+
+  return Array.from(map.entries()).map(([tag, sources]) => ({ tag, sources }));
 }
 
 export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
@@ -138,63 +164,59 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
       case "damage":
         return <>{move.damage.total ?? move.damage.raw ?? "—"}</>;
 
+      // --- Outcome columns: advantage number only. Any tag information
+      // ---   (KND / LNC / STN / …) lives in the Properties column so we
+      // ---   don't render the same chip twice.
       case "block":
         return (
-          <OutcomeBadge
-            outcome={move.block}
-            badges={badges}
-            getTagInfo={getPropertyInfo}
+          <AdvantagePill
+            advantage={move.block.advantage}
+            fallbackText={move.block.raw}
           />
         );
 
       case "hit":
         return (
-          <OutcomeBadge
-            outcome={move.hit}
-            badges={badges}
-            getTagInfo={getPropertyInfo}
+          <AdvantagePill
+            advantage={move.hit.advantage}
+            fallbackText={move.hit.raw}
           />
         );
 
       case "counterHit":
         return (
-          <OutcomeBadge
-            outcome={move.counterHit}
-            badges={badges}
-            getTagInfo={getPropertyInfo}
+          <AdvantagePill
+            advantage={move.counterHit.advantage}
+            fallbackText={move.counterHit.raw}
           />
         );
 
       case "guardBurst":
         return (
-          <OutcomeBadge
-            outcome={{
-              advantage: move.guardBurst ?? null,
-              tags: [],
-              raw: null,
-            }}
-            forceNoSign
-            badges={badges}
-          />
+          <AdvantagePill advantage={move.guardBurst ?? null} forceNoSign />
         );
 
-      case "properties":
-        if (!move.properties.length) return <>—</>;
+      // --- Properties column: one chip per unique property. Chips aggregate
+      // ---   move-wide properties (UA / BA / GI / …) AND outcome tags from
+      // ---   hit / counter-hit / block. A chip's tooltip tells you which
+      // ---   channel(s) the tag fires on.
+      case "properties": {
+        const entries = aggregateProperties(move);
+        if (entries.length === 0) return <>—</>;
         return (
           <div className="flex flex-wrap gap-0.5">
-            {move.properties.map((prop) => {
-              const info = getPropertyInfo(prop);
-              return (
-                <OutcomeTagBadge
-                  key={prop}
-                  tag={prop}
-                  badges={badges}
-                  info={info ?? null}
-                />
-              );
-            })}
+            {entries.map(({ tag, sources }) => (
+              <PropertyChip
+                key={tag}
+                tag={tag}
+                info={getPropertyInfo(tag) ?? null}
+                badges={badges}
+                sources={sources}
+              />
+            ))}
           </div>
         );
+      }
 
       case "notes":
         return (

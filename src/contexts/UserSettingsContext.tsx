@@ -100,18 +100,18 @@ export const defaultColumns: ColumnConfig[] = [
     minWidth: 80,
     maxWidth: 80,
   },
-  // Outcome columns carry an advantage pill AND up to a few tag chips
-  // (e.g. "+28 KND"). 60px was enough when only one or the other could appear;
-  // the new outcome renderer needs breathing room.
+  // Outcome columns show only the numeric advantage pill now; any descriptive
+  // tags (KND / LNC / STN / …) live in the Properties column, so these can
+  // stay the compact 60px they were before the outcome-tag refactor.
   {
     id: "block",
     label: "Block",
     visible: true,
     order: 6,
     className: "pt-2 px-2",
-    width: 120,
-    minWidth: 80,
-    maxWidth: 160,
+    width: 60,
+    minWidth: 60,
+    maxWidth: 60,
   },
   {
     id: "hit",
@@ -119,9 +119,9 @@ export const defaultColumns: ColumnConfig[] = [
     visible: true,
     order: 7,
     className: "pt-2 px-2",
-    width: 140,
-    minWidth: 80,
-    maxWidth: 200,
+    width: 60,
+    minWidth: 60,
+    maxWidth: 60,
   },
   {
     id: "counterHit",
@@ -130,9 +130,9 @@ export const defaultColumns: ColumnConfig[] = [
     visible: true,
     order: 8,
     className: "pt-2 px-2",
-    width: 140,
-    minWidth: 80,
-    maxWidth: 200,
+    width: 60,
+    minWidth: 60,
+    maxWidth: 60,
   },
   {
     id: "guardBurst",

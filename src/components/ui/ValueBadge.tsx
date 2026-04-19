@@ -5,137 +5,174 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { MoveOutcome } from "@/types/Move";
 
 type BadgeMap = Record<string, { className: string }>;
 
-interface OutcomeBadgeProps {
-  /** The full outcome (advantage + tags + raw). */
-  outcome: MoveOutcome;
+// ---------------------------------------------------------------------------
+// Advantage pill
+// ---------------------------------------------------------------------------
+//
+// Numeric-only pill shown inside Block / Hit / Counter-Hit cells. Outcome
+// tags (KND, LNC, STN, …) used to be rendered alongside the pill; they've
+// since been moved to the Properties column where the whole "what does this
+// move do" vocabulary lives together. That leaves these cells with a single
+// job: show the frame advantage.
+
+interface AdvantagePillProps {
+  /** Numeric frame advantage, or null when unspecified. */
+  advantage: number | null;
   /**
-   * Per-game badge style map keyed by outcome tag (KND, LNC, STN, ...).
-   * Used to color the tag chips.
+   * Fallback string shown when there's no numeric advantage (e.g. moves
+   * authored as "KND" with no number). Typically `outcome.raw`.
    */
-  badges?: BadgeMap;
-  /**
-   * Tag → descriptive info (name/description) for tooltip rendering.
-   * Optional; pass from the game context.
-   */
-  getTagInfo?: (
-    tag: string,
-  ) => { name?: string; description?: string; className?: string } | null;
-  /** Suppress advantage sign prefix (used for neutral counters like guard burst). */
+  fallbackText?: string | null;
+  /** Drop the +/- sign (for counters like guard burst). */
   forceNoSign?: boolean;
 }
 
-/**
- * Small colored chip for a single outcome tag (KND, LNC, STN...).
- *
- * Split out so it can be reused both here and in the properties column.
- */
+const pillClass = (advantage: number | null, forceNoSign: boolean): string => {
+  if (advantage === null) return "bg-gray-700";
+  if (forceNoSign) return "bg-zinc-700";
+  return advantage >= 0 ? "bg-green-700" : "bg-rose-700";
+};
+
+export const AdvantagePill = memo<AdvantagePillProps>(
+  ({ advantage, fallbackText, forceNoSign = false }) => {
+    const hasAdvantage = advantage !== null;
+
+    const label = hasAdvantage
+      ? !forceNoSign && advantage! > 0
+        ? "+" + advantage
+        : String(advantage)
+      : (fallbackText ?? "—");
+
+    return (
+      <Badge
+        className={`${pillClass(
+          advantage,
+          forceNoSign,
+        )} text-white w-12 inline-flex items-center justify-center`}
+      >
+        {label}
+      </Badge>
+    );
+  },
+);
+AdvantagePill.displayName = "AdvantagePill";
+
+// ---------------------------------------------------------------------------
+// Property chip
+// ---------------------------------------------------------------------------
+//
+// Small colored chip used in the Properties column for both move-wide
+// properties (UA, BA, GI, …) and on-outcome tags (KND, LNC, STN, …).
+//
+// When a tag is attached to a specific outcome channel — i.e. it fires on hit,
+// on counter-hit, or on block — the tooltip tells you which. A single chip
+// therefore carries three pieces of info:
+//   1. the tag code on the chip face
+//   2. the registry-declared name + description (from Game.json `properties`)
+//   3. the channels it applies on
+
+export interface PropertySources {
+  /** True when this tag is listed in move.properties (move-wide). */
+  asMoveProperty?: boolean;
+  /** True when this tag appears in move.hit.tags. */
+  onHit?: boolean;
+  /** True when this tag appears in move.counterHit.tags. */
+  onCounterHit?: boolean;
+  /** True when this tag appears in move.block.tags. */
+  onBlock?: boolean;
+}
+
+interface PropertyChipProps {
+  /** The tag code, e.g. "KND". */
+  tag: string;
+  /** Descriptor from Game.json#properties, if any. */
+  info?: { name?: string; description?: string; className?: string } | null;
+  /** Per-game quick-style map (fallback if info.className is absent). */
+  badges?: BadgeMap;
+  /** Which channel(s) this tag came from on the current move. */
+  sources: PropertySources;
+}
+
+function sourceSummary(sources: PropertySources): string[] {
+  const lines: string[] = [];
+  if (sources.asMoveProperty) lines.push("Move property");
+  const channels: string[] = [];
+  if (sources.onHit) channels.push("hit");
+  if (sources.onCounterHit) channels.push("counter-hit");
+  if (sources.onBlock) channels.push("block");
+  if (channels.length > 0) {
+    lines.push(`Applies on: ${channels.join(", ")}`);
+  }
+  return lines;
+}
+
+export const PropertyChip = memo<PropertyChipProps>(
+  ({ tag, info, badges, sources }) => {
+    const className =
+      (info?.className && info.className.trim()) ||
+      badges?.[tag]?.className ||
+      "bg-gray-700 text-white";
+
+    const chip = (
+      <Badge
+        className={`whitespace-nowrap border text-xs font-semibold inline-flex items-center justify-center ${className}`}
+      >
+        {tag}
+      </Badge>
+    );
+
+    const sourceLines = sourceSummary(sources);
+    const hasName = info?.name && info.name !== tag;
+    const hasDescription = !!info?.description;
+    const hasTooltip = hasName || hasDescription || sourceLines.length > 0;
+
+    if (!hasTooltip) return chip;
+
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>{chip}</TooltipTrigger>
+        <TooltipContent className="max-w-xs">
+          <div className="space-y-1">
+            <p className="font-semibold">{info?.name || tag}</p>
+            {hasDescription && (
+              <p className="text-xs text-muted-foreground whitespace-pre-wrap">
+                {info!.description}
+              </p>
+            )}
+            {sourceLines.length > 0 && (
+              <ul className="pt-1 border-t border-border/50 text-[11px] text-muted-foreground space-y-0.5">
+                {sourceLines.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    );
+  },
+);
+PropertyChip.displayName = "PropertyChip";
+
+// Legacy export kept so other call sites can still import it. `OutcomeTagBadge`
+// is a thin pass-through to PropertyChip (no source annotation), useful when
+// rendering a tag chip outside the move-row context.
 export const OutcomeTagBadge = memo<{
   tag: string;
   badges?: BadgeMap;
   info?: { name?: string; description?: string; className?: string } | null;
-}>(({ tag, badges, info }) => {
-  const className =
-    (info?.className && info.className.trim()) ||
-    badges?.[tag]?.className ||
-    "bg-gray-700 text-white";
-  const chip = (
-    <Badge
-      className={`whitespace-nowrap border text-xs font-semibold inline-flex items-center justify-center ${className}`}
-    >
-      {tag}
-    </Badge>
-  );
-  const hasTooltip =
-    info && ((info.name && info.name !== tag) || info.description);
-  if (!hasTooltip) return chip;
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>{chip}</TooltipTrigger>
-      <TooltipContent className="max-w-xs">
-        <div className="space-y-1">
-          <p className="font-semibold">{info!.name || tag}</p>
-          {info!.description && (
-            <p className="text-xs text-muted-foreground whitespace-pre-wrap">
-              {info!.description}
-            </p>
-          )}
-        </div>
-      </TooltipContent>
-    </Tooltip>
-  );
-});
+}>(({ tag, badges, info }) => (
+  <PropertyChip tag={tag} badges={badges} info={info} sources={{}} />
+));
 OutcomeTagBadge.displayName = "OutcomeTagBadge";
 
-/**
- * Render a structured move outcome: advantage pill + one tag chip per tag.
- *
- * Replaces the older `<ValueBadge value={...} text={...} />` pattern which only
- * displayed one of (advantage OR tag) at a time. Now a move that is e.g.
- * "+28 on hit, knockdown" renders both the "+28" pill *and* a "KND" chip side
- * by side, which is exactly how players think about it.
- */
-const OutcomeBadgeInner: React.FC<OutcomeBadgeProps> = ({
-  outcome,
-  badges,
-  getTagInfo,
-  forceNoSign = false,
-}) => {
-  const { advantage, tags, raw } = outcome;
-  const hasAdvantage = advantage !== null;
-  const hasTags = tags.length > 0;
-
-  if (!hasAdvantage && !hasTags) {
-    return (
-      <Badge className="bg-gray-700 text-white w-12 inline-flex items-center justify-center">
-        {raw ?? "—"}
-      </Badge>
-    );
-  }
-
-  // Advantage pill colour: positive = green, negative = rose, forced-no-sign = neutral.
-  const advancePill = hasAdvantage ? (
-    <Badge
-      className={
-        (forceNoSign
-          ? "bg-zinc-700"
-          : advantage! >= 0
-            ? "bg-green-700"
-            : "bg-rose-700") +
-        " text-white w-12 inline-flex items-center justify-center"
-      }
-    >
-      {!forceNoSign && advantage! > 0 ? "+" + advantage : advantage}
-    </Badge>
-  ) : null;
-
-  return (
-    <div className="flex items-center gap-1 flex-wrap justify-center">
-      {advancePill}
-      {tags.map((tag) => (
-        <OutcomeTagBadge
-          key={tag}
-          tag={tag}
-          badges={badges}
-          info={getTagInfo?.(tag) ?? null}
-        />
-      ))}
-    </div>
-  );
-};
-
-export const OutcomeBadge = memo(OutcomeBadgeInner);
-
 // ---------------------------------------------------------------------------
-// Back-compat shim
+// Legacy ValueBadge shim (for any remaining callers). New code should prefer
+// AdvantagePill directly.
 // ---------------------------------------------------------------------------
-//
-// Older callers pass `value` + `text` directly. Keep this thin adapter so we
-// don't have to rewrite every consumer at once. New code should use
-// <OutcomeBadge outcome={...} /> directly.
 
 interface LegacyValueBadgeProps {
   value: number | null;
@@ -145,11 +182,11 @@ interface LegacyValueBadgeProps {
 }
 
 export const ValueBadge = memo<LegacyValueBadgeProps>(
-  ({ value, text, forceNoSign = false, badges }) => (
-    <OutcomeBadge
-      outcome={{ advantage: value ?? null, tags: [], raw: text ?? null }}
+  ({ value, text, forceNoSign = false }) => (
+    <AdvantagePill
+      advantage={value}
+      fallbackText={text}
       forceNoSign={forceNoSign}
-      badges={badges}
     />
   ),
 );

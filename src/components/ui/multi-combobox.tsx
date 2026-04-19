@@ -77,11 +77,13 @@ export function MultiCombobox({
           aria-expanded={open}
           aria-label={ariaLabel}
           className={cn(
-            // Tag-box trigger: flex row of chips + caret, min-h matches
+            // Tag-box trigger: flex row of chips + caret, min-h matches the
             // sibling h-8 inputs but can grow when selections wrap.
-            // min-w-[180px] so it starts at sibling-Select width; grows from
-            // there as chips are added; wraps rather than overflowing.
-            "group inline-flex min-h-8 min-w-[180px] max-w-full items-center gap-1 rounded-md border border-input bg-background px-2 py-1 text-sm",
+            // min-w-[200px] matches the "Equals"-style DebouncedInput width
+            // so the empty trigger lines up with the other value inputs in
+            // the row; grows as chips are added; wraps rather than
+            // overflowing.
+            "group inline-flex min-h-8 min-w-[200px] max-w-full items-center gap-1 rounded-md border border-input bg-background px-2 py-1 text-sm",
             "ring-offset-background transition-colors",
             "hover:bg-accent/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             "disabled:cursor-not-allowed disabled:opacity-50",

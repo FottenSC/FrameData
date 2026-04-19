@@ -1,5 +1,11 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { X, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { ChevronDown, ChevronRight, X } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -9,22 +15,21 @@ import {
 } from "./ui/select";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { DebouncedInput } from "./ui/debounced-input";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 import {
-  Move,
   FilterCondition,
   FilterGroup,
-  FilterItem,
   FilterGroupOperator,
+  FilterItem,
 } from "../types/Move";
 import { useGame } from "../contexts/GameContext";
 import { getGameFilterConfig } from "../filters/gameFilterConfigs";
 import { builtinOperators, operatorById } from "../filters/operators";
 import type {
+  FieldConfig,
   FieldType,
   FilterOperator,
-  FieldConfig,
   GameFilterConfig,
 } from "../filters/types";
 import { MultiCombobox } from "./ui/multi-combobox";
@@ -34,9 +39,275 @@ import { Combobox } from "./ui/combobox";
 export type {
   FilterCondition,
   FilterGroup,
-  FilterItem,
   FilterGroupOperator,
+  FilterItem,
 } from "../types/Move";
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+const uniqueId = (prefix: string) =>
+  `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+
+/**
+ * Walk the filter tree and apply `updater` to the item whose id matches.
+ * Updater may return a single replacement, an array (to splice in multiple),
+ * or null to remove the item entirely. Groups are recursed into.
+ */
+function mapTree(
+  items: FilterItem[],
+  id: string,
+  updater: (item: FilterItem) => FilterItem | FilterItem[] | null,
+): FilterItem[] {
+  const out: FilterItem[] = [];
+  for (const item of items) {
+    if (item.id === id) {
+      const next = updater(item);
+      if (next === null) continue;
+      if (Array.isArray(next)) out.push(...next);
+      else out.push(next);
+    } else if (item.type === "group") {
+      out.push({ ...item, filters: mapTree(item.filters, id, updater) });
+    } else {
+      out.push(item);
+    }
+  }
+  return out;
+}
+
+/**
+ * Outdent: find `id`'s parent group and lift `id` out into that parent's
+ * parent (or the root if the parent is at root). Empty groups left behind are
+ * removed automatically. Returns a new tree; `items` is treated as the
+ * implicit root, so items at depth 1 cannot be outdented further.
+ *
+ * This is a proper two-level tree edit — the old implementation silently
+ * punted and just pushed the item to the root list, which was wrong.
+ */
+function outdentInTree(items: FilterItem[], id: string): FilterItem[] {
+  // Returns the new array at this level and, if the target was found and
+  // removed from a group at THIS level, the removed item itself — so the
+  // caller (i.e. the parent level) can splice it in after the group it came
+  // from.
+  function recurse(level: FilterItem[]): {
+    next: FilterItem[];
+    lifted: FilterItem | null;
+  } {
+    const out: FilterItem[] = [];
+    let lifted: FilterItem | null = null;
+
+    for (const item of level) {
+      if (item.type !== "group") {
+        out.push(item);
+        continue;
+      }
+
+      const idx = item.filters.findIndex((f) => f.id === id);
+      if (idx !== -1) {
+        // Found the target directly inside this group — lift it up.
+        const target = item.filters[idx];
+        const remaining = item.filters.filter((_, i) => i !== idx);
+        if (remaining.length === 0) {
+          // Group becomes empty — drop it and put the lifted item in its slot.
+          out.push(target);
+        } else {
+          out.push({ ...item, filters: remaining });
+          out.push(target);
+        }
+        // Target is now at THIS level; we're done — no further propagation.
+        lifted = null;
+      } else {
+        // Recurse into the group.
+        const sub = recurse(item.filters);
+        if (sub.lifted) {
+          // Lifted item bubbled up — place it right after the group.
+          const filtered =
+            sub.next.length > 0 ? sub.next : sub.next; /* empty check below */
+          if (filtered.length === 0) {
+            // Group becomes empty; drop it and place lifted in its slot.
+            out.push(sub.lifted);
+          } else {
+            out.push({ ...item, filters: filtered });
+            out.push(sub.lifted);
+          }
+        } else {
+          out.push({ ...item, filters: sub.next });
+        }
+      }
+    }
+
+    return { next: out, lifted };
+  }
+
+  return recurse(items).next;
+}
+
+/**
+ * Predicate: does this condition, after user input, actually filter anything?
+ * Used so "empty" placeholder rows in the builder don't constrain the dataset.
+ */
+function isConditionActive(cond: FilterCondition, isRange: boolean): boolean {
+  const v = cond.value?.trim?.() ?? "";
+  if (!isRange) return v !== "";
+  const v2 = cond.value2?.trim?.() ?? "";
+  return v !== "" && v2 !== "";
+}
+
+/**
+ * Produce the subset of the filter tree whose conditions are actually filled
+ * in. Empty groups collapse away.
+ */
+function pruneInactive(
+  items: FilterItem[],
+  isRange: (conditionId: string) => boolean,
+): FilterItem[] {
+  const out: FilterItem[] = [];
+  for (const item of items) {
+    if (item.type === "group") {
+      const kids = pruneInactive(item.filters, isRange);
+      if (kids.length > 0) out.push({ ...item, filters: kids });
+    } else if (isConditionActive(item, isRange(item.condition))) {
+      out.push(item);
+    }
+  }
+  return out;
+}
+
+function countActive(
+  items: FilterItem[],
+  isRange: (conditionId: string) => boolean,
+): number {
+  let n = 0;
+  for (const item of items) {
+    if (item.type === "group") n += countActive(item.filters, isRange);
+    else if (isConditionActive(item, isRange(item.condition))) n += 1;
+  }
+  return n;
+}
+
+// ---------------------------------------------------------------------------
+// Preset chips
+// ---------------------------------------------------------------------------
+
+interface PresetSpec {
+  /** Short label shown on the chip. */
+  label: string;
+  /** Tooltip text. */
+  title: string;
+  /** Produce the condition to add (or to toggle off if already present). */
+  build: () => FilterCondition;
+}
+
+/**
+ * Common player queries, exposed as one-click chips above the builder.
+ * Clicking a preset toggles the corresponding condition on/off.
+ *
+ * Presets intentionally produce root-level conditions — they compose with
+ * whatever the user already has in place via the root AND/OR operator.
+ */
+const PRESETS: PresetSpec[] = [
+  {
+    label: "Launchers (hit)",
+    title: "Moves that launch on hit (hitTags contains LNC)",
+    build: () => ({
+      id: uniqueId("preset-lnc-hit"),
+      type: "condition",
+      field: "hitTags",
+      condition: "contains",
+      value: "LNC",
+      value2: "",
+    }),
+  },
+  {
+    label: "Launchers (CH)",
+    title: "Moves that launch on counter-hit",
+    build: () => ({
+      id: uniqueId("preset-lnc-ch"),
+      type: "condition",
+      field: "counterHitTags",
+      condition: "contains",
+      value: "LNC",
+      value2: "",
+    }),
+  },
+  {
+    label: "Knockdown (hit)",
+    title: "Moves that knock down on hit",
+    build: () => ({
+      id: uniqueId("preset-knd-hit"),
+      type: "condition",
+      field: "hitTags",
+      condition: "contains",
+      value: "KND",
+      value2: "",
+    }),
+  },
+  {
+    label: "Stun (hit)",
+    title: "Moves that stun on hit",
+    build: () => ({
+      id: uniqueId("preset-stn-hit"),
+      type: "condition",
+      field: "hitTags",
+      condition: "contains",
+      value: "STN",
+      value2: "",
+    }),
+  },
+  {
+    label: "Plus on block",
+    title: "Moves at +1 or better on block",
+    build: () => ({
+      id: uniqueId("preset-plus-block"),
+      type: "condition",
+      field: "block",
+      condition: "greaterThan",
+      value: "0",
+      value2: "",
+    }),
+  },
+  {
+    label: "Punishable (−10+)",
+    title: "Moves at -10 or worse on block",
+    build: () => ({
+      id: uniqueId("preset-punishable"),
+      type: "condition",
+      field: "block",
+      condition: "lessThan",
+      value: "-9",
+      value2: "",
+    }),
+  },
+  {
+    label: "i12 or faster",
+    title: "Moves with impact 12 or lower",
+    build: () => ({
+      id: uniqueId("preset-fast"),
+      type: "condition",
+      field: "impact",
+      condition: "lessThan",
+      value: "13",
+      value2: "",
+    }),
+  },
+];
+
+// A filter is "the same preset" as another when it matches field + condition
+// + value. This lets a second click on the same chip toggle it off.
+function presetMatches(p: PresetSpec, item: FilterItem): boolean {
+  if (item.type !== "condition") return false;
+  const sample = p.build();
+  return (
+    item.field === sample.field &&
+    item.condition === sample.condition &&
+    item.value === sample.value
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Main component
+// ---------------------------------------------------------------------------
 
 interface FilterBuilderProps {
   onFiltersChange: (filters: FilterItem[]) => void;
@@ -47,49 +318,40 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
   onFiltersChange,
   className,
 }) => {
-  const { selectedGame, hitLevels, applyNotation } = useGame();
-  
-  const gameConfig: GameFilterConfig = useMemo(() => 
-    getGameFilterConfig(selectedGame.id, hitLevels),
-    [selectedGame.id, hitLevels]
+  const { selectedGame, hitLevels } = useGame();
+
+  const gameConfig: GameFilterConfig = useMemo(
+    () => getGameFilterConfig(selectedGame.id, hitLevels),
+    [selectedGame.id, hitLevels],
   );
 
   const allOperators: FilterOperator[] = useMemo(() => {
-    const customs = gameConfig.customOperators ?? [];
     const map = new Map<string, FilterOperator>();
     for (const op of builtinOperators) map.set(op.id, op);
-    for (const op of customs) map.set(op.id, op);
+    for (const op of gameConfig.customOperators ?? []) map.set(op.id, op);
     return Array.from(map.values());
   }, [gameConfig]);
 
-  const operatorsById = useMemo(() => operatorById(allOperators), [allOperators]);
-  
-  const fieldMap = useMemo(() => new Map(
-    gameConfig.fields.map((f) => [f.id, f as FieldConfig]),
-  ), [gameConfig]);
+  const operatorsById = useMemo(
+    () => operatorById(allOperators),
+    [allOperators],
+  );
+
+  const fieldMap = useMemo(
+    () => new Map(gameConfig.fields.map((f) => [f.id, f as FieldConfig])),
+    [gameConfig],
+  );
 
   const [filters, setFilters] = useState<FilterItem[]>([]);
   const [rootOperator, setRootOperator] = useState<FilterGroupOperator>("and");
   const [isExpanded, setIsExpanded] = useState(false);
-  const [quickSearchValue, setQuickSearchValue] = useState("");
-  const defaultFilterAdded = useRef(false);
-  const previousActiveFiltersRef = useRef<string | null>(null);
+  const [quickSearch, setQuickSearch] = useState("");
 
-  // Sync quickSearchValue with the first 'input' filter found at root
-  useEffect(() => {
-    const inputFilter = filters.find(f => f.type === 'condition' && f.field === 'input') as FilterCondition | undefined;
-    if (inputFilter) {
-      setQuickSearchValue(inputFilter.value);
-    } else {
-      setQuickSearchValue("");
-    }
-  }, [filters]);
+  const defaultFilterAddedRef = useRef(false);
+  const lastSentRef = useRef<string | null>(null);
 
   const getFieldType = useCallback(
-    (fieldId: string): FieldType => {
-      const field = fieldMap.get(fieldId);
-      return field?.type ?? "text";
-    },
+    (fieldId: string): FieldType => fieldMap.get(fieldId)?.type ?? "text",
     [fieldMap],
   );
 
@@ -109,69 +371,14 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
     [allOperators, fieldMap],
   );
 
-  const isRangeCondition = useCallback(
-    (conditionId: string): boolean => {
-      const op = operatorsById.get(conditionId);
-      return op ? op.input === "range" : false;
-    },
+  const isRange = useCallback(
+    (conditionId: string): boolean =>
+      operatorsById.get(conditionId)?.input === "range",
     [operatorsById],
   );
 
-  const isItemActive = useCallback(
-    (item: FilterItem): boolean => {
-      if (item.type === "group") {
-        return item.filters.some(isItemActive);
-      }
-      const showRange = isRangeCondition(item.condition);
-      if (showRange) {
-        return (
-          item.value.trim() !== "" &&
-          item.value2 != null &&
-          item.value2.trim() !== ""
-        );
-      }
-      return item.value.trim() !== "";
-    },
-    [isRangeCondition],
-  );
-
-  const getActiveFilters = useCallback(
-    (items: FilterItem[]): FilterItem[] => {
-      return items
-        .map((item) => {
-          if (item.type === "group") {
-            const activeSubFilters = getActiveFilters(item.filters);
-            if (activeSubFilters.length === 0) return null;
-            return { ...item, filters: activeSubFilters };
-          }
-          return isItemActive(item) ? item : null;
-        })
-        .filter((item): item is FilterItem => item !== null);
-    },
-    [isItemActive],
-  );
-
-  useEffect(() => {
-    const active = getActiveFilters(filters);
-    
-    // If rootOperator is 'or', we wrap the active filters in an OR group
-    // so that FrameDataTable (which ANDs the top-level array) will OR them.
-    const finalFilters = rootOperator === 'or' && active.length > 1
-      ? [{ id: 'root-group', type: 'group', operator: 'or', filters: active } as FilterItem]
-      : active;
-
-    const activeString = JSON.stringify(finalFilters);
-
-    if (activeString !== previousActiveFiltersRef.current) {
-      if (typeof React.startTransition === "function") {
-        React.startTransition(() => onFiltersChange(finalFilters));
-      } else {
-        onFiltersChange(finalFilters);
-      }
-      previousActiveFiltersRef.current = activeString;
-    }
-  }, [filters, rootOperator, getActiveFilters, onFiltersChange]);
-
+  // Seed with one empty condition on first mount so the builder shows
+  // something meaningful when the user expands it.
   const createDefaultCondition = useCallback((): FilterCondition => {
     const desired = "input";
     const hasDesired = gameConfig.fields.some((f) => f.id === desired);
@@ -182,258 +389,281 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
         ? fallback
         : (gameConfig.fields[0]?.id ?? desired);
     const available = getAvailableConditions(defaultField);
-    const defaultCondition = available[0]?.id ?? "equals";
-
     return {
-      id: `filter-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: uniqueId("filter"),
       type: "condition",
       field: defaultField,
-      condition: defaultCondition,
+      condition: available[0]?.id ?? "equals",
       value: "",
       value2: "",
     };
   }, [gameConfig.fields, getAvailableConditions]);
 
   useEffect(() => {
-    if (filters.length === 0 && !defaultFilterAdded.current) {
+    if (filters.length === 0 && !defaultFilterAddedRef.current) {
       setFilters([createDefaultCondition()]);
-      defaultFilterAdded.current = true;
+      defaultFilterAddedRef.current = true;
     }
   }, [filters.length, createDefaultCondition]);
 
-  const updateItemRecursive = (
-    items: FilterItem[],
-    id: string,
-    updater: (item: FilterItem) => FilterItem | FilterItem[] | null,
-  ): FilterItem[] => {
-    const result: FilterItem[] = [];
-    for (const item of items) {
-      if (item.id === id) {
-        const updated = updater(item);
-        if (updated === null) continue;
-        if (Array.isArray(updated)) {
-          result.push(...updated);
-        } else {
-          result.push(updated);
-        }
-      } else if (item.type === "group") {
-        result.push({
-          ...item,
-          filters: updateItemRecursive(item.filters, id, updater),
-        });
-      } else {
-        result.push(item);
-      }
+  // ---- Outbound: whenever filters / quickSearch / rootOperator change,
+  //      compose the effective filter list and push it upstream. ---------
+
+  const effectiveFilters = useMemo<FilterItem[]>(() => {
+    // Combine quick-search with the tree. The quick-search is NOT kept in
+    // the visible tree — it's a separate implicit filter prepended here so
+    // its state doesn't race with the tree on each keystroke.
+    const quick: FilterItem[] =
+      quickSearch.trim() !== ""
+        ? [
+            {
+              id: "__quick_search__",
+              type: "condition",
+              field: "input",
+              condition: "contains",
+              value: quickSearch,
+              value2: "",
+            },
+          ]
+        : [];
+
+    const pruned = pruneInactive(filters, isRange);
+
+    if (quick.length === 0 && pruned.length === 0) return [];
+
+    if (rootOperator === "or" && pruned.length + quick.length > 1) {
+      return [
+        {
+          id: "root-group",
+          type: "group",
+          operator: "or",
+          filters: [...quick, ...pruned],
+        },
+      ];
     }
-    return result;
-  };
+    return [...quick, ...pruned];
+  }, [filters, quickSearch, rootOperator, isRange]);
 
-  const handleUpdateCondition = (
-    id: string,
-    property: keyof FilterCondition,
-    value: any,
-  ) => {
-    const doUpdate = () => {
+  useEffect(() => {
+    const serialised = JSON.stringify(effectiveFilters);
+    if (serialised === lastSentRef.current) return;
+    lastSentRef.current = serialised;
+    if (typeof React.startTransition === "function") {
+      React.startTransition(() => onFiltersChange(effectiveFilters));
+    } else {
+      onFiltersChange(effectiveFilters);
+    }
+  }, [effectiveFilters, onFiltersChange]);
+
+  // Cheap memoised count — walks the tree once per actual change, not per
+  // render.
+  const activeCount = useMemo(
+    () => countActive(filters, isRange) + (quickSearch.trim() !== "" ? 1 : 0),
+    [filters, isRange, quickSearch],
+  );
+
+  // ---- Tree mutations ----------------------------------------------------
+
+  const updateCondition = useCallback(
+    (id: string, property: keyof FilterCondition, value: any) => {
       setFilters((prev) =>
-        updateItemRecursive(prev, id, (item) => {
+        mapTree(prev, id, (item) => {
           if (item.type === "group") return item;
-          const updated = { ...item, [property]: value };
-
+          const next = { ...item, [property]: value };
           if (property === "field") {
             const oldType = getFieldType(item.field);
             const newType = getFieldType(value);
             const available = getAvailableConditions(value);
-            if (!available.some((c) => c.id === updated.condition)) {
-              updated.condition = available[0]?.id || "equals";
+            if (!available.some((c) => c.id === next.condition)) {
+              next.condition = available[0]?.id ?? "equals";
             }
             if (oldType !== newType) {
-              updated.value = "";
-              updated.value2 = "";
+              next.value = "";
+              next.value2 = "";
             }
           } else if (property === "condition") {
-            if (!isRangeCondition(value) && isRangeCondition(item.condition)) {
-              updated.value2 = "";
+            if (!isRange(value) && isRange(item.condition)) {
+              next.value2 = "";
             }
           }
-          return updated;
-        }) as FilterItem[],
+          return next;
+        }),
       );
-    };
+    },
+    [getAvailableConditions, getFieldType, isRange],
+  );
 
-    if (property === "value" || property === "value2") {
-      if (typeof React.startTransition === "function") {
-        React.startTransition(doUpdate);
+  const updateGroup = useCallback(
+    (id: string, operator: FilterGroupOperator) => {
+      if (id === "root") {
+        setRootOperator(operator);
         return;
       }
-    }
-    doUpdate();
-  };
-
-  const handleUpdateGroup = (id: string, operator: FilterGroupOperator) => {
-    if (id === "root") {
-      setRootOperator(operator);
-      return;
-    }
-    setFilters((prev) =>
-      updateItemRecursive(prev, id, (item) => {
-        if (item.type !== "group") return item;
-        return { ...item, operator };
-      }) as FilterItem[],
-    );
-  };
-
-  const handleRemoveItem = (id: string) => {
-    setFilters((prev) => {
-      const updated = updateItemRecursive(prev, id, () => null);
-      if (updated.length === 0) {
-        return [createDefaultCondition()];
-      }
-      return updated;
-    });
-  };
-
-  const handleAddItem = (parentId: string | null, type: "condition" | "group") => {
-    const newItem: FilterItem =
-      type === "group"
-        ? {
-            id: `group-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            type: "group",
-            operator: "and",
-            filters: [createDefaultCondition()],
-          }
-        : createDefaultCondition();
-
-    if (!parentId) {
-      setFilters((prev) => [...prev, newItem]);
-    } else {
       setFilters((prev) =>
-        updateItemRecursive(prev, parentId, (item) => {
-          if (item.type !== "group") return item;
-          return { ...item, filters: [...item.filters, newItem] };
-        }) as FilterItem[],
+        mapTree(prev, id, (item) =>
+          item.type === "group" ? { ...item, operator } : item,
+        ),
       );
-    }
-  };
+    },
+    [],
+  );
 
-  const handleIndent = (id: string) => {
-    setFilters((prev) =>
-      updateItemRecursive(prev, id, (item) => {
-        return {
-          id: `group-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-          type: "group",
-          operator: "and",
-          filters: [item],
-        };
-      }) as FilterItem[],
-    );
-  };
+  const removeItem = useCallback(
+    (id: string) => {
+      setFilters((prev) => {
+        const next = mapTree(prev, id, () => null);
+        return next.length === 0 ? [createDefaultCondition()] : next;
+      });
+    },
+    [createDefaultCondition],
+  );
 
-  const handleOutdent = (id: string) => {
-    setFilters((prev) => {
-      // We need to find the parent group and move the item out of it
-      const findAndRemove = (items: FilterItem[]): [FilterItem[], FilterItem | null] => {
-        for (let i = 0; i < items.length; i++) {
-          const item = items[i];
-          if (item.type === "group") {
-            const targetIdx = item.filters.findIndex((f) => f.id === id);
-            if (targetIdx !== -1) {
-              const target = item.filters[targetIdx];
-              const newFilters = [...item.filters];
-              newFilters.splice(targetIdx, 1);
-              const newItems = [...items];
-              newItems[i] = { ...item, filters: newFilters };
-              return [newItems, target];
+  const addItem = useCallback(
+    (parentId: string | null, type: "condition" | "group") => {
+      const newItem: FilterItem =
+        type === "group"
+          ? {
+              id: uniqueId("group"),
+              type: "group",
+              operator: "and",
+              filters: [createDefaultCondition()],
             }
-            const [newSubFilters, found] = findAndRemove(item.filters);
-            if (found) {
-              const newItems = [...items];
-              newItems[i] = { ...item, filters: newSubFilters };
-              return [newItems, found];
-            }
-          }
-        }
-        return [items, null];
-      };
-
-      const [newFilters, target] = findAndRemove(prev);
-      if (target) {
-        // Find where to insert the target. For simplicity, we'll just add it to the root
-        // or we could try to find the parent of the parent.
-        // Let's just add it after the group it was in.
-        const insertAfterGroup = (items: FilterItem[], targetItem: FilterItem): FilterItem[] => {
-          const result: FilterItem[] = [];
-          for (const item of items) {
-            result.push(item);
-            if (item.type === "group") {
-              // If this group was the one that contained the item (now removed), 
-              // we should have inserted it already or we do it here.
-              // This logic is a bit complex for a simple outdent.
-            }
-          }
-          return result;
-        };
-        return [...newFilters, target];
-      }
-      return prev;
-    });
-  };
-
-  const handleQuickSearchChange = (val: string) => {
-    setQuickSearchValue(val);
-    setFilters((prev) => {
-      const existingIdx = prev.findIndex(
-        (f) => f.type === "condition" && f.field === "input",
-      );
-      if (existingIdx !== -1) {
-        const newFilters = [...prev];
-        newFilters[existingIdx] = {
-          ...newFilters[existingIdx],
-          value: val,
-        } as FilterCondition;
-        return newFilters;
+          : createDefaultCondition();
+      if (!parentId) {
+        setFilters((prev) => [...prev, newItem]);
       } else {
-        const newFilter: FilterCondition = {
-          id: `filter-quick-${Date.now()}`,
-          type: "condition",
-          field: "input",
-          condition: "contains",
-          value: val,
-          value2: "",
-        };
-        return [newFilter, ...prev];
+        setFilters((prev) =>
+          mapTree(prev, parentId, (item) =>
+            item.type === "group"
+              ? { ...item, filters: [...item.filters, newItem] }
+              : item,
+          ),
+        );
       }
-    });
-  };
+    },
+    [createDefaultCondition],
+  );
 
-  const activeCount = getActiveFilters(filters).length;
+  const indent = useCallback((id: string) => {
+    setFilters((prev) =>
+      mapTree(prev, id, (item) => ({
+        id: uniqueId("group"),
+        type: "group",
+        operator: "and",
+        filters: [item],
+      })),
+    );
+  }, []);
+
+  const outdent = useCallback((id: string) => {
+    setFilters((prev) => outdentInTree(prev, id));
+  }, []);
+
+  const clearAll = useCallback(() => {
+    setQuickSearch("");
+    setRootOperator("and");
+    setFilters([createDefaultCondition()]);
+  }, [createDefaultCondition]);
+
+  // Preset toggle: if an equivalent condition already exists at root, remove
+  // it; otherwise, append one.
+  const togglePreset = useCallback(
+    (preset: PresetSpec) => {
+      setFilters((prev) => {
+        const match = prev.find((f) => presetMatches(preset, f));
+        if (match) {
+          return mapTree(prev, match.id, () => null);
+        }
+        // If the only filter is the seeded empty default, replace it instead
+        // of appending alongside.
+        const onlyEmpty =
+          prev.length === 1 &&
+          prev[0].type === "condition" &&
+          !isConditionActive(prev[0], isRange(prev[0].condition));
+        const fresh = preset.build();
+        return onlyEmpty ? [fresh] : [...prev, fresh];
+      });
+    },
+    [isRange],
+  );
+
+  const isPresetActive = useCallback(
+    (preset: PresetSpec) => filters.some((f) => presetMatches(preset, f)),
+    [filters],
+  );
+
+  // ---- Render ------------------------------------------------------------
 
   return (
     <div className={cn("mb-1 custom-search-builder pt-2", className)}>
-      <div className="py-2 mb-2">
-        <Input
-          placeholder="Quick search (Stance + Command)..."
-          value={quickSearchValue}
-          onChange={(e) => handleQuickSearchChange(e.target.value)}
-          className="w-full h-10 text-base border-primary/20 focus:border-primary focus-visible:border-primary focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+      {/* Quick search + clear-all action */}
+      <div className="py-2 mb-2 flex items-center gap-2">
+        <DebouncedInput
+          placeholder="Quick search (Stance + Command)…"
+          value={quickSearch}
+          onDebouncedChange={setQuickSearch}
+          className="flex-1 h-10 text-base border-primary/20 focus-visible:border-primary focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+          aria-label="Quick search"
         />
+        {activeCount > 0 && (
+          <Button
+            variant="secondary"
+            size="sm"
+            className="h-10 whitespace-nowrap"
+            onClick={clearAll}
+            aria-label="Clear all filters"
+          >
+            <X className="h-4 w-4 mr-1" />
+            Clear ({activeCount})
+          </Button>
+        )}
       </div>
-      <div 
+
+      {/* Preset chips */}
+      <div className="flex flex-wrap gap-1.5 mb-2">
+        {PRESETS.map((preset) => {
+          const active = isPresetActive(preset);
+          return (
+            <button
+              key={preset.label}
+              type="button"
+              title={preset.title}
+              onClick={() => togglePreset(preset)}
+              className={cn(
+                "px-2.5 py-1 rounded-full text-xs font-medium border transition-colors",
+                active
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-muted/30 hover:bg-muted/60 border-border text-foreground/80",
+              )}
+            >
+              {preset.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Collapsible advanced builder */}
+      <div
         className="flex items-center gap-2 mb-1 cursor-pointer select-none hover:text-primary transition-colors"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <ChevronDown className={cn(
-          "h-4 w-4 transition-transform duration-300",
-          !isExpanded && "-rotate-90"
-        )} />
-        <h3 className="text-sm font-medium">
-          Filter builder ({activeCount}):
-        </h3>
+        <ChevronDown
+          className={cn(
+            "h-4 w-4 transition-transform duration-300",
+            !isExpanded && "-rotate-90",
+          )}
+        />
+        <h3 className="text-sm font-medium">Advanced filters</h3>
       </div>
 
-      <div className={cn(
-        "grid transition-all duration-300 ease-in-out",
-        isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-      )}>
+      <div
+        className={cn(
+          "grid transition-all duration-300 ease-in-out",
+          isExpanded
+            ? "grid-rows-[1fr] opacity-100"
+            : "grid-rows-[0fr] opacity-0",
+        )}
+      >
         <div className="overflow-hidden">
           <div className="space-y-2 pt-1">
             <FilterGroupRow
@@ -441,20 +671,20 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
                 id: "root",
                 type: "group",
                 operator: rootOperator,
-                filters: filters,
+                filters,
               }}
               fields={gameConfig.fields}
               getFieldType={getFieldType}
               getAvailableConditions={getAvailableConditions}
-              isRangeCondition={isRangeCondition}
-              onUpdateCondition={handleUpdateCondition}
-              onUpdateGroup={handleUpdateGroup}
-              onRemove={handleRemoveItem}
-              onAdd={handleAddItem}
-              onIndent={handleIndent}
-              onOutdent={handleOutdent}
+              isRange={isRange}
+              onUpdateCondition={updateCondition}
+              onUpdateGroup={updateGroup}
+              onRemove={removeItem}
+              onAdd={addItem}
+              onIndent={indent}
+              onOutdent={outdent}
               depth={0}
-              isRoot={true}
+              isRoot
             />
           </div>
         </div>
@@ -463,12 +693,20 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
   );
 };
 
+// ---------------------------------------------------------------------------
+// Subcomponents
+// ---------------------------------------------------------------------------
+
 interface BaseFilterProps {
   fields: FieldConfig[];
   getFieldType: (id: string) => FieldType;
   getAvailableConditions: (id: string) => FilterOperator[];
-  isRangeCondition: (id: string) => boolean;
-  onUpdateCondition: (id: string, property: keyof FilterCondition, value: any) => void;
+  isRange: (id: string) => boolean;
+  onUpdateCondition: (
+    id: string,
+    property: keyof FilterCondition,
+    value: any,
+  ) => void;
   onUpdateGroup: (id: string, operator: FilterGroupOperator) => void;
   onRemove: (id: string) => void;
   onAdd: (parentId: string | null, type: "condition" | "group") => void;
@@ -477,105 +715,81 @@ interface BaseFilterProps {
   depth: number;
 }
 
-interface FilterItemComponentProps extends BaseFilterProps {
-  item: FilterItem;
-}
-
-interface FilterGroupRowProps extends BaseFilterProps {
-  group: FilterGroup;
-  isRoot: boolean;
-}
-
-interface FilterRowProps extends BaseFilterProps {
-  filter: FilterCondition;
-}
-
-const FilterItemComponent: React.FC<FilterItemComponentProps> = (props) => {
-  const { item } = props;
-
-  if (item.type === "group") {
-    return <FilterGroupRow {...props} group={item} isRoot={false} />;
+const FilterItemComponent: React.FC<BaseFilterProps & { item: FilterItem }> = (
+  props,
+) => {
+  if (props.item.type === "group") {
+    return <FilterGroupRow {...props} group={props.item} isRoot={false} />;
   }
-
-  return <FilterRow {...props} filter={item} />;
+  return <FilterRow {...props} filter={props.item} />;
 };
 
-const FilterGroupRow: React.FC<FilterGroupRowProps> = (props) => {
+const FilterGroupRow: React.FC<
+  BaseFilterProps & { group: FilterGroup; isRoot: boolean }
+> = (props) => {
   const { group, onUpdateGroup, onRemove, onAdd, depth, isRoot } = props;
 
-  const content = (
+  const toggleOp = () =>
+    onUpdateGroup(group.id, group.operator === "and" ? "or" : "and");
+
+  const operatorToggle = (
+    <button
+      type="button"
+      onClick={toggleOp}
+      className={cn(
+        "flex flex-col items-center justify-center min-w-[36px] px-1.5 select-none border-l border-y rounded-l-md transition-colors",
+        group.operator === "and"
+          ? "bg-primary/10 hover:bg-primary/20 text-primary"
+          : "bg-amber-500/10 hover:bg-amber-500/20 text-amber-500",
+      )}
+      aria-label={`Toggle ${group.operator.toUpperCase()} — click to change`}
+      title={`Currently ${group.operator.toUpperCase()} — click to switch`}
+    >
+      <span
+        className="text-[11px] font-bold uppercase tracking-wider"
+        style={{
+          writingMode: "vertical-lr",
+          transform: "rotate(180deg)",
+        }}
+      >
+        {group.operator}
+      </span>
+    </button>
+  );
+
+  const body = (
     <div className="space-y-2 flex-1">
-      {group.filters.map((subItem) => (
+      {group.filters.map((sub) => (
         <FilterItemComponent
           {...props}
-          key={subItem.id}
-          item={subItem}
+          key={sub.id}
+          item={sub}
           depth={depth + 1}
         />
       ))}
-      {!isRoot && (
-        <Button
-          variant="secondary"
-          size="sm"
-          className="h-8 text-xs bg-muted/30 hover:bg-muted/50"
-          onClick={() => onAdd(group.id, "condition")}
-        >
-          Add Condition
-        </Button>
-      )}
-      {isRoot && group.filters.length === 0 && (
-        <Button
-          variant="secondary"
-          size="sm"
-          className="h-8 text-xs bg-muted/30 hover:bg-muted/50"
-          onClick={() => onAdd(null as any, "condition")}
-        >
-          Add Condition
-        </Button>
-      )}
+      <Button
+        variant="secondary"
+        size="sm"
+        className="h-8 text-xs bg-muted/30 hover:bg-muted/50"
+        onClick={() => onAdd(isRoot ? null : group.id, "condition")}
+      >
+        Add condition
+      </Button>
     </div>
   );
 
   if (isRoot) {
     return (
       <div className="flex gap-0">
-        <div 
-          className="flex flex-col items-center justify-center bg-muted/20 border-l border-y rounded-l-md px-1.5 cursor-pointer hover:bg-muted/30 transition-colors min-w-[32px]"
-          onClick={() => onUpdateGroup(group.id, group.operator === 'and' ? 'or' : 'and')}
-        >
-          <span className="text-[10px] font-bold uppercase select-none" style={{ writingMode: 'vertical-lr', transform: 'rotate(180deg)' }}>
-            {group.operator}
-          </span>
-        </div>
-        <div className="flex-1 border rounded-r-md p-3 bg-muted/5">
-          {content}
-          {isRoot && (
-            <div className="mt-2">
-              <Button
-                variant="secondary"
-                size="sm"
-                className="h-8 text-xs bg-muted/30 hover:bg-muted/50"
-                onClick={() => onAdd(null as any, "condition")}
-              >
-                Add Condition
-              </Button>
-            </div>
-          )}
-        </div>
+        {operatorToggle}
+        <div className="flex-1 border rounded-r-md p-3 bg-muted/5">{body}</div>
       </div>
     );
   }
 
   return (
     <div className="flex gap-0 group-container">
-      <div 
-        className="flex flex-col items-center justify-center bg-muted/20 border-l border-y rounded-l-md px-1.5 cursor-pointer hover:bg-muted/30 transition-colors min-w-[32px]"
-        onClick={() => onUpdateGroup(group.id, group.operator === 'and' ? 'or' : 'and')}
-      >
-        <span className="text-[10px] font-bold uppercase select-none" style={{ writingMode: 'vertical-lr', transform: 'rotate(180deg)' }}>
-          {group.operator}
-        </span>
-      </div>
+      {operatorToggle}
       <div className="flex-1 border-y border-r rounded-r-md p-3 bg-muted/5 relative">
         <Button
           variant="ghost"
@@ -586,51 +800,56 @@ const FilterGroupRow: React.FC<FilterGroupRowProps> = (props) => {
         >
           <X className="h-3 w-3" />
         </Button>
-        {content}
+        {body}
       </div>
     </div>
   );
 };
 
-const FilterRow: React.FC<FilterRowProps> = ({
+const FilterRow: React.FC<BaseFilterProps & { filter: FilterCondition }> = ({
   filter,
   fields,
   getFieldType,
   getAvailableConditions,
-  isRangeCondition,
+  isRange,
   onUpdateCondition,
   onRemove,
   onIndent,
   onOutdent,
-  depth
+  depth,
 }) => {
   const fieldType = getFieldType(filter.field);
   const availableConditions = getAvailableConditions(filter.field);
-  const showRange = isRangeCondition(filter.condition);
+  const showRange = isRange(filter.condition);
   const field = fields.find((f) => f.id === filter.field);
   const isEnum = fieldType === "enum";
-  const multi = availableConditions.find((op) => op.id === filter.condition)?.input === "multi";
+  const multi =
+    availableConditions.find((op) => op.id === filter.condition)?.input ===
+    "multi";
+
+  const numericType = fieldType === "number";
 
   return (
     <div className="flex items-center justify-between gap-2 group/row">
-      <div className="flex items-center gap-2 flex-1">
+      <div className="flex items-center gap-2 flex-1 flex-wrap">
         <Combobox
           value={filter.field}
-          onChange={(val) => val && onUpdateCondition(filter.id, "field", val)}
-          options={fields.map((f) => ({
-            label: f.label,
-            value: f.id,
-          }))}
-          placeholder="Data"
-          className="w-[160px] border-red-500/50 focus:border-red-500 focus:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
-          aria-label="Select data field"
+          onChange={(v) => v && onUpdateCondition(filter.id, "field", v)}
+          options={fields.map((f) => ({ label: f.label, value: f.id }))}
+          placeholder="Field"
+          className="w-[160px] focus-visible:ring-0 focus-visible:ring-offset-0"
+          aria-label="Select field"
         />
 
         <Select
           value={filter.condition}
-          onValueChange={(value) => onUpdateCondition(filter.id, "condition", value)}
+          onValueChange={(v) => onUpdateCondition(filter.id, "condition", v)}
         >
-          <SelectTrigger className="w-[140px] h-8 border-green-500/50 focus:border-green-500 focus:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0" disabled={availableConditions.length <= 1} aria-label="Select condition">
+          <SelectTrigger
+            className="w-[140px] h-8 focus-visible:ring-0 focus-visible:ring-offset-0"
+            disabled={availableConditions.length <= 1}
+            aria-label="Select condition"
+          >
             <SelectValue placeholder="Condition" />
           </SelectTrigger>
           <SelectContent>
@@ -644,52 +863,73 @@ const FilterRow: React.FC<FilterRowProps> = ({
 
         {showRange ? (
           <div className="flex items-center gap-2">
-            <Input
-              type={fieldType === "number" ? "number" : "text"}
+            <DebouncedInput
+              type={numericType ? "number" : "text"}
               value={filter.value}
-              onChange={(e) => onUpdateCondition(filter.id, "value", e.target.value)}
+              onDebouncedChange={(v) =>
+                onUpdateCondition(filter.id, "value", v)
+              }
               placeholder="Min"
-              className="w-[80px] h-8 text-sm border-blue-500/50 focus:border-blue-500 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:bg-transparent"
+              className="w-[90px] h-8 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+              aria-label="Minimum value"
             />
-            <span className="text-muted-foreground">-</span>
-            <Input
-              type={fieldType === "number" ? "number" : "text"}
-              value={filter.value2 || ""}
-              onChange={(e) => onUpdateCondition(filter.id, "value2", e.target.value)}
+            <span className="text-muted-foreground">–</span>
+            <DebouncedInput
+              type={numericType ? "number" : "text"}
+              value={filter.value2 ?? ""}
+              onDebouncedChange={(v) =>
+                onUpdateCondition(filter.id, "value2", v)
+              }
               placeholder="Max"
-              className="w-[80px] h-8 text-sm border-blue-500/50 focus:border-blue-500 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:bg-transparent"
+              className="w-[90px] h-8 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+              aria-label="Maximum value"
             />
           </div>
         ) : isEnum ? (
           multi ? (
             field?.id === "hitLevel" ? (
               <HitLevelMultiCombobox
-                value={(filter.value || "").split(",").map((s) => s.trim()).filter(Boolean)}
-                onChange={(vals) => onUpdateCondition(filter.id, "value", vals.join(","))}
-                options={(field?.options ?? []).map((o) => ({ value: o.value }))}
+                value={(filter.value || "")
+                  .split(",")
+                  .map((s) => s.trim())
+                  .filter(Boolean)}
+                onChange={(vals) =>
+                  onUpdateCondition(filter.id, "value", vals.join(","))
+                }
+                options={(field?.options ?? []).map((o) => ({
+                  value: o.value,
+                }))}
                 placeholder="Value"
-                className="border-blue-500/50 focus:border-blue-500 focus:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+                className="focus-visible:ring-0 focus-visible:ring-offset-0"
                 aria-label="Select hit levels"
               />
             ) : (
               <MultiCombobox
-                value={(filter.value || "").split(",").map((s) => s.trim()).filter(Boolean)}
-                onChange={(vals) => onUpdateCondition(filter.id, "value", vals.join(","))}
+                value={(filter.value || "")
+                  .split(",")
+                  .map((s) => s.trim())
+                  .filter(Boolean)}
+                onChange={(vals) =>
+                  onUpdateCondition(filter.id, "value", vals.join(","))
+                }
                 options={(field?.options ?? []).map((o) => ({
                   label: o.label ?? o.value,
                   value: o.value,
                 }))}
                 placeholder="Value"
-                className="border-blue-500/50 focus:border-blue-500 focus:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+                className="focus-visible:ring-0 focus-visible:ring-offset-0"
                 aria-label="Select values"
               />
             )
           ) : (
             <Select
               value={filter.value}
-              onValueChange={(value) => onUpdateCondition(filter.id, "value", value)}
+              onValueChange={(v) => onUpdateCondition(filter.id, "value", v)}
             >
-              <SelectTrigger className="w-[180px] h-8 border-blue-500/50 focus:border-blue-500 focus:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0" aria-label="Select value">
+              <SelectTrigger
+                className="w-[180px] h-8 focus-visible:ring-0 focus-visible:ring-offset-0"
+                aria-label="Select value"
+              >
                 <SelectValue placeholder="Value" />
               </SelectTrigger>
               <SelectContent>
@@ -702,12 +942,13 @@ const FilterRow: React.FC<FilterRowProps> = ({
             </Select>
           )
         ) : (
-          <Input
-            type={fieldType === "number" ? "number" : "text"}
+          <DebouncedInput
+            type={numericType ? "number" : "text"}
             value={filter.value}
-            onChange={(e) => onUpdateCondition(filter.id, "value", e.target.value)}
+            onDebouncedChange={(v) => onUpdateCondition(filter.id, "value", v)}
             placeholder="Value"
-            className="w-[180px] h-8 text-sm border-blue-500/50 focus:border-blue-500 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:bg-transparent"
+            className="w-[200px] h-8 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+            aria-label="Value"
           />
         )}
       </div>
@@ -717,9 +958,12 @@ const FilterRow: React.FC<FilterRowProps> = ({
           <Button
             variant="secondary"
             size="icon"
+            className="h-8 w-8 bg-muted/50 hover:bg-muted"
+            onClick={() => onOutdent(filter.id)}
             aria-label="Outdent"
+            title="Move out of group"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronDown className="h-4 w-4 -rotate-90" />
           </Button>
         )}
         <Button
@@ -728,6 +972,7 @@ const FilterRow: React.FC<FilterRowProps> = ({
           className="h-8 w-8 bg-muted/50 hover:bg-muted"
           onClick={() => onIndent(filter.id)}
           aria-label="Indent"
+          title="Move into a new group"
         >
           <ChevronRight className="h-4 w-4" />
         </Button>

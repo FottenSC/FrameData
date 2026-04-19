@@ -13,12 +13,21 @@
     "Impact": 12,
     "Damage": "8",
     "DamageDec": 8,
-    "Block": "-8",
-    "BlockDec": -8,
-    "Hit": "-2",
-    "HitDec": -2,
-    "CounterHit": "2",
-    "CounterHitDec": 2,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": -2,
+      "tags": [],
+      "raw": "-2"
+    },
+    "CounterHit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
     "GuardBurst": 1,
     "Notes": "Cancel with G"
   },
@@ -39,12 +48,21 @@
     "Impact": 12,
     "Damage": "8,18",
     "DamageDec": 26,
-    "Block": "-12",
-    "BlockDec": -12,
-    "Hit": "2",
-    "HitDec": 2,
-    "CounterHit": "2",
-    "CounterHitDec": 2,
+    "Block": {
+      "advantage": -12,
+      "tags": [],
+      "raw": "-12"
+    },
+    "Hit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
+    "CounterHit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
     "GuardBurst": 3,
     "Notes": ":LH: if 1st strike misses and 2nd strike hits"
   },
@@ -64,12 +82,21 @@
     "Impact": 12,
     "Damage": "8,18",
     "DamageDec": 26,
-    "Block": "-8",
-    "BlockDec": -8,
-    "Hit": "6",
-    "HitDec": 6,
-    "CounterHit": "6",
-    "CounterHitDec": 6,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": 6,
+      "tags": [],
+      "raw": "6"
+    },
+    "CounterHit": {
+      "advantage": 6,
+      "tags": [],
+      "raw": "6"
+    },
     "GuardBurst": 4,
     "Notes": "NCC"
   },
@@ -88,12 +115,21 @@
     "Impact": 22,
     "Damage": "22",
     "DamageDec": 22,
-    "Block": "-8",
-    "BlockDec": -8,
-    "Hit": "2",
-    "HitDec": 2,
-    "CounterHit": "2",
-    "CounterHitDec": 2,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
+    "CounterHit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
     "GuardBurst": 1,
     "Notes": null
   },
@@ -114,12 +150,21 @@
     "Impact": 22,
     "Damage": "22",
     "DamageDec": 22,
-    "Block": "0",
-    "BlockDec": 0,
-    "Hit": "12",
-    "HitDec": 12,
-    "CounterHit": "12",
-    "CounterHitDec": 12,
+    "Block": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "0"
+    },
+    "Hit": {
+      "advantage": 12,
+      "tags": [],
+      "raw": "12"
+    },
+    "CounterHit": {
+      "advantage": 12,
+      "tags": [],
+      "raw": "12"
+    },
     "GuardBurst": 1,
     "Notes": ":SS: into SE"
   },
@@ -139,12 +184,21 @@
     "Impact": 16,
     "Damage": "22",
     "DamageDec": 22,
-    "Block": "-6",
-    "BlockDec": -6,
-    "Hit": "2",
-    "HitDec": 2,
-    "CounterHit": "2",
-    "CounterHitDec": 2,
+    "Block": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "Hit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
+    "CounterHit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
     "GuardBurst": 1,
     "Notes": null
   },
@@ -163,12 +217,21 @@
     "Impact": 16,
     "Damage": "12",
     "DamageDec": 12,
-    "Block": "-16",
-    "BlockDec": -16,
-    "Hit": "-12",
-    "HitDec": -12,
-    "CounterHit": "-2",
-    "CounterHitDec": -2,
+    "Block": {
+      "advantage": -16,
+      "tags": [],
+      "raw": "-16"
+    },
+    "Hit": {
+      "advantage": -12,
+      "tags": [],
+      "raw": "-12"
+    },
+    "CounterHit": {
+      "advantage": -2,
+      "tags": [],
+      "raw": "-2"
+    },
     "GuardBurst": 1,
     "Notes": null
   },
@@ -190,12 +253,21 @@
     "Impact": 16,
     "Damage": "12,10,20",
     "DamageDec": 42,
-    "Block": "-4",
-    "BlockDec": -4,
-    "Hit": "6",
-    "HitDec": 6,
-    "CounterHit": "6",
-    "CounterHitDec": 6,
+    "Block": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
+    "Hit": {
+      "advantage": 6,
+      "tags": [],
+      "raw": "6"
+    },
+    "CounterHit": {
+      "advantage": 6,
+      "tags": [],
+      "raw": "6"
+    },
     "GuardBurst": 7,
     "Notes": "NCC"
   },
@@ -216,12 +288,21 @@
     "Impact": 16,
     "Damage": "12,18",
     "DamageDec": 30,
-    "Block": "2",
-    "BlockDec": 2,
-    "Hit": "6",
-    "HitDec": 6,
-    "CounterHit": "6",
-    "CounterHitDec": 6,
+    "Block": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
+    "Hit": {
+      "advantage": 6,
+      "tags": [],
+      "raw": "6"
+    },
+    "CounterHit": {
+      "advantage": 6,
+      "tags": [],
+      "raw": "6"
+    },
     "GuardBurst": 3,
     "Notes": null
   },
@@ -240,12 +321,23 @@
     "Impact": 20,
     "Damage": "18",
     "DamageDec": 18,
-    "Block": "-16",
-    "BlockDec": -16,
-    "Hit": "-4",
-    "HitDec": -4,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -16,
+      "tags": [],
+      "raw": "-16"
+    },
+    "Hit": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 4,
     "Notes": null
   },
@@ -264,12 +356,21 @@
     "Impact": 18,
     "Damage": "18",
     "DamageDec": 18,
-    "Block": "-6",
-    "BlockDec": -6,
-    "Hit": "12",
-    "HitDec": 12,
-    "CounterHit": "12",
-    "CounterHitDec": 12,
+    "Block": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "Hit": {
+      "advantage": 12,
+      "tags": [],
+      "raw": "12"
+    },
+    "CounterHit": {
+      "advantage": 12,
+      "tags": [],
+      "raw": "12"
+    },
     "GuardBurst": 1,
     "Notes": null
   },
@@ -288,12 +389,21 @@
     "Impact": 22,
     "Damage": "16",
     "DamageDec": 16,
-    "Block": "-12",
-    "BlockDec": -12,
-    "Hit": "0",
-    "HitDec": 0,
-    "CounterHit": "4",
-    "CounterHitDec": 4,
+    "Block": {
+      "advantage": -12,
+      "tags": [],
+      "raw": "-12"
+    },
+    "Hit": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "0"
+    },
+    "CounterHit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
     "GuardBurst": 1,
     "Notes": null
   },
@@ -312,12 +422,21 @@
     "Impact": 16,
     "Damage": "10",
     "DamageDec": 10,
-    "Block": "-10",
-    "BlockDec": -10,
-    "Hit": "-2",
-    "HitDec": -2,
-    "CounterHit": "-2",
-    "CounterHitDec": -2,
+    "Block": {
+      "advantage": -10,
+      "tags": [],
+      "raw": "-10"
+    },
+    "Hit": {
+      "advantage": -2,
+      "tags": [],
+      "raw": "-2"
+    },
+    "CounterHit": {
+      "advantage": -2,
+      "tags": [],
+      "raw": "-2"
+    },
     "GuardBurst": 1,
     "Notes": "TC [8-RC]"
   },
@@ -336,12 +455,21 @@
     "Impact": 26,
     "Damage": "12",
     "DamageDec": 12,
-    "Block": "-18",
-    "BlockDec": -18,
-    "Hit": "-4",
-    "HitDec": -4,
-    "CounterHit": "-4",
-    "CounterHitDec": -4,
+    "Block": {
+      "advantage": -18,
+      "tags": [],
+      "raw": "-18"
+    },
+    "Hit": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
+    "CounterHit": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
     "GuardBurst": 1,
     "Notes": "TC [10-RC]"
   },
@@ -362,12 +490,21 @@
     "Impact": 26,
     "Damage": "12,12",
     "DamageDec": 24,
-    "Block": "-14",
-    "BlockDec": -14,
-    "Hit": "-2",
-    "HitDec": -2,
-    "CounterHit": "-2",
-    "CounterHitDec": -2,
+    "Block": {
+      "advantage": -14,
+      "tags": [],
+      "raw": "-14"
+    },
+    "Hit": {
+      "advantage": -2,
+      "tags": [],
+      "raw": "-2"
+    },
+    "CounterHit": {
+      "advantage": -2,
+      "tags": [],
+      "raw": "-2"
+    },
     "GuardBurst": 3,
     "Notes": "NCC. TC [0-RC]"
   },
@@ -386,12 +523,21 @@
     "Impact": 20,
     "Damage": "20",
     "DamageDec": 20,
-    "Block": "0",
-    "BlockDec": 0,
-    "Hit": "8",
-    "HitDec": 8,
-    "CounterHit": "8",
-    "CounterHitDec": 8,
+    "Block": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "0"
+    },
+    "Hit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "8"
+    },
+    "CounterHit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "8"
+    },
     "GuardBurst": 3,
     "Notes": null
   },
@@ -413,12 +559,21 @@
     "Impact": 20,
     "Damage": "20",
     "DamageDec": 20,
-    "Block": "-4",
-    "BlockDec": -4,
-    "Hit": "4",
-    "HitDec": 4,
-    "CounterHit": "4",
-    "CounterHitDec": 4,
+    "Block": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
+    "Hit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
+    "CounterHit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
     "GuardBurst": 3,
     "Notes": ":SS:"
   },
@@ -441,12 +596,27 @@
     "Impact": 54,
     "Damage": "100",
     "DamageDec": 100,
-    "Block": "KND",
-    "BlockDec": null,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": null,
     "Notes": ":UA:. :G: cancel. TC [7-46]. TJ [47-73]"
   },
@@ -466,12 +636,21 @@
     "Impact": 16,
     "Damage": "10",
     "DamageDec": 10,
-    "Block": "-10",
-    "BlockDec": -10,
-    "Hit": "-2",
-    "HitDec": -2,
-    "CounterHit": "-2",
-    "CounterHitDec": -2,
+    "Block": {
+      "advantage": -10,
+      "tags": [],
+      "raw": "-10"
+    },
+    "Hit": {
+      "advantage": -2,
+      "tags": [],
+      "raw": "-2"
+    },
+    "CounterHit": {
+      "advantage": -2,
+      "tags": [],
+      "raw": "-2"
+    },
     "GuardBurst": 1,
     "Notes": "TC [0-9] TC [17-RC]"
   },
@@ -491,12 +670,23 @@
     "Impact": 20,
     "Damage": "30",
     "DamageDec": 30,
-    "Block": "-4",
-    "BlockDec": -4,
-    "Hit": "8",
-    "HitDec": 8,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
+    "Hit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "8"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 1,
     "Notes": "TC [0-5]"
   },
@@ -516,12 +706,21 @@
     "Impact": 20,
     "Damage": "14",
     "DamageDec": 14,
-    "Block": "-16",
-    "BlockDec": -16,
-    "Hit": "-2",
-    "HitDec": -2,
-    "CounterHit": "-2",
-    "CounterHitDec": -2,
+    "Block": {
+      "advantage": -16,
+      "tags": [],
+      "raw": "-16"
+    },
+    "Hit": {
+      "advantage": -2,
+      "tags": [],
+      "raw": "-2"
+    },
+    "CounterHit": {
+      "advantage": -2,
+      "tags": [],
+      "raw": "-2"
+    },
     "GuardBurst": 4,
     "Notes": "TC [0-5]"
   },
@@ -540,12 +739,21 @@
     "Impact": 28,
     "Damage": "22",
     "DamageDec": 22,
-    "Block": "-12",
-    "BlockDec": -12,
-    "Hit": "4",
-    "HitDec": 4,
-    "CounterHit": "4",
-    "CounterHitDec": 4,
+    "Block": {
+      "advantage": -12,
+      "tags": [],
+      "raw": "-12"
+    },
+    "Hit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
+    "CounterHit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
     "GuardBurst": 1,
     "Notes": "Slight damage difference depending on the jump direction"
   },
@@ -565,12 +773,25 @@
     "Impact": 12,
     "Damage": "19",
     "DamageDec": 19,
-    "Block": "-8",
-    "BlockDec": -8,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 2,
     "Notes": null
   },
@@ -593,12 +814,21 @@
     "Impact": 22,
     "Damage": "8",
     "DamageDec": 8,
-    "Block": "-14",
-    "BlockDec": -14,
-    "Hit": "-6",
-    "HitDec": -6,
-    "CounterHit": "4",
-    "CounterHitDec": 4,
+    "Block": {
+      "advantage": -14,
+      "tags": [],
+      "raw": "-14"
+    },
+    "Hit": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "CounterHit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
     "GuardBurst": 2,
     "Notes": ":GI:[15-21] vs :L: attack. TC[16-54]"
   },
@@ -621,12 +851,25 @@
     "Impact": 22,
     "Damage": "8,24",
     "DamageDec": 32,
-    "Block": "-14",
-    "BlockDec": -14,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -14,
+      "tags": [],
+      "raw": "-14"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 6,
     "Notes": "NCC. Combos on GI. TC[0-13]"
   },
@@ -644,12 +887,21 @@
     "Impact": 16,
     "Damage": "12",
     "DamageDec": 12,
-    "Block": "-10",
-    "BlockDec": -10,
-    "Hit": "-4",
-    "HitDec": -4,
-    "CounterHit": "-4",
-    "CounterHitDec": -4,
+    "Block": {
+      "advantage": -10,
+      "tags": [],
+      "raw": "-10"
+    },
+    "Hit": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
+    "CounterHit": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
     "GuardBurst": 2,
     "Notes": "Cancel with G"
   },
@@ -669,12 +921,21 @@
     "Impact": 16,
     "Damage": "12,16",
     "DamageDec": 28,
-    "Block": "-10",
-    "BlockDec": -10,
-    "Hit": "-4",
-    "HitDec": -4,
-    "CounterHit": "-4",
-    "CounterHitDec": -4,
+    "Block": {
+      "advantage": -10,
+      "tags": [],
+      "raw": "-10"
+    },
+    "Hit": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
+    "CounterHit": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
     "GuardBurst": 5,
     "Notes": null
   },
@@ -696,12 +957,21 @@
     "Impact": 16,
     "Damage": "12,16,28",
     "DamageDec": 56,
-    "Block": "-10",
-    "BlockDec": -10,
-    "Hit": "-4",
-    "HitDec": -4,
-    "CounterHit": "-4",
-    "CounterHitDec": -4,
+    "Block": {
+      "advantage": -10,
+      "tags": [],
+      "raw": "-10"
+    },
+    "Hit": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
+    "CounterHit": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
     "GuardBurst": 10,
     "Notes": null
   },
@@ -725,12 +995,25 @@
     "Impact": 16,
     "Damage": "12,16,38",
     "DamageDec": 66,
-    "Block": "6",
-    "BlockDec": 6,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": 6,
+      "tags": [],
+      "raw": "6"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 12,
     "Notes": ":BA:"
   },
@@ -749,12 +1032,21 @@
     "Impact": 16,
     "Damage": "32",
     "DamageDec": 32,
-    "Block": "-12",
-    "BlockDec": -12,
-    "Hit": "-10",
-    "HitDec": -10,
-    "CounterHit": "-10",
-    "CounterHitDec": -10,
+    "Block": {
+      "advantage": -12,
+      "tags": [],
+      "raw": "-12"
+    },
+    "Hit": {
+      "advantage": -10,
+      "tags": [],
+      "raw": "-10"
+    },
+    "CounterHit": {
+      "advantage": -10,
+      "tags": [],
+      "raw": "-10"
+    },
     "GuardBurst": 9,
     "Notes": null
   },
@@ -773,12 +1065,25 @@
     "Impact": 22,
     "Damage": "30",
     "DamageDec": 30,
-    "Block": "-8",
-    "BlockDec": -8,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 4,
     "Notes": null
   },
@@ -798,12 +1103,21 @@
     "Impact": 26,
     "Damage": "24",
     "DamageDec": 24,
-    "Block": "-10",
-    "BlockDec": -10,
-    "Hit": "6",
-    "HitDec": 6,
-    "CounterHit": "6",
-    "CounterHitDec": 6,
+    "Block": {
+      "advantage": -10,
+      "tags": [],
+      "raw": "-10"
+    },
+    "Hit": {
+      "advantage": 6,
+      "tags": [],
+      "raw": "6"
+    },
+    "CounterHit": {
+      "advantage": 6,
+      "tags": [],
+      "raw": "6"
+    },
     "GuardBurst": 3,
     "Notes": null
   },
@@ -822,12 +1136,21 @@
     "Impact": 20,
     "Damage": "20",
     "DamageDec": 20,
-    "Block": "-8",
-    "BlockDec": -8,
-    "Hit": "4",
-    "HitDec": 4,
-    "CounterHit": "4",
-    "CounterHitDec": 4,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
+    "CounterHit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
     "GuardBurst": 3,
     "Notes": "Stun on tip hit"
   },
@@ -846,12 +1169,21 @@
     "Impact": 18,
     "Damage": "14",
     "DamageDec": 14,
-    "Block": "-8",
-    "BlockDec": -8,
-    "Hit": "0",
-    "HitDec": 0,
-    "CounterHit": "0",
-    "CounterHitDec": 0,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "0"
+    },
+    "CounterHit": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "0"
+    },
     "GuardBurst": 2,
     "Notes": "TC [16-31]"
   },
@@ -872,12 +1204,21 @@
     "Impact": 18,
     "Damage": "14,26",
     "DamageDec": 40,
-    "Block": "-4",
-    "BlockDec": -4,
-    "Hit": "0",
-    "HitDec": 0,
-    "CounterHit": "0",
-    "CounterHitDec": 0,
+    "Block": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
+    "Hit": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "0"
+    },
+    "CounterHit": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "0"
+    },
     "GuardBurst": 7,
     "Notes": "NCC. Gives stun if only the last hit is a CH"
   },
@@ -900,12 +1241,21 @@
     "Impact": 18,
     "Damage": "14,26",
     "DamageDec": 40,
-    "Block": "4",
-    "BlockDec": 4,
-    "Hit": "8",
-    "HitDec": 8,
-    "CounterHit": "8",
-    "CounterHitDec": 8,
+    "Block": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
+    "Hit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "8"
+    },
+    "CounterHit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "8"
+    },
     "GuardBurst": 7,
     "Notes": "Gives stun if only the last hit is a CH. :SS:"
   },
@@ -926,12 +1276,21 @@
     "Impact": 18,
     "Damage": "14,18",
     "DamageDec": 32,
-    "Block": "-8",
-    "BlockDec": -8,
-    "Hit": "6",
-    "HitDec": 6,
-    "CounterHit": "6",
-    "CounterHitDec": 6,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": 6,
+      "tags": [],
+      "raw": "6"
+    },
+    "CounterHit": {
+      "advantage": 6,
+      "tags": [],
+      "raw": "6"
+    },
     "GuardBurst": 9,
     "Notes": "TC [0-15]"
   },
@@ -953,12 +1312,21 @@
     "Impact": 12,
     "Damage": "20",
     "DamageDec": 20,
-    "Block": "-20",
-    "BlockDec": -20,
-    "Hit": "-10",
-    "HitDec": -10,
-    "CounterHit": "-10",
-    "CounterHitDec": -10,
+    "Block": {
+      "advantage": -20,
+      "tags": [],
+      "raw": "-20"
+    },
+    "Hit": {
+      "advantage": -10,
+      "tags": [],
+      "raw": "-10"
+    },
+    "CounterHit": {
+      "advantage": -10,
+      "tags": [],
+      "raw": "-10"
+    },
     "GuardBurst": 2,
     "Notes": ":TH:"
   },
@@ -982,12 +1350,27 @@
     "Impact": 12,
     "Damage": "41",
     "DamageDec": 41,
-    "Block": "KND",
-    "BlockDec": null,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": null,
     "Notes": ":TH:"
   },
@@ -1009,12 +1392,21 @@
     "Impact": 12,
     "Damage": "20,16",
     "DamageDec": 36,
-    "Block": "-14",
-    "BlockDec": -14,
-    "Hit": "2",
-    "HitDec": 2,
-    "CounterHit": "2",
-    "CounterHitDec": 2,
+    "Block": {
+      "advantage": -14,
+      "tags": [],
+      "raw": "-14"
+    },
+    "Hit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
+    "CounterHit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
     "GuardBurst": 4,
     "Notes": null
   },
@@ -1033,12 +1425,21 @@
     "Impact": 22,
     "Damage": "14",
     "DamageDec": 14,
-    "Block": "-16",
-    "BlockDec": -16,
-    "Hit": "-2",
-    "HitDec": -2,
-    "CounterHit": "-2",
-    "CounterHitDec": -2,
+    "Block": {
+      "advantage": -16,
+      "tags": [],
+      "raw": "-16"
+    },
+    "Hit": {
+      "advantage": -2,
+      "tags": [],
+      "raw": "-2"
+    },
+    "CounterHit": {
+      "advantage": -2,
+      "tags": [],
+      "raw": "-2"
+    },
     "GuardBurst": 9,
     "Notes": "TC [18-41]"
   },
@@ -1061,12 +1462,21 @@
     "Impact": 22,
     "Damage": "14,12",
     "DamageDec": 26,
-    "Block": "-11",
-    "BlockDec": -11,
-    "Hit": "-2",
-    "HitDec": -2,
-    "CounterHit": "-2",
-    "CounterHitDec": -2,
+    "Block": {
+      "advantage": -11,
+      "tags": [],
+      "raw": "-11"
+    },
+    "Hit": {
+      "advantage": -2,
+      "tags": [],
+      "raw": "-2"
+    },
+    "CounterHit": {
+      "advantage": -2,
+      "tags": [],
+      "raw": "-2"
+    },
     "GuardBurst": 10,
     "Notes": "-16 on block at middle range"
   },
@@ -1087,12 +1497,25 @@
     "Impact": 20,
     "Damage": "22",
     "DamageDec": 22,
-    "Block": "-16",
-    "BlockDec": -16,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -16,
+      "tags": [],
+      "raw": "-16"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": ":LH: upon hitting opponent from the back"
   },
@@ -1111,12 +1534,21 @@
     "Impact": 20,
     "Damage": "22",
     "DamageDec": 22,
-    "Block": "-6",
-    "BlockDec": -6,
-    "Hit": "2",
-    "HitDec": 2,
-    "CounterHit": "2",
-    "CounterHitDec": 2,
+    "Block": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "Hit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
+    "CounterHit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
     "GuardBurst": 5,
     "Notes": "TC [20-29]"
   },
@@ -1135,12 +1567,21 @@
     "Impact": 28,
     "Damage": "18",
     "DamageDec": 18,
-    "Block": "-6",
-    "BlockDec": -6,
-    "Hit": "2",
-    "HitDec": 2,
-    "CounterHit": "2",
-    "CounterHitDec": 2,
+    "Block": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "Hit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
+    "CounterHit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
     "GuardBurst": 9,
     "Notes": "TC [29-51]"
   },
@@ -1161,12 +1602,25 @@
     "Impact": 28,
     "Damage": "30",
     "DamageDec": 30,
-    "Block": "-2",
-    "BlockDec": -2,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -2,
+      "tags": [],
+      "raw": "-2"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 13,
     "Notes": "TC [29-51]"
   },
@@ -1185,12 +1639,21 @@
     "Impact": 22,
     "Damage": "18",
     "DamageDec": 18,
-    "Block": "-14",
-    "BlockDec": -14,
-    "Hit": "-6",
-    "HitDec": -6,
-    "CounterHit": "-6",
-    "CounterHitDec": -6,
+    "Block": {
+      "advantage": -14,
+      "tags": [],
+      "raw": "-14"
+    },
+    "Hit": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "CounterHit": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
     "GuardBurst": 9,
     "Notes": "Gives knockdown at close range, more guard damage depending on the range TC [13-19] "
   },
@@ -1218,12 +1681,25 @@
     "Impact": 20,
     "Damage": "45",
     "DamageDec": 45,
-    "Block": "3",
-    "BlockDec": 3,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": 3,
+      "tags": [],
+      "raw": "3"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 12,
     "Notes": null
   },
@@ -1245,12 +1721,21 @@
     "Impact": 20,
     "Damage": "31",
     "DamageDec": 31,
-    "Block": "-18",
-    "BlockDec": -18,
-    "Hit": "-10",
-    "HitDec": -10,
-    "CounterHit": "-10",
-    "CounterHitDec": -10,
+    "Block": {
+      "advantage": -18,
+      "tags": [],
+      "raw": "-18"
+    },
+    "Hit": {
+      "advantage": -10,
+      "tags": [],
+      "raw": "-10"
+    },
+    "CounterHit": {
+      "advantage": -10,
+      "tags": [],
+      "raw": "-10"
+    },
     "GuardBurst": 4,
     "Notes": "TC [7-17]"
   },
@@ -1272,12 +1757,21 @@
     "Impact": 20,
     "Damage": "31",
     "DamageDec": 31,
-    "Block": "-8",
-    "BlockDec": -8,
-    "Hit": "0",
-    "HitDec": 0,
-    "CounterHit": "0",
-    "CounterHitDec": 0,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "0"
+    },
+    "CounterHit": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "0"
+    },
     "GuardBurst": 4,
     "Notes": "SS. TC [7-17]"
   },
@@ -1297,12 +1791,21 @@
     "Impact": 18,
     "Damage": "16",
     "DamageDec": 16,
-    "Block": "-10",
-    "BlockDec": -10,
-    "Hit": "0",
-    "HitDec": 0,
-    "CounterHit": "0",
-    "CounterHitDec": 0,
+    "Block": {
+      "advantage": -10,
+      "tags": [],
+      "raw": "-10"
+    },
+    "Hit": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "0"
+    },
+    "CounterHit": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "0"
+    },
     "GuardBurst": 2,
     "Notes": "TC [0-4] TC [16-]"
   },
@@ -1325,12 +1828,23 @@
     "Impact": 18,
     "Damage": "18",
     "DamageDec": 18,
-    "Block": "-20",
-    "BlockDec": -20,
-    "Hit": "-6",
-    "HitDec": -6,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -20,
+      "tags": [],
+      "raw": "-20"
+    },
+    "Hit": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 2,
     "Notes": "TC [0-]. :LH: vs backstep"
   },
@@ -1353,12 +1867,23 @@
     "Impact": 18,
     "Damage": "18",
     "DamageDec": 18,
-    "Block": "-10",
-    "BlockDec": -10,
-    "Hit": "3",
-    "HitDec": 3,
-    "CounterHit": "STN",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -10,
+      "tags": [],
+      "raw": "-10"
+    },
+    "Hit": {
+      "advantage": 3,
+      "tags": [],
+      "raw": "3"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "STN"
+      ],
+      "raw": "STN"
+    },
     "GuardBurst": 2,
     "Notes": "SS. :LH: vs backstep"
   },
@@ -1379,12 +1904,25 @@
     "Impact": 18,
     "Damage": "26",
     "DamageDec": 26,
-    "Block": "-12",
-    "BlockDec": -12,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -12,
+      "tags": [],
+      "raw": "-12"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": "TC [0-16]"
   },
@@ -1404,12 +1942,25 @@
     "Impact": 20,
     "Damage": "16",
     "DamageDec": 16,
-    "Block": "-14",
-    "BlockDec": -14,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -14,
+      "tags": [],
+      "raw": "-14"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": "TC [0-13]"
   },
@@ -1432,12 +1983,21 @@
     "Impact": 20,
     "Damage": "16,11",
     "DamageDec": 27,
-    "Block": "-12",
-    "BlockDec": -12,
-    "Hit": "-6",
-    "HitDec": -6,
-    "CounterHit": "-6",
-    "CounterHitDec": -6,
+    "Block": {
+      "advantage": -12,
+      "tags": [],
+      "raw": "-12"
+    },
+    "Hit": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "CounterHit": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
     "GuardBurst": 14,
     "Notes": ":AT: Shifts to attack throw upon hit"
   },
@@ -1458,12 +2018,25 @@
     "Impact": 42,
     "Damage": "28",
     "DamageDec": 28,
-    "Block": "-10",
-    "BlockDec": -10,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -10,
+      "tags": [],
+      "raw": "-10"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": "Shifts to attack throw upon hit. :TH:"
   },
@@ -1486,12 +2059,25 @@
     "Impact": 42,
     "Damage": "28,16",
     "DamageDec": 44,
-    "Block": "-16",
-    "BlockDec": -16,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -16,
+      "tags": [],
+      "raw": "-16"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 14,
     "Notes": "Shifts to attack throw upon hit. :TH:"
   },
@@ -1517,12 +2103,21 @@
     "Impact": 42,
     "Damage": "28,16,11",
     "DamageDec": 55,
-    "Block": "-12",
-    "BlockDec": -12,
-    "Hit": "-6",
-    "HitDec": -6,
-    "CounterHit": "-6",
-    "CounterHitDec": -6,
+    "Block": {
+      "advantage": -12,
+      "tags": [],
+      "raw": "-12"
+    },
+    "Hit": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "CounterHit": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
     "GuardBurst": 19,
     "Notes": "Shifts to attack throw upon hit. :TH:"
   },
@@ -1542,12 +2137,21 @@
     "Impact": 18,
     "Damage": "16",
     "DamageDec": 16,
-    "Block": "-6",
-    "BlockDec": -6,
-    "Hit": "4",
-    "HitDec": 4,
-    "CounterHit": "4",
-    "CounterHitDec": 4,
+    "Block": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "Hit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
+    "CounterHit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
     "GuardBurst": 2,
     "Notes": null
   },
@@ -1568,12 +2172,21 @@
     "Impact": 18,
     "Damage": "18",
     "DamageDec": 18,
-    "Block": "-8",
-    "BlockDec": -8,
-    "Hit": "2",
-    "HitDec": 2,
-    "CounterHit": "2",
-    "CounterHitDec": 2,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
+    "CounterHit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
     "GuardBurst": 2,
     "Notes": "TC [13-RC]"
   },
@@ -1591,12 +2204,21 @@
     "Impact": 12,
     "Damage": "12",
     "DamageDec": 12,
-    "Block": "-8",
-    "BlockDec": -8,
-    "Hit": "0",
-    "HitDec": 0,
-    "CounterHit": "0",
-    "CounterHitDec": 0,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "0"
+    },
+    "CounterHit": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "0"
+    },
     "GuardBurst": 1,
     "Notes": "Cancel with G"
   },
@@ -1615,12 +2237,21 @@
     "Impact": 16,
     "Damage": "12",
     "DamageDec": 12,
-    "Block": "-8",
-    "BlockDec": -8,
-    "Hit": "2",
-    "HitDec": 2,
-    "CounterHit": "2",
-    "CounterHitDec": 2,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
+    "CounterHit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
     "GuardBurst": 2,
     "Notes": null
   },
@@ -1641,12 +2272,25 @@
     "Impact": 16,
     "Damage": "12,26",
     "DamageDec": 38,
-    "Block": "4",
-    "BlockDec": 4,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 11,
     "Notes": "Cancel with G, Becomes M when used at a distance, NCC. TC [24-60]"
   },
@@ -1667,12 +2311,27 @@
     "Impact": 16,
     "Damage": "28",
     "DamageDec": 28,
-    "Block": "KND",
-    "BlockDec": null,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": null,
     "Notes": "UA, Cancel with G, Becomes M when used at a distance TC [24-60]"
   },
@@ -1691,12 +2350,21 @@
     "Impact": 14,
     "Damage": "16",
     "DamageDec": 16,
-    "Block": "-6",
-    "BlockDec": -6,
-    "Hit": "4",
-    "HitDec": 4,
-    "CounterHit": "4",
-    "CounterHitDec": 4,
+    "Block": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "Hit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
+    "CounterHit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
     "GuardBurst": 2,
     "Notes": null
   },
@@ -1717,12 +2385,25 @@
     "Impact": 34,
     "Damage": "27",
     "DamageDec": 27,
-    "Block": "2",
-    "BlockDec": 2,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": ":LH: vs. male opponents"
   },
@@ -1741,12 +2422,21 @@
     "Impact": 16,
     "Damage": "12",
     "DamageDec": 12,
-    "Block": "-14",
-    "BlockDec": -14,
-    "Hit": "-4",
-    "HitDec": -4,
-    "CounterHit": "-4",
-    "CounterHitDec": -4,
+    "Block": {
+      "advantage": -14,
+      "tags": [],
+      "raw": "-14"
+    },
+    "Hit": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
+    "CounterHit": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
     "GuardBurst": 1,
     "Notes": "TC [11-RC]"
   },
@@ -1767,12 +2457,23 @@
     "Impact": 16,
     "Damage": "10",
     "DamageDec": 10,
-    "Block": "-16",
-    "BlockDec": -16,
-    "Hit": "-2",
-    "HitDec": -2,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -16,
+      "tags": [],
+      "raw": "-16"
+    },
+    "Hit": {
+      "advantage": -2,
+      "tags": [],
+      "raw": "-2"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 2,
     "Notes": ":TH:"
   },
@@ -1794,12 +2495,27 @@
     "Impact": 16,
     "Damage": "25",
     "DamageDec": 25,
-    "Block": "KND",
-    "BlockDec": null,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": null,
     "Notes": ":AT:"
   },
@@ -1818,12 +2534,21 @@
     "Impact": 18,
     "Damage": "22",
     "DamageDec": 22,
-    "Block": "-6",
-    "BlockDec": -6,
-    "Hit": "8",
-    "HitDec": 8,
-    "CounterHit": "8",
-    "CounterHitDec": 8,
+    "Block": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "Hit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "8"
+    },
+    "CounterHit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "8"
+    },
     "GuardBurst": 2,
     "Notes": "TC [6-19]"
   },
@@ -1843,12 +2568,21 @@
     "Impact": 16,
     "Damage": "12",
     "DamageDec": 12,
-    "Block": "-14",
-    "BlockDec": -14,
-    "Hit": "-4",
-    "HitDec": -4,
-    "CounterHit": "-4",
-    "CounterHitDec": -4,
+    "Block": {
+      "advantage": -14,
+      "tags": [],
+      "raw": "-14"
+    },
+    "Hit": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
+    "CounterHit": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
     "GuardBurst": 1,
     "Notes": "TC [0-4] TC [10-RC]"
   },
@@ -1869,12 +2603,21 @@
     "Impact": 18,
     "Damage": "14",
     "DamageDec": 14,
-    "Block": "-12",
-    "BlockDec": -12,
-    "Hit": "-4",
-    "HitDec": -4,
-    "CounterHit": "-4",
-    "CounterHitDec": -4,
+    "Block": {
+      "advantage": -12,
+      "tags": [],
+      "raw": "-12"
+    },
+    "Hit": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
+    "CounterHit": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
     "GuardBurst": 1,
     "Notes": "TC [0-RC]"
   },
@@ -1894,12 +2637,21 @@
     "Impact": 12,
     "Damage": "18",
     "DamageDec": 18,
-    "Block": "-8",
-    "BlockDec": -8,
-    "Hit": "0",
-    "HitDec": 0,
-    "CounterHit": "0",
-    "CounterHitDec": 0,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "0"
+    },
+    "CounterHit": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "0"
+    },
     "GuardBurst": 2,
     "Notes": "TC [0-6]"
   },
@@ -1918,12 +2670,25 @@
     "Impact": 26,
     "Damage": "22",
     "DamageDec": 22,
-    "Block": "-6",
-    "BlockDec": -6,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 4,
     "Notes": "TJ [7-32]"
   },
@@ -1943,12 +2708,21 @@
     "Impact": 14,
     "Damage": "14",
     "DamageDec": 14,
-    "Block": "-6",
-    "BlockDec": -6,
-    "Hit": "4",
-    "HitDec": 4,
-    "CounterHit": "4",
-    "CounterHitDec": 4,
+    "Block": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "Hit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
+    "CounterHit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
     "GuardBurst": 1,
     "Notes": null
   },
@@ -1969,12 +2743,21 @@
     "Impact": 18,
     "Damage": "18",
     "DamageDec": 18,
-    "Block": "-14",
-    "BlockDec": -14,
-    "Hit": "-4",
-    "HitDec": -4,
-    "CounterHit": "-4",
-    "CounterHitDec": -4,
+    "Block": {
+      "advantage": -14,
+      "tags": [],
+      "raw": "-14"
+    },
+    "Hit": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
+    "CounterHit": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
     "GuardBurst": 1,
     "Notes": "TC [13-RC]"
   },
@@ -1995,12 +2778,25 @@
     "Impact": 38,
     "Damage": "30",
     "DamageDec": 30,
-    "Block": "10",
-    "BlockDec": 10,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": 10,
+      "tags": [],
+      "raw": "10"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 15,
     "Notes": ":BA: :LH: on impact counter"
   },
@@ -2019,12 +2815,21 @@
     "Impact": 22,
     "Damage": "12",
     "DamageDec": 12,
-    "Block": "-16",
-    "BlockDec": -16,
-    "Hit": "0",
-    "HitDec": 0,
-    "CounterHit": "0",
-    "CounterHitDec": 0,
+    "Block": {
+      "advantage": -16,
+      "tags": [],
+      "raw": "-16"
+    },
+    "Hit": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "0"
+    },
+    "CounterHit": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "0"
+    },
     "GuardBurst": 1,
     "Notes": "TJ [20-32] TC [32-RC]"
   },
@@ -2046,12 +2851,21 @@
     "Impact": 22,
     "Damage": "12,21",
     "DamageDec": 33,
-    "Block": "-6",
-    "BlockDec": -6,
-    "Hit": "4",
-    "HitDec": 4,
-    "CounterHit": "4",
-    "CounterHitDec": 4,
+    "Block": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "Hit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
+    "CounterHit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
     "GuardBurst": 6,
     "Notes": "TC [0-22]"
   },
@@ -2072,12 +2886,25 @@
     "Impact": 80,
     "Damage": "37,13",
     "DamageDec": 50,
-    "Block": null,
-    "BlockDec": null,
-    "Hit": "LNC",
-    "HitDec": null,
-    "CounterHit": "LNC",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "LNC"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "LNC"
+    },
     "GuardBurst": null,
     "Notes": ":UA:. TC [14-RC]. NC. 37 damage upon hit; or 50 damage upon opponent landing back on ground"
   },
@@ -2097,12 +2924,25 @@
     "Impact": 38,
     "Damage": "20",
     "DamageDec": 20,
-    "Block": "-8",
-    "BlockDec": -8,
-    "Hit": "LNC",
-    "HitDec": null,
-    "CounterHit": "LNC",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "LNC"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "LNC"
+    },
     "GuardBurst": 9,
     "Notes": "timing vary based upon when B is pressed"
   },
@@ -2121,12 +2961,25 @@
     "Impact": 34,
     "Damage": "22",
     "DamageDec": 22,
-    "Block": "-18",
-    "BlockDec": -18,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -18,
+      "tags": [],
+      "raw": "-18"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": null
   },
@@ -2147,12 +3000,25 @@
     "Impact": 34,
     "Damage": "22,18",
     "DamageDec": 40,
-    "Block": "-22",
-    "BlockDec": -22,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -22,
+      "tags": [],
+      "raw": "-22"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 14,
     "Notes": null
   },
@@ -2171,12 +3037,25 @@
     "Impact": 30,
     "Damage": "20",
     "DamageDec": 20,
-    "Block": "-12",
-    "BlockDec": -12,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -12,
+      "tags": [],
+      "raw": "-12"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": null
   },
@@ -2199,12 +3078,21 @@
     "Impact": 28,
     "Damage": "18",
     "DamageDec": 18,
-    "Block": "-6",
-    "BlockDec": -6,
-    "Hit": "4",
-    "HitDec": 4,
-    "CounterHit": "4",
-    "CounterHitDec": 4,
+    "Block": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "Hit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
+    "CounterHit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
     "GuardBurst": 5,
     "Notes": ":GI:[4-25] vs :M. non-kick horizontals"
   },
@@ -2232,12 +3120,25 @@
     "Impact": 28,
     "Damage": "18,32",
     "DamageDec": 50,
-    "Block": "-24",
-    "BlockDec": -24,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -24,
+      "tags": [],
+      "raw": "-24"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 13,
     "Notes": "Combos on :GI:"
   },
@@ -2256,12 +3157,25 @@
     "Impact": 22,
     "Damage": "20",
     "DamageDec": 20,
-    "Block": "-34",
-    "BlockDec": -34,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -34,
+      "tags": [],
+      "raw": "-34"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": "TC [8-22] TJ [22-54]"
   },
@@ -2282,12 +3196,25 @@
     "Impact": 22,
     "Damage": "20,15",
     "DamageDec": 35,
-    "Block": "-24",
-    "BlockDec": -24,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -24,
+      "tags": [],
+      "raw": "-24"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 14,
     "Notes": "TJ [0-40]"
   },
@@ -2310,12 +3237,25 @@
     "Impact": 22,
     "Damage": "20,27",
     "DamageDec": 47,
-    "Block": "-20",
-    "BlockDec": -20,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -20,
+      "tags": [],
+      "raw": "-20"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 23,
     "Notes": "TJ [0-53] TC [54-79]"
   },
@@ -2339,12 +3279,21 @@
     "Impact": 20,
     "Damage": "36",
     "DamageDec": 36,
-    "Block": "6",
-    "BlockDec": 6,
-    "Hit": "10",
-    "HitDec": 10,
-    "CounterHit": "10",
-    "CounterHitDec": 10,
+    "Block": {
+      "advantage": 6,
+      "tags": [],
+      "raw": "6"
+    },
+    "Hit": {
+      "advantage": 10,
+      "tags": [],
+      "raw": "10"
+    },
+    "CounterHit": {
+      "advantage": 10,
+      "tags": [],
+      "raw": "10"
+    },
     "GuardBurst": 13,
     "Notes": ":BA:"
   },
@@ -2364,12 +3313,25 @@
     "Impact": 26,
     "Damage": "24",
     "DamageDec": 24,
-    "Block": "-6",
-    "BlockDec": -6,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": ":LH: on whiff punish"
   },
@@ -2388,12 +3350,21 @@
     "Impact": 28,
     "Damage": "37",
     "DamageDec": 37,
-    "Block": "-4",
-    "BlockDec": -4,
-    "Hit": "6",
-    "HitDec": 6,
-    "CounterHit": "6",
-    "CounterHitDec": 6,
+    "Block": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
+    "Hit": {
+      "advantage": 6,
+      "tags": [],
+      "raw": "6"
+    },
+    "CounterHit": {
+      "advantage": 6,
+      "tags": [],
+      "raw": "6"
+    },
     "GuardBurst": 9,
     "Notes": "Shifts to attack throw upon close-range hit. TC [26-35]"
   },
@@ -2412,12 +3383,21 @@
     "Impact": 28,
     "Damage": "37",
     "DamageDec": 37,
-    "Block": "-14",
-    "BlockDec": -14,
-    "Hit": "10",
-    "HitDec": 10,
-    "CounterHit": "10",
-    "CounterHitDec": 10,
+    "Block": {
+      "advantage": -14,
+      "tags": [],
+      "raw": "-14"
+    },
+    "Hit": {
+      "advantage": 10,
+      "tags": [],
+      "raw": "10"
+    },
+    "CounterHit": {
+      "advantage": 10,
+      "tags": [],
+      "raw": "10"
+    },
     "GuardBurst": 9,
     "Notes": "Shifts to attack throw upon hit. TC [26-35]"
   },
@@ -2438,12 +3418,25 @@
     "Impact": 30,
     "Damage": "30",
     "DamageDec": 30,
-    "Block": "-8",
-    "BlockDec": -8,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": "Returns to crouching on G cancel. :LH: vs crouching opponents. TC [25-66]"
   },
@@ -2465,12 +3458,25 @@
     "Impact": 24,
     "Damage": "10,10,8,8",
     "DamageDec": 36,
-    "Block": "-10",
-    "BlockDec": -10,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -10,
+      "tags": [],
+      "raw": "-10"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 8,
     "Notes": "NC"
   },
@@ -2494,12 +3500,25 @@
     "Impact": 48,
     "Damage": "10,10,10,16",
     "DamageDec": 46,
-    "Block": "6",
-    "BlockDec": 6,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": 6,
+      "tags": [],
+      "raw": "6"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 8,
     "Notes": "NC. :BA:"
   },
@@ -2520,12 +3539,27 @@
     "Impact": 74,
     "Damage": "80",
     "DamageDec": 80,
-    "Block": "KND",
-    "BlockDec": null,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": null,
     "Notes": ":UA: Cancel with G. TC [74-]"
   },
@@ -2547,12 +3581,25 @@
     "Impact": 28,
     "Damage": "26",
     "DamageDec": 26,
-    "Block": "10",
-    "BlockDec": 10,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": 10,
+      "tags": [],
+      "raw": "10"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": ":BA:. TC [9-14]"
   },
@@ -2574,12 +3621,25 @@
     "Impact": 28,
     "Damage": "26",
     "DamageDec": 26,
-    "Block": "10",
-    "BlockDec": 10,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": 10,
+      "tags": [],
+      "raw": "10"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": ":BA:. TC [11-16]"
   },
@@ -2601,12 +3661,25 @@
     "Impact": 30,
     "Damage": "30",
     "DamageDec": 30,
-    "Block": "-8",
-    "BlockDec": -8,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": "Returns to crouching on G cancel. :LH: vs crouching opponents. TC [25-66]"
   },
@@ -2628,12 +3701,21 @@
     "Impact": 20,
     "Damage": "32",
     "DamageDec": 32,
-    "Block": "-17",
-    "BlockDec": -17,
-    "Hit": "-7",
-    "HitDec": -7,
-    "CounterHit": "-7",
-    "CounterHitDec": -7,
+    "Block": {
+      "advantage": -17,
+      "tags": [],
+      "raw": "-17"
+    },
+    "Hit": {
+      "advantage": -7,
+      "tags": [],
+      "raw": "-7"
+    },
+    "CounterHit": {
+      "advantage": -7,
+      "tags": [],
+      "raw": "-7"
+    },
     "GuardBurst": 12,
     "Notes": ":GI:[14-48] vs :H:&:M:&:L: attacks. TC [0-7]"
   },
@@ -2653,12 +3735,25 @@
     "Impact": 26,
     "Damage": "24",
     "DamageDec": 24,
-    "Block": "-4",
-    "BlockDec": -4,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": "Ends in BT. TC [18-66]"
   },
@@ -2678,12 +3773,25 @@
     "Impact": 18,
     "Damage": "55",
     "DamageDec": 55,
-    "Block": null,
-    "BlockDec": null,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": null,
     "Notes": ":TH:"
   },
@@ -2704,12 +3812,25 @@
     "Impact": 18,
     "Damage": "50",
     "DamageDec": 50,
-    "Block": null,
-    "BlockDec": null,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": null,
     "Notes": ":TH:"
   },
@@ -2730,12 +3851,21 @@
     "Impact": 28,
     "Damage": "30",
     "DamageDec": 30,
-    "Block": "-14",
-    "BlockDec": -14,
-    "Hit": "16",
-    "HitDec": 16,
-    "CounterHit": "16",
-    "CounterHitDec": 16,
+    "Block": {
+      "advantage": -14,
+      "tags": [],
+      "raw": "-14"
+    },
+    "Hit": {
+      "advantage": 16,
+      "tags": [],
+      "raw": "16"
+    },
+    "CounterHit": {
+      "advantage": 16,
+      "tags": [],
+      "raw": "16"
+    },
     "GuardBurst": null,
     "Notes": ":TH:. TC [18-49]"
   },
@@ -2758,12 +3888,21 @@
     "Impact": 28,
     "Damage": "30",
     "DamageDec": 30,
-    "Block": "-14",
-    "BlockDec": -14,
-    "Hit": "16",
-    "HitDec": 16,
-    "CounterHit": "16",
-    "CounterHitDec": 16,
+    "Block": {
+      "advantage": -14,
+      "tags": [],
+      "raw": "-14"
+    },
+    "Hit": {
+      "advantage": 16,
+      "tags": [],
+      "raw": "16"
+    },
+    "CounterHit": {
+      "advantage": 16,
+      "tags": [],
+      "raw": "16"
+    },
     "GuardBurst": null,
     "Notes": ":TH:. TC [18-49]"
   },
@@ -2784,12 +3923,25 @@
     "Impact": 28,
     "Damage": "50",
     "DamageDec": 50,
-    "Block": "-14",
-    "BlockDec": -14,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -14,
+      "tags": [],
+      "raw": "-14"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": null,
     "Notes": ":TH:. TC [18-49]"
   },
@@ -2812,12 +3964,25 @@
     "Impact": 28,
     "Damage": "50",
     "DamageDec": 50,
-    "Block": "-14",
-    "BlockDec": -14,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -14,
+      "tags": [],
+      "raw": "-14"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": null,
     "Notes": ":TH:. TC [18-49]"
   },
@@ -2843,12 +4008,27 @@
     "Impact": 20,
     "Damage": "60",
     "DamageDec": 60,
-    "Block": "KND",
-    "BlockDec": null,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": null,
     "Notes": ":TH:"
   },
@@ -2874,12 +4054,27 @@
     "Impact": 20,
     "Damage": "65",
     "DamageDec": 65,
-    "Block": "KND",
-    "BlockDec": null,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": null,
     "Notes": ":TH:"
   },
@@ -2906,12 +4101,27 @@
     "Impact": 16,
     "Damage": "70",
     "DamageDec": 70,
-    "Block": "KND",
-    "BlockDec": null,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": null,
     "Notes": ":TH:"
   },
@@ -2938,12 +4148,27 @@
     "Impact": 16,
     "Damage": "74",
     "DamageDec": 74,
-    "Block": "KND",
-    "BlockDec": null,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": null,
     "Notes": ":TH:"
   },
@@ -2965,12 +4190,21 @@
     "Impact": 18,
     "Damage": "20",
     "DamageDec": 20,
-    "Block": "8",
-    "BlockDec": 8,
-    "Hit": "8",
-    "HitDec": 8,
-    "CounterHit": "8",
-    "CounterHitDec": 8,
+    "Block": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "8"
+    },
+    "Hit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "8"
+    },
+    "CounterHit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "8"
+    },
     "GuardBurst": null,
     "Notes": ":TH: Put the opponent BT"
   },
@@ -2993,12 +4227,21 @@
     "Impact": 18,
     "Damage": "20",
     "DamageDec": 20,
-    "Block": "8",
-    "BlockDec": 8,
-    "Hit": "8",
-    "HitDec": 8,
-    "CounterHit": "8",
-    "CounterHitDec": 8,
+    "Block": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "8"
+    },
+    "Hit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "8"
+    },
+    "CounterHit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "8"
+    },
     "GuardBurst": null,
     "Notes": ":TH: Put the opponent BT"
   },
@@ -3026,12 +4269,27 @@
     "Impact": 20,
     "Damage": "65",
     "DamageDec": 65,
-    "Block": "KND",
-    "BlockDec": null,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": null,
     "Notes": ":TH:"
   },
@@ -3060,12 +4318,27 @@
     "Impact": 16,
     "Damage": "84",
     "DamageDec": 84,
-    "Block": "KND",
-    "BlockDec": null,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": null,
     "Notes": ":TH:"
   },
@@ -3088,12 +4361,21 @@
     "Impact": 20,
     "Damage": "24",
     "DamageDec": 24,
-    "Block": "-8",
-    "BlockDec": -8,
-    "Hit": "2",
-    "HitDec": 2,
-    "CounterHit": "2",
-    "CounterHitDec": 2,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
+    "CounterHit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
     "GuardBurst": 4,
     "Notes": null
   },
@@ -3119,12 +4401,21 @@
     "Impact": 20,
     "Damage": "44",
     "DamageDec": 44,
-    "Block": "-12",
-    "BlockDec": -12,
-    "Hit": "-4",
-    "HitDec": -4,
-    "CounterHit": "-4",
-    "CounterHitDec": -4,
+    "Block": {
+      "advantage": -12,
+      "tags": [],
+      "raw": "-12"
+    },
+    "Hit": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
+    "CounterHit": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
     "GuardBurst": 10,
     "Notes": ":LH: 2nd hit triggers upon counter hit"
   },
@@ -3147,12 +4438,21 @@
     "Impact": 26,
     "Damage": "18",
     "DamageDec": 18,
-    "Block": "-12",
-    "BlockDec": -12,
-    "Hit": "0",
-    "HitDec": 0,
-    "CounterHit": "0",
-    "CounterHitDec": 0,
+    "Block": {
+      "advantage": -12,
+      "tags": [],
+      "raw": "-12"
+    },
+    "Hit": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "0"
+    },
+    "CounterHit": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "0"
+    },
     "GuardBurst": 4,
     "Notes": ":LH: on whiff punish"
   },
@@ -3175,12 +4475,21 @@
     "Impact": 24,
     "Damage": "24",
     "DamageDec": 24,
-    "Block": "-8",
-    "BlockDec": -8,
-    "Hit": "2",
-    "HitDec": 2,
-    "CounterHit": "2",
-    "CounterHitDec": 2,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
+    "CounterHit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
     "GuardBurst": 4,
     "Notes": null
   },
@@ -3205,12 +4514,21 @@
     "Impact": 28,
     "Damage": "34",
     "DamageDec": 34,
-    "Block": "-24",
-    "BlockDec": -24,
-    "Hit": "8",
-    "HitDec": 8,
-    "CounterHit": "8",
-    "CounterHitDec": 8,
+    "Block": {
+      "advantage": -24,
+      "tags": [],
+      "raw": "-24"
+    },
+    "Hit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "8"
+    },
+    "CounterHit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "8"
+    },
     "GuardBurst": 4,
     "Notes": "Shifts to attack throw upon hit. :TH:"
   },
@@ -3236,12 +4554,25 @@
     "Impact": 28,
     "Damage": "44",
     "DamageDec": 44,
-    "Block": "-24",
-    "BlockDec": -24,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -24,
+      "tags": [],
+      "raw": "-24"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 4,
     "Notes": "Shifts to attack throw upon hit. :TH:"
   },
@@ -3264,12 +4595,23 @@
     "Impact": 16,
     "Damage": "18",
     "DamageDec": 18,
-    "Block": "-8",
-    "BlockDec": -8,
-    "Hit": "4",
-    "HitDec": 4,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 2,
     "Notes": null
   },
@@ -3294,12 +4636,21 @@
     "Impact": 16,
     "Damage": "18,23",
     "DamageDec": 41,
-    "Block": "-12",
-    "BlockDec": -12,
-    "Hit": "14",
-    "HitDec": 14,
-    "CounterHit": "14",
-    "CounterHitDec": 14,
+    "Block": {
+      "advantage": -12,
+      "tags": [],
+      "raw": "-12"
+    },
+    "Hit": {
+      "advantage": 14,
+      "tags": [],
+      "raw": "14"
+    },
+    "CounterHit": {
+      "advantage": 14,
+      "tags": [],
+      "raw": "14"
+    },
     "GuardBurst": 9,
     "Notes": null
   },
@@ -3320,12 +4671,21 @@
     "Impact": 16,
     "Damage": "20",
     "DamageDec": 20,
-    "Block": "-12",
-    "BlockDec": -12,
-    "Hit": "2",
-    "HitDec": 2,
-    "CounterHit": "2",
-    "CounterHitDec": 2,
+    "Block": {
+      "advantage": -12,
+      "tags": [],
+      "raw": "-12"
+    },
+    "Hit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
+    "CounterHit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
     "GuardBurst": 9,
     "Notes": null
   },
@@ -3348,12 +4708,25 @@
     "Impact": 16,
     "Damage": "20,20",
     "DamageDec": 40,
-    "Block": "4",
-    "BlockDec": 4,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 10,
     "Notes": "TC [31-71]"
   },
@@ -3376,12 +4749,25 @@
     "Impact": 24,
     "Damage": "23",
     "DamageDec": 23,
-    "Block": "-4",
-    "BlockDec": -4,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": ":SS:"
   },
@@ -3406,12 +4792,25 @@
     "Impact": 18,
     "Damage": "22",
     "DamageDec": 22,
-    "Block": "-16",
-    "BlockDec": -16,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -16,
+      "tags": [],
+      "raw": "-16"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": ":LH: vs. whiffed high attacks. TC [4-12]"
   },
@@ -3430,12 +4829,21 @@
     "Impact": 16,
     "Damage": "18",
     "DamageDec": 18,
-    "Block": "-4",
-    "BlockDec": -4,
-    "Hit": "4",
-    "HitDec": 4,
-    "CounterHit": "4",
-    "CounterHitDec": 4,
+    "Block": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
+    "Hit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
+    "CounterHit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
     "GuardBurst": 2,
     "Notes": "TC [6-17]"
   },
@@ -3456,12 +4864,21 @@
     "Impact": 16,
     "Damage": "18",
     "DamageDec": 18,
-    "Block": "-6",
-    "BlockDec": -6,
-    "Hit": "2",
-    "HitDec": 2,
-    "CounterHit": "2",
-    "CounterHitDec": 2,
+    "Block": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "Hit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
+    "CounterHit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
     "GuardBurst": 2,
     "Notes": "TC [6-17]. :SS: into SE"
   },
@@ -3484,12 +4901,25 @@
     "Impact": 16,
     "Damage": "24",
     "DamageDec": 24,
-    "Block": "-6",
-    "BlockDec": -6,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": ":LH: after finishing round with CE"
   },
@@ -3512,12 +4942,25 @@
     "Impact": 26,
     "Damage": "33",
     "DamageDec": 33,
-    "Block": "0",
-    "BlockDec": 0,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "0"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": ":LH: after finishing round with CE"
   },
@@ -3539,12 +4982,25 @@
     "Impact": 26,
     "Damage": "33",
     "DamageDec": 33,
-    "Block": "4",
-    "BlockDec": 4,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": null
   },
@@ -3565,12 +5021,25 @@
     "Impact": 24,
     "Damage": "18",
     "DamageDec": 18,
-    "Block": "-18",
-    "BlockDec": -18,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -18,
+      "tags": [],
+      "raw": "-18"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 4,
     "Notes": "TC [7-15] superTC [16-24] TC [25-], -4 on tip hit"
   },
@@ -3593,12 +5062,25 @@
     "Impact": 28,
     "Damage": "26",
     "DamageDec": 26,
-    "Block": "-18",
-    "BlockDec": -18,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -18,
+      "tags": [],
+      "raw": "-18"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": "TC [6-12] TJ [12-36]"
   },
@@ -3622,12 +5104,21 @@
     "Impact": 18,
     "Damage": "35",
     "DamageDec": 35,
-    "Block": "-8",
-    "BlockDec": -8,
-    "Hit": "4",
-    "HitDec": 4,
-    "CounterHit": "4",
-    "CounterHitDec": 4,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
+    "CounterHit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
     "GuardBurst": 3,
     "Notes": null
   },
@@ -3651,12 +5142,25 @@
     "Impact": 26,
     "Damage": "40",
     "DamageDec": 40,
-    "Block": "-10",
-    "BlockDec": -10,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -10,
+      "tags": [],
+      "raw": "-10"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 2,
     "Notes": ":GI: [5-16] mid horizontal"
   },
@@ -3679,12 +5183,25 @@
     "Impact": 48,
     "Damage": "42",
     "DamageDec": 42,
-    "Block": "-6",
-    "BlockDec": -6,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 4,
     "Notes": null
   },
@@ -3709,12 +5226,27 @@
     "Impact": 72,
     "Damage": "70",
     "DamageDec": 70,
-    "Block": "KND",
-    "BlockDec": null,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": null,
     "Notes": ":UA:"
   },
@@ -3739,12 +5271,25 @@
     "Impact": 34,
     "Damage": "37",
     "DamageDec": 37,
-    "Block": "-4",
-    "BlockDec": -4,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 19,
     "Notes": null
   },
@@ -3769,12 +5314,21 @@
     "Impact": 40,
     "Damage": "20",
     "DamageDec": 20,
-    "Block": null,
-    "BlockDec": null,
-    "Hit": null,
-    "HitDec": null,
-    "CounterHit": null,
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
     "GuardBurst": 9,
     "Notes": ":SS:. TC [37-]"
   },
@@ -3794,12 +5348,25 @@
     "Impact": 20,
     "Damage": "26",
     "DamageDec": 26,
-    "Block": "-22",
-    "BlockDec": -22,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -22,
+      "tags": [],
+      "raw": "-22"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": "TJ [6-27] TC [27-47]"
   },
@@ -3819,12 +5386,25 @@
     "Impact": 46,
     "Damage": "35",
     "DamageDec": 35,
-    "Block": "-8",
-    "BlockDec": -8,
-    "Hit": "RE",
-    "HitDec": null,
-    "CounterHit": "RE",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "RE"
+      ],
+      "raw": "RE"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "RE"
+      ],
+      "raw": "RE"
+    },
     "GuardBurst": 16,
     "Notes": "KND vs airborne. :RE: [6-30]"
   },
@@ -3845,12 +5425,25 @@
     "Impact": 66,
     "Damage": "45",
     "DamageDec": 45,
-    "Block": "8",
-    "BlockDec": 8,
-    "Hit": "RE",
-    "HitDec": null,
-    "CounterHit": "RE",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "8"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "RE"
+      ],
+      "raw": "RE"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "RE"
+      ],
+      "raw": "RE"
+    },
     "GuardBurst": 20,
     "Notes": ":RE: [6-50] :BA:"
   },
@@ -3871,12 +5464,21 @@
     "Impact": 52,
     "Damage": "20",
     "DamageDec": 20,
-    "Block": "-7",
-    "BlockDec": -7,
-    "Hit": "4",
-    "HitDec": 4,
-    "CounterHit": "4",
-    "CounterHitDec": 4,
+    "Block": {
+      "advantage": -7,
+      "tags": [],
+      "raw": "-7"
+    },
+    "Hit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
+    "CounterHit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
     "GuardBurst": 2,
     "Notes": ":RE:"
   },
@@ -3899,12 +5501,25 @@
     "Impact": null,
     "Damage": "15",
     "DamageDec": 15,
-    "Block": "-2",
-    "BlockDec": -2,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -2,
+      "tags": [],
+      "raw": "-2"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 33,
     "Notes": ":LH:"
   },
@@ -3927,12 +5542,25 @@
     "Impact": null,
     "Damage": "15",
     "DamageDec": 15,
-    "Block": "6",
-    "BlockDec": 6,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": 6,
+      "tags": [],
+      "raw": "6"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 33,
     "Notes": "SS. :LH:"
   },
@@ -3963,12 +5591,21 @@
     "Impact": null,
     "Damage": "48",
     "DamageDec": 48,
-    "Block": null,
-    "BlockDec": null,
-    "Hit": null,
-    "HitDec": null,
-    "CounterHit": null,
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
     "GuardBurst": 50,
     "Notes": ":LH:"
   },
@@ -3991,12 +5628,21 @@
     "Impact": null,
     "Damage": "16",
     "DamageDec": 16,
-    "Block": "-10",
-    "BlockDec": -10,
-    "Hit": "10",
-    "HitDec": 10,
-    "CounterHit": null,
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -10,
+      "tags": [],
+      "raw": "-10"
+    },
+    "Hit": {
+      "advantage": 10,
+      "tags": [],
+      "raw": "10"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
     "GuardBurst": 33,
     "Notes": ":LH:"
   },
@@ -4023,12 +5669,25 @@
     "Impact": 34,
     "Damage": "80",
     "DamageDec": 80,
-    "Block": "-16",
-    "BlockDec": -16,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -16,
+      "tags": [],
+      "raw": "-16"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 10,
     "Notes": ":CE: :GI: [4-32] vs Verticals"
   },
@@ -4055,12 +5714,25 @@
     "Impact": 14,
     "Damage": "80",
     "DamageDec": 80,
-    "Block": "-16",
-    "BlockDec": -16,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -16,
+      "tags": [],
+      "raw": "-16"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 10,
     "Notes": ":CE:  "
   },
@@ -4079,12 +5751,21 @@
     "Impact": 6,
     "Damage": "0",
     "DamageDec": 0,
-    "Block": "0",
-    "BlockDec": 0,
-    "Hit": "8",
-    "HitDec": 8,
-    "CounterHit": "8",
-    "CounterHitDec": 8,
+    "Block": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "0"
+    },
+    "Hit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "8"
+    },
+    "CounterHit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "8"
+    },
     "GuardBurst": null,
     "Notes": "invincible since i4. Pushback happens at i6, 50F recovery, 56F total"
   },
@@ -4110,12 +5791,21 @@
     "Impact": 16,
     "Damage": "36",
     "DamageDec": 36,
-    "Block": "-6",
-    "BlockDec": -6,
-    "Hit": "4",
-    "HitDec": 4,
-    "CounterHit": "4",
-    "CounterHitDec": 4,
+    "Block": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "Hit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
+    "CounterHit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
     "GuardBurst": 9,
     "Notes": null
   },
@@ -4143,12 +5833,21 @@
     "Impact": 16,
     "Damage": "36",
     "DamageDec": 36,
-    "Block": "-2",
-    "BlockDec": -2,
-    "Hit": "6",
-    "HitDec": 6,
-    "CounterHit": "6",
-    "CounterHitDec": 6,
+    "Block": {
+      "advantage": -2,
+      "tags": [],
+      "raw": "-2"
+    },
+    "Hit": {
+      "advantage": 6,
+      "tags": [],
+      "raw": "6"
+    },
+    "CounterHit": {
+      "advantage": 6,
+      "tags": [],
+      "raw": "6"
+    },
     "GuardBurst": 9,
     "Notes": ":SS:"
   },
@@ -4174,12 +5873,25 @@
     "Impact": 16,
     "Damage": "38",
     "DamageDec": 38,
-    "Block": "4",
-    "BlockDec": 4,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 7,
     "Notes": ":BA:. NCC"
   },
@@ -4202,12 +5914,21 @@
     "Impact": 20,
     "Damage": "23",
     "DamageDec": 23,
-    "Block": "8",
-    "BlockDec": 8,
-    "Hit": "10",
-    "HitDec": 10,
-    "CounterHit": "10",
-    "CounterHitDec": 10,
+    "Block": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "8"
+    },
+    "Hit": {
+      "advantage": 10,
+      "tags": [],
+      "raw": "10"
+    },
+    "CounterHit": {
+      "advantage": 10,
+      "tags": [],
+      "raw": "10"
+    },
     "GuardBurst": 3,
     "Notes": ":BA:"
   },
@@ -4231,12 +5952,21 @@
     "Impact": 20,
     "Damage": "23",
     "DamageDec": 23,
-    "Block": "2",
-    "BlockDec": 2,
-    "Hit": "8",
-    "HitDec": 8,
-    "CounterHit": "8",
-    "CounterHitDec": 8,
+    "Block": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
+    "Hit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "8"
+    },
+    "CounterHit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "8"
+    },
     "GuardBurst": 3,
     "Notes": ":SS:. :BA:"
   },
@@ -4261,12 +5991,25 @@
     "Impact": 18,
     "Damage": "68",
     "DamageDec": 68,
-    "Block": "1",
-    "BlockDec": 1,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": 1,
+      "tags": [],
+      "raw": "1"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 16,
     "Notes": "Shifts to attack throw upon hit, :BA:"
   },
@@ -4289,12 +6032,21 @@
     "Impact": 16,
     "Damage": "47",
     "DamageDec": 47,
-    "Block": "2",
-    "BlockDec": 2,
-    "Hit": "10",
-    "HitDec": 10,
-    "CounterHit": "10",
-    "CounterHitDec": 10,
+    "Block": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
+    "Hit": {
+      "advantage": 10,
+      "tags": [],
+      "raw": "10"
+    },
+    "CounterHit": {
+      "advantage": 10,
+      "tags": [],
+      "raw": "10"
+    },
     "GuardBurst": 5,
     "Notes": null
   },
@@ -4319,12 +6071,21 @@
     "Impact": 16,
     "Damage": "47",
     "DamageDec": 47,
-    "Block": "6",
-    "BlockDec": 6,
-    "Hit": "14",
-    "HitDec": 14,
-    "CounterHit": "14",
-    "CounterHitDec": 14,
+    "Block": {
+      "advantage": 6,
+      "tags": [],
+      "raw": "6"
+    },
+    "Hit": {
+      "advantage": 14,
+      "tags": [],
+      "raw": "14"
+    },
+    "CounterHit": {
+      "advantage": 14,
+      "tags": [],
+      "raw": "14"
+    },
     "GuardBurst": 5,
     "Notes": ":SS:"
   },
@@ -4355,12 +6116,25 @@
     "Impact": 26,
     "Damage": "78",
     "DamageDec": 78,
-    "Block": "-8",
-    "BlockDec": -8,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 24,
     "Notes": "SC. :GI: [5-16] vs :M: horizontal"
   },
@@ -4386,12 +6160,25 @@
     "Impact": 18,
     "Damage": "36",
     "DamageDec": 36,
-    "Block": "4",
-    "BlockDec": 4,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 7,
     "Notes": ":BA:"
   },
@@ -4415,12 +6202,21 @@
     "Impact": 20,
     "Damage": "17",
     "DamageDec": 17,
-    "Block": null,
-    "BlockDec": null,
-    "Hit": null,
-    "HitDec": null,
-    "CounterHit": null,
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
     "GuardBurst": null,
     "Notes": ":UA:"
   },
@@ -4446,12 +6242,25 @@
     "Impact": 20,
     "Damage": "64",
     "DamageDec": 64,
-    "Block": null,
-    "BlockDec": null,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": null,
     "Notes": ":UA: , Shifts to follow-up attack upon hit"
   },
@@ -4472,12 +6281,21 @@
     "Impact": 30,
     "Damage": null,
     "DamageDec": 0,
-    "Block": null,
-    "BlockDec": null,
-    "Hit": null,
-    "HitDec": null,
-    "CounterHit": null,
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
     "GuardBurst": null,
     "Notes": ":SS:"
   },
@@ -4497,12 +6315,21 @@
     "Impact": 18,
     "Damage": "12",
     "DamageDec": 12,
-    "Block": "-14",
-    "BlockDec": -14,
-    "Hit": "-8",
-    "HitDec": -8,
-    "CounterHit": "2",
-    "CounterHitDec": 2,
+    "Block": {
+      "advantage": -14,
+      "tags": [],
+      "raw": "-14"
+    },
+    "Hit": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "CounterHit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
     "GuardBurst": 1,
     "Notes": null
   },
@@ -4525,12 +6352,21 @@
     "Impact": 18,
     "Damage": "40",
     "DamageDec": 40,
-    "Block": "-4",
-    "BlockDec": -4,
-    "Hit": "6",
-    "HitDec": 6,
-    "CounterHit": "6",
-    "CounterHitDec": 6,
+    "Block": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
+    "Hit": {
+      "advantage": 6,
+      "tags": [],
+      "raw": "6"
+    },
+    "CounterHit": {
+      "advantage": 6,
+      "tags": [],
+      "raw": "6"
+    },
     "GuardBurst": 7,
     "Notes": null
   },
@@ -4551,12 +6387,21 @@
     "Impact": 20,
     "Damage": "16",
     "DamageDec": 16,
-    "Block": "-6",
-    "BlockDec": -6,
-    "Hit": "2",
-    "HitDec": 2,
-    "CounterHit": "2",
-    "CounterHitDec": 2,
+    "Block": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "Hit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
+    "CounterHit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
     "GuardBurst": 2,
     "Notes": null
   },
@@ -4579,12 +6424,25 @@
     "Impact": 20,
     "Damage": "58",
     "DamageDec": 58,
-    "Block": "-6",
-    "BlockDec": -6,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": "Shifts to follow-up attack upon hit"
   },
@@ -4607,12 +6465,25 @@
     "Impact": 24,
     "Damage": "16,8,12",
     "DamageDec": 36,
-    "Block": "-26",
-    "BlockDec": -26,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -26,
+      "tags": [],
+      "raw": "-26"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 4,
     "Notes": "Shifts to attack throw upon hit. :TH:"
   },
@@ -4636,12 +6507,25 @@
     "Impact": 22,
     "Damage": "36",
     "DamageDec": 36,
-    "Block": "-12",
-    "BlockDec": -12,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -12,
+      "tags": [],
+      "raw": "-12"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": null
   },
@@ -4671,12 +6555,25 @@
     "Impact": 22,
     "Damage": "68",
     "DamageDec": 68,
-    "Block": "8",
-    "BlockDec": 8,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "8"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 20,
     "Notes": ":BA:"
   },
@@ -4697,12 +6594,25 @@
     "Impact": 14,
     "Damage": "24",
     "DamageDec": 24,
-    "Block": "-12",
-    "BlockDec": -12,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -12,
+      "tags": [],
+      "raw": "-12"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": "Shifts to follow-up attack upon hit"
   },
@@ -4726,12 +6636,25 @@
     "Impact": 38,
     "Damage": "33",
     "DamageDec": 33,
-    "Block": "10",
-    "BlockDec": 10,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": 10,
+      "tags": [],
+      "raw": "10"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 19,
     "Notes": ":BA: :LH: on impact counter"
   },
@@ -4751,12 +6674,23 @@
     "Impact": 16,
     "Damage": "18",
     "DamageDec": 18,
-    "Block": "-8",
-    "BlockDec": -8,
-    "Hit": "2",
-    "HitDec": 2,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 2,
     "Notes": "TC [6-17]"
   },
@@ -4776,12 +6710,23 @@
     "Impact": 16,
     "Damage": "18",
     "DamageDec": 18,
-    "Block": "0",
-    "BlockDec": 0,
-    "Hit": "8",
-    "HitDec": 8,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "0"
+    },
+    "Hit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "8"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 2,
     "Notes": "TC [6-17]"
   },
@@ -4803,12 +6748,25 @@
     "Impact": 49,
     "Damage": "41",
     "DamageDec": 41,
-    "Block": "4",
-    "BlockDec": 4,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": ":BA:"
   },
@@ -4831,12 +6789,25 @@
     "Impact": 49,
     "Damage": "41",
     "DamageDec": 41,
-    "Block": "4",
-    "BlockDec": 4,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": ":BA:"
   },
@@ -4859,12 +6830,25 @@
     "Impact": 49,
     "Damage": "41",
     "DamageDec": 41,
-    "Block": "4",
-    "BlockDec": 4,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "4"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": ":BA:"
   },
@@ -4885,12 +6869,21 @@
     "Impact": 12,
     "Damage": "20",
     "DamageDec": 20,
-    "Block": "-20",
-    "BlockDec": -20,
-    "Hit": "-10",
-    "HitDec": -10,
-    "CounterHit": "-10",
-    "CounterHitDec": -10,
+    "Block": {
+      "advantage": -20,
+      "tags": [],
+      "raw": "-20"
+    },
+    "Hit": {
+      "advantage": -10,
+      "tags": [],
+      "raw": "-10"
+    },
+    "CounterHit": {
+      "advantage": -10,
+      "tags": [],
+      "raw": "-10"
+    },
     "GuardBurst": 2,
     "Notes": ":AT:"
   },
@@ -4911,12 +6904,27 @@
     "Impact": 12,
     "Damage": "51",
     "DamageDec": 51,
-    "Block": "KND",
-    "BlockDec": null,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 2,
     "Notes": ":AT:"
   },
@@ -4939,12 +6947,21 @@
     "Impact": 12,
     "Damage": "36",
     "DamageDec": 36,
-    "Block": "-14",
-    "BlockDec": -14,
-    "Hit": "2",
-    "HitDec": 2,
-    "CounterHit": "2",
-    "CounterHitDec": 2,
+    "Block": {
+      "advantage": -14,
+      "tags": [],
+      "raw": "-14"
+    },
+    "Hit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
+    "CounterHit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "2"
+    },
     "GuardBurst": 4,
     "Notes": null
   },
@@ -4966,12 +6983,27 @@
     "Impact": 74,
     "Damage": "60",
     "DamageDec": 60,
-    "Block": "KND",
-    "BlockDec": null,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": null,
     "Notes": ":UA:"
   },
@@ -4993,12 +7025,27 @@
     "Impact": null,
     "Damage": "56",
     "DamageDec": 56,
-    "Block": "KND",
-    "BlockDec": null,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": null,
     "Notes": ":UA:. :SS:. TC [14-RC]"
   },
@@ -5018,12 +7065,25 @@
     "Impact": 4,
     "Damage": "20",
     "DamageDec": 20,
-    "Block": "-8",
-    "BlockDec": -8,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": "TC [0-7]"
   },
@@ -5043,12 +7103,25 @@
     "Impact": 4,
     "Damage": "25",
     "DamageDec": 25,
-    "Block": "-8",
-    "BlockDec": -8,
-    "Hit": "KND",
-    "HitDec": null,
-    "CounterHit": "KND",
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [
+        "KND"
+      ],
+      "raw": "KND"
+    },
     "GuardBurst": 9,
     "Notes": "TC [0-7]"
   },
@@ -5068,12 +7141,21 @@
     "Impact": 24,
     "Damage": null,
     "DamageDec": 0,
-    "Block": null,
-    "BlockDec": null,
-    "Hit": null,
-    "HitDec": null,
-    "CounterHit": null,
-    "CounterHitDec": null,
+    "Block": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
     "GuardBurst": null,
     "Notes": ":SS: into SE. TC [0-21]"
   }

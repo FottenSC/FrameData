@@ -1,39 +1,84 @@
 {
   "properties": {
-    "UA": {
-      "name": "Unblockable Attack",
-      "description": "The Move can't be blocked.",
-      "className": "bg-red-500 text-zinc-900 border-white"
-    },
     "BA": {
       "name": "Break Attack",
       "description": "Generally plus, inflicts guard damage and counters GI and Reversal edge.",
       "className": "bg-blue-400 text-zinc-900 border-white"
+    },
+    "BREAK": {
+      "name": "",
+      "description": "",
+      "className": ""
+    },
+    "DZY": {
+      "name": "",
+      "description": "",
+      "className": ""
+    },
+    "GB": {
+      "name": "",
+      "description": "",
+      "className": ""
     },
     "GI": {
       "name": "Guard Impact",
       "description": "Defensive option that protects against attacks between i2 and i12, giving you frame advantage based on Attack type \n- Heavy +8\n- Medium +16\n- Light +28",
       "className": "bg-lime-500 text-zinc-900 border-white"
     },
-    "TH": {
-      "name": "Throw",
-      "description": "Attacks that can generally be broken by pressing ",
-      "className": "bg-fuchsia-300 text-zinc-900 border-white"
+    "JGL": {
+      "name": "",
+      "description": "",
+      "className": ""
     },
-    "SS": {
-      "name": "Stance Shift",
-      "description": "The Move transitions you into another stance.",
-      "className": "bg-purple-400 text-zinc-900 border-white"
+    "KND": {
+      "name": "",
+      "description": "",
+      "className": ""
+    },
+    "LH": {
+      "name": "Lethal Hit",
+      "description": "The properties of this move is enhanced when fulfilling a certain conditions.",
+      "className": "bg-orange-500 text-zinc-900 border-white"
+    },
+    "LNC": {
+      "name": "",
+      "description": "",
+      "className": ""
     },
     "RE": {
       "name": "Reversal Edge",
       "description": "Rock paper scissors mini-game.",
       "className": "bg-white text-zinc-900 border-black"
     },
-    "LH": {
-      "name": "Lethal Hit",
-      "description": "The properties of this move is enhanced when fulfilling a certain conditions.",
-      "className": "bg-orange-500 text-zinc-900 border-white"
+    "SLC": {
+      "name": "",
+      "description": "",
+      "className": ""
+    },
+    "SS": {
+      "name": "Stance Shift",
+      "description": "The Move transitions you into another stance.",
+      "className": "bg-purple-400 text-zinc-900 border-white"
+    },
+    "STN": {
+      "name": "",
+      "description": "",
+      "className": ""
+    },
+    "TH": {
+      "name": "Throw",
+      "description": "Attacks that can generally be broken by pressing ",
+      "className": "bg-fuchsia-300 text-zinc-900 border-white"
+    },
+    "UA": {
+      "name": "Unblockable Attack",
+      "description": "The Move can't be blocked.",
+      "className": "bg-red-500 text-zinc-900 border-white"
+    },
+    "UB": {
+      "name": "",
+      "description": "",
+      "className": ""
     }
   },
   "stances": {
@@ -159,13 +204,7 @@
           "description": ""
         }
       },
-      "image": "2b.webp",
-      "credits": [
-        {
-          "name": "@Zollith",
-          "url": "https://twitter.com/Zollith"
-        }
-      ]
+      "image": "2b.webp"
     },
     {
       "id": 2,
@@ -196,25 +235,13 @@
           "description": "Amy needs to have hit her opponent with 4 white roses"
         }
       },
-      "image": "Amy.webp",
-      "credits": [
-        {
-          "name": "@Mas1erCJ",
-          "url": "https://twitter.com/Mas1erCJ"
-        }
-      ]
+      "image": "Amy.webp"
     },
     {
       "id": 3,
       "name": "Astaroth",
       "stances": {},
-      "image": "Astaroth.webp",
-      "credits": [
-        {
-          "name": "@unicorn_cz",
-          "url": "https://twitter.com/unicorn_cz"
-        }
-      ]
+      "image": "Astaroth.webp"
     },
     {
       "id": 4,
@@ -261,13 +288,7 @@
           "description": ""
         }
       },
-      "image": "Azwel.webp",
-      "credits": [
-        {
-          "name": "@Mas1erCJ",
-          "url": "https://twitter.com/Mas1erCJ"
-        }
-      ]
+      "image": "Azwel.webp"
     },
     {
       "id": 5,
@@ -294,13 +315,7 @@
           "description": ""
         }
       },
-      "image": "Cassandra.webp",
-      "credits": [
-        {
-          "name": "@unicorn_cz",
-          "url": "https://twitter.com/unicorn_cz"
-        }
-      ]
+      "image": "Cassandra.webp"
     },
     {
       "id": 6,
@@ -319,13 +334,7 @@
           "description": ""
         }
       },
-      "image": "Cervantes.webp",
-      "credits": [
-        {
-          "name": "@unicorn_cz",
-          "url": "https://twitter.com/unicorn_cz"
-        }
-      ]
+      "image": "Cervantes.webp"
     },
     {
       "id": 7,
@@ -344,17 +353,7 @@
           "description": ""
         }
       },
-      "image": "Geralt.webp",
-      "credits": [
-        {
-          "name": "@unicorn_cz",
-          "url": "https://twitter.com/unicorn_cz"
-        },
-        {
-          "name": "Geist",
-          "url": ""
-        }
-      ]
+      "image": "Geralt.webp"
     },
     {
       "id": 8,
@@ -365,21 +364,7 @@
           "description": ""
         }
       },
-      "image": "Groh.webp",
-      "credits": [
-        {
-          "name": "@ShennouBR",
-          "url": "https://twitter.com/ShennouBR"
-        },
-        {
-          "name": "@unicorn_cz",
-          "url": "https://twitter.com/unicorn_cz"
-        },
-        {
-          "name": "MdT",
-          "url": ""
-        }
-      ]
+      "image": "Groh.webp"
     },
     {
       "id": 9,
@@ -414,13 +399,7 @@
           "description": ""
         }
       },
-      "image": "Haohmaru.webp",
-      "credits": [
-        {
-          "name": "@ZendoCrescendo",
-          "url": "https://twitter.com/ZendoCrescendo"
-        }
-      ]
+      "image": "Haohmaru.webp"
     },
     {
       "id": 10,
@@ -439,13 +418,7 @@
           "description": "Hilde has to hold one or more buttons for a set amount of time to perform these moves."
         }
       },
-      "image": "Hilde.webp",
-      "credits": [
-        {
-          "name": "@unicorn_cz",
-          "url": "https://twitter.com/unicorn_cz"
-        }
-      ]
+      "image": "Hilde.webp"
     },
     {
       "id": 11,
@@ -488,13 +461,7 @@
           "description": ""
         }
       },
-      "image": "Hwang.webp",
-      "credits": [
-        {
-          "name": "@unicorn_cz",
-          "url": "https://twitter.com/unicorn_cz"
-        }
-      ]
+      "image": "Hwang.webp"
     },
     {
       "id": 12,
@@ -540,17 +507,7 @@
           "description": ""
         }
       },
-      "image": "Ivy.webp",
-      "credits": [
-        {
-          "name": "@skeiider",
-          "url": "https://twitter.com/skeiider"
-        },
-        {
-          "name": "@unicorn_cz",
-          "url": "https://twitter.com/unicorn_cz"
-        }
-      ]
+      "image": "Ivy.webp"
     },
     {
       "id": 14,
@@ -569,13 +526,7 @@
           "description": ""
         }
       },
-      "image": "Kilik.webp",
-      "credits": [
-        {
-          "name": "@ZendoCrescendo",
-          "url": "https://twitter.com/ZendoCrescendo"
-        }
-      ]
+      "image": "Kilik.webp"
     },
     {
       "id": 15,
@@ -614,13 +565,7 @@
           "description": ""
         }
       },
-      "image": "Maxi.webp",
-      "credits": [
-        {
-          "name": "@unicorn_cz",
-          "url": "https://twitter.com/unicorn_cz"
-        }
-      ]
+      "image": "Maxi.webp"
     },
     {
       "id": 16,
@@ -643,17 +588,7 @@
           "description": ""
         }
       },
-      "image": "Mitsurugi.webp",
-      "credits": [
-        {
-          "name": "@unicorn_cz",
-          "url": "https://twitter.com/unicorn_cz"
-        },
-        {
-          "name": "arghtown",
-          "url": ""
-        }
-      ]
+      "image": "Mitsurugi.webp"
     },
     {
       "id": 17,
@@ -684,13 +619,7 @@
           "description": ""
         }
       },
-      "image": "Nightmare.webp",
-      "credits": [
-        {
-          "name": "@unicorn_cz",
-          "url": "https://twitter.com/unicorn_cz"
-        }
-      ]
+      "image": "Nightmare.webp"
     },
     {
       "id": 18,
@@ -717,13 +646,7 @@
           "description": ""
         }
       },
-      "image": "Raphael.webp",
-      "credits": [
-        {
-          "name": "@unicorn_cz",
-          "url": "https://twitter.com/unicorn_cz"
-        }
-      ]
+      "image": "Raphael.webp"
     },
     {
       "id": 19,
@@ -738,13 +661,7 @@
           "description": ""
         }
       },
-      "image": "Seong-mi-na.webp",
-      "credits": [
-        {
-          "name": "@unicorn_cz",
-          "url": "https://twitter.com/unicorn_cz"
-        }
-      ]
+      "image": "Seong-mi-na.webp"
     },
     {
       "id": 20,
@@ -771,13 +688,7 @@
           "description": ""
         }
       },
-      "image": "Setsuka.webp",
-      "credits": [
-        {
-          "name": "@unicorn_cz",
-          "url": "https://twitter.com/unicorn_cz"
-        }
-      ]
+      "image": "Setsuka.webp"
     },
     {
       "id": 21,
@@ -804,17 +715,7 @@
           "description": ""
         }
       },
-      "image": "Siegfried.webp",
-      "credits": [
-        {
-          "name": "@unicorn_cz",
-          "url": "https://twitter.com/unicorn_cz"
-        },
-        {
-          "name": "@PantocratorFR",
-          "url": "https://twitter.com/PantocratorFR"
-        }
-      ]
+      "image": "Siegfried.webp"
     },
     {
       "id": 22,
@@ -822,7 +723,7 @@
       "stances": {
         "AS": {
           "name": "Angel Step",
-          "description": "Entered by pressing \u2193 \u2198 \u2192"
+          "description": "Entered by pressing ↓ ↘ →"
         },
         "Hit": {
           "name": "",
@@ -830,16 +731,10 @@
         },
         "TAS": {
           "name": "Twin Angel Step",
-          "description": "Entered by pressing \u2193 \u2198 \u2192 \u2192"
+          "description": "Entered by pressing ↓ ↘ → →"
         }
       },
-      "image": "Sophitia.webp",
-      "credits": [
-        {
-          "name": "@unicorn_cz",
-          "url": "https://twitter.com/unicorn_cz"
-        }
-      ]
+      "image": "Sophitia.webp"
     },
     {
       "id": 23,
@@ -870,13 +765,7 @@
           "description": ""
         }
       },
-      "image": "Taki.webp",
-      "credits": [
-        {
-          "name": "@ArcticKomodo",
-          "url": "https://twitter.com/ArcticKomodo"
-        }
-      ]
+      "image": "Taki.webp"
     },
     {
       "id": 24,
@@ -903,13 +792,7 @@
           "description": ""
         }
       },
-      "image": "Talim.webp",
-      "credits": [
-        {
-          "name": "@slytigertalim",
-          "url": "https://twitter.com/slytigertalim"
-        }
-      ]
+      "image": "Talim.webp"
     },
     {
       "id": 25,
@@ -928,13 +811,7 @@
           "description": "When Tira flys up into the air."
         }
       },
-      "image": "Tira.webp",
-      "credits": [
-        {
-          "name": "@ZendoCrescendo",
-          "url": "https://twitter.com/ZendoCrescendo"
-        }
-      ]
+      "image": "Tira.webp"
     },
     {
       "id": 26,
@@ -977,17 +854,7 @@
           "description": "Opponent is crouching"
         }
       },
-      "image": "Voldo.webp",
-      "credits": [
-        {
-          "name": "@nuclear_purple",
-          "url": "https://twitter.com/nuclear_purple"
-        },
-        {
-          "name": "@Sorcere51872584",
-          "url": "https://twitter.com/Sorcere51872584"
-        }
-      ]
+      "image": "Voldo.webp"
     },
     {
       "id": 27,
@@ -1018,13 +885,7 @@
           "description": ""
         }
       },
-      "image": "Xianghua.webp",
-      "credits": [
-        {
-          "name": "@ZeddSC6",
-          "url": "https://twitter.com/ZeddSC6"
-        }
-      ]
+      "image": "Xianghua.webp"
     },
     {
       "id": 28,
@@ -1051,13 +912,7 @@
           "description": "Enhanced version of Manji Dragonfly that can be performed while in Soulcharge."
         }
       },
-      "image": "Yoshimitsu.webp",
-      "credits": [
-        {
-          "name": "@unicorn_cz",
-          "url": "https://twitter.com/unicorn_cz"
-        }
-      ]
+      "image": "Yoshimitsu.webp"
     },
     {
       "id": 29,
@@ -1088,36 +943,7 @@
           "description": ""
         }
       },
-      "image": "Zasalamel.webp",
-      "credits": [
-        {
-          "name": "@yangin_pikapi",
-          "url": "https://twitter.com/yangin_pikapi"
-        },
-        {
-          "name": "@unicorn_cz",
-          "url": "https://twitter.com/unicorn_cz"
-        }
-      ]
+      "image": "Zasalamel.webp"
     }
-  ],
-  "credits": {
-    "description": "We use the shared framedata that was originally made for framecalibur. Big claps to unicorn and the rest of the team",
-    "contributors": [
-      {
-        "name": "@unicorn_cz",
-        "url": "https://twitter.com/unicorn_cz",
-        "role": "Framedata Organizer"
-      },
-      {
-        "name": "Shared framedata",
-        "url": "https://docs.google.com/spreadsheets/d/1R3I_LXfqhvFjlHTuj-wSWwwqYmlUf299a3VY9pVyGEw",
-        "role": "Spreadsheet"
-      },
-      {
-        "name": "Report framedata issues",
-        "url": "https://discord.gg/XhnVuFe"
-      }
-    ]
-  }
+  ]
 }

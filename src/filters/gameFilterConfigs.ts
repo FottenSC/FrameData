@@ -198,6 +198,27 @@ export function getGameFilterConfig(
       multiSelectMatch("none", fieldString, fieldTokens, value),
   };
 
+  /**
+   * Space-insensitive contains — the operator behind the pinned quick-search
+   * row at the top of the builder. Strips whitespace from both the haystack
+   * and the user's value, so "ws 2k", "ws2k", "WS 2 K" and ":WS::2::K:"
+   * all match the same move. Only meaningful for the stance+command text
+   * column (`input` field); that field lists it first in allowedOperators so
+   * it's the default when the pinned row is seeded.
+   */
+  const quickContainsOperator: FilterOperator = {
+    id: "quickContains",
+    label: "Quick search",
+    input: "single",
+    appliesTo: ["text"],
+    test: ({ fieldString, value }) => {
+      const hay = (fieldString ?? "").replace(/\s+/g, "").toLowerCase();
+      const needle = (value ?? "").replace(/\s+/g, "").toLowerCase();
+      if (!needle) return true;
+      return hay.includes(needle);
+    },
+  };
+
   // Multi-select fields (stance, properties, tags, hit level, character)
   // offer ONLY the three set-membership operators. Partial string ops like
   // "contains" / "equals" don't apply to a vocabulary that's already a
@@ -223,6 +244,21 @@ export function getGameFilterConfig(
 
   const fields = defaultFields.map((f) => {
     switch (f.id) {
+      case "input":
+        // The Stance + Command column is also the quick-search target.
+        // quickContains is listed first so it's the default when a fresh
+        // filter row is seeded against this field; the standard text ops
+        // stay available via the operator dropdown for power users.
+        return {
+          ...f,
+          allowedOperators: [
+            "quickContains",
+            "contains",
+            "startsWith",
+            "equals",
+            "notEquals",
+          ],
+        };
       case "hitLevel":
         return hitLevelOptions.length > 0
           ? withOptions(f, hitLevelOptions)
@@ -247,7 +283,12 @@ export function getGameFilterConfig(
 
   const config: GameFilterConfig = {
     fields,
-    customOperators: [anyOfOperator, allOfOperator, notInOperator],
+    customOperators: [
+      anyOfOperator,
+      allOfOperator,
+      notInOperator,
+      quickContainsOperator,
+    ],
   };
 
   if (gameId === "Tekken8") {

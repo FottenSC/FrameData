@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { ChevronDown, ChevronRight, Search, X } from "lucide-react";
+import { ChevronDown, ChevronRight, X } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -313,19 +313,27 @@ function presetMatches(p: PresetSpec, item: FilterItem): boolean {
 
 interface FilterBuilderProps {
   onFiltersChange: (filters: FilterItem[]) => void;
-  /**
-   * Fires with the raw quick-search query whenever the user edits it
-   * (debounced). The query is NOT translated into a filter item — it lives
-   * as a separate concern in the parent so the parent can apply richer
-   * omnibar semantics (prefix fields, numeric ops, multi-term AND, negation).
-   */
-  onQuickSearchChange?: (query: string) => void;
   className?: string;
 }
 
+/**
+ * Id used for the pinned quick-search row. The builder always keeps an item
+ * with this id at the top of the filter list — it's the same condition whose
+ * value the "Quick search" input at the top of the builder edits.
+ */
+const PINNED_QUICK_SEARCH_ID = "__pinned_quick_search__";
+
+const makePinnedQuickSearch = (): FilterCondition => ({
+  id: PINNED_QUICK_SEARCH_ID,
+  type: "condition",
+  field: "input",
+  condition: "quickContains",
+  value: "",
+  value2: "",
+});
+
 export const FilterBuilder: React.FC<FilterBuilderProps> = ({
   onFiltersChange,
-  onQuickSearchChange,
   className,
 }) => {
   const {
@@ -391,12 +399,24 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
     [gameConfig],
   );
 
-  const [filters, setFilters] = useState<FilterItem[]>([]);
+  // Seed state with the pinned quick-search row. It lives at index 0 of
+  // `filters` for its entire lifetime — the top "Quick search" input and the
+  // first row in the advanced tree are two views into this one item.
+  const [filters, setFilters] = useState<FilterItem[]>(() => [
+    makePinnedQuickSearch(),
+  ]);
   const [rootOperator, setRootOperator] = useState<FilterGroupOperator>("and");
   const [isExpanded, setIsExpanded] = useState(false);
-  const [quickSearch, setQuickSearch] = useState("");
 
-  const defaultFilterAddedRef = useRef(false);
+  // Convenience view into the pinned row's current value for the top input.
+  const pinnedQuickSearch = useMemo<FilterCondition | null>(() => {
+    const first = filters[0];
+    return first && first.type === "condition" && first.id === PINNED_QUICK_SEARCH_ID
+      ? first
+      : null;
+  }, [filters]);
+  const quickSearch = pinnedQuickSearch?.value ?? "";
+
   const lastSentRef = useRef<string | null>(null);
 
   const getFieldType = useCallback(
@@ -426,17 +446,14 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
     [operatorsById],
   );
 
-  // Seed with one empty condition on first mount so the builder shows
-  // something meaningful when the user expands it.
+  // Factory for "Add condition" — lands on impact so every new row is a
+  // blank slate that doesn't collide with the pinned quick-search row.
   const createDefaultCondition = useCallback((): FilterCondition => {
-    const desired = "input";
-    const hasDesired = gameConfig.fields.some((f) => f.id === desired);
-    const fallback = "impact";
-    const defaultField = hasDesired
-      ? desired
-      : gameConfig.fields.some((f) => f.id === fallback)
-        ? fallback
-        : (gameConfig.fields[0]?.id ?? desired);
+    const preferred = ["impact", "damage", "hit", "block", "counterHit"];
+    const defaultField =
+      preferred.find((id) => gameConfig.fields.some((f) => f.id === id)) ??
+      gameConfig.fields[0]?.id ??
+      "impact";
     const available = getAvailableConditions(defaultField);
     return {
       id: uniqueId("filter"),
@@ -448,17 +465,29 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
     };
   }, [gameConfig.fields, getAvailableConditions]);
 
+  // Safety-net: if something ever drops the pinned row (e.g. the switcher
+  // hands us a fresh filters array from elsewhere), put it back at index 0.
   useEffect(() => {
-    if (filters.length === 0 && !defaultFilterAddedRef.current) {
-      setFilters([createDefaultCondition()]);
-      defaultFilterAddedRef.current = true;
+    if (
+      filters.length === 0 ||
+      filters[0].type !== "condition" ||
+      filters[0].id !== PINNED_QUICK_SEARCH_ID
+    ) {
+      setFilters((prev) => {
+        const pinned = prev.find(
+          (f) => f.type === "condition" && f.id === PINNED_QUICK_SEARCH_ID,
+        ) as FilterCondition | undefined;
+        const head = pinned ?? makePinnedQuickSearch();
+        const rest = prev.filter(
+          (f) => f.type !== "condition" || f.id !== PINNED_QUICK_SEARCH_ID,
+        );
+        return [head, ...rest];
+      });
     }
-  }, [filters.length, createDefaultCondition]);
+  }, [filters]);
 
-  // ---- Outbound: filters tree + quick-search travel through separate
-  //      channels. Quick-search is no longer smuggled in as a fake filter
-  //      item — it has richer omnibar semantics (prefix fields, numeric ops,
-  //      multi-word AND, negation) that would be clumsy to express as one.
+  // The pinned quick-search is just the first filter item, so we just ship
+  // `filters` (pruned of empty rows) upstream — one unified pipeline.
 
   const effectiveFilters = useMemo<FilterItem[]>(() => {
     const pruned = pruneInactive(filters, isRange);
@@ -487,17 +516,12 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
     }
   }, [effectiveFilters, onFiltersChange]);
 
-  // Notify the parent when the quick-search changes. Debouncing already
-  // happens inside DebouncedInput; here we just forward.
-  useEffect(() => {
-    onQuickSearchChange?.(quickSearch);
-  }, [quickSearch, onQuickSearchChange]);
-
-  // Cheap memoised count — walks the tree once per actual change, not per
-  // render.
+  // Count of actually-narrowing filter rows — pinned quick-search included
+  // naturally because it's a filter item itself (and `pruneInactive` /
+  // `countActive` treat it like any other row).
   const activeCount = useMemo(
-    () => countActive(filters, isRange) + (quickSearch.trim() !== "" ? 1 : 0),
-    [filters, isRange, quickSearch],
+    () => countActive(filters, isRange),
+    [filters, isRange],
   );
 
   // ---- Tree mutations ----------------------------------------------------
@@ -546,15 +570,21 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
     [],
   );
 
-  const removeItem = useCallback(
-    (id: string) => {
-      setFilters((prev) => {
-        const next = mapTree(prev, id, () => null);
-        return next.length === 0 ? [createDefaultCondition()] : next;
-      });
-    },
-    [createDefaultCondition],
-  );
+  const removeItem = useCallback((id: string) => {
+    // Pinned quick-search row is never removable; clicking its × instead
+    // empties its value. Regular rows delete as before.
+    if (id === PINNED_QUICK_SEARCH_ID) {
+      setFilters((prev) =>
+        mapTree(prev, id, (item) =>
+          item.type === "condition"
+            ? { ...item, value: "", value2: "" }
+            : item,
+        ),
+      );
+      return;
+    }
+    setFilters((prev) => mapTree(prev, id, () => null));
+  }, []);
 
   const addItem = useCallback(
     (parentId: string | null, type: "condition" | "group") => {
@@ -598,32 +628,23 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
   }, []);
 
   const clearAll = useCallback(() => {
-    setQuickSearch("");
     setRootOperator("and");
-    setFilters([createDefaultCondition()]);
-  }, [createDefaultCondition]);
+    // Keep the pinned quick-search row (emptied); drop everything else.
+    setFilters([makePinnedQuickSearch()]);
+  }, []);
 
-  // Preset toggle: if an equivalent condition already exists at root, remove
-  // it; otherwise, append one.
-  const togglePreset = useCallback(
-    (preset: PresetSpec) => {
-      setFilters((prev) => {
-        const match = prev.find((f) => presetMatches(preset, f));
-        if (match) {
-          return mapTree(prev, match.id, () => null);
-        }
-        // If the only filter is the seeded empty default, replace it instead
-        // of appending alongside.
-        const onlyEmpty =
-          prev.length === 1 &&
-          prev[0].type === "condition" &&
-          !isConditionActive(prev[0], isRange(prev[0].condition));
-        const fresh = preset.build();
-        return onlyEmpty ? [fresh] : [...prev, fresh];
-      });
-    },
-    [isRange],
-  );
+  // Preset toggle: if an equivalent condition already exists at root,
+  // remove it; otherwise, append one. Presets always sit AFTER the pinned
+  // quick-search row (filter rows[0] is reserved).
+  const togglePreset = useCallback((preset: PresetSpec) => {
+    setFilters((prev) => {
+      const match = prev.find(
+        (f) => f.id !== PINNED_QUICK_SEARCH_ID && presetMatches(preset, f),
+      );
+      if (match) return mapTree(prev, match.id, () => null);
+      return [...prev, preset.build()];
+    });
+  }, []);
 
   const isPresetActive = useCallback(
     (preset: PresetSpec) => filters.some((f) => presetMatches(preset, f)),
@@ -634,12 +655,18 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
 
   return (
     <div className={cn("mb-1 custom-search-builder pt-2", className)}>
-      {/* Quick search + clear-all action */}
+      {/*
+        Quick search input = a view into the pinned filter row's value.
+        Typing here and editing the first row in the advanced tree are the
+        same action: both mutate the PINNED_QUICK_SEARCH_ID condition.
+      */}
       <div className="py-2 mb-2 flex items-center gap-2">
         <DebouncedInput
           placeholder="Quick search"
           value={quickSearch}
-          onDebouncedChange={setQuickSearch}
+          onDebouncedChange={(v) =>
+            updateCondition(PINNED_QUICK_SEARCH_ID, "value", v)
+          }
           className="flex-1 h-10 text-base border-primary/20 focus-visible:border-primary focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
           aria-label="Quick search (stance + command)"
         />
@@ -717,30 +744,6 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
       >
         <div className="overflow-hidden">
           <div className="space-y-2 pt-1">
-            {/*
-              Pinned chip surfaces the active quick-search inside the
-              advanced view so the two aren't visually disconnected. Editing
-              the query still happens in the top search box — this chip is
-              just a "reminder you have this on" with a one-click clear.
-            */}
-            {quickSearch.trim() !== "" && (
-              <div className="flex items-center gap-2 rounded-md border border-primary/30 bg-primary/5 px-3 py-1.5 text-xs">
-                <Search className="h-3.5 w-3.5 text-primary shrink-0" />
-                <span className="text-muted-foreground">Quick search:</span>
-                <span className="font-mono text-foreground truncate">
-                  “{quickSearch}”
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setQuickSearch("")}
-                  className="ml-auto inline-flex h-5 w-5 items-center justify-center rounded hover:bg-primary/15 text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label="Clear quick search"
-                  title="Clear quick search"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            )}
             <FilterGroupRow
               group={{
                 id: "root",
@@ -901,25 +904,38 @@ const FilterRow: React.FC<BaseFilterProps & { filter: FilterCondition }> = ({
   const activeOp = availableConditions.find((op) => op.id === filter.condition);
   const multi = activeOp?.input === "multi";
   const hasOptions = (field?.options?.length ?? 0) > 0;
-  // MultiCombobox kicks in whenever the active operator wants a multi-value
-  // AND we know the available options (stance / properties / tags / hit
-  // level / character). This is independent of fieldType === "enum" so
-  // text-typed fields can still offer "In list" alongside contains / equals.
   const showMultiCombobox = multi && hasOptions;
 
   const numericType = fieldType === "number";
 
+  // Pinned quick-search row: the field is fixed (it IS the stance+command
+  // column by design), and it can't be removed — its × clears the value
+  // instead. The operator remains editable so the user can switch between
+  // quickContains / contains / starts-with / etc. without leaving the row.
+  const isPinned = filter.id === PINNED_QUICK_SEARCH_ID;
+
   return (
     <div className="flex items-center justify-between gap-2 group/row">
       <div className="flex items-center gap-2 flex-1 flex-wrap">
-        <Combobox
-          value={filter.field}
-          onChange={(v) => v && onUpdateCondition(filter.id, "field", v)}
-          options={fields.map((f) => ({ label: f.label, value: f.id }))}
-          placeholder="Field"
-          className="w-[160px] focus-visible:ring-0 focus-visible:ring-offset-0"
-          aria-label="Select field"
-        />
+        {isPinned ? (
+          <div
+            className="inline-flex h-8 w-[160px] items-center justify-between rounded-md border border-primary/30 bg-primary/5 px-3 text-sm"
+            title="Pinned quick-search field"
+          >
+            <span className="truncate">
+              {field?.label ?? "Stance + Command"}
+            </span>
+          </div>
+        ) : (
+          <Combobox
+            value={filter.field}
+            onChange={(v) => v && onUpdateCondition(filter.id, "field", v)}
+            options={fields.map((f) => ({ label: f.label, value: f.id }))}
+            placeholder="Field"
+            className="w-[160px] focus-visible:ring-0 focus-visible:ring-offset-0"
+            aria-label="Select field"
+          />
+        )}
 
         <Select
           value={filter.condition}
@@ -1032,7 +1048,7 @@ const FilterRow: React.FC<BaseFilterProps & { filter: FilterCondition }> = ({
       </div>
 
       <div className="flex items-center gap-1">
-        {depth > 1 && (
+        {!isPinned && depth > 1 && (
           <Button
             variant="secondary"
             size="icon"
@@ -1044,22 +1060,25 @@ const FilterRow: React.FC<BaseFilterProps & { filter: FilterCondition }> = ({
             <ChevronDown className="h-4 w-4 -rotate-90" />
           </Button>
         )}
-        <Button
-          variant="secondary"
-          size="icon"
-          className="h-8 w-8 bg-muted/50 hover:bg-muted"
-          onClick={() => onIndent(filter.id)}
-          aria-label="Indent"
-          title="Move into a new group"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
+        {!isPinned && (
+          <Button
+            variant="secondary"
+            size="icon"
+            className="h-8 w-8 bg-muted/50 hover:bg-muted"
+            onClick={() => onIndent(filter.id)}
+            aria-label="Indent"
+            title="Move into a new group"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        )}
         <Button
           variant="secondary"
           size="icon"
           className="h-8 w-8 bg-muted/50 hover:bg-muted hover:text-destructive"
           onClick={() => onRemove(filter.id)}
-          aria-label="Remove filter"
+          aria-label={isPinned ? "Clear quick search" : "Remove filter"}
+          title={isPinned ? "Clear the quick-search value" : "Remove this row"}
         >
           <X className="h-4 w-4" />
         </Button>

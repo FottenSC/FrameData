@@ -33,7 +33,7 @@ import {
   useTableConfig,
   useUserSettings,
 } from "@/contexts/UserSettingsContext";
-import { sharedNotationMapping } from "@/lib/notationMapping";
+import { getStylesForGame } from "@/lib/notation";
 import type { ColumnConfig } from "@/contexts/UserSettingsContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,7 +46,8 @@ import { fetchCharacterMoves } from "@/hooks/useMoves";
 export function CommandPalette() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { open, setOpen, currentView, setCurrentView, setCreditsOpen } = useCommand();
+  const { open, setOpen, currentView, setCurrentView, setCreditsOpen } =
+    useCommand();
   const {
     characters,
     selectedGame,
@@ -57,8 +58,7 @@ export function CommandPalette() {
   } = useGame();
 
   const {} = useTableConfig();
-  const { getEnabledNotationMappings, toggleGameNotationMapping } =
-    useUserSettings();
+  const { getNotationStyleId, setNotationStyle } = useUserSettings();
 
   const [searchValue, setSearchValue] = React.useState("");
 
@@ -66,7 +66,7 @@ export function CommandPalette() {
 
   const prefetchCharacter = (character: { id: number; name: string }) => {
     if (!selectedGame) return;
-    
+
     if (prefetchTimeoutRef.current) {
       clearTimeout(prefetchTimeoutRef.current);
     }
@@ -132,7 +132,10 @@ export function CommandPalette() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent style={{ backgroundColor: "var(--background)" }} className="overflow-hidden p-0 top-[30%] translate-y-[-30%] max-w-2xl border-border">
+      <DialogContent
+        style={{ backgroundColor: "var(--background)" }}
+        className="overflow-hidden p-0 top-[30%] translate-y-[-30%] max-w-2xl border-border"
+      >
         <DialogTitle className="sr-only">Command Palette</DialogTitle>
         <DialogDescription className="sr-only">
           Navigate through the application using keyboard shortcuts and commands
@@ -150,8 +153,8 @@ export function CommandPalette() {
                   : showGames
                     ? `Search ${avaliableGames.length} games...`
                     : showNotationMappings
-                        ? "Toggle notation mappings..."
-                        : "Type a command or search..."
+                      ? "Toggle notation mappings..."
+                      : "Type a command or search..."
             }
             value={searchValue}
             onValueChange={setSearchValue}
@@ -236,46 +239,48 @@ export function CommandPalette() {
                   <ChevronLeft className="mr-2 h-4 w-4" />
                   <span>Back to Commands</span>
                 </CommandItem>
-                {[
-                  selectedGame,
-                  ...avaliableGames.filter((g) => g.id !== selectedGame.id),
-                ].map((game) => {
-                  const enabledForGame = getEnabledNotationMappings(
-                    game.id,
-                    game.notationMapping.defaultEnabled,
-                  );
-                  return (
-                    <CommandGroup
-                      key={game.id}
-                      heading={`${game.name} Notation Mappings`}
-                    >
-                      {Object.keys(sharedNotationMapping).map((key) => (
-                        <CommandItem
-                          key={`${game.id}-${key}`}
-                          onSelect={() =>
-                            toggleGameNotationMapping(
-                              game.id,
-                              key,
-                              enabledForGame,
-                            )
-                          }
+                {/*
+                  Radio-style: exactly one style active at a time for the
+                  current game. Other games' styles aren't relevant here —
+                  the Navbar game-switcher is the path to those.
+                */}
+                <CommandGroup heading={`${selectedGame.name} notation`}>
+                  {getStylesForGame(selectedGame.id).map((style) => {
+                    const activeId = getNotationStyleId(
+                      selectedGame.id,
+                      selectedGame.defaultNotationStyleId,
+                    );
+                    const active = style.id === activeId;
+                    return (
+                      <CommandItem
+                        key={style.id}
+                        onSelect={() => {
+                          setNotationStyle(selectedGame.id, style.id);
+                          setOpen(false);
+                        }}
+                      >
+                        <div
+                          className={cn(
+                            "mr-2 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-primary",
+                            active
+                              ? "bg-primary text-primary-foreground"
+                              : "opacity-50 [&_svg]:invisible",
+                          )}
                         >
-                          <div
-                            className={cn(
-                              "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                              enabledForGame.includes(key)
-                                ? "bg-primary text-primary-foreground"
-                                : "opacity-50 [&_svg]:invisible",
-                            )}
-                          >
-                            <Check className={cn("h-4 w-4")} />
-                          </div>
-                          <span>{key}</span>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  );
-                })}
+                          <Check className="h-3 w-3" />
+                        </div>
+                        <div className="flex flex-col min-w-0">
+                          <span className="truncate">{style.name}</span>
+                          {style.description && (
+                            <span className="truncate text-[11px] text-muted-foreground">
+                              {style.description}
+                            </span>
+                          )}
+                        </div>
+                      </CommandItem>
+                    );
+                  })}
+                </CommandGroup>
               </>
             ) : (
               <>

@@ -7,6 +7,7 @@ import React, {
   useMemo,
   ReactNode,
 } from "react";
+import { LEGACY_STYLE_ID_MAP } from "@/lib/notation";
 
 // Define the column configuration interface
 export interface ColumnConfig {
@@ -172,14 +173,20 @@ interface StoredColumnConfig {
 }
 
 interface UserSettingsContextType {
-  // Game notation mappings
-  gameNotationMappings: Record<string, string[]>;
-  getEnabledNotationMappings: (gameId: string, defaults?: string[]) => string[];
-  toggleGameNotationMapping: (
-    gameId: string,
-    key: string,
-    currentEnabled: string[],
-  ) => void;
+  /**
+   * One notation style id per game. Replaces the legacy
+   * `gameNotationMappings` multi-select — now radio semantics.
+   */
+  notationStyleByGame: Record<string, string>;
+  /**
+   * Resolve the active style id for a game. Returns the user's saved choice
+   * if any, else the provided `fallback` (typically `game.defaultNotationStyleId`),
+   * else `"universal"`.
+   */
+  getNotationStyleId: (gameId: string, fallback?: string) => string;
+  /** Set (or replace) the active style id for a game. */
+  setNotationStyle: (gameId: string, styleId: string) => void;
+
   // Table config
   columnConfigs: ColumnConfig[];
   setColumnConfigs: React.Dispatch<React.SetStateAction<ColumnConfig[]>>;
@@ -201,41 +208,57 @@ interface UserSettingsProviderProps {
 export const UserSettingsProvider: React.FC<UserSettingsProviderProps> = ({
   children,
 }) => {
-  // Game notation mappings state
-  const [gameNotationMappings, setGameNotationMappings] = useState<
-    Record<string, string[]>
+  // --- Notation style (one per game) ---------------------------------------
+  //
+  // Stored as `{ [gameId]: styleId }`. Initial read also migrates the legacy
+  // `gameNotationMappings` array format: if present, take the first element
+  // of each array, translate through LEGACY_STYLE_ID_MAP, and drop the old key.
+  const [notationStyleByGame, setNotationStyleByGame] = useState<
+    Record<string, string>
   >(() => {
-    const saved = localStorage.getItem("gameNotationMappings");
-    return saved ? JSON.parse(saved) : {};
+    try {
+      const saved = localStorage.getItem("notationStyleByGame");
+      if (saved) return JSON.parse(saved);
+
+      const legacy = localStorage.getItem("gameNotationMappings");
+      if (legacy) {
+        const parsed = JSON.parse(legacy) as Record<string, string[]>;
+        const migrated: Record<string, string> = {};
+        for (const [gameId, enabled] of Object.entries(parsed ?? {})) {
+          const first = Array.isArray(enabled) ? enabled[0] : undefined;
+          if (first) migrated[gameId] = LEGACY_STYLE_ID_MAP[first] ?? first;
+        }
+        localStorage.removeItem("gameNotationMappings");
+        return migrated;
+      }
+    } catch {
+      // fall through
+    }
+    return {};
   });
 
   useEffect(() => {
-    localStorage.setItem(
-      "gameNotationMappings",
-      JSON.stringify(gameNotationMappings),
+    try {
+      localStorage.setItem(
+        "notationStyleByGame",
+        JSON.stringify(notationStyleByGame),
+      );
+    } catch {
+      // ignore quota / privacy-mode errors
+    }
+  }, [notationStyleByGame]);
+
+  const getNotationStyleId = useCallback(
+    (gameId: string, fallback?: string) =>
+      notationStyleByGame[gameId] ?? fallback ?? "universal",
+    [notationStyleByGame],
+  );
+
+  const setNotationStyle = useCallback((gameId: string, styleId: string) => {
+    setNotationStyleByGame((prev) =>
+      prev[gameId] === styleId ? prev : { ...prev, [gameId]: styleId },
     );
-  }, [gameNotationMappings]);
-
-  const getEnabledNotationMappings = useCallback(
-    (gameId: string, defaults: string[] = []) => {
-      return gameNotationMappings[gameId] ?? defaults;
-    },
-    [gameNotationMappings],
-  );
-
-  const toggleGameNotationMapping = useCallback(
-    (gameId: string, key: string, currentEnabled: string[]) => {
-      setGameNotationMappings((prev) => {
-        const isEnabled = currentEnabled.includes(key);
-        const newEnabled = isEnabled
-          ? currentEnabled.filter((k) => k !== key)
-          : [...currentEnabled, key];
-
-        return { ...prev, [gameId]: newEnabled };
-      });
-    },
-    [],
-  );
+  }, []);
 
   // Table config state
   const [columnConfigs, setColumnConfigs] = useState<ColumnConfig[]>(() => {
@@ -325,9 +348,9 @@ export const UserSettingsProvider: React.FC<UserSettingsProviderProps> = ({
 
   const value: UserSettingsContextType = useMemo(
     () => ({
-      gameNotationMappings,
-      getEnabledNotationMappings,
-      toggleGameNotationMapping,
+      notationStyleByGame,
+      getNotationStyleId,
+      setNotationStyle,
       columnConfigs,
       setColumnConfigs,
       updateColumnVisibility,
@@ -337,9 +360,9 @@ export const UserSettingsProvider: React.FC<UserSettingsProviderProps> = ({
       getSortedColumns,
     }),
     [
-      gameNotationMappings,
-      getEnabledNotationMappings,
-      toggleGameNotationMapping,
+      notationStyleByGame,
+      getNotationStyleId,
+      setNotationStyle,
       columnConfigs,
       updateColumnVisibility,
       reorderColumns,

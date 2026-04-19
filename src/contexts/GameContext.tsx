@@ -9,7 +9,12 @@ import React, {
 } from "react";
 import { Gamepad2, Sword } from "lucide-react";
 import { useNavigate, useParams, useLocation } from "@tanstack/react-router";
-import { sharedNotationMapping, NotationMap } from "@/lib/notationMapping";
+import {
+  applyNotationStyle,
+  getNotationStyle,
+  getStylesForGame,
+  NotationStyle,
+} from "@/lib/notation";
 import { useUserSettings } from "./UserSettingsContext";
 import { clearStringCache } from "@/hooks/useMoves";
 import { loadGameData } from "@/lib/loadGameData";
@@ -24,81 +29,13 @@ export interface IconConfig {
   iconClasses?: string;
 }
 
-// --- Notation Mapping Layer ---
-// NotationMap imported from lib
-
-// Define reusable notation mappings
-// Define reusable notation mappings
-// Moved to src/lib/notationMapping.ts
-
-// Define notation mapping configuration for games
-// Define notation mapping configuration for games
-export type GameNotationMappingConfig = {
-  // extends?: string[]; // Removed: managed by user settings
-  specific?: NotationMap; // Game-unique mappings
-  defaultEnabled?: string[]; // Default enabled notation mappings for this game
-};
-
-// Helper function to build the final notation map for a game
-export const buildNotationMap = (
-  config: GameNotationMappingConfig,
-  enabledNotationMappings: string[],
-): NotationMap => {
-  let effectiveMap: NotationMap = {};
-
-  // Add mappings from enabled notation mappings (User Settings)
-  enabledNotationMappings.forEach((mappingName) => {
-    const mapping = sharedNotationMapping[mappingName];
-    if (mapping) {
-      effectiveMap = { ...effectiveMap, ...mapping };
-    }
-  });
-
-  // Add/override with game-specific mappings
-  if (config.specific) {
-    effectiveMap = { ...effectiveMap, ...config.specific };
-  }
-
-  return effectiveMap;
-};
-
-// Cache for pre-compiled notation RegExps to avoid expensive re-compilation
-// Use WeakMap to allow NotationMap objects to be garbage collected
-const notationRegexCache = new WeakMap<NotationMap, { regex: RegExp }>();
-
-// Helper function to apply notation mappings
-export const applyNotationMapping = (
-  text: string | null,
-  map: NotationMap,
-): string | null => {
-  if (text === null) {
-    return null;
-  }
-
-  const keys = Object.keys(map);
-  if (keys.length === 0) return text;
-
-  let cache = notationRegexCache.get(map);
-  if (!cache) {
-    // Sort keys by length descending to replace longer sequences first
-    const sortedKeys = [...keys].sort((a, b) => b.length - a.length);
-    const escapedKeys = sortedKeys.map((key) =>
-      key.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"),
-    );
-    const regex = new RegExp(escapedKeys.join("|"), "g");
-    cache = { regex };
-    notationRegexCache.set(map, cache);
-  }
-
-  return text.replace(cache.regex, (matched) => map[matched] ?? matched);
-};
-
 // Define Game interface here
 export interface Game {
   id: string;
   name: string;
   icons: IconConfig[];
-  notationMapping: GameNotationMappingConfig;
+  /** Notation style selected when the user first lands on this game. */
+  defaultNotationStyleId: string;
   icon: ReactNode;
   badges?: Record<string, { className: string }>;
 }
@@ -153,10 +90,7 @@ export const avaliableGames: Game[] = [
       STN: { className: "bg-stone-600 text-white" },
       LNC: { className: "bg-stone-600 text-white" },
     },
-    notationMapping: {
-      specific: {},
-      defaultEnabled: ["soulcaliburButtons"],
-    },
+    defaultNotationStyleId: "soulcalibur",
     icons: [
       // 2x1 icons
       { code: "UA", title: "Unblockable", iconClasses: "h-4 w-8" },
@@ -194,10 +128,7 @@ export const avaliableGames: Game[] = [
       STN: { className: "bg-stone-600 text-white" },
       LNC: { className: "bg-stone-600 text-white" },
     },
-    notationMapping: {
-      specific: {},
-      defaultEnabled: ["weirdTekken"],
-    },
+    defaultNotationStyleId: "tekken",
     icons: [
       { code: "LP", title: "Light Punch" },
       { code: "RP", title: "Right Punch" },
@@ -233,7 +164,11 @@ interface GameContextType {
   setSelectedCharacterId: (id: number | null) => void;
   availableIcons: IconConfig[];
   getIconUrl: (iconName: string, isHeld?: boolean) => string;
-  getNotationMap: () => NotationMap;
+  /** The notation style currently active for the selected game. */
+  notationStyle: NotationStyle;
+  /** All styles available for the selected game (for the switcher UI). */
+  notationStylesForGame: NotationStyle[];
+  /** Apply the currently-active style to a command string. Null-safe. */
   applyNotation: (text: string | null) => string | null;
   getStanceInfo: (
     stanceCode: string,
@@ -417,31 +352,44 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     [selectedGame.id],
   );
 
-  const { getEnabledNotationMappings } = useUserSettings();
+  const { getNotationStyleId } = useUserSettings();
 
-  // Memoize notation map for the selected game
-  const notationMap: NotationMap = useMemo(() => {
-    const enabled = getEnabledNotationMappings(
-      selectedGame.id,
-      selectedGame.notationMapping.defaultEnabled,
-    );
-    return buildNotationMap(selectedGame.notationMapping, enabled);
-  }, [
-    selectedGame.id,
-    selectedGame.notationMapping,
-    getEnabledNotationMappings,
-  ]);
-
-  const getNotationMap = useCallback(
-    (): NotationMap => notationMap,
-    [notationMap],
+  // Available styles for the current game (for the switcher UI).
+  const notationStylesForGame = useMemo(
+    () => getStylesForGame(selectedGame.id),
+    [selectedGame.id],
   );
 
+  // The single style active for the selected game right now. Always resolves
+  // to a concrete style: user's pick → first style for the game → universal.
+  const notationStyle: NotationStyle = useMemo(() => {
+    const pickedId = getNotationStyleId(
+      selectedGame.id,
+      selectedGame.defaultNotationStyleId,
+    );
+    return (
+      getNotationStyle(pickedId) ??
+      notationStylesForGame[0] ??
+        // Last-ditch fallback — a zero-replacement pass-through.
+        {
+          id: "universal",
+          name: "Universal",
+          short: "ABCD",
+          games: [],
+          replacements: {},
+        }
+    );
+  }, [
+    getNotationStyleId,
+    selectedGame.id,
+    selectedGame.defaultNotationStyleId,
+    notationStylesForGame,
+  ]);
+
   const applyNotation = useCallback(
-    (text: string | null): string | null => {
-      return applyNotationMapping(text, notationMap);
-    },
-    [notationMap],
+    (text: string | null): string | null =>
+      applyNotationStyle(text, notationStyle),
+    [notationStyle],
   );
 
   // Get stance info by code, checking character-specific stances first, then game-level
@@ -484,7 +432,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       availableIcons: combinedIcons,
       gameCreditsDescription,
       getIconUrl: getIconUrl,
-      getNotationMap,
+      notationStyle,
+      notationStylesForGame,
       applyNotation,
       getStanceInfo,
       getPropertyInfo,
@@ -502,7 +451,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       gameCreditsDescription,
       combinedIcons,
       getIconUrl,
-      getNotationMap,
+      notationStyle,
+      notationStylesForGame,
       applyNotation,
       getStanceInfo,
       getPropertyInfo,

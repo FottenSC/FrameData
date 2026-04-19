@@ -28,7 +28,12 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
 } from "./ui/dropdown-menu";
+import { useUserSettings } from "../contexts/UserSettingsContext";
 import { cn } from "@/lib/utils";
 
 const gameIcons: Record<string, React.ReactNode> = {
@@ -44,7 +49,10 @@ export const Navbar: React.FC = () => {
     characters,
     selectedCharacterId,
     setSelectedCharacterId,
+    notationStyle,
+    notationStylesForGame,
   } = useGame();
+  const { setNotationStyle } = useUserSettings();
   const { setOpen, openView } = useCommand();
   const {
     activeFiltersCount,
@@ -195,13 +203,57 @@ export const Navbar: React.FC = () => {
               >
                 <Settings2 className="h-4 w-4" />
               </button>
-              <button
-                onClick={() => openView("notationMappings")}
-                className="hidden md:inline-flex items-center justify-center p-1.5 text-muted-foreground hover:text-foreground rounded-md border border-border bg-secondary/30 hover:bg-secondary/50 active:scale-95 active:bg-secondary/70 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
-                title="Notation Mappings"
-              >
-                <Languages className="h-4 w-4" />
-              </button>
+              {/*
+                Notation style switcher — a compact button showing the active
+                style's short label (e.g. "ABKG"). Click to radio-select
+                another style for the current game.
+              */}
+              {notationStylesForGame.length > 1 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      className="hidden md:inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-muted-foreground hover:text-foreground rounded-md border border-border bg-secondary/30 hover:bg-secondary/50 active:scale-95 active:bg-secondary/70 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
+                      title={`Notation: ${notationStyle.name}`}
+                      aria-label={`Notation style: ${notationStyle.name}. Click to change.`}
+                    >
+                      <Languages className="h-3.5 w-3.5" />
+                      <span className="tabular-nums">
+                        {notationStyle.short}
+                      </span>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    className="bg-card/95 backdrop-blur-sm border-border shadow-lg min-w-[240px]"
+                  >
+                    <DropdownMenuLabel className="text-xs uppercase tracking-wider text-muted-foreground">
+                      Notation — {selectedGame.name}
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuRadioGroup
+                      value={notationStyle.id}
+                      onValueChange={(v) =>
+                        setNotationStyle(selectedGame.id, v)
+                      }
+                    >
+                      {notationStylesForGame.map((style) => (
+                        <DropdownMenuRadioItem
+                          key={style.id}
+                          value={style.id}
+                          className="flex flex-col items-start gap-0 py-1.5"
+                        >
+                          <span className="text-sm">{style.name}</span>
+                          {style.description && (
+                            <span className="text-[11px] text-muted-foreground">
+                              {style.description}
+                            </span>
+                          )}
+                        </DropdownMenuRadioItem>
+                      ))}
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button

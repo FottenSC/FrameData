@@ -2288,20 +2288,24 @@
     "DamageDec": 30,
     "Block": {
       "advantage": null,
-      "tags": [],
+      "tags": [
+        "UA"
+      ],
       "raw": null
     },
     "Hit": {
       "advantage": null,
       "tags": [
-        "KND"
+        "KND",
+        "UA"
       ],
       "raw": "KND"
     },
     "CounterHit": {
       "advantage": null,
       "tags": [
-        "KND"
+        "KND",
+        "UA"
       ],
       "raw": "KND"
     },
@@ -2829,20 +2833,24 @@
     "DamageDec": 74,
     "Block": {
       "advantage": null,
-      "tags": [],
+      "tags": [
+        "UA"
+      ],
       "raw": null
     },
     "Hit": {
       "advantage": null,
       "tags": [
-        "LNC"
+        "LNC",
+        "UA"
       ],
       "raw": "LNC"
     },
     "CounterHit": {
       "advantage": null,
       "tags": [
-        "LNC"
+        "LNC",
+        "UA"
       ],
       "raw": "LNC"
     },
@@ -5758,20 +5766,24 @@
     "DamageDec": 110,
     "Block": {
       "advantage": null,
-      "tags": [],
+      "tags": [
+        "UA"
+      ],
       "raw": null
     },
     "Hit": {
       "advantage": null,
       "tags": [
-        "KND"
+        "KND",
+        "UA"
       ],
       "raw": "KND"
     },
     "CounterHit": {
       "advantage": null,
       "tags": [
-        "KND"
+        "KND",
+        "UA"
       ],
       "raw": "KND"
     },

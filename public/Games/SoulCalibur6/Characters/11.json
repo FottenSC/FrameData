@@ -5223,19 +5223,24 @@
     "DamageDec": 72,
     "Block": {
       "advantage": null,
-      "tags": [],
+      "tags": [
+        "UA"
+      ],
       "raw": null
     },
     "Hit": {
       "advantage": null,
       "tags": [
-        "KND"
+        "KND",
+        "UA"
       ],
       "raw": "KND"
     },
     "CounterHit": {
       "advantage": null,
-      "tags": [],
+      "tags": [
+        "UA"
+      ],
       "raw": null
     },
     "GuardBurst": null,

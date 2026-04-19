@@ -175,6 +175,26 @@ frameData["BlockOutcome"] = frameData["Block"].apply(parse_outcome)
 frameData["HitOutcome"] = frameData["Hit"].apply(parse_outcome)
 frameData["CounterHitOutcome"] = frameData["Counter Hit"].apply(parse_outcome)
 
+
+# ---------------------------------------------------------------------------
+# Cross-channel move-wide properties
+# ---------------------------------------------------------------------------
+#
+# Some properties describe the move itself, not a specific outcome — if a
+# move is unblockable (UA), it's unblockable on hit AND on counter-hit AND
+# "on block" alike. Listing the property only in the move-wide Properties
+# array means the frontend can't answer the obvious filter question
+# "hit-tags contains UA?". Echo those tags into every outcome so the data is
+# queryable per-channel.
+#
+# The frontend knows these are really move-wide (via the Properties array)
+# and collapses them to a single "Move property" pill in tooltips, so this
+# duplication never causes visual noise in the UI.
+#
+# The actual propagation happens further down, AFTER the Properties column is
+# populated by extract_properties. This constant lives up here for visibility.
+OUTCOME_ECHO_PROPERTIES = {"UA"}
+
 # PostProcess.sql: translate to universal command format (K->C, k->c, G->D, g->d)
 def translate_command(cmd):
     if not isinstance(cmd, str):
@@ -226,6 +246,32 @@ def extract_properties(row):
     return properties if properties else None
 
 frameData["Properties"] = frameData.apply(extract_properties, axis=1)
+
+
+# Now that Properties has been computed, echo any move-wide properties that
+# logically apply across every outcome (see OUTCOME_ECHO_PROPERTIES above)
+# into each outcome's tag list. iterrows yields a Series whose cell VALUES
+# (the outcome dicts) are references to the original objects in the DataFrame,
+# so mutating `tags` in place persists.
+def propagate_move_wide_properties(row):
+    props = row.get("Properties") or []
+    to_echo = [p for p in props if p in OUTCOME_ECHO_PROPERTIES]
+    if not to_echo:
+        return
+    for col in ("BlockOutcome", "HitOutcome", "CounterHitOutcome"):
+        outcome = row.get(col)
+        if not isinstance(outcome, dict):
+            continue
+        tags = outcome.get("tags")
+        if not isinstance(tags, list):
+            continue
+        for p in to_echo:
+            if p not in tags:
+                tags.append(p)
+
+
+for _, _row in frameData.iterrows():
+    propagate_move_wide_properties(_row)
 
 
 # Stance case fixer

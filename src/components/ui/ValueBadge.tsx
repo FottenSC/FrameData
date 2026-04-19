@@ -101,8 +101,14 @@ interface PropertyChipProps {
 }
 
 function sourceChannels(sources: PropertySources): SourceChannel[] {
+  // Move-wide properties (UA / BA / GI / ...) are by definition true across
+  // every outcome channel. The data pipeline echoes UA into each outcome's
+  // tag list so per-channel filters still work — but in the tooltip we
+  // collapse to a single "Move property" pill to avoid a noisy row of four
+  // nearly-identical chips that all say the same thing.
+  if (sources.asMoveProperty) return ["move"];
+
   const out: SourceChannel[] = [];
-  if (sources.asMoveProperty) out.push("move");
   if (sources.onHit) out.push("hit");
   if (sources.onCounterHit) out.push("counterHit");
   if (sources.onBlock) out.push("block");

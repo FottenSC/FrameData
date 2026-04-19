@@ -3900,21 +3900,24 @@
     "Block": {
       "advantage": null,
       "tags": [
-        "KND"
+        "KND",
+        "UA"
       ],
       "raw": "KND"
     },
     "Hit": {
       "advantage": null,
       "tags": [
-        "KND"
+        "KND",
+        "UA"
       ],
       "raw": "KND"
     },
     "CounterHit": {
       "advantage": null,
       "tags": [
-        "KND"
+        "KND",
+        "UA"
       ],
       "raw": "KND"
     },
@@ -5472,17 +5475,23 @@
     "DamageDec": 79,
     "Block": {
       "advantage": null,
-      "tags": [],
+      "tags": [
+        "UA"
+      ],
       "raw": null
     },
     "Hit": {
       "advantage": 14,
-      "tags": [],
+      "tags": [
+        "UA"
+      ],
       "raw": "14"
     },
     "CounterHit": {
       "advantage": null,
-      "tags": [],
+      "tags": [
+        "UA"
+      ],
       "raw": null
     },
     "GuardBurst": null,

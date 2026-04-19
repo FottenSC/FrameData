@@ -2618,20 +2618,24 @@
     "DamageDec": 45,
     "Block": {
       "advantage": null,
-      "tags": [],
+      "tags": [
+        "UA"
+      ],
       "raw": null
     },
     "Hit": {
       "advantage": null,
       "tags": [
-        "LNC"
+        "LNC",
+        "UA"
       ],
       "raw": "LNC"
     },
     "CounterHit": {
       "advantage": null,
       "tags": [
-        "LNC"
+        "LNC",
+        "UA"
       ],
       "raw": "LNC"
     },

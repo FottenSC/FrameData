@@ -6264,20 +6264,24 @@
     "DamageDec": 50,
     "Block": {
       "advantage": null,
-      "tags": [],
+      "tags": [
+        "UA"
+      ],
       "raw": null
     },
     "Hit": {
       "advantage": null,
       "tags": [
-        "KND"
+        "KND",
+        "UA"
       ],
       "raw": "KND"
     },
     "CounterHit": {
       "advantage": null,
       "tags": [
-        "KND"
+        "KND",
+        "UA"
       ],
       "raw": "KND"
     },

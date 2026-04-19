@@ -199,23 +199,39 @@ export function getGameFilterConfig(
   };
 
   /**
-   * Space-insensitive contains — the operator behind the pinned quick-search
-   * row at the top of the builder. Strips whitespace from both the haystack
-   * and the user's value, so "ws 2k", "ws2k", "WS 2 K" and ":WS::2::K:"
-   * all match the same move. Only meaningful for the stance+command text
-   * column (`input` field); that field lists it first in allowedOperators so
-   * it's the default when the pinned row is seeded.
+   * Punctuation / whitespace-insensitive contains — the operator behind the
+   * pinned quick-search row at the top of the builder. Strips everything
+   * that isn't alphanumeric or `+` (kept because directional notation uses
+   * it: `A+G`, `B+K`), so "ws 2k", "ws2k", "WS 2 K" and ":WS::2::K:" all
+   * match the same move, and parenthesised optional inputs like `(2) B+K`
+   * in the data are found by typing `2B+K`.
+   *
+   * When the accessor exposes `fieldTokens` (the `input` column does — one
+   * string per OR-branch expansion of `_` separators in the command array),
+   * this iterates each token individually. That way a move authored as
+   * `(2) _ (8) B+K` gets expanded into "2 B+K" AND "8 B+K", and typing
+   * "2B+K" hits the first branch without accidentally bridging the
+   * underscore.
+   *
+   * Only meaningful for the stance+command text column (`input` field);
+   * that field lists it first in allowedOperators so it's the default when
+   * the pinned row is seeded.
    */
+  const normalizeQuick = (s: string): string =>
+    s.replace(/[^a-zA-Z0-9+]/g, "").toLowerCase();
+
   const quickContainsOperator: FilterOperator = {
     id: "quickContains",
     label: "Quick search",
     input: "single",
     appliesTo: ["text"],
-    test: ({ fieldString, value }) => {
-      const hay = (fieldString ?? "").replace(/\s+/g, "").toLowerCase();
-      const needle = (value ?? "").replace(/\s+/g, "").toLowerCase();
+    test: ({ fieldString, fieldTokens, value }) => {
+      const needle = normalizeQuick(value ?? "");
       if (!needle) return true;
-      return hay.includes(needle);
+      if (fieldTokens && fieldTokens.length > 0) {
+        return fieldTokens.some((t) => normalizeQuick(t).includes(needle));
+      }
+      return normalizeQuick(fieldString ?? "").includes(needle);
     },
   };
 

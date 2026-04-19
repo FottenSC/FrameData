@@ -21,6 +21,49 @@ const joinOrNull = (xs: string[] | null, sep: string): string | null =>
   xs && xs.length > 0 ? xs.join(sep) : null;
 
 /**
+ * Expand OR-groups inside a command array into concrete alternative
+ * sequences. The source-data convention is that a literal `"_"` token between
+ * two other tokens means "either side is valid", e.g.
+ *
+ *     ["(2)", "_", "(8)", "B+K"]        → "(2) or (8), then B+K"
+ *     ["(3)", "_", "(6)", "_", "(9)",   → "(3) or (6) or (9), then A+G"
+ *      "A+G"]
+ *
+ * Returns one concatenated string per cartesian product of OR options, so
+ * downstream string-matching logic can find a match in any real input
+ * sequence without accidentally spanning an OR branch boundary.
+ */
+export function expandCommandOrGroups(cmd: string[] | null): string[] {
+  if (!cmd || cmd.length === 0) return [""];
+  const groups: string[][] = [];
+  let i = 0;
+  while (i < cmd.length) {
+    if (i + 1 < cmd.length && cmd[i + 1] === "_") {
+      const options: string[] = [cmd[i]];
+      i += 2; // past current and the `_`
+      while (i < cmd.length) {
+        options.push(cmd[i]);
+        i += 1;
+        if (i < cmd.length && cmd[i] === "_") {
+          i += 1; // consume the next `_` and continue extending the group
+        } else {
+          break;
+        }
+      }
+      groups.push(options);
+    } else {
+      groups.push([cmd[i]]);
+      i += 1;
+    }
+  }
+  // Cartesian product. For most moves this is 1–3 expansions.
+  return groups.reduce<string[]>(
+    (acc, opts) => acc.flatMap((prefix) => opts.map((opt) => prefix + opt)),
+    [""],
+  );
+}
+
+/**
  * Outcome-tag "search string" used by text filters. Joins parsed tags with the
  * raw authored string so queries like "contains KND" find both structured tag
  * matches and unusual author variations ("BREAK", "knockdown", etc.).
@@ -93,7 +136,10 @@ export const FIELD_ACCESSORS: Record<string, FieldAccessor> = {
     exportValue: (m) => m.stringCommand ?? "",
   },
 
-  // "input" = stance + command, displayed / searched as a single combined field.
+  // "input" = stance + command, displayed / searched as a single combined
+  // field. filterTokens expands OR-groups in the command (e.g. `(2) _ (8)`)
+  // into separate alternative strings so the quick-search can match any
+  // real input sequence without accidentally bridging the underscore.
   input: {
     sortValue: (m) =>
       [joinOrNull(m.stance, " "), joinOrNull(m.command, " ")]
@@ -104,6 +150,14 @@ export const FIELD_ACCESSORS: Record<string, FieldAccessor> = {
       [joinOrNull(m.stance, " "), joinOrNull(m.command, " ")]
         .filter(Boolean)
         .join(" ") || null,
+    filterTokens: (m) => {
+      const stancePart = joinOrNull(m.stance, " ") ?? "";
+      const expansions = expandCommandOrGroups(m.command);
+      const tokens = expansions.map((cmd) =>
+        stancePart ? `${stancePart} ${cmd}` : cmd,
+      );
+      return tokens.length > 0 ? tokens : null;
+    },
     exportValue: (m) =>
       [joinOrNull(m.stance, " "), joinOrNull(m.command, " ")]
         .filter(Boolean)

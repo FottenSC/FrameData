@@ -35,6 +35,45 @@ interface MoveTableCellProps {
 }
 
 /**
+ * Render the contents of a single outcome cell (Block / Hit / Counter-Hit).
+ * Centralised so all three channels share identical rules:
+ *
+ *   1. If there's a numeric advantage, show the AdvantagePill.
+ *   2. Else if the outcome has tags, show them as PropertyChips (same
+ *      component & colour as the Properties column). Each chip carries
+ *      the current channel in `sources` so the tooltip confirms e.g.
+ *      "Applies on: hit".
+ *   3. Else, neutral "—".
+ */
+function renderOutcomeCell(
+  advantage: number | null,
+  tags: string[],
+  sources: PropertySources,
+  getPropertyInfo: (prop: string) => PropertyInfo | null,
+  badges: BadgeMap | undefined,
+): React.ReactNode {
+  if (advantage !== null) {
+    return <AdvantagePill advantage={advantage} />;
+  }
+  if (tags.length > 0) {
+    return (
+      <div className="flex flex-wrap gap-0.5 justify-center">
+        {tags.map((tag) => (
+          <PropertyChip
+            key={tag}
+            tag={tag}
+            info={getPropertyInfo(tag) ?? null}
+            badges={badges}
+            sources={sources}
+          />
+        ))}
+      </div>
+    );
+  }
+  return <AdvantagePill advantage={null} />;
+}
+
+/**
  * Aggregate the four possible sources of "this move has property X" into a
  * single ordered list of chip descriptors. A property that appears on, say,
  * both hit and counter-hit is collapsed into ONE chip whose tooltip lists
@@ -155,20 +194,45 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
       case "damage":
         return <>{move.damage.total ?? move.damage.raw ?? "—"}</>;
 
-      // --- Outcome columns: advantage number only. Any tag information
-      // ---   (KND / LNC / STN / …) lives in the Properties column so we
-      // ---   don't render the same chip twice.
-      // Outcome cells only ever show the numeric advantage pill. Any tag
-      // information (KND / LNC / STN / …) is rendered in the Properties
-      // column — no more duplicated chip in a different colour here.
+      // --- Outcome columns ---
+      //
+      //   has advantage  → numeric pill (green / rose / zinc).
+      //   no advantage,
+      //   has tags       → the tag(s) rendered via PropertyChip, so the
+      //                    chip looks IDENTICAL to its counterpart in the
+      //                    Properties column. Outcome-cell chips carry
+      //                    only their own channel in `sources`, so the
+      //                    tooltip still confirms e.g. "Applies on: hit".
+      //   nothing at all → neutral "—" pill.
+      //
+      // Players keep a quick visual for pure-tag outcomes (e.g. "KND on
+      // hit, no number"), without any cross-column colour mismatch.
       case "block":
-        return <AdvantagePill advantage={move.block.advantage} />;
+        return renderOutcomeCell(
+          move.block.advantage,
+          move.block.tags,
+          { onBlock: true },
+          getPropertyInfo,
+          badges,
+        );
 
       case "hit":
-        return <AdvantagePill advantage={move.hit.advantage} />;
+        return renderOutcomeCell(
+          move.hit.advantage,
+          move.hit.tags,
+          { onHit: true },
+          getPropertyInfo,
+          badges,
+        );
 
       case "counterHit":
-        return <AdvantagePill advantage={move.counterHit.advantage} />;
+        return renderOutcomeCell(
+          move.counterHit.advantage,
+          move.counterHit.tags,
+          { onCounterHit: true },
+          getPropertyInfo,
+          badges,
+        );
 
       case "guardBurst":
         return (

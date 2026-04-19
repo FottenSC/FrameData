@@ -1,50 +1,8 @@
 import React, { useMemo } from "react";
 import { useGame } from "@/contexts/GameContext";
 import { CommandIcon } from "@/components/ui/CommandIcon";
+import { DirectionChip } from "@/components/ui/direction-chip";
 import { getDirectionSet } from "@/lib/notation";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { ChipTooltipContent } from "@/components/ui/chip-tooltip";
-import { cn } from "@/lib/utils";
-
-/**
- * Render a single direction token as text (used for notation styles whose
- * directions are letter codes like `F` / `UF`, which don't have artwork).
- */
-const DirectionChip = React.memo(
-  ({ token, isHeld }: { token: string; isHeld: boolean }) => (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <div
-          className={cn(
-            "inline-flex items-center justify-center font-bold align-middle font-sans rounded cursor-default",
-            "min-w-5 h-5 px-1 text-[13px] relative z-10 border",
-            // Direction pill uses a distinct, quieter palette so it reads as
-            // input-flavoured but doesn't compete with bright button pills.
-            isHeld
-              ? "bg-sky-600 text-white border-white"
-              : "bg-zinc-800 text-zinc-100 border-zinc-500",
-          )}
-        >
-          {token}
-        </div>
-      </TooltipTrigger>
-      <TooltipContent>
-        <ChipTooltipContent
-          code={token}
-          title={isHeld ? `Held ${token}` : `${token} direction`}
-          description={
-            isHeld ? "Hold the direction until the move comes out." : undefined
-          }
-        />
-      </TooltipContent>
-    </Tooltip>
-  ),
-);
-DirectionChip.displayName = "DirectionChip";
 
 const CommandRendererInner: React.FC<{ command: string[] | null }> = ({
   command,

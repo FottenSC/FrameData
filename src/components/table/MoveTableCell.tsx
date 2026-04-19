@@ -100,7 +100,7 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
                 const chip = (
                   <Badge
                     variant="secondary"
-                    className="whitespace-nowrap border border-gray-500"
+                    className="whitespace-nowrap border border-zinc-500"
                   >
                     {s}
                   </Badge>
@@ -158,29 +158,17 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
       // --- Outcome columns: advantage number only. Any tag information
       // ---   (KND / LNC / STN / …) lives in the Properties column so we
       // ---   don't render the same chip twice.
+      // Outcome cells only ever show the numeric advantage pill. Any tag
+      // information (KND / LNC / STN / …) is rendered in the Properties
+      // column — no more duplicated chip in a different colour here.
       case "block":
-        return (
-          <AdvantagePill
-            advantage={move.block.advantage}
-            fallbackText={move.block.raw}
-          />
-        );
+        return <AdvantagePill advantage={move.block.advantage} />;
 
       case "hit":
-        return (
-          <AdvantagePill
-            advantage={move.hit.advantage}
-            fallbackText={move.hit.raw}
-          />
-        );
+        return <AdvantagePill advantage={move.hit.advantage} />;
 
       case "counterHit":
-        return (
-          <AdvantagePill
-            advantage={move.counterHit.advantage}
-            fallbackText={move.counterHit.raw}
-          />
-        );
+        return <AdvantagePill advantage={move.counterHit.advantage} />;
 
       case "guardBurst":
         return (

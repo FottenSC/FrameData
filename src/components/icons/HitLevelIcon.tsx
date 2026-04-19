@@ -29,14 +29,14 @@ export const HitLevelIcon = React.memo(({ level }: { level: string }) => {
   const bgColor =
     levelInfo?.className ||
     DEFAULT_HIT_LEVEL_BG[effectiveLevel] ||
-    "bg-gray-400";
+    "bg-zinc-400";
   const label =
     effectiveLevel.length > 1 && ["SL", "SH", "SM"].includes(effectiveLevel)
       ? effectiveLevel
       : effectiveLevel.charAt(0);
 
   const icon = (
-    <div className="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center p-px ring-1 ring-black">
+    <div className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center p-px ring-1 ring-black">
       <div className="w-full h-full rounded-full bg-white flex items-center justify-center p-px">
         <div
           className={`w-full h-full rounded-full flex items-center justify-center text-xs font-bold text-white ${bgColor}`}

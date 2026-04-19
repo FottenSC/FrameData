@@ -37,11 +37,6 @@ interface AdvantagePillProps {
   /** Numeric value, or null when unspecified. */
   advantage: number | null;
   /**
-   * Fallback string shown when there's no numeric value (e.g. moves authored
-   * as "KND" with no number). Typically `outcome.raw`.
-   */
-  fallbackText?: string | null;
-  /**
    * Drop the +/- sign from the label. Independent of colour — use `tone` for
    * visual variant. Enabled automatically when `tone="guard"`.
    */
@@ -51,18 +46,21 @@ interface AdvantagePillProps {
 }
 
 const pillBackground = (advantage: number | null, tone: PillTone): string => {
-  if (advantage === null) return "bg-gray-700";
+  // Null = "no numeric data" — uses the project's unified neutral grey.
+  // Any tag information (KND / LNC / STN / …) lives in the Properties column
+  // with its own stone-600 chip; we deliberately don't echo the raw tag into
+  // this pill so players never see the same value styled two different ways.
+  if (advantage === null) return "bg-zinc-700";
   // Guard damage is a non-negative counter — colour needs to be visually
   // distinct from advantage pills (so it doesn't read as "positive") without
-  // competing for attention. A muted warm-neutral stone works: present but
-  // quiet. Intentionally different hue than the cool gray we use for null so
-  // the two aren't confusable.
+  // competing for attention. Stone sits between the cool neutral zinc and
+  // the outcome-tag chips for a subtle differentiation.
   if (tone === "guard") return "bg-stone-600";
   return advantage >= 0 ? "bg-green-700" : "bg-rose-700";
 };
 
 export const AdvantagePill = memo<AdvantagePillProps>(
-  ({ advantage, fallbackText, forceNoSign, tone = "advantage" }) => {
+  ({ advantage, forceNoSign, tone = "advantage" }) => {
     // Guard tone always uses the bare number — signs would be nonsensical
     // (guard damage is a non-negative counter).
     const suppressSign = forceNoSign ?? tone === "guard";
@@ -72,7 +70,7 @@ export const AdvantagePill = memo<AdvantagePillProps>(
       ? !suppressSign && advantage! > 0
         ? "+" + advantage
         : String(advantage)
-      : (fallbackText ?? "—");
+      : "—";
 
     return (
       <Badge
@@ -141,10 +139,12 @@ function sourceChannels(sources: PropertySources): SourceChannel[] {
 
 export const PropertyChip = memo<PropertyChipProps>(
   ({ tag, info, badges, sources }) => {
+    // Fallback matches the AdvantagePill null pill so an untagged / unknown
+    // outcome chip sits in the same neutral grey as the rest of the app.
     const className =
       (info?.className && info.className.trim()) ||
       badges?.[tag]?.className ||
-      "bg-gray-700 text-white";
+      "bg-zinc-700 text-white";
 
     const chip = (
       <Badge
@@ -203,12 +203,8 @@ interface LegacyValueBadgeProps {
 }
 
 export const ValueBadge = memo<LegacyValueBadgeProps>(
-  ({ value, text, forceNoSign = false }) => (
-    <AdvantagePill
-      advantage={value}
-      fallbackText={text}
-      forceNoSign={forceNoSign}
-    />
+  ({ value, forceNoSign = false }) => (
+    <AdvantagePill advantage={value} forceNoSign={forceNoSign} />
   ),
 );
 ValueBadge.displayName = "ValueBadge";

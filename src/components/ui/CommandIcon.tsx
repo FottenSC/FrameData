@@ -14,7 +14,11 @@ export const CommandIcon: React.FC<CommandIconProps> = ({
 }) => {
   let baseClasses = "border border-black bg-white text-black rounded";
   let heldClasses = "bg-black text-white border border-white rounded";
-  const sizeClasses = isSlide ? "w-4 h-4 text-[13px]" : "w-5 h-5 text-[16px]";
+  // Slide inputs (lowercase letters in the source) render at a smaller size
+  // so they read as a secondary / chained input next to regular button pills.
+  const sizeClasses = isSlide
+    ? "w-3.5 h-3.5 text-[11px]"
+    : "w-5 h-5 text-[16px]";
   const marginClasses = isSlide ? "" : "mx-0.25";
 
   return (

@@ -5,6 +5,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  ChipTooltipContent,
+  type SourceChannel,
+} from "@/components/ui/chip-tooltip";
 
 type BadgeMap = Record<string, { className: string }>;
 
@@ -96,17 +100,13 @@ interface PropertyChipProps {
   sources: PropertySources;
 }
 
-function sourceSummary(sources: PropertySources): string[] {
-  const lines: string[] = [];
-  if (sources.asMoveProperty) lines.push("Move property");
-  const channels: string[] = [];
-  if (sources.onHit) channels.push("hit");
-  if (sources.onCounterHit) channels.push("counter-hit");
-  if (sources.onBlock) channels.push("block");
-  if (channels.length > 0) {
-    lines.push(`Applies on: ${channels.join(", ")}`);
-  }
-  return lines;
+function sourceChannels(sources: PropertySources): SourceChannel[] {
+  const out: SourceChannel[] = [];
+  if (sources.asMoveProperty) out.push("move");
+  if (sources.onHit) out.push("hit");
+  if (sources.onCounterHit) out.push("counterHit");
+  if (sources.onBlock) out.push("block");
+  return out;
 }
 
 export const PropertyChip = memo<PropertyChipProps>(
@@ -124,32 +124,23 @@ export const PropertyChip = memo<PropertyChipProps>(
       </Badge>
     );
 
-    const sourceLines = sourceSummary(sources);
-    const hasName = info?.name && info.name !== tag;
+    const channels = sourceChannels(sources);
+    const hasName = !!(info?.name && info.name !== tag);
     const hasDescription = !!info?.description;
-    const hasTooltip = hasName || hasDescription || sourceLines.length > 0;
+    const hasTooltip = hasName || hasDescription || channels.length > 0;
 
     if (!hasTooltip) return chip;
 
     return (
       <Tooltip>
         <TooltipTrigger asChild>{chip}</TooltipTrigger>
-        <TooltipContent className="max-w-xs">
-          <div className="space-y-1">
-            <p className="font-semibold">{info?.name || tag}</p>
-            {hasDescription && (
-              <p className="text-xs text-muted-foreground whitespace-pre-wrap">
-                {info!.description}
-              </p>
-            )}
-            {sourceLines.length > 0 && (
-              <ul className="pt-1 border-t border-border/50 text-[11px] text-muted-foreground space-y-0.5">
-                {sourceLines.map((line) => (
-                  <li key={line}>{line}</li>
-                ))}
-              </ul>
-            )}
-          </div>
+        <TooltipContent>
+          <ChipTooltipContent
+            code={tag}
+            title={info?.name || tag}
+            description={info?.description}
+            sources={channels}
+          />
         </TooltipContent>
       </Tooltip>
     );

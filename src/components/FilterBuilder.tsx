@@ -16,6 +16,7 @@ import {
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { DebouncedInput } from "./ui/debounced-input";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { cn } from "@/lib/utils";
 import {
   FilterCondition,
@@ -624,20 +625,28 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
         {PRESETS.map((preset) => {
           const active = isPresetActive(preset);
           return (
-            <button
-              key={preset.label}
-              type="button"
-              title={preset.title}
-              onClick={() => togglePreset(preset)}
-              className={cn(
-                "px-2.5 py-1 rounded-full text-xs font-medium border transition-colors",
-                active
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-muted/30 hover:bg-muted/60 border-border text-foreground/80",
-              )}
-            >
-              {preset.label}
-            </button>
+            <Tooltip key={preset.label}>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={() => togglePreset(preset)}
+                  aria-pressed={active}
+                  className={cn(
+                    "px-2.5 py-1 rounded-full text-xs font-medium border transition-colors",
+                    active
+                      ? "bg-primary text-primary-foreground border-primary shadow-sm shadow-primary/30"
+                      : "bg-muted/30 hover:bg-muted/60 border-border text-foreground/80",
+                  )}
+                >
+                  {preset.label}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="max-w-[240px] text-[12px] leading-snug">
+                  {preset.title}
+                </p>
+              </TooltipContent>
+            </Tooltip>
           );
         })}
       </div>

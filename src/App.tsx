@@ -5,7 +5,7 @@ import { router } from "./router";
 
 function App() {
   return (
-    <TooltipProvider>
+    <TooltipProvider delayDuration={150} skipDelayDuration={500}>
       {/*
         `richColors` opts into Sonner's success/info/warning/error palettes so
         copied / saved / error toasts get the appropriate accent automatically.

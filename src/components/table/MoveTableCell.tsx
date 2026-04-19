@@ -13,21 +13,8 @@ import {
   PropertyChip,
   type PropertySources,
 } from "@/components/ui/ValueBadge";
+import { ChipTooltipContent } from "@/components/ui/chip-tooltip";
 import type { PropertyInfo } from "@/contexts/GameContext";
-
-// Memoised tooltip content — avoids re-creating nodes during virtualisation.
-const StanceTooltipContent = React.memo(
-  ({ stanceInfo, s }: { stanceInfo: any; s: string }) => (
-    <div className="space-y-1">
-      <p className="font-semibold">{stanceInfo.name || s}</p>
-      {stanceInfo.description && (
-        <p className="text-xs text-muted-foreground whitespace-pre-wrap">
-          {stanceInfo.description}
-        </p>
-      )}
-    </div>
-  ),
-);
 
 type BadgeMap = Record<string, { className: string }>;
 
@@ -105,10 +92,10 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
               .filter((s) => s && s.trim() !== "")
               .map((s, i) => {
                 const stanceInfo = getStanceInfo(s, move.characterId);
-                const hasTooltipContent =
-                  stanceInfo &&
+                const hasTooltip =
+                  !!stanceInfo &&
                   ((stanceInfo.name && stanceInfo.name !== s) ||
-                    stanceInfo.description);
+                    !!stanceInfo.description);
 
                 const chip = (
                   <Badge
@@ -118,14 +105,18 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
                     {s}
                   </Badge>
                 );
-                if (!hasTooltipContent) {
+                if (!hasTooltip) {
                   return <React.Fragment key={i}>{chip}</React.Fragment>;
                 }
                 return (
                   <Tooltip key={i}>
                     <TooltipTrigger asChild>{chip}</TooltipTrigger>
-                    <TooltipContent className="max-w-xs">
-                      <StanceTooltipContent stanceInfo={stanceInfo} s={s} />
+                    <TooltipContent>
+                      <ChipTooltipContent
+                        code={s}
+                        title={stanceInfo.name || s}
+                        description={stanceInfo.description}
+                      />
                     </TooltipContent>
                   </Tooltip>
                 );

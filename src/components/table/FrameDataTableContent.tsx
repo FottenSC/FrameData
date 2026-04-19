@@ -328,7 +328,11 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
 export const FrameDataTableContent: React.FC<DataTableContentProps> = (
   props,
 ) => (
-  <TooltipProvider delayDuration={300} disableHoverableContent>
+  <TooltipProvider
+    delayDuration={150}
+    skipDelayDuration={500}
+    disableHoverableContent
+  >
     <FrameDataTableContentInner {...props} />
   </TooltipProvider>
 );

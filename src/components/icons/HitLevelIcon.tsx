@@ -5,50 +5,43 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { ChipTooltipContent } from "@/components/ui/chip-tooltip";
+
+/**
+ * Default colour palette used when the game hasn't declared a `className`
+ * for a hit level (legacy fallback). Keeps SC6 / T8 presentation identical
+ * to what shipped before the tooltip refresh.
+ */
+const DEFAULT_HIT_LEVEL_BG: Record<string, string> = {
+  M: "bg-yellow-500",
+  L: "bg-cyan-500",
+  H: "bg-pink-500",
+  SM: "bg-purple-500",
+  SL: "bg-cyan-500",
+  SH: "bg-orange-500",
+};
 
 export const HitLevelIcon = React.memo(({ level }: { level: string }) => {
   const { hitLevels } = useGame();
-  let bgColor = "bg-gray-400";
-  let textColor = "text-white";
 
   const effectiveLevel = level.toUpperCase();
   const levelInfo = hitLevels[effectiveLevel];
-
-  if (levelInfo?.className) {
-    bgColor = levelInfo.className;
-  } else {
-    switch (effectiveLevel) {
-      case "M":
-        bgColor = "bg-yellow-500";
-        break;
-      case "L":
-        bgColor = "bg-cyan-500";
-        break;
-      case "H":
-        bgColor = "bg-pink-500";
-        break;
-      case "SM":
-        bgColor = "bg-purple-500";
-        break;
-      case "SL":
-        bgColor = "bg-cyan-500";
-        break;
-      case "SH":
-        bgColor = "bg-orange-500";
-        break;
-    }
-  }
+  const bgColor =
+    levelInfo?.className ||
+    DEFAULT_HIT_LEVEL_BG[effectiveLevel] ||
+    "bg-gray-400";
+  const label =
+    effectiveLevel.length > 1 && ["SL", "SH", "SM"].includes(effectiveLevel)
+      ? effectiveLevel
+      : effectiveLevel.charAt(0);
 
   const icon = (
     <div className="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center p-px ring-1 ring-black">
       <div className="w-full h-full rounded-full bg-white flex items-center justify-center p-px">
         <div
-          className={`w-full h-full rounded-full flex items-center justify-center text-xs font-bold ${bgColor} ${textColor}`}
+          className={`w-full h-full rounded-full flex items-center justify-center text-xs font-bold text-white ${bgColor}`}
         >
-          {effectiveLevel.length > 1 &&
-          ["SL", "SH", "SM"].includes(effectiveLevel)
-            ? effectiveLevel
-            : effectiveLevel.charAt(0)}
+          {label}
         </div>
       </div>
     </div>
@@ -59,12 +52,14 @@ export const HitLevelIcon = React.memo(({ level }: { level: string }) => {
   return (
     <Tooltip>
       <TooltipTrigger asChild>{icon}</TooltipTrigger>
-      <TooltipContent className="flex flex-col gap-1">
-        <p className="font-bold">{levelInfo.name}</p>
-        {levelInfo.description && (
-          <p className="text-xs text-zinc-400">{levelInfo.description}</p>
-        )}
+      <TooltipContent>
+        <ChipTooltipContent
+          code={effectiveLevel}
+          title={levelInfo.name || effectiveLevel}
+          description={levelInfo.description}
+        />
       </TooltipContent>
     </Tooltip>
   );
 });
+HitLevelIcon.displayName = "HitLevelIcon";

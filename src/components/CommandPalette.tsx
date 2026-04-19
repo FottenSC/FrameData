@@ -235,16 +235,25 @@ export function CommandPalette() {
               </>
             ) : showNotationMappings ? (
               <>
-                <CommandItem onSelect={goBackToMain} className="mb-1">
-                  <ChevronLeft className="mr-2 h-4 w-4" />
-                  <span>Back to Commands</span>
-                </CommandItem>
                 {/*
                   Radio-style: exactly one style active at a time for the
                   current game. Other games' styles aren't relevant here —
                   the Navbar game-switcher is the path to those.
+
+                  The "Back" item must live inside the same CommandGroup as
+                  the style entries — cmdk's arrow-key navigation groups its
+                  focus tracking by CommandGroup, and an item sitting
+                  directly under CommandList breaks up/down traversal.
                 */}
                 <CommandGroup heading={`${selectedGame.name} notation`}>
+                  <CommandItem
+                    onSelect={goBackToMain}
+                    value="back-to-commands"
+                    className="mb-1"
+                  >
+                    <ChevronLeft className="mr-2 h-4 w-4" />
+                    <span>Back to Commands</span>
+                  </CommandItem>
                   {getStylesForGame(selectedGame.id).map((style) => {
                     const activeId = getNotationStyleId(
                       selectedGame.id,
@@ -254,6 +263,11 @@ export function CommandPalette() {
                     return (
                       <CommandItem
                         key={style.id}
+                        // Explicit value so cmdk doesn't derive it from the
+                        // tooltip-friendly nested JSX (which can collapse to
+                        // text that collides between similarly-named styles
+                        // and break arrow-selection highlighting).
+                        value={`notation-style-${style.id}`}
                         onSelect={() => {
                           setNotationStyle(selectedGame.id, style.id);
                           setOpen(false);

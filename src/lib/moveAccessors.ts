@@ -27,7 +27,13 @@
 
 import { formatOutcome } from "./parseOutcome";
 import type { Move, MoveOutcome } from "@/types/Move";
-import { translateCommand, type NotationStyle } from "./notation";
+import {
+  expandMotionShorthand,
+  isMotionShorthand,
+  translateCommand,
+  translateToken,
+  type NotationStyle,
+} from "./notation";
 
 /** Join an optional string array with the given separator, or return null. */
 const joinOrNull = (xs: string[] | null, sep: string): string | null =>
@@ -56,6 +62,56 @@ export function expandCommand(cmd: string[][] | null): string[] {
       ),
     [""],
   );
+}
+
+/**
+ * Like {@link expandCommand} but additionally produces expansions that
+ * substitute each motion-shorthand token (qcf / qcb / hcf / hcb / dp) with
+ * its component direction sequence, translated through the current style.
+ *
+ * Why: a Tekken player thinking in shorthand types "qcf2" in the quick
+ * search; a numpad player thinking in digits types "2361"; an FBUD
+ * player types "d df f 2". All three should hit a row whose authored
+ * command is `[["qcf"], ["B"]]` — so we expose a search token for each
+ * rendering. Only shorthand tokens get expanded; plain tokens pass
+ * through.
+ *
+ * Return value is deduped; in the common no-shorthand case this is
+ * exactly {@link expandCommand}.
+ */
+export function expandCommandWithMotions(
+  cmd: string[][] | null,
+  style: NotationStyle | null | undefined,
+): string[] {
+  if (!cmd || cmd.length === 0) return [""];
+
+  // For each step, build the list of display variants every alternative
+  // should contribute. A plain token gives one variant (itself); a
+  // shorthand gives TWO — the shorthand label AND its expanded sequence
+  // rendered as a space-joined string. Cartesian-product those across
+  // steps to get all command forms.
+  const stepVariants = cmd.map((step) =>
+    step.flatMap((tok) => {
+      if (!isMotionShorthand(tok)) return [tok];
+      const expansion = expandMotionShorthand(tok) ?? [];
+      const expandedInStyle = expansion
+        .map((t) => translateToken(t, style))
+        .join(" ");
+      return expandedInStyle ? [tok, expandedInStyle] : [tok];
+    }),
+  );
+
+  const combinations = stepVariants.reduce<string[]>(
+    (acc, variants) =>
+      acc.flatMap((prefix) =>
+        variants.map((v) => (prefix ? `${prefix} ${v}` : v)),
+      ),
+    [""],
+  );
+
+  // Dedup — a no-shorthand command produces the same set as `expandCommand`
+  // but a shorthand-heavy one multiplies: cap the return via a Set.
+  return [...new Set(combinations)];
 }
 
 /**
@@ -161,14 +217,15 @@ export function buildFieldAccessors(
       sortValue: (m) => formatCommandFlat(cmdInStyle(m)),
       sortType: "string",
       filterString: (m) => formatCommandFlat(cmdInStyle(m)),
-      // Token projection is every concrete expansion of the command (one string
-      // per OR-branch), so a multi-select / exact-match operator on the command
-      // column matches any real input sequence without needing to know about
-      // the nested shape.
+      // Token projection is every concrete expansion of the command (one
+      // string per OR-branch), PLUS — for rows that contain motion shorthand
+      // — each shorthand's numpad expansion. That way a quick-search for
+      // "qcf 2", "236 2" or "d df f 2" all hit the same move without the
+      // user needing to know which notation shape was authored on disk.
       filterTokens: (m) => {
         const translated = cmdInStyle(m);
         if (!translated || translated.length === 0) return null;
-        const expansions = expandCommand(translated);
+        const expansions = expandCommandWithMotions(translated, style);
         return expansions.length > 0 ? expansions : null;
       },
       exportValue: (m) => formatCommandFlat(cmdInStyle(m)) ?? "",
@@ -201,7 +258,7 @@ export function buildFieldAccessors(
           .join(" ") || null,
       filterTokens: (m) => {
         const stancePart = joinOrNull(m.stance, " ") ?? "";
-        const expansions = expandCommand(cmdInStyle(m));
+        const expansions = expandCommandWithMotions(cmdInStyle(m), style);
         const tokens = expansions.map((cmd) =>
           stancePart ? `${stancePart} ${cmd}` : cmd,
         );

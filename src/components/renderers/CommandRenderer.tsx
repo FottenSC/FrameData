@@ -2,7 +2,13 @@ import React, { useMemo } from "react";
 import { useGame } from "@/contexts/GameContext";
 import { CommandIcon } from "@/components/ui/CommandIcon";
 import { DirectionChip } from "@/components/ui/direction-chip";
-import { getDirectionSet, translateCommand } from "@/lib/notation";
+import {
+  expandMotionShorthand,
+  getDirectionSet,
+  isMotionShorthand,
+  translateCommand,
+  translateToken,
+} from "@/lib/notation";
 
 /**
  * A command is a list of ordered "steps"; each step is itself a list of
@@ -140,6 +146,60 @@ const CommandRendererInner: React.FC<{ command: string[][] | null }> = ({
         button = button.replace(/[()]/g, "");
       }
       if (!button) continue;
+
+      // Motion shorthand (qcf / qcb / hcf / hcb / dp). Two cases:
+      //
+      //  1. The active style lists this shorthand in its directionTokens
+      //     (Tekken FBUD does). We draw one compact chip with the literal
+      //     label and let the tooltip show the expansion.
+      //
+      //  2. Any other style — numpad, universal, ABKG — doesn't recognise
+      //     the shorthand as a direction, so we expand it inline into its
+      //     component numpad arrows. Each expanded arrow is then translated
+      //     through the current style (numpad stays numpad; nothing else
+      //     has a rule for "2"/"3"/etc. so they pass through), so a `qcf`
+      //     token renders as "↓ ↘ →" in numpad mode — exactly what the
+      //     user would see if the data had been authored with three steps.
+      if (isMotionShorthand(button)) {
+        const expansion = expandMotionShorthand(button) ?? [];
+        if (directionSet.has(button)) {
+          out.push(
+            <DirectionChip
+              key={`motion-${tokenBranchKey}-${j}-${button}`}
+              token={button}
+              isHeld={isHeld}
+              expansion={expansion}
+            />,
+          );
+        } else {
+          // Inline expansion: render each component as a direction under
+          // the current style. Tokens without a notation mapping (numpad
+          // in universal, for example) pass through translateToken cleanly.
+          expansion.forEach((numpadTok, idx) => {
+            const mapped = translateToken(numpadTok, notationStyle);
+            if (directionMode === "text") {
+              out.push(
+                <DirectionChip
+                  key={`motion-exp-${tokenBranchKey}-${j}-${idx}-${mapped}`}
+                  token={mapped}
+                  isHeld={isHeld}
+                />,
+              );
+            } else {
+              const iconUrl = getIconUrl(mapped, isHeld);
+              out.push(
+                <img
+                  key={`motion-exp-${tokenBranchKey}-${j}-${idx}-${mapped}`}
+                  src={iconUrl}
+                  alt={mapped}
+                  className="inline object-contain align-text-bottom h-4 w-4"
+                />,
+              );
+            }
+          });
+        }
+        continue;
+      }
 
       // Directions are style-dependent — check against the ACTIVE notation
       // direction set rather than naively "starts with a digit".

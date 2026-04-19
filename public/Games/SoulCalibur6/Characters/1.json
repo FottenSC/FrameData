@@ -165,55 +165,6 @@
     "Notes": ":SS: into AGS on hit or block for 5th hit"
   },
   {
-    "ID": 9,
-    "stringCommand": ":A::A::A::4:",
-    "Command": [
-      [
-        "A"
-      ],
-      [
-        "A"
-      ],
-      [
-        "A"
-      ],
-      [
-        "4"
-      ]
-    ],
-    "Stance": null,
-    "Properties": [
-      "SS"
-    ],
-    "HitLevel": [
-      "H",
-      "H",
-      "H",
-      "H",
-      "H"
-    ],
-    "Impact": 12,
-    "Damage": "8,10,4,4,4",
-    "DamageDec": 30,
-    "Block": {
-      "advantage": -14,
-      "tags": [],
-      "raw": "-14"
-    },
-    "Hit": {
-      "advantage": -8,
-      "tags": [],
-      "raw": "-8"
-    },
-    "CounterHit": {
-      "advantage": -8,
-      "tags": [],
-      "raw": "-8"
-    },
-    "GuardBurst": 7,
-    "Notes": ":SS: into AGS on hit or block for 5th hit"
-  },
-  {
     "ID": 10,
     "stringCommand": ":A::A::A::8:",
     "Command": [
@@ -3561,435 +3512,6 @@
     },
     "GuardBurst": 12,
     "Notes": "Dodges H / M / L attacks starting i44"
-  },
-  {
-    "ID": 90,
-    "stringCommand": ":4::A+B:",
-    "Command": [
-      [
-        "4"
-      ],
-      [
-        "A+B"
-      ]
-    ],
-    "Stance": null,
-    "Properties": [
-      "BA"
-    ],
-    "HitLevel": [
-      "H"
-    ],
-    "Impact": 23,
-    "Damage": "37",
-    "DamageDec": 37,
-    "Block": {
-      "advantage": null,
-      "tags": [],
-      "raw": null
-    },
-    "Hit": {
-      "advantage": null,
-      "tags": [
-        "KND"
-      ],
-      "raw": "KND"
-    },
-    "CounterHit": {
-      "advantage": null,
-      "tags": [
-        "KND"
-      ],
-      "raw": "KND"
-    },
-    "GuardBurst": null,
-    "Notes": ":BA:"
-  },
-  {
-    "ID": 91,
-    "stringCommand": ":4::(A)+(B):",
-    "Command": [
-      [
-        "4"
-      ],
-      [
-        "(A)+(B)"
-      ]
-    ],
-    "Stance": null,
-    "Properties": [
-      "BA"
-    ],
-    "HitLevel": [
-      "H"
-    ],
-    "Impact": 35,
-    "Damage": "47",
-    "DamageDec": 47,
-    "Block": {
-      "advantage": null,
-      "tags": [],
-      "raw": null
-    },
-    "Hit": {
-      "advantage": null,
-      "tags": [
-        "KND"
-      ],
-      "raw": "KND"
-    },
-    "CounterHit": {
-      "advantage": null,
-      "tags": [
-        "KND"
-      ],
-      "raw": "KND"
-    },
-    "GuardBurst": null,
-    "Notes": ":BA:"
-  },
-  {
-    "ID": 92,
-    "stringCommand": ":8::A+B:",
-    "Command": [
-      [
-        "8"
-      ],
-      [
-        "A+B"
-      ]
-    ],
-    "Stance": null,
-    "Properties": null,
-    "HitLevel": [
-      "SM",
-      "SL",
-      "SL",
-      "SL"
-    ],
-    "Impact": 58,
-    "Damage": "16,2,2,2",
-    "DamageDec": 22,
-    "Block": {
-      "advantage": -8,
-      "tags": [],
-      "raw": "-8"
-    },
-    "Hit": {
-      "advantage": 10,
-      "tags": [],
-      "raw": "10"
-    },
-    "CounterHit": {
-      "advantage": 10,
-      "tags": [],
-      "raw": "10"
-    },
-    "GuardBurst": 11,
-    "Notes": "Deals 3 chip damage when guarded"
-  },
-  {
-    "ID": 93,
-    "stringCommand": ":8::(A)+(B):",
-    "Command": [
-      [
-        "8"
-      ],
-      [
-        "(A)+(B)"
-      ]
-    ],
-    "Stance": null,
-    "Properties": [
-      "LH"
-    ],
-    "HitLevel": [
-      "SM",
-      "SL",
-      "SL",
-      "SL"
-    ],
-    "Impact": 74,
-    "Damage": "24,3,3,3",
-    "DamageDec": 33,
-    "Block": {
-      "advantage": -4,
-      "tags": [],
-      "raw": "-4"
-    },
-    "Hit": {
-      "advantage": 14,
-      "tags": [],
-      "raw": "14"
-    },
-    "CounterHit": {
-      "advantage": null,
-      "tags": [
-        "KND"
-      ],
-      "raw": "KND"
-    },
-    "GuardBurst": 19,
-    "Notes": ":LH: If own guard gauge full, deals 6 chip damage when guarded"
-  },
-  {
-    "ID": 94,
-    "stringCommand": ":B+K:",
-    "Command": [
-      [
-        "B+C"
-      ]
-    ],
-    "Stance": null,
-    "Properties": [
-      "UA",
-      "BA",
-      "GI"
-    ],
-    "HitLevel": [
-      "M"
-    ],
-    "Impact": null,
-    "Damage": "40",
-    "DamageDec": 40,
-    "Block": {
-      "advantage": null,
-      "tags": [
-        "UA"
-      ],
-      "raw": null
-    },
-    "Hit": {
-      "advantage": null,
-      "tags": [
-        "KND",
-        "UA"
-      ],
-      "raw": "KND"
-    },
-    "CounterHit": {
-      "advantage": null,
-      "tags": [
-        "KND",
-        "UA"
-      ],
-      "raw": "KND"
-    },
-    "GuardBurst": 15,
-    "Notes": "Dodges high/middle attacks [4-14]. After successful dodge:. :BA:. :GC:. :GI: H/M/L attacks, press G to cancel or dodge again, counter does 60 and becomes :UA: after 2 or more consecutive dodges"
-  },
-  {
-    "ID": 95,
-    "stringCommand": ":2::B+K:",
-    "Command": [
-      [
-        "2"
-      ],
-      [
-        "B+C"
-      ]
-    ],
-    "Stance": null,
-    "Properties": [
-      "UA",
-      "BA",
-      "GI"
-    ],
-    "HitLevel": [
-      "M"
-    ],
-    "Impact": null,
-    "Damage": "40",
-    "DamageDec": 40,
-    "Block": {
-      "advantage": null,
-      "tags": [
-        "UA"
-      ],
-      "raw": null
-    },
-    "Hit": {
-      "advantage": null,
-      "tags": [
-        "KND",
-        "UA"
-      ],
-      "raw": "KND"
-    },
-    "CounterHit": {
-      "advantage": null,
-      "tags": [
-        "KND",
-        "UA"
-      ],
-      "raw": "KND"
-    },
-    "GuardBurst": 15,
-    "Notes": "Dodges middle/low attacks [4-14]. After successful dodge:. :BA:. :GC:. :GI: H/M/L attacks, press G to cancel or dodge again, counter does 60 and becomes :UA: after 2 or more consecutive dodges"
-  },
-  {
-    "ID": 96,
-    "stringCommand": ":6::B+K:",
-    "Command": [
-      [
-        "6"
-      ],
-      [
-        "B+C"
-      ]
-    ],
-    "Stance": null,
-    "Properties": null,
-    "HitLevel": [
-      "M",
-      "M",
-      "M"
-    ],
-    "Impact": 24,
-    "Damage": "22,6,14",
-    "DamageDec": 42,
-    "Block": {
-      "advantage": -14,
-      "tags": [],
-      "raw": "-14"
-    },
-    "Hit": {
-      "advantage": 6,
-      "tags": [],
-      "raw": "6"
-    },
-    "CounterHit": {
-      "advantage": null,
-      "tags": [
-        "LNC"
-      ],
-      "raw": "LNC"
-    },
-    "GuardBurst": 14,
-    "Notes": "NC. :GC: 1st and 3rd hits TJ i10"
-  },
-  {
-    "ID": 97,
-    "stringCommand": ":3::B+K:",
-    "Command": [
-      [
-        "3"
-      ],
-      [
-        "B+C"
-      ]
-    ],
-    "Stance": null,
-    "Properties": null,
-    "HitLevel": [
-      "M",
-      "H"
-    ],
-    "Impact": 18,
-    "Damage": "22,24",
-    "DamageDec": 46,
-    "Block": {
-      "advantage": -16,
-      "tags": [],
-      "raw": "-16"
-    },
-    "Hit": {
-      "advantage": null,
-      "tags": [
-        "KND"
-      ],
-      "raw": "KND"
-    },
-    "CounterHit": {
-      "advantage": null,
-      "tags": [
-        "KND"
-      ],
-      "raw": "KND"
-    },
-    "GuardBurst": 15,
-    "Notes": "NC. :GC:. TC i4"
-  },
-  {
-    "ID": 98,
-    "stringCommand": ":4::B+K:",
-    "Command": [
-      [
-        "4"
-      ],
-      [
-        "B+C"
-      ]
-    ],
-    "Stance": null,
-    "Properties": null,
-    "HitLevel": [
-      "M",
-      "H",
-      "M"
-    ],
-    "Impact": 36,
-    "Damage": "16,8,14",
-    "DamageDec": 38,
-    "Block": {
-      "advantage": -12,
-      "tags": [],
-      "raw": "-12"
-    },
-    "Hit": {
-      "advantage": 4,
-      "tags": [],
-      "raw": "4"
-    },
-    "CounterHit": {
-      "advantage": null,
-      "tags": [
-        "STN"
-      ],
-      "raw": "STN"
-    },
-    "GuardBurst": 14,
-    "Notes": "NC. :GC:"
-  },
-  {
-    "ID": 99,
-    "stringCommand": ":B+K:",
-    "Command": [
-      [
-        "B+C"
-      ]
-    ],
-    "Stance": [
-      "FC"
-    ],
-    "Properties": null,
-    "HitLevel": [
-      "M"
-    ],
-    "Impact": 26,
-    "Damage": "42",
-    "DamageDec": 42,
-    "Block": {
-      "advantage": -12,
-      "tags": [],
-      "raw": "-12"
-    },
-    "Hit": {
-      "advantage": null,
-      "tags": [
-        "LNC"
-      ],
-      "raw": "LNC"
-    },
-    "CounterHit": {
-      "advantage": null,
-      "tags": [
-        "LNC"
-      ],
-      "raw": "LNC"
-    },
-    "GuardBurst": 15,
-    "Notes": ":GC:"
   },
   {
     "ID": 100,
@@ -9524,5 +9046,228 @@
     },
     "GuardBurst": 13,
     "Notes": "NC. :GC:"
+  },
+  {
+    "ID": 9001,
+    "stringCommand": ":qcf::A:",
+    "Command": [
+      [
+        "qcf"
+      ],
+      [
+        "A"
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 15,
+    "Damage": "20",
+    "DamageDec": 20,
+    "Block": {
+      "advantage": -5,
+      "tags": [],
+      "raw": "-5"
+    },
+    "Hit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "+8"
+    },
+    "CounterHit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "+8"
+    },
+    "GuardBurst": 1,
+    "Notes": "[TEST qcf] Synthetic row for motion-shorthand verification — quarter-circle forward + A. Remove by re-running the Python factory."
+  },
+  {
+    "ID": 9002,
+    "stringCommand": ":qcb::B:",
+    "Command": [
+      [
+        "qcb"
+      ],
+      [
+        "B"
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 15,
+    "Damage": "20",
+    "DamageDec": 20,
+    "Block": {
+      "advantage": -5,
+      "tags": [],
+      "raw": "-5"
+    },
+    "Hit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "+8"
+    },
+    "CounterHit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "+8"
+    },
+    "GuardBurst": 1,
+    "Notes": "[TEST qcb] Synthetic row for motion-shorthand verification — quarter-circle back + B. Remove by re-running the Python factory."
+  },
+  {
+    "ID": 9003,
+    "stringCommand": ":hcf::A+B:",
+    "Command": [
+      [
+        "hcf"
+      ],
+      [
+        "A+B"
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 15,
+    "Damage": "20",
+    "DamageDec": 20,
+    "Block": {
+      "advantage": -5,
+      "tags": [],
+      "raw": "-5"
+    },
+    "Hit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "+8"
+    },
+    "CounterHit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "+8"
+    },
+    "GuardBurst": 1,
+    "Notes": "[TEST hcf] Synthetic row for motion-shorthand verification — half-circle forward + A+B. Remove by re-running the Python factory."
+  },
+  {
+    "ID": 9004,
+    "stringCommand": ":hcb::K:",
+    "Command": [
+      [
+        "hcb"
+      ],
+      [
+        "K"
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 15,
+    "Damage": "20",
+    "DamageDec": 20,
+    "Block": {
+      "advantage": -5,
+      "tags": [],
+      "raw": "-5"
+    },
+    "Hit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "+8"
+    },
+    "CounterHit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "+8"
+    },
+    "GuardBurst": 1,
+    "Notes": "[TEST hcb] Synthetic row for motion-shorthand verification — half-circle back + K. Remove by re-running the Python factory."
+  },
+  {
+    "ID": 9005,
+    "stringCommand": ":dp::K:",
+    "Command": [
+      [
+        "dp"
+      ],
+      [
+        "K"
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 15,
+    "Damage": "20",
+    "DamageDec": 20,
+    "Block": {
+      "advantage": -5,
+      "tags": [],
+      "raw": "-5"
+    },
+    "Hit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "+8"
+    },
+    "CounterHit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "+8"
+    },
+    "GuardBurst": 1,
+    "Notes": "[TEST dp] Synthetic row for motion-shorthand verification — dragon punch + K. Remove by re-running the Python factory."
+  },
+  {
+    "ID": 9006,
+    "stringCommand": ":qcf:_:dp::A:",
+    "Command": [
+      [
+        "qcf",
+        "dp"
+      ],
+      [
+        "A"
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "M"
+    ],
+    "Impact": 15,
+    "Damage": "20",
+    "DamageDec": 20,
+    "Block": {
+      "advantage": -5,
+      "tags": [],
+      "raw": "-5"
+    },
+    "Hit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "+8"
+    },
+    "CounterHit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "+8"
+    },
+    "GuardBurst": 1,
+    "Notes": "[TEST qcf-or] Synthetic row for motion-shorthand verification — OR-step: qcf OR dp, then A. Remove by re-running the Python factory."
   }
 ]

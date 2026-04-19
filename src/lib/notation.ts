@@ -67,6 +67,75 @@ export const NUMPAD_DIRECTIONS: readonly string[] = [
 ];
 
 // ---------------------------------------------------------------------------
+// Motion-input shorthand (Tekken convention)
+// ---------------------------------------------------------------------------
+//
+// Tekken authoring — and wavu wiki specifically — compresses common
+// multi-step direction sequences into a single token:
+//
+//     qcf  = d, df, f              (quarter-circle forward)
+//     qcb  = d, db, b              (quarter-circle back)
+//     hcf  = b, db, d, df, f       (half-circle forward)
+//     hcb  = f, df, d, db, b       (half-circle back)
+//     dp   = f, d, df              (dragon punch)
+//
+// We keep these tokens atomic through the data pipeline (a shorthand is ONE
+// step, i.e. `[["qcf"]]`) and let the presentation layer decide how to
+// display them:
+//
+//   - In Tekken notation (which lists the shorthand in its directionTokens),
+//     the CommandRenderer draws one compact DirectionChip with the literal
+//     label; the tooltip spells out the expansion so new players can learn
+//     what the shorthand means.
+//
+//   - In any style that does NOT list the shorthand as a direction (numpad
+//     / universal / ABKG), the renderer expands the token into its component
+//     numpad directions inline, so `qcf 2` reads as "↓↘→ B".
+//
+// Search / filter is symmetric: `expandCommandWithMotions` yields both the
+// shorthand form and the expanded numpad sequence so users who think in
+// either convention find the same moves.
+
+/** Canonical shorthand → numpad expansion map. Keys are lowercased. */
+export const MOTION_SHORTHAND: Record<string, readonly string[]> = {
+  qcf: ["2", "3", "6"],
+  qcb: ["2", "1", "4"],
+  hcf: ["4", "1", "2", "3", "6"],
+  hcb: ["6", "3", "2", "1", "4"],
+  dp: ["6", "2", "3"],
+};
+
+/** Full human-readable titles for shorthand tokens (used in tooltips). */
+export const MOTION_TITLES: Record<string, string> = {
+  qcf: "Quarter-Circle Forward",
+  qcb: "Quarter-Circle Back",
+  hcf: "Half-Circle Forward",
+  hcb: "Half-Circle Back",
+  dp: "Dragon Punch",
+};
+
+/** Lookup-friendly set of all shorthand codes, lowercased. */
+const MOTION_SHORTHAND_SET: ReadonlySet<string> = new Set(
+  Object.keys(MOTION_SHORTHAND),
+);
+
+/** Is this token a known motion shorthand? Case-insensitive. */
+export function isMotionShorthand(tok: string | null | undefined): boolean {
+  if (!tok) return false;
+  return MOTION_SHORTHAND_SET.has(tok.toLowerCase());
+}
+
+/**
+ * Expand a shorthand token into its numpad sequence, or null if the token
+ * isn't a known shorthand. Returns a copy so callers can't poison the
+ * shared registry.
+ */
+export function expandMotionShorthand(tok: string): string[] | null {
+  const seq = MOTION_SHORTHAND[tok.toLowerCase()];
+  return seq ? [...seq] : null;
+}
+
+// ---------------------------------------------------------------------------
 // Catalog
 // ---------------------------------------------------------------------------
 
@@ -132,7 +201,14 @@ export const NOTATION_STYLES: NotationStyle[] = [
     // renders as `(DF)/(F) 1+4` and lets us exercise direction-remapping
     // end-to-end against the richer SC6 data (held inputs, OR-steps, etc.).
     games: ["SoulCalibur6", "Tekken8"],
-    directionTokens: ["F", "B", "U", "D", "UF", "UB", "DF", "DB", "N"],
+    // Motion shorthand (qcf / qcb / hcf / hcb / dp) is authored as a single
+    // atomic token. We include it in the direction set so the CommandRenderer
+    // treats it as a first-class direction (compact text chip with the
+    // expansion in the tooltip) rather than trying to parse it as a button.
+    directionTokens: [
+      "F", "B", "U", "D", "UF", "UB", "DF", "DB", "N",
+      "qcf", "qcb", "hcf", "hcb", "dp",
+    ],
     directionRenderMode: "text",
     replacements: {
       // Numpad directions → letter codes

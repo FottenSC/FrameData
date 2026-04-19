@@ -39,15 +39,18 @@ interface MoveTableCellProps {
  * Centralised so all three channels share identical rules:
  *
  *   1. If there's a numeric advantage, show the AdvantagePill.
- *   2. Else if the outcome has tags, show them as PropertyChips (same
- *      component & colour as the Properties column). Each chip carries
- *      the current channel in `sources` so the tooltip confirms e.g.
- *      "Applies on: hit".
+ *   2. Else if there are tags UNIQUE to this outcome (not already a
+ *      move-wide property), show them as PropertyChips. Anything that's
+ *      also in `move.properties` is filtered out here — it's already
+ *      covered by the Properties column, so duplicating it on the outcome
+ *      cell just clutters the row. Example: a move with UA in properties
+ *      and KND in hit.tags renders as just "KND" in the Hit cell.
  *   3. Else, neutral "—".
  */
 function renderOutcomeCell(
   advantage: number | null,
   tags: string[],
+  moveProperties: string[],
   sources: PropertySources,
   getPropertyInfo: (prop: string) => PropertyInfo | null,
   badges: BadgeMap | undefined,
@@ -55,10 +58,16 @@ function renderOutcomeCell(
   if (advantage !== null) {
     return <AdvantagePill advantage={advantage} />;
   }
-  if (tags.length > 0) {
+  // Strip out tags that are already represented as move-wide properties.
+  // UA, for instance, is echoed into every outcome's tags array by the
+  // data pipeline so per-channel filters work — but the Properties column
+  // is where it belongs visually.
+  const propertySet = new Set(moveProperties);
+  const outcomeOnlyTags = tags.filter((t) => !propertySet.has(t));
+  if (outcomeOnlyTags.length > 0) {
     return (
       <div className="flex flex-wrap gap-0.5 justify-center">
-        {tags.map((tag) => (
+        {outcomeOnlyTags.map((tag) => (
           <PropertyChip
             key={tag}
             tag={tag}
@@ -211,6 +220,7 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
         return renderOutcomeCell(
           move.block.advantage,
           move.block.tags,
+          move.properties,
           { onBlock: true },
           getPropertyInfo,
           badges,
@@ -220,6 +230,7 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
         return renderOutcomeCell(
           move.hit.advantage,
           move.hit.tags,
+          move.properties,
           { onHit: true },
           getPropertyInfo,
           badges,
@@ -229,6 +240,7 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
         return renderOutcomeCell(
           move.counterHit.advantage,
           move.counterHit.tags,
+          move.properties,
           { onCounterHit: true },
           getPropertyInfo,
           badges,

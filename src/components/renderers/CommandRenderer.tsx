@@ -78,22 +78,26 @@ const CommandRendererInner: React.FC<{ command: string[][] | null }> = ({
     return true;
   };
 
+  // Outer list of STEPS. Each step becomes one `inline-flex` flex-child in
+  // the outermost `flex-wrap` container, which means the command can wrap
+  // between steps (long commands break onto multiple lines gracefully) but
+  // the alternatives inside an OR-step — and the buttons inside an A+G
+  // compound — stay cohesively on one line.
   const parts: React.ReactNode[] = [];
 
-  const renderToken = (
+  /**
+   * Append the rendered pieces of a single token (one alternative of one
+   * step) to the provided buffer. A token may contain multiple `+`-joined
+   * buttons (like `A+G`), so this may push several pills and a `+` icon.
+   */
+  const renderTokenInto = (
+    out: React.ReactNode[],
     token: string,
     stepIdx: number,
     altIdx: number,
     tokenBranchKey: string,
   ): void => {
-    // Split by + to get individual buttons within this alternative token.
     const buttons = token.split("+");
-
-    // Local buffer so a compound like "A+G" becomes ONE flex-child at the
-    // outer level. Without this, each button and each "+" icon is its own
-    // flex item, and the outer flex-wrap will happily break "A" to one
-    // line and "+G" to the next.
-    const tokenChildren: React.ReactNode[] = [];
 
     for (let j = 0; j < buttons.length; j++) {
       const buttonStr = buttons[j];
@@ -101,7 +105,7 @@ const CommandRendererInner: React.FC<{ command: string[][] | null }> = ({
 
       // "+" separator between buttons in the same "A+G" / "B+K" chunk.
       if (j > 0) {
-        tokenChildren.push(
+        out.push(
           <span
             key={`plus-${tokenBranchKey}-${j}`}
             className="relative inline-flex items-center justify-center w-3 h-3 border border-black bg-white text-black rounded-full mx-[-5px] z-20 align-middle plus-separator"
@@ -141,7 +145,7 @@ const CommandRendererInner: React.FC<{ command: string[][] | null }> = ({
       // direction set rather than naively "starts with a digit".
       if (directionSet.has(button)) {
         if (directionMode === "text") {
-          tokenChildren.push(
+          out.push(
             <DirectionChip
               key={`direction-${tokenBranchKey}-${j}-${button}`}
               token={button}
@@ -150,7 +154,7 @@ const CommandRendererInner: React.FC<{ command: string[][] | null }> = ({
           );
         } else {
           const iconUrl = getIconUrl(button, isHeld);
-          tokenChildren.push(
+          out.push(
             <img
               key={`direction-${tokenBranchKey}-${j}-${button}`}
               src={iconUrl}
@@ -167,7 +171,7 @@ const CommandRendererInner: React.FC<{ command: string[][] | null }> = ({
       if (first >= "a" && first <= "z") {
         isSlide = true;
       }
-      tokenChildren.push(
+      out.push(
         <CommandIcon
           key={`command-${tokenBranchKey}-${j}-${button}`}
           input={button}
@@ -179,32 +183,22 @@ const CommandRendererInner: React.FC<{ command: string[][] | null }> = ({
         />,
       );
     }
-
-    if (tokenChildren.length === 0) return;
-
-    // One flex-child per TOKEN. `whitespace-nowrap` keeps "A+G" intact
-    // when the outer flex-wrap kicks in; everything inside this span
-    // stays on one line.
-    parts.push(
-      <span
-        key={`token-${tokenBranchKey}`}
-        className="inline-flex items-center whitespace-nowrap"
-      >
-        {tokenChildren}
-      </span>,
-    );
   };
 
   for (let i = 0; i < styledCommand.length; i++) {
     const step = styledCommand[i];
     if (!step || step.length === 0) continue;
 
+    // Per-step buffer. Alternatives and their OR-dividers live here, then
+    // get wrapped in ONE flex-child that doesn't wrap internally.
+    const stepChildren: React.ReactNode[] = [];
+
     for (let a = 0; a < step.length; a++) {
       // Visual "or" divider between alternatives within an OR-step. Matches
       // the old underscore-separator styling so multi-alt inputs render
       // with the same vertical bar users are used to.
       if (a > 0) {
-        parts.push(
+        stepChildren.push(
           <span
             key={`or-${i}-${a}`}
             className="relative inline-flex items-center justify-center w-3 h-4 mx-[-5px] z-20 align-middle underscore-separator"
@@ -227,8 +221,23 @@ const CommandRendererInner: React.FC<{ command: string[][] | null }> = ({
           </span>,
         );
       }
-      renderToken(step[a], i, a, `${i}-${a}`);
+      renderTokenInto(stepChildren, step[a], i, a, `${i}-${a}`);
     }
+
+    if (stepChildren.length === 0) continue;
+
+    // One flex-child per STEP. No `flex-wrap` here — OR alternatives must
+    // stay on one line together so `(DF) | (F) | (UF)` reads as a single
+    // "choose one of these" group. Line breaks happen between steps, not
+    // inside them.
+    parts.push(
+      <span
+        key={`step-${i}`}
+        className="inline-flex items-center"
+      >
+        {stepChildren}
+      </span>,
+    );
   }
 
   return <span className="inline-flex items-center flex-wrap">{parts}</span>;

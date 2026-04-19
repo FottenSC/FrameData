@@ -229,34 +229,31 @@ const tagPreset = (
 });
 
 const PRESETS: PresetSpec[] = [
-  tagPreset(
-    "Launchers (hit)",
-    "Moves that launch on hit",
-    "preset-lnc-hit",
-    "hitTags",
-    "LNC",
-  ),
-  tagPreset(
-    "Launchers (CH)",
-    "Moves that launch on counter-hit",
-    "preset-lnc-ch",
-    "counterHitTags",
-    "LNC",
-  ),
-  tagPreset(
-    "Knockdown (hit)",
-    "Moves that knock down on hit",
-    "preset-knd-hit",
-    "hitTags",
-    "KND",
-  ),
-  tagPreset(
-    "Stun (hit)",
-    "Moves that stun on hit",
-    "preset-stn-hit",
-    "hitTags",
-    "STN",
-  ),
+  {
+    label: "Punishable",
+    title: "Moves at -10 or worse on block",
+    build: () => ({
+      id: uniqueId("preset-punishable"),
+      type: "condition",
+      field: "block",
+      condition: "lessThan",
+      value: "-9",
+      value2: "",
+    }),
+  },
+  {
+    label: "i10+",
+    title: "Fast pokes — impact 10 frames or faster",
+    build: () => ({
+      id: uniqueId("preset-i10plus"),
+      type: "condition",
+      field: "impact",
+      // "lessThan 11" expresses "≤ 10" without needing a new operator.
+      condition: "lessThan",
+      value: "11",
+      value2: "",
+    }),
+  },
   {
     label: "Plus on block",
     title: "Moves at +1 or better on block",
@@ -269,30 +266,20 @@ const PRESETS: PresetSpec[] = [
       value2: "",
     }),
   },
-  {
-    label: "Punishable (−10+)",
-    title: "Moves at -10 or worse on block",
-    build: () => ({
-      id: uniqueId("preset-punishable"),
-      type: "condition",
-      field: "block",
-      condition: "lessThan",
-      value: "-9",
-      value2: "",
-    }),
-  },
-  {
-    label: "i12 or faster",
-    title: "Moves with impact 12 or lower",
-    build: () => ({
-      id: uniqueId("preset-fast"),
-      type: "condition",
-      field: "impact",
-      condition: "lessThan",
-      value: "13",
-      value2: "",
-    }),
-  },
+  tagPreset(
+    "Launch on hit",
+    "Moves that launch on hit",
+    "preset-lnc-hit",
+    "hitTags",
+    "LNC",
+  ),
+  tagPreset(
+    "is aGI",
+    "Auto Guard Impact moves (properties any of GI)",
+    "preset-agi",
+    "properties",
+    "GI",
+  ),
 ];
 
 // A filter is "the same preset" as another when it matches field + condition

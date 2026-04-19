@@ -124,45 +124,72 @@ export function getGameFilterConfig(
   // fields so any field with an option list can use it; the old code had
   // this pinned to `enum` only which meant stance / properties / tags
   // couldn't surface a multi-select even though we knew all their values.
-  const inListOperator: FilterOperator = {
-    id: "inList",
-    label: "In list",
-    input: "multi",
-    appliesTo: ["enum", "text"],
-    test: ({ fieldString, fieldTokens, value }) => {
-      // User-selected values are stored comma-separated by MultiCombobox.
-      const selections = (value ?? "")
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
-      if (selections.length === 0) return false;
+  // Shared multi-select predicate used by both "Any of" and "All of".
+  // Picks fieldTokens first (exact atomic match, correct for multi-word
+  // stances and prefix-colliding codes like SC / SCH) and falls back to
+  // splitting fieldString on common separators for accessors that don't
+  // declare a token projection.
+  const multiSelectMatch = (
+    mode: "any" | "all",
+    fieldString: string | null | undefined,
+    fieldTokens: string[] | null | undefined,
+    value: string | undefined,
+  ): boolean => {
+    const selections = (value ?? "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (selections.length === 0) return false;
 
-      // Prefer the accessor's atomic-token array when available — it keeps
-      // multi-word tokens like "Back Side" intact AND gives us exact-match
-      // semantics so picking "SC" doesn't also match moves with "SCH".
-      if (fieldTokens && fieldTokens.length > 0) {
-        const tokenSet = new Set(fieldTokens.map((t) => t.toLowerCase()));
-        return selections.some((sel) => tokenSet.has(sel.toLowerCase()));
-      }
-
-      // Fallback for fields without a token projection: split the haystack
-      // on common separators. Single-token vocabularies (properties / tags
-      // / hit levels) round-trip cleanly through this path.
+    let tokenSet: Set<string>;
+    if (fieldTokens && fieldTokens.length > 0) {
+      tokenSet = new Set(fieldTokens.map((t) => t.toLowerCase()));
+    } else {
       if (!fieldString) return false;
-      const tokenSet = new Set(
+      tokenSet = new Set(
         fieldString
           .split(/[\s:,\/()]+/)
           .map((t) => t.trim().toLowerCase())
           .filter(Boolean),
       );
-      return selections.some((sel) => tokenSet.has(sel.toLowerCase()));
-    },
+    }
+
+    const iter = mode === "any" ? selections.some : selections.every;
+    return iter.call(selections, (sel: string) =>
+      tokenSet.has(sel.toLowerCase()),
+    );
+  };
+
+  /** Matches when AT LEAST ONE of the picks is on the row (OR / union). */
+  const anyOfOperator: FilterOperator = {
+    id: "inList",
+    label: "Any of",
+    input: "multi",
+    appliesTo: ["enum", "text"],
+    test: ({ fieldString, fieldTokens, value }) =>
+      multiSelectMatch("any", fieldString, fieldTokens, value),
+  };
+
+  /** Matches only when EVERY pick is on the row (AND / intersection). */
+  const allOfOperator: FilterOperator = {
+    id: "allOf",
+    label: "All of",
+    input: "multi",
+    appliesTo: ["enum", "text"],
+    test: ({ fieldString, fieldTokens, value }) =>
+      multiSelectMatch("all", fieldString, fieldTokens, value),
   };
 
   // Attach enum-like options + allowed operators to the relevant fields.
-  // Keep the default operators available alongside "In list" so users can
-  // still do `stance contains "W"` etc.
-  const defaultEnumOps = ["inList", "contains", "equals", "notEquals"];
+  // Keep the default operators available alongside the multi-selects so
+  // users can still do `stance contains "W"` etc.
+  const defaultEnumOps = [
+    "inList", // "Any of" — OR semantics (legacy id kept for saved filters)
+    "allOf", // "All of" — AND semantics
+    "contains",
+    "equals",
+    "notEquals",
+  ];
 
   const withOptions = (
     f: FieldConfig,
@@ -206,7 +233,7 @@ export function getGameFilterConfig(
 
   const config: GameFilterConfig = {
     fields,
-    customOperators: [inListOperator],
+    customOperators: [anyOfOperator, allOfOperator],
   };
 
   if (gameId === "Tekken8") {

@@ -4,7 +4,7 @@ import {
   QueryClient,
   keepPreviousData,
 } from "@tanstack/react-query";
-import { Move } from "@/types/Move";
+import { Move, MoveOutcome } from "@/types/Move";
 import { DEFAULT_OUTCOME_TAGS, parseOutcome } from "@/lib/parseOutcome";
 
 interface Character {
@@ -112,6 +112,61 @@ function toPropertyArray(raw: unknown): string[] {
 }
 
 /**
+ * Normalize an outcome field (Block / Hit / CounterHit).
+ *
+ * Accepts BOTH shapes to ease migration:
+ *
+ *   1. The new structured shape emitted by the Python script, where the JSON
+ *      already carries ``{ advantage, tags, raw }``. In that case we just
+ *      coerce the types (and intern tag strings).
+ *   2. The legacy flat shape where the JSON has two correlated fields — a raw
+ *      string like "KND,+16" and a pre-computed numeric "*Dec". Here we fall
+ *      through to {@link parseOutcome} so the tag list is recovered on load.
+ *
+ * This lets the frontend read any character JSON regardless of whether it was
+ * produced before or after the data-pipeline refactor.
+ */
+function parseOutcomeField(
+  structured: unknown,
+  legacyRaw: unknown,
+  legacyDec: unknown,
+): MoveOutcome {
+  if (
+    structured &&
+    typeof structured === "object" &&
+    !Array.isArray(structured) &&
+    ("advantage" in structured || "tags" in structured || "raw" in structured)
+  ) {
+    const s = structured as {
+      advantage?: unknown;
+      tags?: unknown;
+      raw?: unknown;
+    };
+    const advantage =
+      typeof s.advantage === "number" && Number.isFinite(s.advantage)
+        ? s.advantage
+        : null;
+    const tags = Array.isArray(s.tags)
+      ? s.tags
+          .filter((t): t is string => typeof t === "string" && t.length > 0)
+          .map((t) => intern(t)!)
+      : [];
+    const raw = typeof s.raw === "string" && s.raw.length > 0 ? s.raw : null;
+    return { advantage, tags, raw };
+  }
+
+  return parseOutcome(
+    typeof legacyRaw === "string" ? legacyRaw : null,
+    typeof legacyDec === "number"
+      ? legacyDec
+      : legacyDec != null
+        ? Number(legacyDec)
+        : null,
+    DEFAULT_OUTCOME_TAGS,
+  );
+}
+
+/**
  * Convert a single raw JSON move object into the rich in-memory {@link Move}.
  *
  * The raw shape uses SC6-era field names ("HitDec", "CounterHit", etc.) and
@@ -136,24 +191,17 @@ function processMove(
     return out.length > 0 ? out : null;
   })();
 
-  // Parse outcomes. Note: the raw JSON stores both the string form (e.g. "Hit")
-  // and the pre-parsed numeric form (e.g. "HitDec"). We feed both to parseOutcome
-  // so we get the benefit of the authoritative numeric hint while still
-  // recovering tags like KND/LNC from the string.
-  const block = parseOutcome(
-    typeof raw.Block === "string" ? raw.Block : null,
-    raw.BlockDec != null ? Number(raw.BlockDec) : null,
-    DEFAULT_OUTCOME_TAGS,
-  );
-  const hit = parseOutcome(
-    typeof raw.Hit === "string" ? raw.Hit : null,
-    raw.HitDec != null ? Number(raw.HitDec) : null,
-    DEFAULT_OUTCOME_TAGS,
-  );
-  const counterHit = parseOutcome(
-    typeof raw.CounterHit === "string" ? raw.CounterHit : null,
-    raw.CounterHitDec != null ? Number(raw.CounterHitDec) : null,
-    DEFAULT_OUTCOME_TAGS,
+  // Outcomes. The current Python pipeline emits the pre-parsed
+  //     { advantage, tags, raw }
+  // structure directly; older JSON files still in the wild have the flat
+  //     "Block": "KND,+16", "BlockDec": 16
+  // shape. parseOutcomeField accepts either.
+  const block = parseOutcomeField(raw.Block, raw.Block, raw.BlockDec);
+  const hit = parseOutcomeField(raw.Hit, raw.Hit, raw.HitDec);
+  const counterHit = parseOutcomeField(
+    raw.CounterHit,
+    raw.CounterHit,
+    raw.CounterHitDec,
   );
 
   return {

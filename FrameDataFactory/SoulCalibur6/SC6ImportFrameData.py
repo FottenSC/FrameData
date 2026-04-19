@@ -36,7 +36,7 @@ def normalize_character(name):
 
 frameData["Character"] = frameData["Character"].apply(normalize_character)
 
-# Sum damage 
+# Sum damage
 def sumAndCleanDamage(row):
     if(str(row) == "nan"):
         return 0
@@ -58,43 +58,122 @@ def sumAndCleanDamage(row):
 
 frameData["DamageDec"] = frameData["Damage"].apply(lambda x: sumAndCleanDamage(x))
 
-# Create Block decimal
-def cleanUpBlock(block):
-    blockClean = re.findall(r'[-+]?\d+', str(block))
 
-    if(len(blockClean) == 0):
-        return None
-    else:
-        return int(blockClean[0])
+# ---------------------------------------------------------------------------
+# Outcome parsing (block / hit / counter-hit)
+# ---------------------------------------------------------------------------
+#
+# The spreadsheet stores an outcome as a single string that may combine a frame
+# advantage with one or more outcome-tag tokens, e.g.:
+#
+#   "2"          -> advantage=2    tags=[]
+#   "+28"        -> advantage=28   tags=[]
+#   "KND"        -> advantage=None tags=["KND"]
+#   "STN,+18"    -> advantage=18   tags=["STN"]
+#   "LNC -43"    -> advantage=-43  tags=["LNC"]
+#   "UB, STN"    -> advantage=None tags=["UB","STN"]
+#   "KND/-2"     -> advantage=-2   tags=["KND"]
+#   "STN (+10)"  -> advantage=10   tags=["STN"]
+#   "KND/LNC"    -> advantage=None tags=["KND","LNC"]
+#
+# We emit a structured dict instead of two correlated scalar columns so the
+# frontend can render and filter the numeric advantage and the outcome tags
+# independently. A move that is "+28 on hit and knocks down" is now
+# represented as { advantage: 28, tags: ["KND"], raw: "+28 KND" } instead of
+# being crammed into a single string.
 
-frameData["BlockDec"] = frameData["Block"].apply(lambda x: cleanUpBlock(x))
+# Known outcome-tag whitelist. Only tokens in this list are accepted as tags;
+# everything else (numeric noise, ordinals like "2nd", typos like "lol")
+# stays in `raw` but never becomes a structured tag.
+OUTCOME_TAGS = {
+    "KND",    # knockdown
+    "LNC",    # launch
+    "STN",    # stun
+    "JGL",    # juggle
+    "LH",     # lethal hit
+    "UB",     # un-techable / unbreakable hit state
+    "GB",     # guard burst / break
+    "BREAK",  # spelled-out guard break
+    "DZY",    # dizzy
+    "SLC",    # slice
+    "RE",     # reversal edge triggered
+}
+
+# Tokens we ignore when scanning for tags — these appear in author prose but
+# are not outcome tags.
+_NON_TAG_WORDS = {"NC", "NCC", "VS", "IF", "AND", "OR", "ON", "TO", "AT", "THE"}
 
 
-# Create Hit decimal
-def cleanUpHit(hit):
-    hitClean = re.findall(r'[-+]?\d+', str(hit))
+def parse_outcome(value, numeric_hint=None):
+    """Parse a raw outcome string into {advantage, tags, raw}.
 
-    if(len(hitClean) == 0):
-        return None
-    else:
-        return int(hitClean[0])
+    ``value`` is the raw cell content; it may be ``None``/``NaN``, a bare
+    number, or a mixed string like ``"STN,+18"``.
 
-frameData["HitDec"] = frameData["Hit"].apply(lambda x: cleanUpHit(x))
+    ``numeric_hint`` is an optional pre-computed advantage (e.g. from an
+    existing ``*Dec`` column). It's only used when the string contains no
+    numeric advantage at all.
+    """
+    # NaN guard (pandas cells)
+    try:
+        if pd.isna(value):
+            value = None
+    except Exception:
+        pass
+
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        return {
+            "advantage": int(value),
+            "tags": [],
+            "raw": str(int(value)) if float(value).is_integer() else str(value),
+        }
+
+    raw = str(value).strip() if value is not None else ""
+    if not raw:
+        return {
+            "advantage": int(numeric_hint) if numeric_hint is not None else None,
+            "tags": [],
+            "raw": None,
+        }
+
+    # Tags: uppercase alpha tokens matching the whitelist.
+    tokens = re.findall(r"[A-Z]+", raw.upper())
+    tags = []
+    for tok in tokens:
+        if tok in _NON_TAG_WORDS:
+            continue
+        if tok in OUTCOME_TAGS and tok not in tags:
+            tags.append(tok)
+
+    # Advantage extraction:
+    #   1. Prefer explicitly signed integers (`+28`, `-6`).
+    #   2. If no tags were found and exactly one plain integer is present,
+    #      treat it as the advantage (so bare "2" still means +2).
+    #   3. Otherwise leave advantage None — ambiguous author prose like
+    #      "LNC, STN (2nd)" should NOT parse "2" as an advantage.
+    advantage = None
+    signed = re.findall(r"[+-]\d+", raw)
+    if signed:
+        advantage = int(signed[-1])
+    elif not tags:
+        plain = re.findall(r"-?\d+", raw)
+        if len(plain) == 1:
+            advantage = int(plain[0])
+
+    if advantage is None and numeric_hint is not None:
+        try:
+            advantage = int(numeric_hint)
+        except (TypeError, ValueError):
+            advantage = None
+
+    return {"advantage": advantage, "tags": tags, "raw": raw}
 
 
-# Create CounterHit decimal
-def cleanUpCounterHit(ch):
-    if(str(ch) in ["LNC, STN (2nd)"]):
-        return None
-    
-
-    chClean = re.findall(r'[-+]?\d+', str(ch))
-    if(len(chClean) == 0):
-        return None
-    else:
-        return int(chClean[0])
-
-frameData["CounterHitDec"] = frameData["Counter Hit"].apply(lambda x: cleanUpCounterHit(x))
+# Apply outcome parsing to the three outcome columns. We store the structured
+# dicts alongside the raw columns (useful for debugging the CSV roundtrip).
+frameData["BlockOutcome"] = frameData["Block"].apply(parse_outcome)
+frameData["HitOutcome"] = frameData["Hit"].apply(parse_outcome)
+frameData["CounterHitOutcome"] = frameData["Counter Hit"].apply(parse_outcome)
 
 # PostProcess.sql: translate to universal command format (K->C, k->c, G->D, g->d)
 def translate_command(cmd):
@@ -134,16 +213,16 @@ def extract_properties(row):
     properties = []
     notes = row.get("Notes")
     stance = row.get("Stance")
-    
+
     for token, prop_name in PROPERTY_TOKENS.items():
         if note_has(notes, token):
             properties.append(prop_name)
-    
+
     # Special case: RE can also be detected from Stance
     if "RE" not in properties:
         if isinstance(stance, str) and "RE" in stance:
             properties.append("RE")
-    
+
     return properties if properties else None
 
 frameData["Properties"] = frameData.apply(extract_properties, axis=1)
@@ -332,7 +411,7 @@ def caseFixer(stance):
                 stance = stance.lower().replace(test[0], "")
             else:
                 keepLooping = False
-        
+
     # if (not alreadyExported.get(originalStance)):
     #     with open("debugStances.txt", "a", encoding="utf-8") as f:
     #         f.write(f"{stances} , {originalStance}\n")
@@ -341,7 +420,7 @@ def caseFixer(stance):
     stance = stance.strip()
     if len(stance) > 0:
         print(f"Warning: Unknown stance case: {stance} | output {stances} | Original: {originalStance}")
-        
+
     return stances
 
 frameData["Stance"] = frameData["Stance"].apply(caseFixer)
@@ -383,14 +462,14 @@ for name in characters:
     # Handle legacy array format
     if isinstance(existing_char_stances, list):
         existing_char_stances = {s.get("name", ""): s for s in existing_char_stances}
-    
+
     # Get character ID (preserve existing or assign new)
     if "id" in existing_char:
         char_id = existing_char["id"]
     else:
         max_char_id += 1
         char_id = max_char_id
-    
+
     # Extract stances for this character from the frame data
     char_moves = frameData[frameData["Character"] == name]
     char_stances = set()
@@ -399,7 +478,7 @@ for name in characters:
             for s in stance_list:
                 if s and isinstance(s, str):
                     char_stances.add(s)
-    
+
     # Build stances dict for this character, preserving existing data
     # Skip stances that have been moved to game-level stances
     stances_dict = {}
@@ -407,7 +486,7 @@ for name in characters:
         # Skip if this stance exists in game-level stances (it's been moved to shared)
         if stance_name in existing_game_stances:
             continue
-            
+
         if stance_name in existing_char_stances:
             # Preserve existing stance data (including user-edited name/description)
             existing_stance = existing_char_stances[stance_name]
@@ -421,7 +500,7 @@ for name in characters:
                 "name": "",
                 "description": ""
             }
-    
+
     char_entry = {
         "id": char_id,
         "name": name,
@@ -429,15 +508,25 @@ for name in characters:
     }
     if "image" in existing_char:
         char_entry["image"] = existing_char["image"]
-        
+
     characters_manifest.append(char_entry)
 
 char_id_map = {c["name"]: c["id"] for c in characters_manifest}
 frameData["CharacterID"] = frameData["Character"].map(char_id_map)
 
-# Build properties dict, preserving existing user-edited data
+# Build properties dict, preserving existing user-edited data.
+#
+# The same `properties` registry is consulted by the frontend for two things:
+#   - the Properties column badges (UA / BA / GI / TH / SS / RE / LH)
+#   - the outcome-tag chips rendered inside the Hit / Counter-Hit / Block
+#     cells (KND / LNC / STN / JGL / LH / UB / GB / BREAK / DZY / SLC / RE)
+# We therefore seed the dict with BOTH sets so authors can edit name /
+# description / className for either kind without having to also update the
+# frontend code.
+property_codes_used = set(PROPERTY_TOKENS.values()) | OUTCOME_TAGS
+
 properties_dict = {}
-for prop_key in PROPERTY_TOKENS.values():
+for prop_key in sorted(property_codes_used):
     if prop_key in existing_game_properties:
         # Preserve existing property data (including user-edited name/description)
         existing_prop = existing_game_properties[prop_key]
@@ -516,7 +605,7 @@ def split_by_delimiter(value, delimiter="::"):
         return None
     # Split by :: first
     parts = value.split(delimiter)
-    
+
     # Process each part, keeping _ as a separate element
     final_parts = []
     for part in parts:
@@ -535,10 +624,16 @@ def split_by_delimiter(value, delimiter="::"):
                 cleaned = part.strip().strip(":")
                 if cleaned:
                     final_parts.append(cleaned)
-    
+
     return final_parts if final_parts else None
 
-# Columns mapping to UI Move interface
+# Columns mapping to UI Move interface.
+#
+# The `Block` / `Hit` / `CounterHit` fields now emit the structured
+#     { "advantage": <int|null>, "tags": [<tag>, ...], "raw": "<original>" }
+# shape consumed by the TypeScript Move type. We no longer emit the separate
+# *Dec columns — the same information is carried inside the outcome object's
+# `advantage` field.
 def move_row_to_dict(row: pd.Series):
     return {
         "ID": to_int_or_none(row.get("ID")),
@@ -550,12 +645,9 @@ def move_row_to_dict(row: pd.Series):
         "Impact": to_int_or_none(row.get("Impact")),
         "Damage": to_str_or_none(row.get("Damage")),
         "DamageDec": to_int_or_none(row.get("DamageDec")),
-        "Block": to_str_or_none(row.get("Block")),
-        "BlockDec": to_int_or_none(row.get("BlockDec")),
-        "Hit": to_str_or_none(row.get("Hit")),
-        "HitDec": to_int_or_none(row.get("HitDec")),
-        "CounterHit": to_str_or_none(row.get("Counter Hit")),
-        "CounterHitDec": to_int_or_none(row.get("CounterHitDec")),
+        "Block": row.get("BlockOutcome"),
+        "Hit": row.get("HitOutcome"),
+        "CounterHit": row.get("CounterHitOutcome"),
         "GuardBurst": to_int_or_none(row.get("Guard Burst")),
         "Notes": to_str_or_none(row.get("Notes")),
     }

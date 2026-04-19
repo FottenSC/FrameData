@@ -596,68 +596,13 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
     <div className={cn("mb-1 custom-search-builder pt-2", className)}>
       {/* Quick search + clear-all action */}
       <div className="py-2 mb-2 flex items-center gap-2">
-        <div className="relative flex-1">
-          <DebouncedInput
-            placeholder='Search anything — try "amy knd", tag:KND, imp:<=12, -G'
-            value={quickSearch}
-            onDebouncedChange={setQuickSearch}
-            className="h-10 text-base pr-9 border-primary/20 focus-visible:border-primary focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
-            aria-label="Quick search"
-          />
-          {/* Syntax help — tiny ? icon pinned to the right edge of the input */}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                type="button"
-                className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
-                aria-label="Quick-search syntax help"
-                tabIndex={-1}
-              >
-                <span className="text-sm font-semibold">?</span>
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom" align="end" className="w-[360px]">
-              <div className="space-y-2 text-[12px]">
-                <div>
-                  <p className="font-semibold">Search syntax</p>
-                  <p className="text-muted-foreground">
-                    Terms are AND-ed. All matches are case-insensitive.
-                  </p>
-                </div>
-                <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 font-mono">
-                  <span className="text-primary">amy knd</span>
-                  <span className="text-muted-foreground">
-                    rows containing both words
-                  </span>
-                  <span className="text-primary">char:amy</span>
-                  <span className="text-muted-foreground">
-                    scope to a field
-                  </span>
-                  <span className="text-primary">tag:KND</span>
-                  <span className="text-muted-foreground">
-                    tag / property match
-                  </span>
-                  <span className="text-primary">imp:&lt;=12</span>
-                  <span className="text-muted-foreground">numeric compare</span>
-                  <span className="text-primary">block:&lt;-9</span>
-                  <span className="text-muted-foreground">
-                    punishable on block
-                  </span>
-                  <span className="text-primary">"lethal hit"</span>
-                  <span className="text-muted-foreground">phrase match</span>
-                  <span className="text-primary">-G</span>
-                  <span className="text-muted-foreground">exclude</span>
-                </div>
-                <p className="text-muted-foreground">
-                  Fields:{" "}
-                  <span className="font-mono">
-                    char cmd stance note tag hit ch block imp dmg level
-                  </span>
-                </p>
-              </div>
-            </TooltipContent>
-          </Tooltip>
-        </div>
+        <DebouncedInput
+          placeholder="Quick search — stance + command (e.g. “ws 2k”)"
+          value={quickSearch}
+          onDebouncedChange={setQuickSearch}
+          className="flex-1 h-10 text-base border-primary/20 focus-visible:border-primary focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+          aria-label="Quick search (stance + command)"
+        />
         {activeCount > 0 && (
           <Button
             variant="secondary"

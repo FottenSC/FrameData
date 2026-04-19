@@ -127,7 +127,11 @@ export const NOTATION_STYLES: NotationStyle[] = [
     short: "FBUD",
     description:
       "Directional letters (F / B / UF / …) + numeric button labels (1–4).",
-    games: ["Tekken8"],
+    // Listed for SC6 as well — the replacements operate on the universal
+    // ABCD authoring layer, so a SC6 `(3) _ (6) A+D` command naturally
+    // renders as `(DF)/(F) 1+4` and lets us exercise direction-remapping
+    // end-to-end against the richer SC6 data (held inputs, OR-steps, etc.).
+    games: ["SoulCalibur6", "Tekken8"],
     directionTokens: ["F", "B", "U", "D", "UF", "UB", "DF", "DB", "N"],
     directionRenderMode: "text",
     replacements: {

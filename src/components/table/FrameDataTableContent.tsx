@@ -5,7 +5,7 @@ import {
   TableCell,
   TableRow as UITableRow,
 } from "@/components/ui/table";
-import { toast } from "sonner";
+import { showCopiedToast } from "@/components/ui/copy-toast";
 import { Move, SortableColumn } from "@/types/Move";
 import { ColumnConfig } from "@/contexts/UserSettingsContext";
 import { useVirtualizer } from "@tanstack/react-virtual";
@@ -66,7 +66,7 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
       : commandPart;
 
     navigator.clipboard.writeText(textToCopy).then(() => {
-      toast("Copied!", { duration: 1000 });
+      showCopiedToast(textToCopy);
     });
   }, []);
 

@@ -6,17 +6,12 @@ import { router } from "./router";
 function App() {
   return (
     <TooltipProvider>
-      <Toaster
-        position="top-left"
-        theme="dark"
-        toastOptions={{
-          style: {
-            background: "hsl(0, 0%, 20%)",
-            border: "1px solid hsla(0, 0%, 100%, 0.1)",
-            color: "hsl(0, 0%, 98%)",
-          },
-        }}
-      />
+      {/*
+        Toaster is rendered unstyled — individual call sites produce their own
+        JSX (see `showCopiedToast`) so every toast can carry its own visual
+        language, icon and countdown.
+      */}
+      <Toaster position="top-left" theme="dark" />
       <RouterProvider router={router} />
     </TooltipProvider>
   );

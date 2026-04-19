@@ -101,6 +101,28 @@
   animation: characterEntrance 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
+/*
+ * Toast countdown progress bar.
+ *
+ * Drives the little bar that slides from full-width to zero over a toast's
+ * lifetime. The duration is injected via the inline `animation-duration`
+ * style, so a single class handles any length.
+ */
+@keyframes toastProgress {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+.animate-toast-progress {
+  animation-name: toastProgress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+  transform-origin: left center;
+}
+
 .character-grid-container {
   perspective: 1000px;
 }

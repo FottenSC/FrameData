@@ -30,6 +30,7 @@ import type { FieldConfig, FieldType, FilterOperator } from "../filters/types";
 import { useMoves, clearNotationCache } from "@/hooks/useMoves";
 import { getAccessor } from "@/lib/moveAccessors";
 import { matchesQuickSearch, parseQuickSearch } from "@/lib/quickSearch";
+import { exportCsv, exportExcel, type ExportCell } from "@/lib/export";
 
 /**
  * Generic comparator factory. Accepts a primitive-valued getter and produces
@@ -401,42 +402,31 @@ export const FrameDataTable: React.FC = () => {
     if (!rows || rows.length === 0) return;
     const headers = visibleColumns.map((c) => c.label);
     const fieldIds = visibleColumns.map((c) => c.id);
-    const escape = (v: unknown) => {
-      if (v == null) return "";
-      const s = String(v);
-      if (/[,"\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
-      return s;
-    };
-    const dataLines: string[] = [];
-    dataLines.push(headers.map(escape).join(","));
-    for (const m of rows) {
-      const line = fieldIds
-        .map((fid) => {
-          const acc = getAccessor(fid);
-          return acc ? acc.exportValue(m) : "";
-        })
-        .map(escape)
-        .join(",");
-      dataLines.push(line);
+
+    // Build typed row data (numbers stay numbers so the Excel exporter can
+    // tag numeric cells with x:num and Excel won't coerce them to text).
+    const tableRows: ExportCell[][] = rows.map((m) =>
+      fieldIds.map<ExportCell>((fid) => {
+        const acc = getAccessor(fid);
+        if (!acc) return "";
+        const v = acc.exportValue(m);
+        return (v as ExportCell) ?? "";
+      }),
+    );
+
+    // Friendly filename: "SoulCalibur6_Astaroth" beats "SoulCalibur6_3".
+    const characterLabel =
+      selectedCharacterId === -1
+        ? "All"
+        : (characters.find((c) => c.id === selectedCharacterId)?.name ??
+          String(selectedCharacterId));
+    const basename = `${selectedGame.id || "export"}_${characterLabel}`;
+
+    if (format === "excel") {
+      exportExcel(headers, tableRows, basename);
+    } else {
+      exportCsv(headers, tableRows, basename);
     }
-    const csv = dataLines.join("\n");
-    const blob = new Blob([csv], {
-      type:
-        format === "excel"
-          ? "application/vnd.ms-excel"
-          : "text/csv;charset=utf-8;",
-    });
-    const ext = format === "excel" ? "xls" : "csv";
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${selectedGame.id || "export"}_${
-      selectedCharacterId === -1 ? "All" : selectedCharacterId
-    }.${ext}`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   };
 
   const handleFiltersChange = useCallback((filters: FilterItem[]) => {

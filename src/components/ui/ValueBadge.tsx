@@ -52,7 +52,12 @@ interface AdvantagePillProps {
 
 const pillBackground = (advantage: number | null, tone: PillTone): string => {
   if (advantage === null) return "bg-gray-700";
-  if (tone === "guard") return "bg-amber-700";
+  // Guard damage is a non-negative counter — colour needs to be visually
+  // distinct from advantage pills (so it doesn't read as "positive") without
+  // competing for attention. A muted warm-neutral stone works: present but
+  // quiet. Intentionally different hue than the cool gray we use for null so
+  // the two aren't confusable.
+  if (tone === "guard") return "bg-stone-600";
   return advantage >= 0 ? "bg-green-700" : "bg-rose-700";
 };
 

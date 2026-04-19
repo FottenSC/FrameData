@@ -8,8 +8,10 @@
  * slightly different fallbacks across sort vs export vs filter). That's exactly
  * the kind of thing that becomes a bug farm.
  *
- * This module defines each column once. FrameDataTable looks up the accessor
- * by id for every operation; cell rendering stays in {@link MoveTableCell}
+ * This module defines each column once. {@link buildFieldAccessors} returns
+ * a bundle of accessors keyed by column id; FrameDataTable memoises that
+ * bundle against the current notation style and looks columns up through it
+ * for sort / filter / export. Cell rendering stays in {@link MoveTableCell}
  * because it returns JSX rather than a primitive.
  *
  * ## Notation awareness
@@ -313,10 +315,3 @@ export function buildFieldAccessors(
   };
 }
 
-/**
- * Style-less accessor bundle. Useful for contexts that don't care about
- * display notation (e.g. unit tests, programmatic export to an external
- * tool that always wants authored tokens).
- */
-export const UNIVERSAL_FIELD_ACCESSORS: Record<string, FieldAccessor> =
-  buildFieldAccessors(null);

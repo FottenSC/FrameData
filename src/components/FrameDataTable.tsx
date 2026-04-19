@@ -6,7 +6,6 @@ import React, {
   useCallback,
 } from "react";
 import { useParams, useNavigate } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
 import {
   Card,
   CardContent,
@@ -88,7 +87,6 @@ export const FrameDataTable: React.FC = () => {
     setFilteredMoves,
     setIsUpdating,
   } = useToolbar();
-  const queryClient = useQueryClient();
 
   const {
     data: originalMoves = [],

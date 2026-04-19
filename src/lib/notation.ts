@@ -220,43 +220,28 @@ function getRegexFor(replacements: Record<string, string>): RegExp | null {
   return regex;
 }
 
-/**
- * Apply a style's replacements to a single command string. Null-safe; returns
- * null when given null, and passes the input straight through for empty or
- * no-op styles.
- */
-export function applyNotationStyle(
-  text: string | null,
-  style: NotationStyle | null | undefined,
-): string | null {
-  if (text === null) return null;
-  if (!style) return text;
-  const regex = getRegexFor(style.replacements);
-  if (!regex) return text;
-  return text.replace(regex, (match) => style.replacements[match] ?? match);
-}
-
 // ---------------------------------------------------------------------------
-// Memoised token / command translators used by the presentation layer.
+// Token / command translation.
 //
-// The data layer stores commands as authored *universal* tokens — no notation
-// applied. Translation happens lazily at render / copy / accessor time. Doing
-// a regex replace on every token for every accessor call would be wasteful,
-// so we cache results per (style identity, raw token).
+// The data layer stores commands as authored *universal* tokens (ABCD +
+// numpad). Translation into the active notation style happens lazily at the
+// presentation layer — renderer, copy handler, accessor bundle. That means
+// flipping the style is a pure re-render with zero cache invalidation.
 //
-// The cache is keyed on style OBJECT identity via WeakMap — when the user
-// picks a different style, the GameContext hands us a different NotationStyle
-// reference and the old cache becomes eligible for GC.
+// Raw regex replace would be wasteful on hot paths (thousands of tokens
+// across a virtualised table), so translateToken memoises results on a
+// WeakMap keyed by style identity. When the user picks a different style
+// the GameContext hands us a fresh NotationStyle reference and the old
+// cache becomes eligible for GC.
 // ---------------------------------------------------------------------------
 
 const tokenCache = new WeakMap<NotationStyle, Map<string, string>>();
 
 /**
- * Translate a single command token under the active style, memoised so that
- * hot paths (accessor bundles, renderer, virtualised table rows) don't pay
- * regex cost on every access.
- *
- * Returns the input unchanged when `style` is null / has no replacements.
+ * Translate a single command token under the given style. Cached per
+ * (style, raw token) so repeated calls across moves / renders are effectively
+ * free. Returns the input unchanged when `style` is null / has no
+ * replacements.
  */
 export function translateToken(
   token: string,
@@ -278,6 +263,21 @@ export function translateToken(
   );
   cache.set(token, result);
   return result;
+}
+
+/**
+ * Apply a style's replacements to a string containing one or more tokens.
+ * Null-safe. Internally just defers to {@link translateToken}; kept as a
+ * stable export for code paths that happen to hand around a joined
+ * command string rather than a token array.
+ */
+export function applyNotationStyle(
+  text: string | null,
+  style: NotationStyle | null | undefined,
+): string | null {
+  if (text === null) return null;
+  if (!style) return text;
+  return translateToken(text, style);
 }
 
 /**

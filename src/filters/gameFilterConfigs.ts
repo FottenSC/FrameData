@@ -39,19 +39,26 @@ export const defaultFields: FieldConfig[] = [
  * Unique sorted stance codes from the game-level registry AND every
  * character-specific registry. The "In list" dropdown on the stance field
  * should offer every stance any character could be in.
+ *
+ * Codes that also appear in the PROPERTIES registry are excluded here — the
+ * SC6 Game.json has historical overlaps where tokens like "GI" (Guard
+ * Impact) appear in both stances and properties, and they are semantically
+ * properties. Trusting `properties` as the source of truth keeps the stance
+ * dropdown clean without needing to edit the authored data.
  */
 function buildStanceOptions(
   gameStances: Record<string, StanceInfo>,
   characterStances: Record<number, Record<string, StanceInfo>>,
+  excludeCodes: ReadonlySet<string>,
 ): { value: string; label: string }[] {
   const seen = new Map<string, StanceInfo>();
-  for (const [code, info] of Object.entries(gameStances)) {
+  const add = (code: string, info: StanceInfo) => {
+    if (excludeCodes.has(code)) return;
     if (!seen.has(code)) seen.set(code, info);
-  }
+  };
+  for (const [code, info] of Object.entries(gameStances)) add(code, info);
   for (const charMap of Object.values(characterStances)) {
-    for (const [code, info] of Object.entries(charMap)) {
-      if (!seen.has(code)) seen.set(code, info);
-    }
+    for (const [code, info] of Object.entries(charMap)) add(code, info);
   }
   return [...seen.entries()]
     .sort(([a], [b]) => a.localeCompare(b))
@@ -101,9 +108,17 @@ export function getGameFilterConfig(
   characters: { id: number; name: string }[] = [],
 ): GameFilterConfig {
   const hitLevelOptions = buildOptionsFromRecord(hitLevels);
-  const stanceOptions = buildStanceOptions(gameStances, characterStances);
   const propertyOptions = buildOptionsFromRecord(gameProperties);
   const characterOptions = buildCharacterOptions(characters);
+  // Stances minus any code that's really a property (GI, etc.) — prevents
+  // historical overlaps in the Game.json stance registry from polluting
+  // the stance dropdown.
+  const propertyCodes = new Set(Object.keys(gameProperties));
+  const stanceOptions = buildStanceOptions(
+    gameStances,
+    characterStances,
+    propertyCodes,
+  );
 
   // Custom "In list" operator. Relaxed to apply to both `text` and `enum`
   // fields so any field with an option list can use it; the old code had

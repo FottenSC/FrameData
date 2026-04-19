@@ -143,10 +143,15 @@ export const avaliableGames: Game[] = [
     id: "SoulCalibur6",
     name: "Soulcalibur VI",
     icon: <Sword className="h-5 w-5 mr-2" />,
+    // Fallback chip colours used when Game.json#properties doesn't declare a
+    // className for the code. Outcome tags (KND / STN / LNC) share a single
+    // muted warm-neutral — they all mean "something specific happens next"
+    // and carrying three loud, different colours on one row was visual noise.
+    // Matches the guard-damage pill in AdvantagePill(tone="guard").
     badges: {
-      KND: { className: "bg-fuchsia-800 text-white" },
-      STN: { className: "bg-pink-700 text-white" },
-      LNC: { className: "bg-rose-700 text-white" },
+      KND: { className: "bg-stone-600 text-white" },
+      STN: { className: "bg-stone-600 text-white" },
+      LNC: { className: "bg-stone-600 text-white" },
     },
     notationMapping: {
       specific: {},
@@ -185,9 +190,9 @@ export const avaliableGames: Game[] = [
     name: "Tekken 8",
     icon: <Gamepad2 className="h-5 w-5 mr-2" />,
     badges: {
-      KND: { className: "bg-indigo-700 text-white" },
-      STN: { className: "bg-amber-700 text-white" },
-      LNC: { className: "bg-rose-700 text-white" },
+      KND: { className: "bg-stone-600 text-white" },
+      STN: { className: "bg-stone-600 text-white" },
+      LNC: { className: "bg-stone-600 text-white" },
     },
     notationMapping: {
       specific: {},

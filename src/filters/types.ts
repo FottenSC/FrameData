@@ -11,6 +11,13 @@ export interface FilterOperator {
     fieldType: FieldType;
     fieldString: string | null; // string representation of the field
     fieldNumber: number | null; // numeric representation when applicable, else null
+    /**
+     * Atomic-token view of the field for array-sourced fields (stance,
+     * properties, tags, …). When present, operators that need exact-match
+     * semantics (like `inList`) should prefer this over splitting
+     * `fieldString`. null for fields whose natural source is a single scalar.
+     */
+    fieldTokens?: string[] | null;
     value?: string; // user value
     value2?: string; // optional 2nd value for ranges
   }) => boolean;

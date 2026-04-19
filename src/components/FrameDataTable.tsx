@@ -305,8 +305,9 @@ export const FrameDataTable: React.FC = () => {
   // ---------- Field extraction for filter evaluation ----------
   //
   // Backed by the central column registry in `lib/moveAccessors.ts`. The
-  // registry defines — for each column id — a `filterString` and (optionally)
-  // a `filterNumber` projection. We just look up the bundle and call through.
+  // registry defines — for each column id — filterString / filterNumber /
+  // (optionally) filterTokens projections. We just look up the bundle and
+  // call through.
   const getFieldAs = useCallback(
     (
       move: Move,
@@ -314,15 +315,17 @@ export const FrameDataTable: React.FC = () => {
     ): {
       string: string | null;
       number: number | null;
+      tokens: string[] | null;
       type: FieldType;
     } => {
       const field = fieldMap.get(fieldId);
       const type: FieldType = field?.type ?? "text";
       const acc = getAccessor(fieldId);
-      if (!acc) return { string: null, number: null, type };
+      if (!acc) return { string: null, number: null, tokens: null, type };
       return {
         string: acc.filterString(move),
         number: acc.filterNumber ? acc.filterNumber(move) : null,
+        tokens: acc.filterTokens ? acc.filterTokens(move) : null,
         type,
       };
     },
@@ -344,6 +347,7 @@ export const FrameDataTable: React.FC = () => {
         fieldType: f.type,
         fieldString: f.string,
         fieldNumber: f.number,
+        fieldTokens: f.tokens,
         value: item.value,
         value2: item.value2,
       });

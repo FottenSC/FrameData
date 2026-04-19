@@ -129,9 +129,7 @@ export function getGameFilterConfig(
     label: "In list",
     input: "multi",
     appliesTo: ["enum", "text"],
-    test: ({ fieldString, value }) => {
-      if (!fieldString) return false;
-
+    test: ({ fieldString, fieldTokens, value }) => {
       // User-selected values are stored comma-separated by MultiCombobox.
       const selections = (value ?? "")
         .split(",")
@@ -139,21 +137,25 @@ export function getGameFilterConfig(
         .filter(Boolean);
       if (selections.length === 0) return false;
 
-      // Split the field's haystack on anything that could be a separator in
-      // our data: whitespace, colons, commas, slashes, parens. Gives a clean
-      // token set so e.g. stance "Back Side, AS" matches a selection of "AS"
-      // but not "SS".
-      const normalizedTokens = fieldString
-        .split(/[\s:,\/()]+/)
-        .map((t) => t.trim().toLowerCase())
-        .filter(Boolean);
-      const tokenSet = new Set(normalizedTokens);
-      const fieldLower = fieldString.toLowerCase();
+      // Prefer the accessor's atomic-token array when available — it keeps
+      // multi-word tokens like "Back Side" intact AND gives us exact-match
+      // semantics so picking "SC" doesn't also match moves with "SCH".
+      if (fieldTokens && fieldTokens.length > 0) {
+        const tokenSet = new Set(fieldTokens.map((t) => t.toLowerCase()));
+        return selections.some((sel) => tokenSet.has(sel.toLowerCase()));
+      }
 
-      return selections.some((sel) => {
-        const needle = sel.toLowerCase();
-        return tokenSet.has(needle) || fieldLower.includes(needle);
-      });
+      // Fallback for fields without a token projection: split the haystack
+      // on common separators. Single-token vocabularies (properties / tags
+      // / hit levels) round-trip cleanly through this path.
+      if (!fieldString) return false;
+      const tokenSet = new Set(
+        fieldString
+          .split(/[\s:,\/()]+/)
+          .map((t) => t.trim().toLowerCase())
+          .filter(Boolean),
+      );
+      return selections.some((sel) => tokenSet.has(sel.toLowerCase()));
     },
   };
 

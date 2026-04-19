@@ -42,6 +42,14 @@ export interface FieldAccessor {
   filterNumber?: (m: Move) => number | null;
   /** String projection for text / enum filter operators. */
   filterString: (m: Move) => string | null;
+  /**
+   * Atomic-token projection for fields whose natural source is a list
+   * (stance, properties, tags, hit levels, …). Used by exact-match
+   * operators like `inList` so picking "SC" doesn't bleed into "SCH" and
+   * multi-word tokens like "Back Side" stay intact. null / undefined for
+   * scalar-sourced fields.
+   */
+  filterTokens?: (m: Move) => string[] | null;
   /** Plain value for CSV / Excel export. Will be stringified. */
   exportValue: (m: Move) => string | number | null;
 }
@@ -51,6 +59,10 @@ export const FIELD_ACCESSORS: Record<string, FieldAccessor> = {
     sortValue: (m) => m.characterName ?? null,
     sortType: "string",
     filterString: (m) => m.characterName || null,
+    // Single scalar wrapped as a one-element list so "In list" against
+    // characters matches exactly (multi-word names like "Seong Mi-na" don't
+    // get split on whitespace).
+    filterTokens: (m) => (m.characterName ? [m.characterName] : null),
     exportValue: (m) => m.characterName,
   },
 
@@ -58,6 +70,10 @@ export const FIELD_ACCESSORS: Record<string, FieldAccessor> = {
     sortValue: (m) => joinOrNull(m.stance, ", "),
     sortType: "string",
     filterString: (m) => joinOrNull(m.stance, ", "),
+    // Hand back the raw stance array so "Back Side" stays an atomic token
+    // and picking "SC" in the "In list" dropdown doesn't also match moves
+    // with "SCH" (Super-Charge Hold, etc.).
+    filterTokens: (m) => (m.stance && m.stance.length > 0 ? m.stance : null),
     exportValue: (m) => joinOrNull(m.stance, ", ") ?? "",
   },
 
@@ -65,6 +81,8 @@ export const FIELD_ACCESSORS: Record<string, FieldAccessor> = {
     sortValue: (m) => joinOrNull(m.command, " "),
     sortType: "string",
     filterString: (m) => joinOrNull(m.command, " "),
+    filterTokens: (m) =>
+      m.command && m.command.length > 0 ? m.command : null,
     exportValue: (m) => joinOrNull(m.command, " ") ?? "",
   },
 
@@ -96,6 +114,8 @@ export const FIELD_ACCESSORS: Record<string, FieldAccessor> = {
     sortValue: (m) => joinOrNull(m.hitLevel, " "),
     sortType: "string",
     filterString: (m) => joinOrNull(m.hitLevel, " "),
+    filterTokens: (m) =>
+      m.hitLevel && m.hitLevel.length > 0 ? m.hitLevel : null,
     exportValue: (m) => joinOrNull(m.hitLevel, " ") ?? "",
   },
 
@@ -127,6 +147,8 @@ export const FIELD_ACCESSORS: Record<string, FieldAccessor> = {
     sortValue: (m) => outcomeTagSearchString(m.block),
     sortType: "string",
     filterString: (m) => outcomeTagSearchString(m.block),
+    filterTokens: (m) =>
+      m.block.tags.length > 0 ? [...m.block.tags] : null,
     exportValue: (m) => outcomeTagSearchString(m.block) ?? "",
   },
 
@@ -141,6 +163,7 @@ export const FIELD_ACCESSORS: Record<string, FieldAccessor> = {
     sortValue: (m) => outcomeTagSearchString(m.hit),
     sortType: "string",
     filterString: (m) => outcomeTagSearchString(m.hit),
+    filterTokens: (m) => (m.hit.tags.length > 0 ? [...m.hit.tags] : null),
     exportValue: (m) => outcomeTagSearchString(m.hit) ?? "",
   },
 
@@ -155,6 +178,8 @@ export const FIELD_ACCESSORS: Record<string, FieldAccessor> = {
     sortValue: (m) => outcomeTagSearchString(m.counterHit),
     sortType: "string",
     filterString: (m) => outcomeTagSearchString(m.counterHit),
+    filterTokens: (m) =>
+      m.counterHit.tags.length > 0 ? [...m.counterHit.tags] : null,
     exportValue: (m) => outcomeTagSearchString(m.counterHit) ?? "",
   },
 
@@ -171,6 +196,8 @@ export const FIELD_ACCESSORS: Record<string, FieldAccessor> = {
     sortType: "string",
     filterString: (m) =>
       m.properties.length > 0 ? m.properties.join(" ") : null,
+    filterTokens: (m) =>
+      m.properties.length > 0 ? [...m.properties] : null,
     exportValue: (m) =>
       m.properties.length > 0 ? m.properties.join(", ") : "",
   },

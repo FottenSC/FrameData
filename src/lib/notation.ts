@@ -31,10 +31,40 @@ export interface NotationStyle {
   games: string[];
   /**
    * Source → display replacements. Applied as a single regex over each
-   * command string by {@link applyNotationMapping}. Empty object = pass through.
+   * command string by {@link applyNotationStyle}. Empty object = pass through.
    */
   replacements: Record<string, string>;
+  /**
+   * Tokens the command renderer should treat as **directional inputs** (to be
+   * drawn as arrow icons or direction chips) rather than button pills.
+   * Defaults to numpad digits `1..9`.
+   *
+   * Required for styles that re-purpose digits as buttons (e.g. Tekken's
+   * `1 2 3 4` button labels) — in that case buttons *are* digits and the
+   * renderer's old "first char is a digit → direction" heuristic breaks.
+   */
+  directionTokens?: readonly string[];
+  /**
+   * How to render direction tokens:
+   *  - `"icon"` (default): look up an SVG at `/Games/{gameId}/Icons/{token}.svg`
+   *  - `"text"`: render the token as a compact text chip (for styles whose
+   *    directions are letter codes like `F` / `UF` and don't have artwork)
+   */
+  directionRenderMode?: "icon" | "text";
 }
+
+/** Default numpad direction set, used when a style doesn't declare its own. */
+export const NUMPAD_DIRECTIONS: readonly string[] = [
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+];
 
 // ---------------------------------------------------------------------------
 // Catalog
@@ -91,7 +121,51 @@ export const NOTATION_STYLES: NotationStyle[] = [
     games: ["Tekken8"],
     replacements: TEKKEN_BUTTONS,
   },
+  {
+    id: "tekken-notation",
+    name: "Tekken (F B U D / 1 2 3 4)",
+    short: "FBUD",
+    description:
+      "Directional letters (F / B / UF / …) + numeric button labels (1–4).",
+    games: ["Tekken8"],
+    directionTokens: ["F", "B", "U", "D", "UF", "UB", "DF", "DB", "N"],
+    directionRenderMode: "text",
+    replacements: {
+      // Numpad directions → letter codes
+      "1": "DB",
+      "2": "D",
+      "3": "DF",
+      "4": "B",
+      "5": "N",
+      "6": "F",
+      "7": "UB",
+      "8": "U",
+      "9": "UF",
+      // Universal buttons → Tekken numbers (1-4)
+      A: "1",
+      B: "2",
+      C: "3",
+      D: "4",
+      a: "1",
+      b: "2",
+      c: "3",
+      d: "4",
+    },
+  },
 ];
+
+/**
+ * Resolve the set of directional tokens for a style. Callers (the command
+ * renderer in particular) use this to decide whether a command segment is a
+ * direction or a button — critical for styles where digits are BUTTONS
+ * (Tekken notation) rather than directions.
+ */
+export function getDirectionSet(
+  style: NotationStyle | null | undefined,
+): ReadonlySet<string> {
+  const list = style?.directionTokens ?? NUMPAD_DIRECTIONS;
+  return new Set(list);
+}
 
 // ---------------------------------------------------------------------------
 // Helpers

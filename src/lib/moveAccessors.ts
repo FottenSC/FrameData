@@ -11,10 +11,21 @@
  * This module defines each column once. FrameDataTable looks up the accessor
  * by id for every operation; cell rendering stays in {@link MoveTableCell}
  * because it returns JSX rather than a primitive.
+ *
+ * ## Notation awareness
+ *
+ * `Move.command` carries tokens exactly as authored (universal ABCD + numpad
+ * directions). The current `NotationStyle` is passed to
+ * {@link buildFieldAccessors} so any command-touching accessor (command,
+ * input, rawCommand) translates tokens lazily into whatever style the user
+ * is currently viewing — sort/filter/export always match what they see on
+ * screen. Flipping styles rebuilds this bundle via a parent `useMemo` and
+ * costs nothing at the data layer.
  */
 
 import { formatOutcome } from "./parseOutcome";
 import type { Move, MoveOutcome } from "@/types/Move";
+import { translateCommand, type NotationStyle } from "./notation";
 
 /** Join an optional string array with the given separator, or return null. */
 const joinOrNull = (xs: string[] | null, sep: string): string | null =>
@@ -96,181 +107,216 @@ export interface FieldAccessor {
   exportValue: (m: Move) => string | number | null;
 }
 
-export const FIELD_ACCESSORS: Record<string, FieldAccessor> = {
-  character: {
-    sortValue: (m) => m.characterName ?? null,
-    sortType: "string",
-    filterString: (m) => m.characterName || null,
-    // Single scalar wrapped as a one-element list so "In list" against
-    // characters matches exactly (multi-word names like "Seong Mi-na" don't
-    // get split on whitespace).
-    filterTokens: (m) => (m.characterName ? [m.characterName] : null),
-    exportValue: (m) => m.characterName,
-  },
+/**
+ * Build the column-accessor bundle for a given notation style.
+ *
+ * Command-touching accessors (`command`, `input`, implicitly `rawCommand`)
+ * translate `Move.command` through {@link translateCommand} so sort /
+ * filter / export always reflect what the user is currently seeing. Every
+ * other accessor is style-independent and returns the same value regardless
+ * of the passed style; they're included in the same bundle so FrameDataTable
+ * has one registry to index into.
+ *
+ * Translation is memoised per (style, token) inside `translateCommand`, so
+ * calling this bundle's methods repeatedly across thousands of moves is
+ * cheap — each unique token is regex-replaced exactly once per style.
+ */
+export function buildFieldAccessors(
+  style: NotationStyle | null | undefined,
+): Record<string, FieldAccessor> {
+  /**
+   * Get the command in the user's current notation. Called from every
+   * command-touching accessor so translation is centralised. `null` in →
+   * `null` out, mirroring the underlying field.
+   */
+  const cmdInStyle = (m: Move): string[][] | null =>
+    translateCommand(m.command, style);
 
-  stance: {
-    sortValue: (m) => joinOrNull(m.stance, ", "),
-    sortType: "string",
-    filterString: (m) => joinOrNull(m.stance, ", "),
-    // Hand back the raw stance array so "Back Side" stays an atomic token
-    // and picking "SC" in the "In list" dropdown doesn't also match moves
-    // with "SCH" (Super-Charge Hold, etc.).
-    filterTokens: (m) => (m.stance && m.stance.length > 0 ? m.stance : null),
-    exportValue: (m) => joinOrNull(m.stance, ", ") ?? "",
-  },
-
-  command: {
-    sortValue: (m) => formatCommandFlat(m.command),
-    sortType: "string",
-    filterString: (m) => formatCommandFlat(m.command),
-    // Token projection is every concrete expansion of the command (one string
-    // per OR-branch), so a multi-select / exact-match operator on the command
-    // column matches any real input sequence without needing to know about
-    // the nested shape.
-    filterTokens: (m) => {
-      if (!m.command || m.command.length === 0) return null;
-      const expansions = expandCommand(m.command);
-      return expansions.length > 0 ? expansions : null;
+  return {
+    character: {
+      sortValue: (m) => m.characterName ?? null,
+      sortType: "string",
+      filterString: (m) => m.characterName || null,
+      // Single scalar wrapped as a one-element list so "In list" against
+      // characters matches exactly (multi-word names like "Seong Mi-na" don't
+      // get split on whitespace).
+      filterTokens: (m) => (m.characterName ? [m.characterName] : null),
+      exportValue: (m) => m.characterName,
     },
-    exportValue: (m) => formatCommandFlat(m.command) ?? "",
-  },
 
-  rawCommand: {
-    sortValue: (m) => m.stringCommand ?? null,
-    sortType: "string",
-    filterString: (m) => m.stringCommand,
-    exportValue: (m) => m.stringCommand ?? "",
-  },
-
-  // "input" = stance + command, displayed / searched as a single combined
-  // field. filterTokens expands OR-steps in the command (e.g. `[["(2)","(8)"]]`)
-  // into separate alternative strings so the quick-search can match any
-  // real input sequence without accidentally bridging across the alternatives.
-  input: {
-    sortValue: (m) =>
-      [joinOrNull(m.stance, " "), formatCommandFlat(m.command)]
-        .filter(Boolean)
-        .join(" "),
-    sortType: "string",
-    filterString: (m) =>
-      [joinOrNull(m.stance, " "), formatCommandFlat(m.command)]
-        .filter(Boolean)
-        .join(" ") || null,
-    filterTokens: (m) => {
-      const stancePart = joinOrNull(m.stance, " ") ?? "";
-      const expansions = expandCommand(m.command);
-      const tokens = expansions.map((cmd) =>
-        stancePart ? `${stancePart} ${cmd}` : cmd,
-      );
-      return tokens.length > 0 ? tokens : null;
+    stance: {
+      sortValue: (m) => joinOrNull(m.stance, ", "),
+      sortType: "string",
+      filterString: (m) => joinOrNull(m.stance, ", "),
+      // Hand back the raw stance array so "Back Side" stays an atomic token
+      // and picking "SC" in the "In list" dropdown doesn't also match moves
+      // with "SCH" (Super-Charge Hold, etc.).
+      filterTokens: (m) => (m.stance && m.stance.length > 0 ? m.stance : null),
+      exportValue: (m) => joinOrNull(m.stance, ", ") ?? "",
     },
-    exportValue: (m) =>
-      [joinOrNull(m.stance, " "), formatCommandFlat(m.command)]
-        .filter(Boolean)
-        .join(" "),
-  },
 
-  hitLevel: {
-    sortValue: (m) => joinOrNull(m.hitLevel, " "),
-    sortType: "string",
-    filterString: (m) => joinOrNull(m.hitLevel, " "),
-    filterTokens: (m) =>
-      m.hitLevel && m.hitLevel.length > 0 ? m.hitLevel : null,
-    exportValue: (m) => joinOrNull(m.hitLevel, " ") ?? "",
-  },
+    command: {
+      sortValue: (m) => formatCommandFlat(cmdInStyle(m)),
+      sortType: "string",
+      filterString: (m) => formatCommandFlat(cmdInStyle(m)),
+      // Token projection is every concrete expansion of the command (one string
+      // per OR-branch), so a multi-select / exact-match operator on the command
+      // column matches any real input sequence without needing to know about
+      // the nested shape.
+      filterTokens: (m) => {
+        const translated = cmdInStyle(m);
+        if (!translated || translated.length === 0) return null;
+        const expansions = expandCommand(translated);
+        return expansions.length > 0 ? expansions : null;
+      },
+      exportValue: (m) => formatCommandFlat(cmdInStyle(m)) ?? "",
+    },
 
-  impact: {
-    sortValue: (m) => m.impact ?? null,
-    sortType: "number",
-    filterNumber: (m) => m.impact ?? null,
-    filterString: (m) => (m.impact != null ? String(m.impact) : null),
-    exportValue: (m) => m.impact ?? "",
-  },
+    rawCommand: {
+      // The authored `:A::B+K:` source text is intentionally NOT translated —
+      // it's the human-validation view used to cross-check against the
+      // upstream sheet, so it should always look the same regardless of
+      // which notation the user has picked.
+      sortValue: (m) => m.stringCommand ?? null,
+      sortType: "string",
+      filterString: (m) => m.stringCommand,
+      exportValue: (m) => m.stringCommand ?? "",
+    },
 
-  damage: {
-    sortValue: (m) => m.damage.total ?? null,
-    sortType: "number",
-    filterNumber: (m) => m.damage.total ?? null,
-    filterString: (m) =>
-      m.damage.total != null ? String(m.damage.total) : m.damage.raw,
-    exportValue: (m) => m.damage.total ?? m.damage.raw ?? "",
-  },
+    // "input" = stance + command, displayed / searched as a single combined
+    // field. filterTokens expands OR-steps in the command (e.g. `[["(2)","(8)"]]`)
+    // into separate alternative strings so the quick-search can match any
+    // real input sequence without accidentally bridging across the alternatives.
+    input: {
+      sortValue: (m) =>
+        [joinOrNull(m.stance, " "), formatCommandFlat(cmdInStyle(m))]
+          .filter(Boolean)
+          .join(" "),
+      sortType: "string",
+      filterString: (m) =>
+        [joinOrNull(m.stance, " "), formatCommandFlat(cmdInStyle(m))]
+          .filter(Boolean)
+          .join(" ") || null,
+      filterTokens: (m) => {
+        const stancePart = joinOrNull(m.stance, " ") ?? "";
+        const expansions = expandCommand(cmdInStyle(m));
+        const tokens = expansions.map((cmd) =>
+          stancePart ? `${stancePart} ${cmd}` : cmd,
+        );
+        return tokens.length > 0 ? tokens : null;
+      },
+      exportValue: (m) =>
+        [joinOrNull(m.stance, " "), formatCommandFlat(cmdInStyle(m))]
+          .filter(Boolean)
+          .join(" "),
+    },
 
-  block: {
-    sortValue: (m) => m.block.advantage,
-    sortType: "number",
-    filterNumber: (m) => m.block.advantage,
-    filterString: (m) => formatOutcome(m.block) || null,
-    exportValue: (m) => formatOutcome(m.block),
-  },
-  blockTags: {
-    sortValue: (m) => outcomeTagSearchString(m.block),
-    sortType: "string",
-    filterString: (m) => outcomeTagSearchString(m.block),
-    filterTokens: (m) =>
-      m.block.tags.length > 0 ? [...m.block.tags] : null,
-    exportValue: (m) => outcomeTagSearchString(m.block) ?? "",
-  },
+    hitLevel: {
+      sortValue: (m) => joinOrNull(m.hitLevel, " "),
+      sortType: "string",
+      filterString: (m) => joinOrNull(m.hitLevel, " "),
+      filterTokens: (m) =>
+        m.hitLevel && m.hitLevel.length > 0 ? m.hitLevel : null,
+      exportValue: (m) => joinOrNull(m.hitLevel, " ") ?? "",
+    },
 
-  hit: {
-    sortValue: (m) => m.hit.advantage,
-    sortType: "number",
-    filterNumber: (m) => m.hit.advantage,
-    filterString: (m) => formatOutcome(m.hit) || null,
-    exportValue: (m) => formatOutcome(m.hit),
-  },
-  hitTags: {
-    sortValue: (m) => outcomeTagSearchString(m.hit),
-    sortType: "string",
-    filterString: (m) => outcomeTagSearchString(m.hit),
-    filterTokens: (m) => (m.hit.tags.length > 0 ? [...m.hit.tags] : null),
-    exportValue: (m) => outcomeTagSearchString(m.hit) ?? "",
-  },
+    impact: {
+      sortValue: (m) => m.impact ?? null,
+      sortType: "number",
+      filterNumber: (m) => m.impact ?? null,
+      filterString: (m) => (m.impact != null ? String(m.impact) : null),
+      exportValue: (m) => m.impact ?? "",
+    },
 
-  counterHit: {
-    sortValue: (m) => m.counterHit.advantage,
-    sortType: "number",
-    filterNumber: (m) => m.counterHit.advantage,
-    filterString: (m) => formatOutcome(m.counterHit) || null,
-    exportValue: (m) => formatOutcome(m.counterHit),
-  },
-  counterHitTags: {
-    sortValue: (m) => outcomeTagSearchString(m.counterHit),
-    sortType: "string",
-    filterString: (m) => outcomeTagSearchString(m.counterHit),
-    filterTokens: (m) =>
-      m.counterHit.tags.length > 0 ? [...m.counterHit.tags] : null,
-    exportValue: (m) => outcomeTagSearchString(m.counterHit) ?? "",
-  },
+    damage: {
+      sortValue: (m) => m.damage.total ?? null,
+      sortType: "number",
+      filterNumber: (m) => m.damage.total ?? null,
+      filterString: (m) =>
+        m.damage.total != null ? String(m.damage.total) : m.damage.raw,
+      exportValue: (m) => m.damage.total ?? m.damage.raw ?? "",
+    },
 
-  guardBurst: {
-    sortValue: (m) => m.guardBurst ?? null,
-    sortType: "number",
-    filterNumber: (m) => m.guardBurst ?? null,
-    filterString: (m) => (m.guardBurst != null ? String(m.guardBurst) : null),
-    exportValue: (m) => m.guardBurst ?? "",
-  },
+    block: {
+      sortValue: (m) => m.block.advantage,
+      sortType: "number",
+      filterNumber: (m) => m.block.advantage,
+      filterString: (m) => formatOutcome(m.block) || null,
+      exportValue: (m) => formatOutcome(m.block),
+    },
+    blockTags: {
+      sortValue: (m) => outcomeTagSearchString(m.block),
+      sortType: "string",
+      filterString: (m) => outcomeTagSearchString(m.block),
+      filterTokens: (m) =>
+        m.block.tags.length > 0 ? [...m.block.tags] : null,
+      exportValue: (m) => outcomeTagSearchString(m.block) ?? "",
+    },
 
-  properties: {
-    sortValue: (m) => (m.properties.length > 0 ? m.properties.join(" ") : null),
-    sortType: "string",
-    filterString: (m) =>
-      m.properties.length > 0 ? m.properties.join(" ") : null,
-    filterTokens: (m) =>
-      m.properties.length > 0 ? [...m.properties] : null,
-    exportValue: (m) =>
-      m.properties.length > 0 ? m.properties.join(", ") : "",
-  },
+    hit: {
+      sortValue: (m) => m.hit.advantage,
+      sortType: "number",
+      filterNumber: (m) => m.hit.advantage,
+      filterString: (m) => formatOutcome(m.hit) || null,
+      exportValue: (m) => formatOutcome(m.hit),
+    },
+    hitTags: {
+      sortValue: (m) => outcomeTagSearchString(m.hit),
+      sortType: "string",
+      filterString: (m) => outcomeTagSearchString(m.hit),
+      filterTokens: (m) => (m.hit.tags.length > 0 ? [...m.hit.tags] : null),
+      exportValue: (m) => outcomeTagSearchString(m.hit) ?? "",
+    },
 
-  notes: {
-    sortValue: (m) => m.notes,
-    sortType: "string",
-    filterString: (m) => m.notes,
-    exportValue: (m) => m.notes ?? "",
-  },
-};
+    counterHit: {
+      sortValue: (m) => m.counterHit.advantage,
+      sortType: "number",
+      filterNumber: (m) => m.counterHit.advantage,
+      filterString: (m) => formatOutcome(m.counterHit) || null,
+      exportValue: (m) => formatOutcome(m.counterHit),
+    },
+    counterHitTags: {
+      sortValue: (m) => outcomeTagSearchString(m.counterHit),
+      sortType: "string",
+      filterString: (m) => outcomeTagSearchString(m.counterHit),
+      filterTokens: (m) =>
+        m.counterHit.tags.length > 0 ? [...m.counterHit.tags] : null,
+      exportValue: (m) => outcomeTagSearchString(m.counterHit) ?? "",
+    },
 
-/** Get the accessor bundle for a column id. Returns null for unknown ids. */
-export function getAccessor(fieldId: string): FieldAccessor | null {
-  return FIELD_ACCESSORS[fieldId] ?? null;
+    guardBurst: {
+      sortValue: (m) => m.guardBurst ?? null,
+      sortType: "number",
+      filterNumber: (m) => m.guardBurst ?? null,
+      filterString: (m) => (m.guardBurst != null ? String(m.guardBurst) : null),
+      exportValue: (m) => m.guardBurst ?? "",
+    },
+
+    properties: {
+      sortValue: (m) =>
+        m.properties.length > 0 ? m.properties.join(" ") : null,
+      sortType: "string",
+      filterString: (m) =>
+        m.properties.length > 0 ? m.properties.join(" ") : null,
+      filterTokens: (m) =>
+        m.properties.length > 0 ? [...m.properties] : null,
+      exportValue: (m) =>
+        m.properties.length > 0 ? m.properties.join(", ") : "",
+    },
+
+    notes: {
+      sortValue: (m) => m.notes,
+      sortType: "string",
+      filterString: (m) => m.notes,
+      exportValue: (m) => m.notes ?? "",
+    },
+  };
 }
+
+/**
+ * Style-less accessor bundle. Useful for contexts that don't care about
+ * display notation (e.g. unit tests, programmatic export to an external
+ * tool that always wants authored tokens).
+ */
+export const UNIVERSAL_FIELD_ACCESSORS: Record<string, FieldAccessor> =
+  buildFieldAccessors(null);

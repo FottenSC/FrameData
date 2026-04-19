@@ -10,7 +10,6 @@ import React, {
 import { Gamepad2, Sword } from "lucide-react";
 import { useNavigate, useParams, useLocation } from "@tanstack/react-router";
 import {
-  applyNotationStyle,
   getNotationStyle,
   getStylesForGame,
   NotationStyle,
@@ -164,12 +163,16 @@ interface GameContextType {
   setSelectedCharacterId: (id: number | null) => void;
   availableIcons: IconConfig[];
   getIconUrl: (iconName: string, isHeld?: boolean) => string;
-  /** The notation style currently active for the selected game. */
+  /**
+   * The notation style currently active for the selected game. Consumers
+   * that need to translate tokens should use {@link translateToken} /
+   * {@link translateCommand} from `@/lib/notation` with this style — it's
+   * memoised per (style, token) so repeated calls across thousands of moves
+   * are effectively free.
+   */
   notationStyle: NotationStyle;
   /** All styles available for the selected game (for the switcher UI). */
   notationStylesForGame: NotationStyle[];
-  /** Apply the currently-active style to a command string. Null-safe. */
-  applyNotation: (text: string | null) => string | null;
   getStanceInfo: (
     stanceCode: string,
     characterId?: number | null,
@@ -394,12 +397,6 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     notationStylesForGame,
   ]);
 
-  const applyNotation = useCallback(
-    (text: string | null): string | null =>
-      applyNotationStyle(text, notationStyle),
-    [notationStyle],
-  );
-
   // Get stance info by code, checking character-specific stances first, then game-level
   const getStanceInfo = useCallback(
     (stanceCode: string, characterId?: number | null): StanceInfo | null => {
@@ -442,7 +439,6 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       getIconUrl: getIconUrl,
       notationStyle,
       notationStylesForGame,
-      applyNotation,
       getStanceInfo,
       getPropertyInfo,
       hitLevels,
@@ -464,7 +460,6 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       getIconUrl,
       notationStyle,
       notationStylesForGame,
-      applyNotation,
       getStanceInfo,
       getPropertyInfo,
       hitLevels,

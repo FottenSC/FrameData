@@ -54,7 +54,6 @@ export function CommandPalette() {
     setSelectedCharacterId,
     selectedCharacterId,
     setSelectedGameById,
-    applyNotation,
   } = useGame();
 
   const {} = useTableConfig();
@@ -75,12 +74,7 @@ export function CommandPalette() {
       queryClient.prefetchQuery({
         queryKey: ["moves", selectedGame.id, character.id],
         queryFn: () =>
-          fetchCharacterMoves(
-            selectedGame.id,
-            character.id,
-            character.name,
-            applyNotation,
-          ),
+          fetchCharacterMoves(selectedGame.id, character.id, character.name),
         staleTime: 1000 * 60 * 5, // 5 minutes
       });
     }, 150); // 150ms delay to avoid prefetching while scrolling/moving mouse quickly

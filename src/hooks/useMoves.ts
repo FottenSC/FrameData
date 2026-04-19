@@ -12,8 +12,6 @@ interface Character {
   name: string;
 }
 
-type ApplyNotationFn = (cmd: string | null) => string | null;
-
 // ---------- String interning ----------
 //
 // Large characters generate thousands of Move objects whose stance/command/hit-level
@@ -25,21 +23,8 @@ type ApplyNotationFn = (cmd: string | null) => string | null;
 // are almost always unique and interning them would defeat GC.
 const stringCache = new Map<string, string>();
 
-// Notation-application cache. Keyed by the applyNotation function *identity* so
-// that changing notation settings (which creates a new function) invalidates the
-// old cache automatically via WeakMap.
-const notationCache = new WeakMap<
-  ApplyNotationFn,
-  Map<string, string | null>
->();
-
 export function clearStringCache() {
   stringCache.clear();
-}
-
-/** @deprecated the notation cache now self-cleans via WeakMap. */
-export function clearNotationCache() {
-  // no-op retained for call-site compatibility
 }
 
 function intern(s: string | null): string | null {
@@ -51,30 +36,19 @@ function intern(s: string | null): string | null {
   return s;
 }
 
-function cachedApplyNotation(
-  cmd: string | null,
-  applyNotation: ApplyNotationFn,
-): string | null {
-  if (cmd === null) return null;
-  let fnCache = notationCache.get(applyNotation);
-  if (!fnCache) {
-    fnCache = new Map();
-    notationCache.set(applyNotation, fnCache);
-  }
-  const cached = fnCache.get(cmd);
-  if (cached !== undefined) return cached;
-  const result = applyNotation(cmd);
-  fnCache.set(cmd, result);
-  return result;
-}
-
 // ---------- Data fetching ----------
+//
+// The data layer is notation-agnostic. Move.command carries tokens as
+// authored in the source JSON (universal ABCD + numpad directions), and
+// notation translation is applied lazily by the presentation layer —
+// CommandRenderer, copyCommand, and the accessor bundle. This decouples
+// the react-query cache from the notation style so flipping styles is a
+// pure re-render, no refetch or re-process.
 
 export async function fetchCharacterMoves(
   gameId: string,
   characterId: number,
   characterName: string,
-  applyNotation: ApplyNotationFn,
 ): Promise<Move[]> {
   const res = await fetch(
     `/Games/${encodeURIComponent(gameId)}/Characters/${encodeURIComponent(
@@ -86,9 +60,7 @@ export async function fetchCharacterMoves(
   if (!Array.isArray(data)) return [];
 
   const internedCharName = intern(characterName)!;
-  return data.map((m: any) =>
-    processMove(m, characterId, internedCharName, applyNotation),
-  );
+  return data.map((m: any) => processMove(m, characterId, internedCharName));
 }
 
 // ---------- Normalization ----------
@@ -177,19 +149,17 @@ function parseOutcomeField(
  *  - **Flat + "_" sentinel** (legacy): `["(3)", "_", "(6)", "_", "(9)", "A"]`
  *    — older JSON where alternatives were separated by a literal `"_"` token.
  *
- * Each token is passed through `applyNotation` so direction glyphs get
- * translated into the active notation style, then interned.
+ * Tokens are interned so the vocabulary (A / B / 6 / A+G / etc.) collapses
+ * to a single heap entry each. Notation translation is NOT applied here —
+ * that happens at presentation time.
  */
-function normalizeCommand(
-  raw: unknown,
-  applyNotation: ApplyNotationFn,
-): string[][] | null {
+function normalizeCommand(raw: unknown): string[][] | null {
   if (raw == null) return null;
   if (!Array.isArray(raw)) {
     // Single scalar (rare path) — wrap as a one-step, one-alt command.
-    const mapped =
-      cachedApplyNotation(String(raw), applyNotation) ?? String(raw);
-    const t = intern(mapped);
+    const s = String(raw);
+    if (!s) return null;
+    const t = intern(s);
     return t ? [[t]] : null;
   }
   if (raw.length === 0) return null;
@@ -198,8 +168,7 @@ function normalizeCommand(
     if (t == null) return null;
     const s = String(t);
     if (s.length === 0) return null;
-    const mapped = cachedApplyNotation(s, applyNotation) ?? s;
-    return intern(mapped);
+    return intern(s);
   };
 
   // Nested shape: first element is itself an array.
@@ -253,13 +222,8 @@ function normalizeCommand(
  * represents an outcome as either a string or number. We parse these into
  * structured {@link MoveOutcome} values.
  */
-function processMove(
-  raw: any,
-  charId: number,
-  charName: string,
-  applyNotation: ApplyNotationFn,
-): Move {
-  const mappedCommand = normalizeCommand(raw.Command, applyNotation);
+function processMove(raw: any, charId: number, charName: string): Move {
+  const mappedCommand = normalizeCommand(raw.Command);
 
   // Outcomes. The current Python pipeline emits the pre-parsed
   //     { advantage, tags, raw }
@@ -300,7 +264,6 @@ function processMove(
 
 async function fetchAllCharactersMoves(
   gameId: string,
-  applyNotation: ApplyNotationFn,
   queryClient: QueryClient,
   characters: Character[],
 ): Promise<Move[]> {
@@ -308,8 +271,7 @@ async function fetchAllCharactersMoves(
     characters.map((char) =>
       queryClient.fetchQuery({
         queryKey: ["moves", gameId, char.id],
-        queryFn: () =>
-          fetchCharacterMoves(gameId, char.id, char.name, applyNotation),
+        queryFn: () => fetchCharacterMoves(gameId, char.id, char.name),
         staleTime: 1000 * 60 * 30,
       }),
     ),
@@ -320,14 +282,12 @@ async function fetchAllCharactersMoves(
 interface UseMoveOptions {
   gameId: string | undefined;
   characterId: number | null;
-  applyNotation: (cmd: string | null) => string | null;
   characters: Character[];
 }
 
 export function useMoves({
   gameId,
   characterId,
-  applyNotation,
   characters,
 }: UseMoveOptions) {
   const queryClient = useQueryClient();
@@ -337,16 +297,11 @@ export function useMoves({
     queryFn: async () => {
       if (!gameId || characterId === null) return [];
       if (characterId === -1) {
-        return fetchAllCharactersMoves(
-          gameId,
-          applyNotation,
-          queryClient,
-          characters,
-        );
+        return fetchAllCharactersMoves(gameId, queryClient, characters);
       }
       const charName =
         characters.find((c) => c.id === characterId)?.name || "Unknown";
-      return fetchCharacterMoves(gameId, characterId, charName, applyNotation);
+      return fetchCharacterMoves(gameId, characterId, charName);
     },
     enabled: !!gameId && characterId !== null,
     staleTime: 1000 * 60 * 5,

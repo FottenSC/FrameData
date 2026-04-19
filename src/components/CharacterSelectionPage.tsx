@@ -16,23 +16,17 @@ export const CharacterSelectionPage: React.FC = () => {
     setSelectedCharacterId,
     isCharactersLoading,
     characterError,
-    applyNotation,
   } = useGame();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const prefetchCharacter = (character: Character) => {
     if (!selectedGame) return;
-    
+
     queryClient.prefetchQuery({
       queryKey: ["moves", selectedGame.id, character.id],
       queryFn: () =>
-        fetchCharacterMoves(
-          selectedGame.id,
-          character.id,
-          character.name,
-          applyNotation,
-        ),
+        fetchCharacterMoves(selectedGame.id, character.id, character.name),
       staleTime: 1000 * 60 * 5, // 5 minutes
     });
   };

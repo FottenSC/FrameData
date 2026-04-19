@@ -2,22 +2,32 @@ import React, { useMemo } from "react";
 import { useGame } from "@/contexts/GameContext";
 import { CommandIcon } from "@/components/ui/CommandIcon";
 import { DirectionChip } from "@/components/ui/direction-chip";
-import { getDirectionSet } from "@/lib/notation";
+import { getDirectionSet, translateCommand } from "@/lib/notation";
 
 /**
  * A command is a list of ordered "steps"; each step is itself a list of
  * alternative tokens the player may choose from (single-alt steps are the
  * common case, OR-steps like `(3)_(6)_(9)` are multi-alt).
  *
- * We render step-by-step. For a multi-alt step we render each alternative
- * inline with the existing vertical-bar "or" divider between them. The
- * renderer never sees the legacy flat `"_"` sentinel shape — `useMoves`
- * normalises to nested-step on load.
+ * The incoming `command` is always in the *authored universal* form (ABCD
+ * + numpad directions). We translate it through the active notation style
+ * here — the one place that actually cares about display — rather than
+ * persisting a per-style snapshot in the data layer. That way flipping
+ * notations costs a React re-render and nothing else; no refetch, no
+ * re-process of Move objects.
  */
 const CommandRendererInner: React.FC<{ command: string[][] | null }> = ({
   command,
 }) => {
   const { getIconUrl, notationStyle } = useGame();
+
+  // Translate once per (command, style). `translateCommand` memoises at
+  // the token level, so this is cheap even in a virtualised table — each
+  // unique raw token gets regex-replaced exactly once per style.
+  const styledCommand = useMemo(
+    () => translateCommand(command, notationStyle),
+    [command, notationStyle],
+  );
 
   // Whether a given token is a direction is style-dependent — Tekken
   // notation uses letter codes, numpad styles use 1–9. Memoised against the
@@ -28,7 +38,7 @@ const CommandRendererInner: React.FC<{ command: string[][] | null }> = ({
   );
   const directionMode = notationStyle?.directionRenderMode ?? "icon";
 
-  if (!command || command.length === 0) return <>—</>;
+  if (!styledCommand || styledCommand.length === 0) return <>—</>;
 
   /**
    * Does the token at (stepIdx, altIdx, buttonIdx) end in a slide that wants
@@ -49,11 +59,11 @@ const CommandRendererInner: React.FC<{ command: string[][] | null }> = ({
     if (buttonIdx + 1 < buttons.length) {
       // Same "+"-chunk continues.
       nextRaw = buttons[buttonIdx + 1];
-    } else if (stepIdx + 1 < command.length) {
+    } else if (stepIdx + 1 < styledCommand.length) {
       // Fall through to the next step. For multi-alt steps, the overlap
       // logic isn't meaningful (you don't know which alt the player picks),
       // so only pull leftward when the next step is single-alt.
-      const nextStep = command[stepIdx + 1];
+      const nextStep = styledCommand[stepIdx + 1];
       if (nextStep.length !== 1) return false;
       nextRaw = nextStep[0].split("+")[0];
     }
@@ -165,8 +175,8 @@ const CommandRendererInner: React.FC<{ command: string[][] | null }> = ({
     }
   };
 
-  for (let i = 0; i < command.length; i++) {
-    const step = command[i];
+  for (let i = 0; i < styledCommand.length; i++) {
+    const step = styledCommand[i];
     if (!step || step.length === 0) continue;
 
     for (let a = 0; a < step.length; a++) {

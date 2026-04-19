@@ -235,3 +235,64 @@ export function applyNotationStyle(
   if (!regex) return text;
   return text.replace(regex, (match) => style.replacements[match] ?? match);
 }
+
+// ---------------------------------------------------------------------------
+// Memoised token / command translators used by the presentation layer.
+//
+// The data layer stores commands as authored *universal* tokens — no notation
+// applied. Translation happens lazily at render / copy / accessor time. Doing
+// a regex replace on every token for every accessor call would be wasteful,
+// so we cache results per (style identity, raw token).
+//
+// The cache is keyed on style OBJECT identity via WeakMap — when the user
+// picks a different style, the GameContext hands us a different NotationStyle
+// reference and the old cache becomes eligible for GC.
+// ---------------------------------------------------------------------------
+
+const tokenCache = new WeakMap<NotationStyle, Map<string, string>>();
+
+/**
+ * Translate a single command token under the active style, memoised so that
+ * hot paths (accessor bundles, renderer, virtualised table rows) don't pay
+ * regex cost on every access.
+ *
+ * Returns the input unchanged when `style` is null / has no replacements.
+ */
+export function translateToken(
+  token: string,
+  style: NotationStyle | null | undefined,
+): string {
+  if (!style) return token;
+  const regex = getRegexFor(style.replacements);
+  if (!regex) return token;
+  let cache = tokenCache.get(style);
+  if (!cache) {
+    cache = new Map();
+    tokenCache.set(style, cache);
+  }
+  const cached = cache.get(token);
+  if (cached !== undefined) return cached;
+  const result = token.replace(
+    regex,
+    (match) => style.replacements[match] ?? match,
+  );
+  cache.set(token, result);
+  return result;
+}
+
+/**
+ * Translate every token of a nested-step command array. Preserves the
+ * outer structure (one inner array per step, alternatives inside) and
+ * returns a freshly-allocated shape so callers can safely mutate or
+ * memoise without worrying about shared references.
+ *
+ * Passing `null` style short-circuits to returning the input as-is.
+ */
+export function translateCommand(
+  cmd: string[][] | null,
+  style: NotationStyle | null | undefined,
+): string[][] | null {
+  if (cmd === null) return null;
+  if (!style) return cmd;
+  return cmd.map((step) => step.map((t) => translateToken(t, style)));
+}

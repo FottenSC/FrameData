@@ -12,6 +12,7 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useGame } from "@/contexts/GameContext";
+import { translateToken } from "@/lib/notation";
 import { PaginationFooter } from "./PaginationFooter";
 import { TableRow } from "./TableRow";
 import { FrameDataTableHeader } from "./FrameDataTableHeader";
@@ -44,7 +45,7 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
   isAllCharacters = false,
 }) => {
   // Get stance info function from context
-  const { getStanceInfo, getPropertyInfo } = useGame();
+  const { getStanceInfo, getPropertyInfo, notationStyle } = useGame();
 
   // Single scroll container ref - component owns its scroll
   const [scrollContainer, setScrollContainer] = useState<HTMLDivElement | null>(
@@ -59,22 +60,27 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
 
   // Copy command to clipboard. For multi-alt steps we take the first
   // alternative — clipboard needs ONE concrete input to paste, and the first
-  // alt is the canonical / authored entry.
-  const copyCommand = React.useCallback((move: Move) => {
-    const stancePart = move.stance?.join(" ") ?? "";
-    const commandPart =
-      move.command
-        ?.map((step) => step[0] ?? "")
-        .filter(Boolean)
-        .join("") ?? "";
-    const textToCopy = stancePart
-      ? `${stancePart} ${commandPart}`
-      : commandPart;
+  // alt is the canonical / authored entry. Tokens are translated through
+  // the active notation style so what the user copies matches what they
+  // see on screen.
+  const copyCommand = React.useCallback(
+    (move: Move) => {
+      const stancePart = move.stance?.join(" ") ?? "";
+      const commandPart =
+        move.command
+          ?.map((step) => translateToken(step[0] ?? "", notationStyle))
+          .filter(Boolean)
+          .join("") ?? "";
+      const textToCopy = stancePart
+        ? `${stancePart} ${commandPart}`
+        : commandPart;
 
-    navigator.clipboard.writeText(textToCopy).then(() => {
-      showCopiedToast(textToCopy);
-    });
-  }, []);
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        showCopiedToast(textToCopy);
+      });
+    },
+    [notationStyle],
+  );
 
   // Reset page when moves change
   useEffect(() => {

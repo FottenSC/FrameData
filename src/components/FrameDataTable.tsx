@@ -27,8 +27,8 @@ import { Move, FilterItem, SortableColumn } from "../types/Move";
 import { builtinOperators, operatorById } from "../filters/operators";
 import { getGameFilterConfig } from "../filters/gameFilterConfigs";
 import type { FieldConfig, FieldType, FilterOperator } from "../filters/types";
-import { useMoves, clearNotationCache } from "@/hooks/useMoves";
-import { getAccessor } from "@/lib/moveAccessors";
+import { useMoves } from "@/hooks/useMoves";
+import { buildFieldAccessors } from "@/lib/moveAccessors";
 import { exportCsv, exportExcel, type ExportCell } from "@/lib/export";
 
 /**
@@ -76,7 +76,7 @@ export const FrameDataTable: React.FC = () => {
     characters,
     selectedCharacterId,
     setSelectedCharacterId,
-    applyNotation,
+    notationStyle,
     hitLevels,
   } = useGame();
 
@@ -98,9 +98,19 @@ export const FrameDataTable: React.FC = () => {
   } = useMoves({
     gameId: selectedGame?.id,
     characterId: selectedCharacterId,
-    applyNotation,
     characters,
   });
+
+  /**
+   * Column-accessor bundle for the currently active notation style. Rebuilt
+   * whenever the user switches styles — translation of command tokens is
+   * memoised inside `translateCommand`, so swapping this bundle is nearly
+   * free and doesn't touch react-query's cache.
+   */
+  const accessors = useMemo(
+    () => buildFieldAccessors(notationStyle),
+    [notationStyle],
+  );
 
   const error = movesError ? (movesError as Error).message : null;
 
@@ -242,14 +252,9 @@ export const FrameDataTable: React.FC = () => {
     setSelectedCharacterId,
   ]);
 
-  const prevApplyNotationRef = React.useRef(applyNotation);
-  useEffect(() => {
-    if (prevApplyNotationRef.current !== applyNotation) {
-      clearNotationCache();
-      queryClient.invalidateQueries({ queryKey: ["moves"] });
-      prevApplyNotationRef.current = applyNotation;
-    }
-  }, [applyNotation, queryClient]);
+  // Notation translation is now a pure presentation concern — flipping the
+  // style just swaps the memoised accessor bundle and re-renders. Nothing
+  // in the data layer needs to be invalidated, re-fetched, or re-processed.
 
   const handleSort = useCallback(
     (column: SortableColumn) => {
@@ -313,7 +318,7 @@ export const FrameDataTable: React.FC = () => {
     } => {
       const field = fieldMap.get(fieldId);
       const type: FieldType = field?.type ?? "text";
-      const acc = getAccessor(fieldId);
+      const acc = accessors[fieldId];
       if (!acc) return { string: null, number: null, tokens: null, type };
       return {
         string: acc.filterString(move),
@@ -322,7 +327,7 @@ export const FrameDataTable: React.FC = () => {
         type,
       };
     },
-    [fieldMap],
+    [fieldMap, accessors],
   );
 
   const applyFilterItem = useCallback(
@@ -359,7 +364,7 @@ export const FrameDataTable: React.FC = () => {
     }
 
     if (sortColumn) {
-      const acc = getAccessor(sortColumn);
+      const acc = accessors[sortColumn];
       if (acc) {
         result = [...result];
         const comparator = createComparator(
@@ -377,6 +382,7 @@ export const FrameDataTable: React.FC = () => {
     activeFilters,
     sortDirection,
     applyFilterItem,
+    accessors,
   ]);
 
   const deferredMoves = useDeferredValue(displayedMoves);
@@ -394,7 +400,7 @@ export const FrameDataTable: React.FC = () => {
     // tag numeric cells with x:num and Excel won't coerce them to text).
     const tableRows: ExportCell[][] = rows.map((m) =>
       fieldIds.map<ExportCell>((fid) => {
-        const acc = getAccessor(fid);
+        const acc = accessors[fid];
         if (!acc) return "";
         const v = acc.exportValue(m);
         return (v as ExportCell) ?? "";

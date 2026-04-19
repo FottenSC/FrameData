@@ -3,7 +3,9 @@
     "ID": 2811,
     "stringCommand": ":A:",
     "Command": [
-      "A"
+      [
+        "A"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -35,8 +37,12 @@
     "ID": 2812,
     "stringCommand": ":A::A:",
     "Command": [
-      "A",
-      "A"
+      [
+        "A"
+      ],
+      [
+        "A"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -69,8 +75,12 @@
     "ID": 2813,
     "stringCommand": ":A::B:",
     "Command": [
-      "A",
-      "B"
+      [
+        "A"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -103,8 +113,12 @@
     "ID": 2814,
     "stringCommand": ":6::A:",
     "Command": [
-      "6",
-      "A"
+      [
+        "6"
+      ],
+      [
+        "A"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -136,9 +150,15 @@
     "ID": 2815,
     "stringCommand": ":6::A::A:",
     "Command": [
-      "6",
-      "A",
-      "A"
+      [
+        "6"
+      ],
+      [
+        "A"
+      ],
+      [
+        "A"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -171,8 +191,12 @@
     "ID": 2816,
     "stringCommand": ":3::A:",
     "Command": [
-      "3",
-      "A"
+      [
+        "3"
+      ],
+      [
+        "A"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -206,8 +230,12 @@
     "ID": 2817,
     "stringCommand": ":2::A:",
     "Command": [
-      "2",
-      "A"
+      [
+        "2"
+      ],
+      [
+        "A"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -239,8 +267,12 @@
     "ID": 2818,
     "stringCommand": ":1::A:",
     "Command": [
-      "1",
-      "A"
+      [
+        "1"
+      ],
+      [
+        "A"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -272,8 +304,12 @@
     "ID": 2819,
     "stringCommand": ":4::A:",
     "Command": [
-      "4",
-      "A"
+      [
+        "4"
+      ],
+      [
+        "A"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -307,9 +343,15 @@
     "ID": 2820,
     "stringCommand": ":4::6::A:",
     "Command": [
-      "4",
-      "6",
-      "A"
+      [
+        "4"
+      ],
+      [
+        "6"
+      ],
+      [
+        "A"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -343,7 +385,9 @@
     "ID": 2821,
     "stringCommand": ":A:",
     "Command": [
-      "A"
+      [
+        "A"
+      ]
     ],
     "Stance": [
       "FC"
@@ -377,7 +421,9 @@
     "ID": 2822,
     "stringCommand": ":A:",
     "Command": [
-      "A"
+      [
+        "A"
+      ]
     ],
     "Stance": [
       "WR"
@@ -411,8 +457,12 @@
     "ID": 2823,
     "stringCommand": ":7::A:",
     "Command": [
-      "7",
-      "A"
+      [
+        "7"
+      ],
+      [
+        "A"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -444,8 +494,12 @@
     "ID": 2824,
     "stringCommand": ":8::A:",
     "Command": [
-      "8",
-      "A"
+      [
+        "8"
+      ],
+      [
+        "A"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -477,8 +531,12 @@
     "ID": 2825,
     "stringCommand": ":9::A:",
     "Command": [
-      "9",
-      "A"
+      [
+        "9"
+      ],
+      [
+        "A"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -510,7 +568,9 @@
     "ID": 2826,
     "stringCommand": ":A:",
     "Command": [
-      "A"
+      [
+        "A"
+      ]
     ],
     "Stance": [
       "BT"
@@ -544,8 +604,12 @@
     "ID": 2827,
     "stringCommand": ":2::A:",
     "Command": [
-      "2",
-      "A"
+      [
+        "2"
+      ],
+      [
+        "A"
+      ]
     ],
     "Stance": [
       "BT"
@@ -579,7 +643,9 @@
     "ID": 2828,
     "stringCommand": ":B:",
     "Command": [
-      "B"
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -611,8 +677,12 @@
     "ID": 2829,
     "stringCommand": ":B::B:",
     "Command": [
-      "B",
-      "B"
+      [
+        "B"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -645,9 +715,15 @@
     "ID": 2830,
     "stringCommand": ":B::B::B:",
     "Command": [
-      "B",
-      "B",
-      "B"
+      [
+        "B"
+      ],
+      [
+        "B"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -681,10 +757,18 @@
     "ID": 2831,
     "stringCommand": ":B::B::B::4:",
     "Command": [
-      "B",
-      "B",
-      "B",
-      "4"
+      [
+        "B"
+      ],
+      [
+        "B"
+      ],
+      [
+        "B"
+      ],
+      [
+        "4"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -720,11 +804,21 @@
     "ID": 2832,
     "stringCommand": ":B::B::B::4::6:",
     "Command": [
-      "B",
-      "B",
-      "B",
-      "4",
-      "6"
+      [
+        "B"
+      ],
+      [
+        "B"
+      ],
+      [
+        "B"
+      ],
+      [
+        "4"
+      ],
+      [
+        "6"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -760,10 +854,18 @@
     "ID": 2833,
     "stringCommand": ":B::B::B::B:",
     "Command": [
-      "B",
-      "B",
-      "B",
-      "B"
+      [
+        "B"
+      ],
+      [
+        "B"
+      ],
+      [
+        "B"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -798,9 +900,15 @@
     "ID": 2834,
     "stringCommand": ":B::B::K:",
     "Command": [
-      "B",
-      "B",
-      "C"
+      [
+        "B"
+      ],
+      [
+        "B"
+      ],
+      [
+        "C"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -834,8 +942,12 @@
     "ID": 2835,
     "stringCommand": ":b::2:",
     "Command": [
-      "b",
-      "2"
+      [
+        "b"
+      ],
+      [
+        "2"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -867,9 +979,15 @@
     "ID": 2836,
     "stringCommand": ":b::2::B:",
     "Command": [
-      "b",
-      "2",
-      "B"
+      [
+        "b"
+      ],
+      [
+        "2"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -902,8 +1020,12 @@
     "ID": 2837,
     "stringCommand": ":b::4:",
     "Command": [
-      "b",
-      "4"
+      [
+        "b"
+      ],
+      [
+        "4"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -939,8 +1061,12 @@
     "ID": 2838,
     "stringCommand": ":6::B:",
     "Command": [
-      "6",
-      "B"
+      [
+        "6"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -972,9 +1098,15 @@
     "ID": 2839,
     "stringCommand": ":6::B::4:",
     "Command": [
-      "6",
-      "B",
-      "4"
+      [
+        "6"
+      ],
+      [
+        "B"
+      ],
+      [
+        "4"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -1008,10 +1140,18 @@
     "ID": 2840,
     "stringCommand": ":6::B::4::6:",
     "Command": [
-      "6",
-      "B",
-      "4",
-      "6"
+      [
+        "6"
+      ],
+      [
+        "B"
+      ],
+      [
+        "4"
+      ],
+      [
+        "6"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -1045,9 +1185,15 @@
     "ID": 2841,
     "stringCommand": ":6::B::B:",
     "Command": [
-      "6",
-      "B",
-      "B"
+      [
+        "6"
+      ],
+      [
+        "B"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -1080,9 +1226,15 @@
     "ID": 2842,
     "stringCommand": ":6::B::(B):",
     "Command": [
-      "6",
-      "B",
-      "(B)"
+      [
+        "6"
+      ],
+      [
+        "B"
+      ],
+      [
+        "(B)"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -1117,10 +1269,18 @@
     "ID": 2843,
     "stringCommand": ":6::B::B::B:",
     "Command": [
-      "6",
-      "B",
-      "B",
-      "B"
+      [
+        "6"
+      ],
+      [
+        "B"
+      ],
+      [
+        "B"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -1154,8 +1314,12 @@
     "ID": 2844,
     "stringCommand": ":3::B:",
     "Command": [
-      "3",
-      "B"
+      [
+        "3"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -1191,8 +1355,12 @@
     "ID": 2845,
     "stringCommand": ":3::(B):",
     "Command": [
-      "3",
-      "(B)"
+      [
+        "3"
+      ],
+      [
+        "(B)"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -1230,8 +1398,12 @@
     "ID": 2846,
     "stringCommand": ":2::B:",
     "Command": [
-      "2",
-      "B"
+      [
+        "2"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -1263,8 +1435,12 @@
     "ID": 2847,
     "stringCommand": ":1::B:",
     "Command": [
-      "1",
-      "B"
+      [
+        "1"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -1296,8 +1472,12 @@
     "ID": 2848,
     "stringCommand": ":1::(B):",
     "Command": [
-      "1",
-      "(B)"
+      [
+        "1"
+      ],
+      [
+        "(B)"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -1331,8 +1511,12 @@
     "ID": 2849,
     "stringCommand": ":4::B:",
     "Command": [
-      "4",
-      "B"
+      [
+        "4"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -1364,8 +1548,12 @@
     "ID": 2850,
     "stringCommand": ":4::(B):",
     "Command": [
-      "4",
-      "(B)"
+      [
+        "4"
+      ],
+      [
+        "(B)"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -1399,10 +1587,18 @@
     "ID": 2851,
     "stringCommand": ":2::3::6::B:",
     "Command": [
-      "2",
-      "3",
-      "6",
-      "B"
+      [
+        "2"
+      ],
+      [
+        "3"
+      ],
+      [
+        "6"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -1440,10 +1636,18 @@
     "ID": 2852,
     "stringCommand": ":2::1::4::B:",
     "Command": [
-      "2",
-      "1",
-      "4",
-      "B"
+      [
+        "2"
+      ],
+      [
+        "1"
+      ],
+      [
+        "4"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -1487,9 +1691,15 @@
     "ID": 2853,
     "stringCommand": ":4::6::B:",
     "Command": [
-      "4",
-      "6",
-      "B"
+      [
+        "4"
+      ],
+      [
+        "6"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -1523,7 +1733,9 @@
     "ID": 2854,
     "stringCommand": ":B:",
     "Command": [
-      "B"
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "FC"
@@ -1557,8 +1769,12 @@
     "ID": 2855,
     "stringCommand": ":3::B:",
     "Command": [
-      "3",
-      "B"
+      [
+        "3"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "FC"
@@ -1598,7 +1814,9 @@
     "ID": 2856,
     "stringCommand": ":B:",
     "Command": [
-      "B"
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "WR"
@@ -1632,8 +1850,12 @@
     "ID": 2857,
     "stringCommand": ":B::B:",
     "Command": [
-      "B",
-      "B"
+      [
+        "B"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "WR"
@@ -1668,9 +1890,15 @@
     "ID": 2858,
     "stringCommand": ":B::B::4:",
     "Command": [
-      "B",
-      "B",
-      "4"
+      [
+        "B"
+      ],
+      [
+        "B"
+      ],
+      [
+        "4"
+      ]
     ],
     "Stance": [
       "WR"
@@ -1707,10 +1935,18 @@
     "ID": 2859,
     "stringCommand": ":B::B::4::6:",
     "Command": [
-      "B",
-      "B",
-      "4",
-      "6"
+      [
+        "B"
+      ],
+      [
+        "B"
+      ],
+      [
+        "4"
+      ],
+      [
+        "6"
+      ]
     ],
     "Stance": [
       "WR"
@@ -1747,8 +1983,12 @@
     "ID": 2860,
     "stringCommand": ":b::K:",
     "Command": [
-      "b",
-      "C"
+      [
+        "b"
+      ],
+      [
+        "C"
+      ]
     ],
     "Stance": [
       "WR"
@@ -1783,8 +2023,12 @@
     "ID": 2861,
     "stringCommand": ":7::B:",
     "Command": [
-      "7",
-      "B"
+      [
+        "7"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -1816,8 +2060,12 @@
     "ID": 2862,
     "stringCommand": ":8::B:",
     "Command": [
-      "8",
-      "B"
+      [
+        "8"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -1853,8 +2101,12 @@
     "ID": 2863,
     "stringCommand": ":9::B:",
     "Command": [
-      "9",
-      "B"
+      [
+        "9"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -1890,7 +2142,9 @@
     "ID": 2864,
     "stringCommand": ":B:",
     "Command": [
-      "B"
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "BT"
@@ -1924,8 +2178,12 @@
     "ID": 2865,
     "stringCommand": ":2::B:",
     "Command": [
-      "2",
-      "B"
+      [
+        "2"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "BT"
@@ -1959,7 +2217,9 @@
     "ID": 2866,
     "stringCommand": ":K:",
     "Command": [
-      "C"
+      [
+        "C"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -1991,8 +2251,12 @@
     "ID": 2867,
     "stringCommand": ":6::K:",
     "Command": [
-      "6",
-      "C"
+      [
+        "6"
+      ],
+      [
+        "C"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -2026,8 +2290,12 @@
     "ID": 2868,
     "stringCommand": ":3::K:",
     "Command": [
-      "3",
-      "C"
+      [
+        "3"
+      ],
+      [
+        "C"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -2059,8 +2327,12 @@
     "ID": 2869,
     "stringCommand": ":2::K:",
     "Command": [
-      "2",
-      "C"
+      [
+        "2"
+      ],
+      [
+        "C"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -2092,8 +2364,12 @@
     "ID": 2870,
     "stringCommand": ":1::K:",
     "Command": [
-      "1",
-      "C"
+      [
+        "1"
+      ],
+      [
+        "C"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -2125,8 +2401,12 @@
     "ID": 2871,
     "stringCommand": ":4::K:",
     "Command": [
-      "4",
-      "C"
+      [
+        "4"
+      ],
+      [
+        "C"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -2158,9 +2438,15 @@
     "ID": 2872,
     "stringCommand": ":4::6::K:",
     "Command": [
-      "4",
-      "6",
-      "C"
+      [
+        "4"
+      ],
+      [
+        "6"
+      ],
+      [
+        "C"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -2194,7 +2480,9 @@
     "ID": 2873,
     "stringCommand": ":K:",
     "Command": [
-      "C"
+      [
+        "C"
+      ]
     ],
     "Stance": [
       "FC"
@@ -2228,7 +2516,9 @@
     "ID": 2874,
     "stringCommand": ":K:",
     "Command": [
-      "C"
+      [
+        "C"
+      ]
     ],
     "Stance": [
       "WR"
@@ -2262,8 +2552,12 @@
     "ID": 2875,
     "stringCommand": ":7::K:",
     "Command": [
-      "7",
-      "C"
+      [
+        "7"
+      ],
+      [
+        "C"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -2295,8 +2589,12 @@
     "ID": 2876,
     "stringCommand": ":8::K:",
     "Command": [
-      "8",
-      "C"
+      [
+        "8"
+      ],
+      [
+        "C"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -2328,8 +2626,12 @@
     "ID": 2877,
     "stringCommand": ":9::K:",
     "Command": [
-      "9",
-      "C"
+      [
+        "9"
+      ],
+      [
+        "C"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -2361,7 +2663,9 @@
     "ID": 2878,
     "stringCommand": ":K:",
     "Command": [
-      "C"
+      [
+        "C"
+      ]
     ],
     "Stance": [
       "BT"
@@ -2395,8 +2699,12 @@
     "ID": 2879,
     "stringCommand": ":2::K:",
     "Command": [
-      "2",
-      "C"
+      [
+        "2"
+      ],
+      [
+        "C"
+      ]
     ],
     "Stance": [
       "BT"
@@ -2430,7 +2738,9 @@
     "ID": 2880,
     "stringCommand": ":A+B:",
     "Command": [
-      "A+B"
+      [
+        "A+B"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -2469,8 +2779,12 @@
     "ID": 2881,
     "stringCommand": ":6::A+B:",
     "Command": [
-      "6",
-      "A+B"
+      [
+        "6"
+      ],
+      [
+        "A+B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -2503,8 +2817,12 @@
     "ID": 2882,
     "stringCommand": ":6::(A)+(B):",
     "Command": [
-      "6",
-      "(A)+(B)"
+      [
+        "6"
+      ],
+      [
+        "(A)+(B)"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -2541,8 +2859,12 @@
     "ID": 2883,
     "stringCommand": ":3::A+B:",
     "Command": [
-      "3",
-      "A+B"
+      [
+        "3"
+      ],
+      [
+        "A+B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -2576,8 +2898,12 @@
     "ID": 2884,
     "stringCommand": ":2::A+B:",
     "Command": [
-      "2",
-      "A+B"
+      [
+        "2"
+      ],
+      [
+        "A+B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -2612,8 +2938,12 @@
     "ID": 2885,
     "stringCommand": ":4::A+B:",
     "Command": [
-      "4",
-      "A+B"
+      [
+        "4"
+      ],
+      [
+        "A+B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -2646,9 +2976,15 @@
     "ID": 2886,
     "stringCommand": ":4::A+B::A:",
     "Command": [
-      "4",
-      "A+B",
-      "A"
+      [
+        "4"
+      ],
+      [
+        "A+B"
+      ],
+      [
+        "A"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -2684,8 +3020,12 @@
     "ID": 2887,
     "stringCommand": ":8::A+B:",
     "Command": [
-      "8",
-      "A+B"
+      [
+        "8"
+      ],
+      [
+        "A+B"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -2721,7 +3061,9 @@
     "ID": 2888,
     "stringCommand": ":B+K:",
     "Command": [
-      "B+C"
+      [
+        "B+C"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -2753,8 +3095,12 @@
     "ID": 2889,
     "stringCommand": ":2::B+K:",
     "Command": [
-      "2",
-      "B+C"
+      [
+        "2"
+      ],
+      [
+        "B+C"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -2786,7 +3132,9 @@
     "ID": 2890,
     "stringCommand": ":B+K:",
     "Command": [
-      "B+C"
+      [
+        "B+C"
+      ]
     ],
     "Stance": [
       "BT"
@@ -2820,7 +3168,9 @@
     "ID": 2891,
     "stringCommand": ":B:",
     "Command": [
-      "B"
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "Evade"
@@ -2854,8 +3204,12 @@
     "ID": 2892,
     "stringCommand": ":B::4:",
     "Command": [
-      "B",
-      "4"
+      [
+        "B"
+      ],
+      [
+        "4"
+      ]
     ],
     "Stance": [
       "Evade"
@@ -2891,9 +3245,15 @@
     "ID": 2893,
     "stringCommand": ":B::4::6:",
     "Command": [
-      "B",
-      "4",
-      "6"
+      [
+        "B"
+      ],
+      [
+        "4"
+      ],
+      [
+        "6"
+      ]
     ],
     "Stance": [
       "Evade"
@@ -2929,8 +3289,12 @@
     "ID": 2894,
     "stringCommand": ":4::B+K:",
     "Command": [
-      "4",
-      "B+C"
+      [
+        "4"
+      ],
+      [
+        "B+C"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -2963,8 +3327,12 @@
     "ID": 2895,
     "stringCommand": ":6::B+K:",
     "Command": [
-      "6",
-      "B+C"
+      [
+        "6"
+      ],
+      [
+        "B+C"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -2998,9 +3366,15 @@
     "ID": 2896,
     "stringCommand": ":6::B+K::8:",
     "Command": [
-      "6",
-      "B+C",
-      "8"
+      [
+        "6"
+      ],
+      [
+        "B+C"
+      ],
+      [
+        "8"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -3036,9 +3410,15 @@
     "ID": 2897,
     "stringCommand": ":6::B+K::2:",
     "Command": [
-      "6",
-      "B+C",
-      "2"
+      [
+        "6"
+      ],
+      [
+        "B+C"
+      ],
+      [
+        "2"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -3074,7 +3454,9 @@
     "ID": 2898,
     "stringCommand": ":A+G:",
     "Command": [
-      "A+D"
+      [
+        "A+D"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -3108,8 +3490,12 @@
     "ID": 2899,
     "stringCommand": ":4::A+G:",
     "Command": [
-      "4",
-      "A+D"
+      [
+        "4"
+      ],
+      [
+        "A+D"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -3143,7 +3529,9 @@
     "ID": 2900,
     "stringCommand": ":A+G:",
     "Command": [
-      "A+D"
+      [
+        "A+D"
+      ]
     ],
     "Stance": [
       "Left Side"
@@ -3179,7 +3567,9 @@
     "ID": 2901,
     "stringCommand": ":A+G:",
     "Command": [
-      "A+D"
+      [
+        "A+D"
+      ]
     ],
     "Stance": [
       "Right Side"
@@ -3215,7 +3605,9 @@
     "ID": 2902,
     "stringCommand": ":A+G:",
     "Command": [
-      "A+D"
+      [
+        "A+D"
+      ]
     ],
     "Stance": [
       "Back Side"
@@ -3251,12 +3643,14 @@
     "ID": 2903,
     "stringCommand": ":(3):_:(6):_:(9)::A:",
     "Command": [
-      "(3)",
-      "_",
-      "(6)",
-      "_",
-      "(9)",
-      "A"
+      [
+        "(3)",
+        "(6)",
+        "(9)"
+      ],
+      [
+        "A"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -3288,10 +3682,13 @@
     "ID": 2904,
     "stringCommand": ":(2):_:(8)::A:",
     "Command": [
-      "(2)",
-      "_",
-      "(8)",
-      "A"
+      [
+        "(2)",
+        "(8)"
+      ],
+      [
+        "A"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -3323,11 +3720,16 @@
     "ID": 2905,
     "stringCommand": ":(2):_:(8)::A::A:",
     "Command": [
-      "(2)",
-      "_",
-      "(8)",
-      "A",
-      "A"
+      [
+        "(2)",
+        "(8)"
+      ],
+      [
+        "A"
+      ],
+      [
+        "A"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -3360,12 +3762,19 @@
     "ID": 2906,
     "stringCommand": ":(2):_:(8)::A::A::4:",
     "Command": [
-      "(2)",
-      "_",
-      "(8)",
-      "A",
-      "A",
-      "4"
+      [
+        "(2)",
+        "(8)"
+      ],
+      [
+        "A"
+      ],
+      [
+        "A"
+      ],
+      [
+        "4"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -3400,13 +3809,22 @@
     "ID": 2907,
     "stringCommand": ":(2):_:(8)::A::A::4::6:",
     "Command": [
-      "(2)",
-      "_",
-      "(8)",
-      "A",
-      "A",
-      "4",
-      "6"
+      [
+        "(2)",
+        "(8)"
+      ],
+      [
+        "A"
+      ],
+      [
+        "A"
+      ],
+      [
+        "4"
+      ],
+      [
+        "6"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -3441,11 +3859,16 @@
     "ID": 2908,
     "stringCommand": ":(2):_:(8)::A::B:",
     "Command": [
-      "(2)",
-      "_",
-      "(8)",
-      "A",
-      "B"
+      [
+        "(2)",
+        "(8)"
+      ],
+      [
+        "A"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -3478,11 +3901,16 @@
     "ID": 2909,
     "stringCommand": ":(2):_:(8)::A::(B):",
     "Command": [
-      "(2)",
-      "_",
-      "(8)",
-      "A",
-      "(B)"
+      [
+        "(2)",
+        "(8)"
+      ],
+      [
+        "A"
+      ],
+      [
+        "(B)"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -3517,12 +3945,14 @@
     "ID": 2910,
     "stringCommand": ":(1):_:(4):_:(7)::A:",
     "Command": [
-      "(1)",
-      "_",
-      "(4)",
-      "_",
-      "(7)",
-      "A"
+      [
+        "(1)",
+        "(4)",
+        "(7)"
+      ],
+      [
+        "A"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -3554,13 +3984,17 @@
     "ID": 2911,
     "stringCommand": ":(1):_:(4):_:(7)::A::B:",
     "Command": [
-      "(1)",
-      "_",
-      "(4)",
-      "_",
-      "(7)",
-      "A",
-      "B"
+      [
+        "(1)",
+        "(4)",
+        "(7)"
+      ],
+      [
+        "A"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -3593,13 +4027,17 @@
     "ID": 2912,
     "stringCommand": ":(1):_:(4):_:(7)::A::(B):",
     "Command": [
-      "(1)",
-      "_",
-      "(4)",
-      "_",
-      "(7)",
-      "A",
-      "(B)"
+      [
+        "(1)",
+        "(4)",
+        "(7)"
+      ],
+      [
+        "A"
+      ],
+      [
+        "(B)"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -3634,8 +4072,12 @@
     "ID": 2913,
     "stringCommand": ":(6)::B:",
     "Command": [
-      "(6)",
-      "B"
+      [
+        "(6)"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -3669,8 +4111,12 @@
     "ID": 2914,
     "stringCommand": ":(6)::(B):",
     "Command": [
-      "(6)",
-      "(B)"
+      [
+        "(6)"
+      ],
+      [
+        "(B)"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -3706,10 +4152,13 @@
     "ID": 2915,
     "stringCommand": ":(3):_:(9)::B:",
     "Command": [
-      "(3)",
-      "_",
-      "(9)",
-      "B"
+      [
+        "(3)",
+        "(9)"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -3743,10 +4192,13 @@
     "ID": 2916,
     "stringCommand": ":(2):_:(8)::B:",
     "Command": [
-      "(2)",
-      "_",
-      "(8)",
-      "B"
+      [
+        "(2)",
+        "(8)"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -3778,11 +4230,16 @@
     "ID": 2917,
     "stringCommand": ":(2):_:(8)::B::B:",
     "Command": [
-      "(2)",
-      "_",
-      "(8)",
-      "B",
-      "B"
+      [
+        "(2)",
+        "(8)"
+      ],
+      [
+        "B"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -3819,12 +4276,14 @@
     "ID": 2918,
     "stringCommand": ":(1):_:(4):_:(7)::B:",
     "Command": [
-      "(1)",
-      "_",
-      "(4)",
-      "_",
-      "(7)",
-      "B"
+      [
+        "(1)",
+        "(4)",
+        "(7)"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -3860,12 +4319,14 @@
     "ID": 2919,
     "stringCommand": ":(3):_:(6):_:(9)::K:",
     "Command": [
-      "(3)",
-      "_",
-      "(6)",
-      "_",
-      "(9)",
-      "C"
+      [
+        "(3)",
+        "(6)",
+        "(9)"
+      ],
+      [
+        "C"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -3901,10 +4362,13 @@
     "ID": 2920,
     "stringCommand": ":(2):_:(8)::K:",
     "Command": [
-      "(2)",
-      "_",
-      "(8)",
-      "C"
+      [
+        "(2)",
+        "(8)"
+      ],
+      [
+        "C"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -3938,12 +4402,14 @@
     "ID": 2921,
     "stringCommand": ":(1):_:(4):_:(7)::K:",
     "Command": [
-      "(1)",
-      "_",
-      "(4)",
-      "_",
-      "(7)",
-      "C"
+      [
+        "(1)",
+        "(4)",
+        "(7)"
+      ],
+      [
+        "C"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -3979,12 +4445,14 @@
     "ID": 2922,
     "stringCommand": ":(3):_:(6):_:(9)::A+B:",
     "Command": [
-      "(3)",
-      "_",
-      "(6)",
-      "_",
-      "(9)",
-      "A+B"
+      [
+        "(3)",
+        "(6)",
+        "(9)"
+      ],
+      [
+        "A+B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -4020,12 +4488,14 @@
     "ID": 2923,
     "stringCommand": ":(1):_:(4):_:(7)::A+B:",
     "Command": [
-      "(1)",
-      "_",
-      "(4)",
-      "_",
-      "(7)",
-      "A+B"
+      [
+        "(1)",
+        "(4)",
+        "(7)"
+      ],
+      [
+        "A+B"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -4068,12 +4538,14 @@
     "ID": 2924,
     "stringCommand": ":(3):_:(6):_:(9)::B+K:",
     "Command": [
-      "(3)",
-      "_",
-      "(6)",
-      "_",
-      "(9)",
-      "B+C"
+      [
+        "(3)",
+        "(6)",
+        "(9)"
+      ],
+      [
+        "B+C"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -4109,12 +4581,14 @@
     "ID": 2925,
     "stringCommand": ":(3):_:(6):_:(9)::(B)+(K):",
     "Command": [
-      "(3)",
-      "_",
-      "(6)",
-      "_",
-      "(9)",
-      "(B)+(C)"
+      [
+        "(3)",
+        "(6)",
+        "(9)"
+      ],
+      [
+        "(B)+(C)"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -4150,7 +4624,9 @@
     "ID": 2926,
     "stringCommand": ":K:",
     "Command": [
-      "C"
+      [
+        "C"
+      ]
     ],
     "Stance": [
       "RUN"
@@ -4190,7 +4666,9 @@
     "ID": 2927,
     "stringCommand": ":A:",
     "Command": [
-      "A"
+      [
+        "A"
+      ]
     ],
     "Stance": [
       "PR"
@@ -4224,8 +4702,12 @@
     "ID": 2928,
     "stringCommand": ":A::A:",
     "Command": [
-      "A",
-      "A"
+      [
+        "A"
+      ],
+      [
+        "A"
+      ]
     ],
     "Stance": [
       "PR"
@@ -4260,8 +4742,12 @@
     "ID": 2929,
     "stringCommand": ":A::B:",
     "Command": [
-      "A",
-      "B"
+      [
+        "A"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "PR"
@@ -4296,8 +4782,12 @@
     "ID": 2930,
     "stringCommand": ":A::(B):",
     "Command": [
-      "A",
-      "(B)"
+      [
+        "A"
+      ],
+      [
+        "(B)"
+      ]
     ],
     "Stance": [
       "PR"
@@ -4334,8 +4824,12 @@
     "ID": 2931,
     "stringCommand": ":A::K:",
     "Command": [
-      "A",
-      "C"
+      [
+        "A"
+      ],
+      [
+        "C"
+      ]
     ],
     "Stance": [
       "PR"
@@ -4375,8 +4869,12 @@
     "ID": 2932,
     "stringCommand": ":6::A:",
     "Command": [
-      "6",
-      "A"
+      [
+        "6"
+      ],
+      [
+        "A"
+      ]
     ],
     "Stance": [
       "PR"
@@ -4410,8 +4908,12 @@
     "ID": 2933,
     "stringCommand": ":6::(A):",
     "Command": [
-      "6",
-      "(A)"
+      [
+        "6"
+      ],
+      [
+        "(A)"
+      ]
     ],
     "Stance": [
       "PR"
@@ -4447,7 +4949,9 @@
     "ID": 2934,
     "stringCommand": ":B:",
     "Command": [
-      "B"
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "PR"
@@ -4481,8 +4985,12 @@
     "ID": 2935,
     "stringCommand": ":B::B:",
     "Command": [
-      "B",
-      "B"
+      [
+        "B"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "PR"
@@ -4517,8 +5025,12 @@
     "ID": 2936,
     "stringCommand": ":B::(B):",
     "Command": [
-      "B",
-      "(B)"
+      [
+        "B"
+      ],
+      [
+        "(B)"
+      ]
     ],
     "Stance": [
       "PR"
@@ -4555,9 +5067,15 @@
     "ID": 2937,
     "stringCommand": ":B::B::A:",
     "Command": [
-      "B",
-      "B",
-      "A"
+      [
+        "B"
+      ],
+      [
+        "B"
+      ],
+      [
+        "A"
+      ]
     ],
     "Stance": [
       "PR"
@@ -4593,9 +5111,15 @@
     "ID": 2938,
     "stringCommand": ":B::B::B:",
     "Command": [
-      "B",
-      "B",
-      "B"
+      [
+        "B"
+      ],
+      [
+        "B"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "PR"
@@ -4635,8 +5159,12 @@
     "ID": 2939,
     "stringCommand": ":B::K:",
     "Command": [
-      "B",
-      "C"
+      [
+        "B"
+      ],
+      [
+        "C"
+      ]
     ],
     "Stance": [
       "PR"
@@ -4671,8 +5199,12 @@
     "ID": 2940,
     "stringCommand": ":6::B:",
     "Command": [
-      "6",
-      "B"
+      [
+        "6"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "PR"
@@ -4710,7 +5242,9 @@
     "ID": 2941,
     "stringCommand": ":K:",
     "Command": [
-      "C"
+      [
+        "C"
+      ]
     ],
     "Stance": [
       "PR"
@@ -4748,8 +5282,12 @@
     "ID": 2942,
     "stringCommand": ":K::K:",
     "Command": [
-      "C",
-      "C"
+      [
+        "C"
+      ],
+      [
+        "C"
+      ]
     ],
     "Stance": [
       "PR"
@@ -4788,9 +5326,15 @@
     "ID": 2943,
     "stringCommand": ":K::K::B:",
     "Command": [
-      "C",
-      "C",
-      "B"
+      [
+        "C"
+      ],
+      [
+        "C"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "PR"
@@ -4830,8 +5374,12 @@
     "ID": 2944,
     "stringCommand": ":6::K:",
     "Command": [
-      "6",
-      "C"
+      [
+        "6"
+      ],
+      [
+        "C"
+      ]
     ],
     "Stance": [
       "PR"
@@ -4867,7 +5415,9 @@
     "ID": 2945,
     "stringCommand": ":A+B:",
     "Command": [
-      "A+B"
+      [
+        "A+B"
+      ]
     ],
     "Stance": [
       "PR"
@@ -4908,7 +5458,9 @@
     "ID": 2946,
     "stringCommand": ":B+K:",
     "Command": [
-      "B+C"
+      [
+        "B+C"
+      ]
     ],
     "Stance": [
       "PR"
@@ -4943,8 +5495,12 @@
     "ID": 2947,
     "stringCommand": ":8::B+K:",
     "Command": [
-      "8",
-      "B+C"
+      [
+        "8"
+      ],
+      [
+        "B+C"
+      ]
     ],
     "Stance": [
       "PR"
@@ -4980,7 +5536,9 @@
     "ID": 2948,
     "stringCommand": ":A:",
     "Command": [
-      "A"
+      [
+        "A"
+      ]
     ],
     "Stance": [
       "AG"
@@ -5014,8 +5572,12 @@
     "ID": 2949,
     "stringCommand": ":A::B:",
     "Command": [
-      "A",
-      "B"
+      [
+        "A"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "AG"
@@ -5050,7 +5612,9 @@
     "ID": 2950,
     "stringCommand": ":B:",
     "Command": [
-      "B"
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "AG"
@@ -5088,7 +5652,9 @@
     "ID": 2951,
     "stringCommand": ":K:",
     "Command": [
-      "C"
+      [
+        "C"
+      ]
     ],
     "Stance": [
       "AG"
@@ -5126,8 +5692,12 @@
     "ID": 2952,
     "stringCommand": ":K::K:",
     "Command": [
-      "C",
-      "C"
+      [
+        "C"
+      ],
+      [
+        "C"
+      ]
     ],
     "Stance": [
       "AG"
@@ -5166,7 +5736,9 @@
     "ID": 2953,
     "stringCommand": ":A:",
     "Command": [
-      "A"
+      [
+        "A"
+      ]
     ],
     "Stance": [
       "SE"
@@ -5200,7 +5772,9 @@
     "ID": 2954,
     "stringCommand": ":B:",
     "Command": [
-      "B"
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "SE"
@@ -5240,7 +5814,9 @@
     "ID": 2955,
     "stringCommand": ":K:",
     "Command": [
-      "C"
+      [
+        "C"
+      ]
     ],
     "Stance": [
       "SE"
@@ -5278,7 +5854,9 @@
     "ID": 2956,
     "stringCommand": ":A:",
     "Command": [
-      "A"
+      [
+        "A"
+      ]
     ],
     "Stance": [
       "QP"
@@ -5314,7 +5892,9 @@
     "ID": 2957,
     "stringCommand": ":B:",
     "Command": [
-      "B"
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "QP"
@@ -5354,8 +5934,12 @@
     "ID": 2958,
     "stringCommand": ":B::B:",
     "Command": [
-      "B",
-      "B"
+      [
+        "B"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "QP"
@@ -5400,7 +5984,9 @@
     "ID": 2959,
     "stringCommand": ":K:",
     "Command": [
-      "C"
+      [
+        "C"
+      ]
     ],
     "Stance": [
       "QP"
@@ -5441,7 +6027,9 @@
     "ID": 2960,
     "stringCommand": ":B+G:",
     "Command": [
-      "B+D"
+      [
+        "B+D"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -5475,8 +6063,12 @@
     "ID": 2961,
     "stringCommand": ":B+G::4:",
     "Command": [
-      "B+D",
-      "4"
+      [
+        "B+D"
+      ],
+      [
+        "4"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -5510,9 +6102,15 @@
     "ID": 2962,
     "stringCommand": ":B+G::4::6:",
     "Command": [
-      "B+D",
-      "4",
-      "6"
+      [
+        "B+D"
+      ],
+      [
+        "4"
+      ],
+      [
+        "6"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -5546,8 +6144,12 @@
     "ID": 2963,
     "stringCommand": ":B+G::B:",
     "Command": [
-      "B+D",
-      "B"
+      [
+        "B+D"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -5580,8 +6182,12 @@
     "ID": 2964,
     "stringCommand": ":B+G::(B):",
     "Command": [
-      "B+D",
-      "(B)"
+      [
+        "B+D"
+      ],
+      [
+        "(B)"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -5616,7 +6222,9 @@
     "ID": 2965,
     "stringCommand": ":(B)+(G):",
     "Command": [
-      "(B)+(D)"
+      [
+        "(B)+(D)"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -5650,8 +6258,12 @@
     "ID": 2966,
     "stringCommand": ":(B)+(G)::4:",
     "Command": [
-      "(B)+(D)",
-      "4"
+      [
+        "(B)+(D)"
+      ],
+      [
+        "4"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -5685,9 +6297,15 @@
     "ID": 2967,
     "stringCommand": ":(B)+(G)::4::6:",
     "Command": [
-      "(B)+(D)",
-      "4",
-      "6"
+      [
+        "(B)+(D)"
+      ],
+      [
+        "4"
+      ],
+      [
+        "6"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -5721,8 +6339,12 @@
     "ID": 2968,
     "stringCommand": ":(B)+(G)::B:",
     "Command": [
-      "(B)+(D)",
-      "B"
+      [
+        "(B)+(D)"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -5755,8 +6377,12 @@
     "ID": 2969,
     "stringCommand": ":(B)+(G)::(B):",
     "Command": [
-      "(B)+(D)",
-      "(B)"
+      [
+        "(B)+(D)"
+      ],
+      [
+        "(B)"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -5791,7 +6417,9 @@
     "ID": 2970,
     "stringCommand": ":A:",
     "Command": [
-      "A"
+      [
+        "A"
+      ]
     ],
     "Stance": [
       "RE"
@@ -5830,7 +6458,9 @@
     "ID": 2971,
     "stringCommand": ":B:",
     "Command": [
-      "B"
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "RE"
@@ -5870,7 +6500,9 @@
     "ID": 2972,
     "stringCommand": ":K:",
     "Command": [
-      "C"
+      [
+        "C"
+      ]
     ],
     "Stance": [
       "RE"
@@ -5910,7 +6542,9 @@
     "ID": 2973,
     "stringCommand": ":A+B+K:",
     "Command": [
-      "A+B+C"
+      [
+        "A+B+C"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -5946,7 +6580,9 @@
     "ID": 2974,
     "stringCommand": ":A+B+K:",
     "Command": [
-      "A+B+C"
+      [
+        "A+B+C"
+      ]
     ],
     "Stance": [
       "PR"
@@ -5986,8 +6622,12 @@
     "ID": 2975,
     "stringCommand": ":4::A+B+K:",
     "Command": [
-      "4",
-      "A+B+C"
+      [
+        "4"
+      ],
+      [
+        "A+B+C"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -6019,10 +6659,18 @@
     "ID": 2976,
     "stringCommand": ":2::3::6::A+B+K:",
     "Command": [
-      "2",
-      "3",
-      "6",
-      "A+B+C"
+      [
+        "2"
+      ],
+      [
+        "3"
+      ],
+      [
+        "6"
+      ],
+      [
+        "A+B+C"
+      ]
     ],
     "Stance": null,
     "Properties": null,
@@ -6052,11 +6700,21 @@
     "ID": 2977,
     "stringCommand": ":2::3::6::A+B+K::2:",
     "Command": [
-      "2",
-      "3",
-      "6",
-      "A+B+C",
-      "2"
+      [
+        "2"
+      ],
+      [
+        "3"
+      ],
+      [
+        "6"
+      ],
+      [
+        "A+B+C"
+      ],
+      [
+        "2"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -6088,11 +6746,21 @@
     "ID": 2978,
     "stringCommand": ":2::3::6::A+B+K::(2):",
     "Command": [
-      "2",
-      "3",
-      "6",
-      "A+B+C",
-      "(2)"
+      [
+        "2"
+      ],
+      [
+        "3"
+      ],
+      [
+        "6"
+      ],
+      [
+        "A+B+C"
+      ],
+      [
+        "(2)"
+      ]
     ],
     "Stance": null,
     "Properties": [
@@ -6124,9 +6792,15 @@
     "ID": 2979,
     "stringCommand": ":6::A::B:",
     "Command": [
-      "6",
-      "A",
-      "B"
+      [
+        "6"
+      ],
+      [
+        "A"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "SC"
@@ -6167,9 +6841,15 @@
     "ID": 2980,
     "stringCommand": ":6::A::(B):",
     "Command": [
-      "6",
-      "A",
-      "(B)"
+      [
+        "6"
+      ],
+      [
+        "A"
+      ],
+      [
+        "(B)"
+      ]
     ],
     "Stance": [
       "SC"
@@ -6211,9 +6891,15 @@
     "ID": 2981,
     "stringCommand": ":4::A::B:",
     "Command": [
-      "4",
-      "A",
-      "B"
+      [
+        "4"
+      ],
+      [
+        "A"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "SC"
@@ -6254,9 +6940,15 @@
     "ID": 2982,
     "stringCommand": ":4::A::(B):",
     "Command": [
-      "4",
-      "A",
-      "(B)"
+      [
+        "4"
+      ],
+      [
+        "A"
+      ],
+      [
+        "(B)"
+      ]
     ],
     "Stance": [
       "SC"
@@ -6298,11 +6990,21 @@
     "ID": 2983,
     "stringCommand": ":6::B::B::B::B:",
     "Command": [
-      "6",
-      "B",
-      "B",
-      "B",
-      "B"
+      [
+        "6"
+      ],
+      [
+        "B"
+      ],
+      [
+        "B"
+      ],
+      [
+        "B"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "SC"
@@ -6343,9 +7045,15 @@
     "ID": 2984,
     "stringCommand": ":4::B::B:",
     "Command": [
-      "4",
-      "B",
-      "B"
+      [
+        "4"
+      ],
+      [
+        "B"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "SC"
@@ -6380,10 +7088,18 @@
     "ID": 2985,
     "stringCommand": ":4::B::B::B:",
     "Command": [
-      "4",
-      "B",
-      "B",
-      "B"
+      [
+        "4"
+      ],
+      [
+        "B"
+      ],
+      [
+        "B"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "SC"
@@ -6423,9 +7139,15 @@
     "ID": 2986,
     "stringCommand": ":1::K::B:",
     "Command": [
-      "1",
-      "C",
-      "B"
+      [
+        "1"
+      ],
+      [
+        "C"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "SC"
@@ -6464,9 +7186,15 @@
     "ID": 2987,
     "stringCommand": ":2::A+B::B:",
     "Command": [
-      "2",
-      "A+B",
-      "B"
+      [
+        "2"
+      ],
+      [
+        "A+B"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "SC"
@@ -6504,9 +7232,15 @@
     "ID": 2988,
     "stringCommand": ":8::A::B:",
     "Command": [
-      "8",
-      "A",
-      "B"
+      [
+        "8"
+      ],
+      [
+        "A"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "SC"
@@ -6543,9 +7277,15 @@
     "ID": 2989,
     "stringCommand": ":8::A::(B):",
     "Command": [
-      "8",
-      "A",
-      "(B)"
+      [
+        "8"
+      ],
+      [
+        "A"
+      ],
+      [
+        "(B)"
+      ]
     ],
     "Stance": [
       "SC"
@@ -6583,7 +7323,9 @@
     "ID": 2990,
     "stringCommand": ":A+G:",
     "Command": [
-      "A+D"
+      [
+        "A+D"
+      ]
     ],
     "Stance": [
       "SC"
@@ -6617,9 +7359,15 @@
     "ID": 2991,
     "stringCommand": ":B::B::A+B:",
     "Command": [
-      "B",
-      "B",
-      "A+B"
+      [
+        "B"
+      ],
+      [
+        "B"
+      ],
+      [
+        "A+B"
+      ]
     ],
     "Stance": [
       "SC",
@@ -6668,9 +7416,15 @@
     "ID": 2992,
     "stringCommand": ":6::K::K:",
     "Command": [
-      "6",
-      "C",
-      "C"
+      [
+        "6"
+      ],
+      [
+        "C"
+      ],
+      [
+        "C"
+      ]
     ],
     "Stance": [
       "SC",
@@ -6710,8 +7464,12 @@
     "ID": 2993,
     "stringCommand": ":K::B:",
     "Command": [
-      "C",
-      "B"
+      [
+        "C"
+      ],
+      [
+        "B"
+      ]
     ],
     "Stance": [
       "SC",

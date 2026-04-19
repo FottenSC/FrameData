@@ -264,7 +264,7 @@ export const FrameDataTable: React.FC = () => {
   );
 
   const renderCommand = useCallback(
-    (command: string[] | null) => <CommandRenderer command={command} />,
+    (command: string[][] | null) => <CommandRenderer command={command} />,
     [],
   );
   const renderNotes = useCallback(

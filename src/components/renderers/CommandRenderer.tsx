@@ -4,7 +4,17 @@ import { CommandIcon } from "@/components/ui/CommandIcon";
 import { DirectionChip } from "@/components/ui/direction-chip";
 import { getDirectionSet } from "@/lib/notation";
 
-const CommandRendererInner: React.FC<{ command: string[] | null }> = ({
+/**
+ * A command is a list of ordered "steps"; each step is itself a list of
+ * alternative tokens the player may choose from (single-alt steps are the
+ * common case, OR-steps like `(3)_(6)_(9)` are multi-alt).
+ *
+ * We render step-by-step. For a multi-alt step we render each alternative
+ * inline with the existing vertical-bar "or" divider between them. The
+ * renderer never sees the legacy flat `"_"` sentinel shape — `useMoves`
+ * normalises to nested-step on load.
+ */
+const CommandRendererInner: React.FC<{ command: string[][] | null }> = ({
   command,
 }) => {
   const { getIconUrl, notationStyle } = useGame();
@@ -21,55 +31,63 @@ const CommandRendererInner: React.FC<{ command: string[] | null }> = ({
   if (!command || command.length === 0) return <>—</>;
 
   /**
-   * Peek at the token that will be rendered *after* the one at (i, j), and
-   * tell the caller whether it's a normal button. Used exclusively to decide
-   * whether a slide pill should pull its right-hand neighbour leftward for
-   * the overlap look — slide → normal overlaps, slide → anything else does
-   * not (so slide-next-to-slide, trailing slide, slide-before-separator all
-   * render tidily side-by-side).
+   * Does the token at (stepIdx, altIdx, buttonIdx) end in a slide that wants
+   * to overlap its right-hand neighbour? The overlap only looks right when
+   * the neighbour is a normal button; next-is-direction / next-is-slide /
+   * next-is-OR-boundary all render tidily without the pull-leftward tweak.
+   *
+   * We only peek *inside the same alternative branch* — reaching across an
+   * OR-step would be confusing because those tokens are mutually exclusive.
    */
-  const peekNextIsNormalButton = (i: number, j: number): boolean => {
+  const peekNextIsNormalButton = (
+    stepIdx: number,
+    altIdx: number,
+    buttons: string[],
+    buttonIdx: number,
+  ): boolean => {
     let nextRaw: string | undefined;
-    // First try the next "+"-separated chunk within the same command part.
-    if (j + 1 < buttons.length) {
-      nextRaw = buttons[j + 1];
-    } else if (i + 1 < command.length) {
-      // Fall through to the first chunk of the next command part.
-      const nextPart = command[i + 1];
-      nextRaw = nextPart?.split("+")[0];
+    if (buttonIdx + 1 < buttons.length) {
+      // Same "+"-chunk continues.
+      nextRaw = buttons[buttonIdx + 1];
+    } else if (stepIdx + 1 < command.length) {
+      // Fall through to the next step. For multi-alt steps, the overlap
+      // logic isn't meaningful (you don't know which alt the player picks),
+      // so only pull leftward when the next step is single-alt.
+      const nextStep = command[stepIdx + 1];
+      if (nextStep.length !== 1) return false;
+      nextRaw = nextStep[0].split("+")[0];
     }
     if (!nextRaw) return false;
-    // Strip held-button parens.
     const stripped = nextRaw.replace(/[()]/g, "");
     if (!stripped || stripped === "_") return false;
-    // Directions in the active style aren't buttons.
     if (directionSet.has(stripped)) return false;
-    // Slides are flagged by lowercase first char.
     const c = stripped[0];
     if (c >= "a" && c <= "z") return false;
+    // Ignore altIdx — overlap calc doesn't depend on which branch we came from.
+    void altIdx;
     return true;
   };
 
   const parts: React.ReactNode[] = [];
-  let buttons: string[] = [];
 
-  for (let i = 0; i < command.length; i++) {
-    const commandPart = command[i];
-
-    // Split by + to get individual buttons in this command part. Assigning
-    // (not re-declaring) so `peekNextIsNormalButton` above can close over
-    // the current iteration's array.
-    buttons = commandPart.split("+");
+  const renderToken = (
+    token: string,
+    stepIdx: number,
+    altIdx: number,
+    tokenBranchKey: string,
+  ): void => {
+    // Split by + to get individual buttons within this alternative token.
+    const buttons = token.split("+");
 
     for (let j = 0; j < buttons.length; j++) {
       const buttonStr = buttons[j];
       if (!buttonStr) continue;
 
-      // Add + separator between buttons within same command
+      // "+" separator between buttons in the same "A+G" / "B+K" chunk.
       if (j > 0) {
         parts.push(
           <span
-            key={`plus-${i}-${j}`}
+            key={`plus-${tokenBranchKey}-${j}`}
             className="relative inline-flex items-center justify-center w-3 h-3 border border-black bg-white text-black rounded-full mx-[-5px] z-20 align-middle plus-separator"
           >
             <span className="text-transparent select-text leading-none">+</span>
@@ -91,24 +109,74 @@ const CommandRendererInner: React.FC<{ command: string[] | null }> = ({
         );
       }
 
-      // Parse individual button
+      // Parse individual button.
       let button = buttonStr;
       let isHeld = false;
       let isSlide = false;
 
-      // Check for held button (parentheses)
+      // Held button (parens).
       if (button[0] === "(") {
         isHeld = true;
         button = button.replace(/[()]/g, "");
       }
-
       if (!button) continue;
 
-      // Separator token between command groups ("_" in source data).
-      if (button === "_") {
+      // Directions are style-dependent — check against the ACTIVE notation
+      // direction set rather than naively "starts with a digit".
+      if (directionSet.has(button)) {
+        if (directionMode === "text") {
+          parts.push(
+            <DirectionChip
+              key={`direction-${tokenBranchKey}-${j}-${button}`}
+              token={button}
+              isHeld={isHeld}
+            />,
+          );
+        } else {
+          const iconUrl = getIconUrl(button, isHeld);
+          parts.push(
+            <img
+              key={`direction-${tokenBranchKey}-${j}-${button}`}
+              src={iconUrl}
+              alt={button}
+              className="inline object-contain align-text-bottom h-4 w-4"
+            />,
+          );
+        }
+        continue;
+      }
+
+      // Slide if the first char is a lowercase letter.
+      const first = button[0];
+      if (first >= "a" && first <= "z") {
+        isSlide = true;
+      }
+      parts.push(
+        <CommandIcon
+          key={`command-${tokenBranchKey}-${j}-${button}`}
+          input={button}
+          isHeld={isHeld}
+          isSlide={isSlide}
+          overlapNext={
+            isSlide && peekNextIsNormalButton(stepIdx, altIdx, buttons, j)
+          }
+        />,
+      );
+    }
+  };
+
+  for (let i = 0; i < command.length; i++) {
+    const step = command[i];
+    if (!step || step.length === 0) continue;
+
+    for (let a = 0; a < step.length; a++) {
+      // Visual "or" divider between alternatives within an OR-step. Matches
+      // the old underscore-separator styling so multi-alt inputs render
+      // with the same vertical bar users are used to.
+      if (a > 0) {
         parts.push(
           <span
-            key={`separator-${i}-${j}`}
+            key={`or-${i}-${a}`}
             className="relative inline-flex items-center justify-center w-3 h-4 mx-[-5px] z-20 align-middle underscore-separator"
           >
             <span className="text-transparent select-text leading-none">_</span>
@@ -128,50 +196,8 @@ const CommandRendererInner: React.FC<{ command: string[] | null }> = ({
             </svg>
           </span>,
         );
-        continue;
       }
-
-      // Direction? Check against the ACTIVE notation style's direction set
-      // — not a naive "starts with a digit" check, because Tekken-style
-      // notations put digits on buttons (1/2/3/4).
-      if (directionSet.has(button)) {
-        if (directionMode === "text") {
-          parts.push(
-            <DirectionChip
-              key={`direction-${i}-${j}-${button}`}
-              token={button}
-              isHeld={isHeld}
-            />,
-          );
-        } else {
-          const iconUrl = getIconUrl(button, isHeld);
-          parts.push(
-            <img
-              key={`direction-${i}-${j}-${button}`}
-              src={iconUrl}
-              alt={button}
-              className="inline object-contain align-text-bottom h-4 w-4"
-            />,
-          );
-        }
-        continue;
-      }
-
-      // Otherwise it's a button. Lowercase LETTER first char = "slide"
-      // (source-data convention). Digits / symbols are never slides.
-      const first = button[0];
-      if (first >= "a" && first <= "z") {
-        isSlide = true;
-      }
-      parts.push(
-        <CommandIcon
-          key={`command-${i}-${j}-${button}`}
-          input={button}
-          isHeld={isHeld}
-          isSlide={isSlide}
-          overlapNext={isSlide && peekNextIsNormalButton(i, j)}
-        />,
-      );
+      renderToken(step[a], i, a, `${i}-${a}`);
     }
   }
 

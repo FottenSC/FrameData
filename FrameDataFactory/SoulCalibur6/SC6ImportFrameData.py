@@ -641,7 +641,10 @@ def toArrayOrNone(v):
     return None
 
 def split_by_delimiter(value, delimiter="::"):
-    """Split string by delimiter and filter out empty strings, return None if invalid"""
+    """Split a ``::``-delimited string into a flat list of token strings.
+
+    Used for fields like Hit Level that don't have OR-alternatives. Returns
+    ``None`` if the input is NaN / not a string / empty."""
     try:
         if pd.isna(value):
             return None
@@ -649,29 +652,58 @@ def split_by_delimiter(value, delimiter="::"):
         pass
     if not isinstance(value, str):
         return None
-    # Split by :: first
-    parts = value.split(delimiter)
 
-    # Process each part, keeping _ as a separate element
-    final_parts = []
-    for part in parts:
-        if part:
-            # Check if this part contains :_: separator
-            if ":_:" in part:
-                sub_parts = part.split(":_:")
-                for i, sub in enumerate(sub_parts):
-                    cleaned = sub.strip().strip(":")
-                    if cleaned:
-                        final_parts.append(cleaned)
-                    # Add _ separator between sub-parts (not after the last one)
-                    if i < len(sub_parts) - 1:
-                        final_parts.append("_")
-            else:
-                cleaned = part.strip().strip(":")
+    parts = []
+    for part in value.split(delimiter):
+        cleaned = part.strip().strip(":")
+        if cleaned:
+            parts.append(cleaned)
+
+    return parts if parts else None
+
+
+def split_command(value, delimiter="::"):
+    """Parse an authored command string into an ordered list of steps, where
+    each step is itself a list of alternative tokens the player may pick.
+
+    The authored format uses ``::`` as the step separator and ``:_:`` inside
+    a single ``::``-part to mark OR-alternatives between otherwise-equivalent
+    tokens:
+
+        ``":A::B+K:"``                  -> [["A"], ["B+K"]]
+        ``":(3):_:(6):_:(9)::A:"``      -> [["(3)", "(6)", "(9)"], ["A"]]
+        ``":A::A::B:"``                 -> [["A"], ["A"], ["B"]]
+
+    Returning a nested shape instead of a flat list with ``"_"`` sentinels
+    removes the need for the frontend to walk a state machine to recover
+    the OR-branches — every step is uniformly a list.
+    """
+    try:
+        if pd.isna(value):
+            return None
+    except Exception:
+        pass
+    if not isinstance(value, str):
+        return None
+
+    steps = []
+    for part in value.split(delimiter):
+        if not part:
+            continue
+        if ":_:" in part:
+            alternatives = []
+            for sub in part.split(":_:"):
+                cleaned = sub.strip().strip(":")
                 if cleaned:
-                    final_parts.append(cleaned)
+                    alternatives.append(cleaned)
+            if alternatives:
+                steps.append(alternatives)
+        else:
+            cleaned = part.strip().strip(":")
+            if cleaned:
+                steps.append([cleaned])
 
-    return final_parts if final_parts else None
+    return steps if steps else None
 
 # Columns mapping to UI Move interface.
 #
@@ -684,7 +716,7 @@ def move_row_to_dict(row: pd.Series):
     return {
         "ID": to_int_or_none(row.get("ID")),
         "stringCommand": to_str_or_none(row.get("stringCommand")),
-        "Command": split_by_delimiter(row.get("Command")),
+        "Command": split_command(row.get("Command")),
         "Stance": toArrayOrNone(row.get("Stance")),
         "Properties": toArrayOrNone(row.get("Properties")),
         "HitLevel": split_by_delimiter(row.get("Hit level")),

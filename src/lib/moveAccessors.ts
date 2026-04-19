@@ -21,46 +21,45 @@ const joinOrNull = (xs: string[] | null, sep: string): string | null =>
   xs && xs.length > 0 ? xs.join(sep) : null;
 
 /**
- * Expand OR-groups inside a command array into concrete alternative
- * sequences. The source-data convention is that a literal `"_"` token between
- * two other tokens means "either side is valid", e.g.
+ * Cartesian expansion of a command's OR-steps into concrete input sequences.
  *
- *     ["(2)", "_", "(8)", "B+K"]        → "(2) or (8), then B+K"
- *     ["(3)", "_", "(6)", "_", "(9)",   → "(3) or (6) or (9), then A+G"
- *      "A+G"]
+ * A command is stored as an ordered list of steps where each step is a list
+ * of alternative tokens:
  *
- * Returns one concatenated string per cartesian product of OR options, so
- * downstream string-matching logic can find a match in any real input
- * sequence without accidentally spanning an OR branch boundary.
+ *     [["(2)", "(8)"], ["B+K"]]          → ["(2) B+K", "(8) B+K"]
+ *     [["(3)", "(6)", "(9)"], ["A+G"]]   → ["(3) A+G", "(6) A+G", "(9) A+G"]
+ *     [["A"], ["A"], ["B"]]              → ["A A B"]
+ *
+ * Returned strings are space-joined; the search/filter layer normalises
+ * further. Empty / null input yields `[""]` so callers can unconditionally
+ * iterate without a null-check.
  */
-export function expandCommandOrGroups(cmd: string[] | null): string[] {
+export function expandCommand(cmd: string[][] | null): string[] {
   if (!cmd || cmd.length === 0) return [""];
-  const groups: string[][] = [];
-  let i = 0;
-  while (i < cmd.length) {
-    if (i + 1 < cmd.length && cmd[i + 1] === "_") {
-      const options: string[] = [cmd[i]];
-      i += 2; // past current and the `_`
-      while (i < cmd.length) {
-        options.push(cmd[i]);
-        i += 1;
-        if (i < cmd.length && cmd[i] === "_") {
-          i += 1; // consume the next `_` and continue extending the group
-        } else {
-          break;
-        }
-      }
-      groups.push(options);
-    } else {
-      groups.push([cmd[i]]);
-      i += 1;
-    }
-  }
-  // Cartesian product. For most moves this is 1–3 expansions.
-  return groups.reduce<string[]>(
-    (acc, opts) => acc.flatMap((prefix) => opts.map((opt) => prefix + opt)),
+  return cmd.reduce<string[]>(
+    (acc, step) =>
+      acc.flatMap((prefix) =>
+        step.map((opt) => (prefix ? `${prefix} ${opt}` : opt)),
+      ),
     [""],
   );
+}
+
+/**
+ * Human-readable flat rendering of a command, used for sort keys and CSV /
+ * Excel export. Multi-alternative steps collapse to `"a/b/c"`; steps are
+ * space-separated. `null` / empty → `null`.
+ *
+ *     [["(3)", "(6)", "(9)"], ["A"]] → "(3)/(6)/(9) A"
+ *     [["A"], ["A"], ["B"]]          → "A A B"
+ */
+export function formatCommandFlat(cmd: string[][] | null): string | null {
+  if (!cmd || cmd.length === 0) return null;
+  const out = cmd
+    .map((step) => (step.length === 1 ? step[0] : step.join("/")))
+    .filter((s) => s.length > 0)
+    .join(" ");
+  return out.length > 0 ? out : null;
 }
 
 /**
@@ -121,12 +120,19 @@ export const FIELD_ACCESSORS: Record<string, FieldAccessor> = {
   },
 
   command: {
-    sortValue: (m) => joinOrNull(m.command, " "),
+    sortValue: (m) => formatCommandFlat(m.command),
     sortType: "string",
-    filterString: (m) => joinOrNull(m.command, " "),
-    filterTokens: (m) =>
-      m.command && m.command.length > 0 ? m.command : null,
-    exportValue: (m) => joinOrNull(m.command, " ") ?? "",
+    filterString: (m) => formatCommandFlat(m.command),
+    // Token projection is every concrete expansion of the command (one string
+    // per OR-branch), so a multi-select / exact-match operator on the command
+    // column matches any real input sequence without needing to know about
+    // the nested shape.
+    filterTokens: (m) => {
+      if (!m.command || m.command.length === 0) return null;
+      const expansions = expandCommand(m.command);
+      return expansions.length > 0 ? expansions : null;
+    },
+    exportValue: (m) => formatCommandFlat(m.command) ?? "",
   },
 
   rawCommand: {
@@ -137,29 +143,29 @@ export const FIELD_ACCESSORS: Record<string, FieldAccessor> = {
   },
 
   // "input" = stance + command, displayed / searched as a single combined
-  // field. filterTokens expands OR-groups in the command (e.g. `(2) _ (8)`)
+  // field. filterTokens expands OR-steps in the command (e.g. `[["(2)","(8)"]]`)
   // into separate alternative strings so the quick-search can match any
-  // real input sequence without accidentally bridging the underscore.
+  // real input sequence without accidentally bridging across the alternatives.
   input: {
     sortValue: (m) =>
-      [joinOrNull(m.stance, " "), joinOrNull(m.command, " ")]
+      [joinOrNull(m.stance, " "), formatCommandFlat(m.command)]
         .filter(Boolean)
         .join(" "),
     sortType: "string",
     filterString: (m) =>
-      [joinOrNull(m.stance, " "), joinOrNull(m.command, " ")]
+      [joinOrNull(m.stance, " "), formatCommandFlat(m.command)]
         .filter(Boolean)
         .join(" ") || null,
     filterTokens: (m) => {
       const stancePart = joinOrNull(m.stance, " ") ?? "";
-      const expansions = expandCommandOrGroups(m.command);
+      const expansions = expandCommand(m.command);
       const tokens = expansions.map((cmd) =>
         stancePart ? `${stancePart} ${cmd}` : cmd,
       );
       return tokens.length > 0 ? tokens : null;
     },
     exportValue: (m) =>
-      [joinOrNull(m.stance, " "), joinOrNull(m.command, " ")]
+      [joinOrNull(m.stance, " "), formatCommandFlat(m.command)]
         .filter(Boolean)
         .join(" "),
   },

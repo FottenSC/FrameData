@@ -167,6 +167,86 @@ function parseOutcomeField(
 }
 
 /**
+ * Normalize the raw `Command` field into the in-memory nested shape
+ * `string[][]` (one array per step, inner array listing alternatives).
+ *
+ * Accepts BOTH on-disk shapes:
+ *
+ *  - **Nested** (current): `[["(3)", "(6)", "(9)"], ["A"]]` — emitted by the
+ *    Python factory.
+ *  - **Flat + "_" sentinel** (legacy): `["(3)", "_", "(6)", "_", "(9)", "A"]`
+ *    — older JSON where alternatives were separated by a literal `"_"` token.
+ *
+ * Each token is passed through `applyNotation` so direction glyphs get
+ * translated into the active notation style, then interned.
+ */
+function normalizeCommand(
+  raw: unknown,
+  applyNotation: ApplyNotationFn,
+): string[][] | null {
+  if (raw == null) return null;
+  if (!Array.isArray(raw)) {
+    // Single scalar (rare path) — wrap as a one-step, one-alt command.
+    const mapped =
+      cachedApplyNotation(String(raw), applyNotation) ?? String(raw);
+    const t = intern(mapped);
+    return t ? [[t]] : null;
+  }
+  if (raw.length === 0) return null;
+
+  const mapTok = (t: unknown): string | null => {
+    if (t == null) return null;
+    const s = String(t);
+    if (s.length === 0) return null;
+    const mapped = cachedApplyNotation(s, applyNotation) ?? s;
+    return intern(mapped);
+  };
+
+  // Nested shape: first element is itself an array.
+  if (Array.isArray(raw[0])) {
+    const out: string[][] = [];
+    for (const step of raw) {
+      if (!Array.isArray(step)) continue;
+      const alts: string[] = [];
+      for (const tok of step) {
+        const m = mapTok(tok);
+        if (m) alts.push(m);
+      }
+      if (alts.length > 0) out.push(alts);
+    }
+    return out.length > 0 ? out : null;
+  }
+
+  // Legacy flat shape: collapse "_"-separated runs into multi-alt steps.
+  const out: string[][] = [];
+  let i = 0;
+  while (i < raw.length) {
+    const tok = mapTok(raw[i]);
+    if (tok == null) {
+      i += 1;
+      continue;
+    }
+    // Peek: if the next token is "_", walk the alternation run.
+    if (i + 1 < raw.length && raw[i + 1] === "_") {
+      const alts: string[] = [tok];
+      i += 2;
+      while (i < raw.length) {
+        const nxt = mapTok(raw[i]);
+        if (nxt) alts.push(nxt);
+        i += 1;
+        if (raw[i] !== "_") break;
+        i += 1;
+      }
+      out.push(alts);
+    } else {
+      out.push([tok]);
+      i += 1;
+    }
+  }
+  return out.length > 0 ? out : null;
+}
+
+/**
  * Convert a single raw JSON move object into the rich in-memory {@link Move}.
  *
  * The raw shape uses SC6-era field names ("HitDec", "CounterHit", etc.) and
@@ -179,17 +259,7 @@ function processMove(
   charName: string,
   applyNotation: ApplyNotationFn,
 ): Move {
-  const mappedCommand = (() => {
-    const cmd = raw.Command;
-    if (cmd == null) return null;
-    const arr = Array.isArray(cmd) ? cmd : [cmd];
-    const out: string[] = [];
-    for (const c of arr) {
-      const mapped = cachedApplyNotation(String(c), applyNotation) ?? String(c);
-      out.push(intern(mapped)!);
-    }
-    return out.length > 0 ? out : null;
-  })();
+  const mappedCommand = normalizeCommand(raw.Command, applyNotation);
 
   // Outcomes. The current Python pipeline emits the pre-parsed
   //     { advantage, tags, raw }

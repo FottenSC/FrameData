@@ -24,7 +24,7 @@ interface DataTableContentProps {
   sortColumn: SortableColumn | null;
   sortDirection: "asc" | "desc";
   handleSort: (column: SortableColumn) => void;
-  renderCommand: (command: string[] | null) => React.ReactNode;
+  renderCommand: (command: string[][] | null) => React.ReactNode;
   renderNotes: (note: string | null) => React.ReactNode;
   visibleColumns: ColumnConfig[];
   badges?: Record<string, { className: string }>;
@@ -57,10 +57,16 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
   // Pagination state
   const [currentPage, setCurrentPage] = useState(0);
 
-  // Copy command to clipboard
+  // Copy command to clipboard. For multi-alt steps we take the first
+  // alternative — clipboard needs ONE concrete input to paste, and the first
+  // alt is the canonical / authored entry.
   const copyCommand = React.useCallback((move: Move) => {
     const stancePart = move.stance?.join(" ") ?? "";
-    const commandPart = move.command?.join("") ?? "";
+    const commandPart =
+      move.command
+        ?.map((step) => step[0] ?? "")
+        .filter(Boolean)
+        .join("") ?? "";
     const textToCopy = stancePart
       ? `${stancePart} ${commandPart}`
       : commandPart;

@@ -41,7 +41,17 @@ export interface Move {
   characterName: string;
 
   stringCommand: string | null;
-  command: string[] | null;
+  /**
+   * Command input as an ordered list of "steps". Each step is itself a list
+   * of alternative tokens the player can choose from — single-alternative
+   * steps (the common case) have length 1; OR-steps authored as e.g.
+   * `(3)_(6)_(9) A` become `[["(3)", "(6)", "(9)"], ["A"]]`.
+   *
+   * This replaces the older flat shape with a literal `"_"` sentinel token
+   * between alternatives. The normaliser in useMoves accepts both formats
+   * for backwards compatibility with older JSON on disk.
+   */
+  command: string[][] | null;
   stance: string[] | null;
   hitLevel: string[] | null;
 

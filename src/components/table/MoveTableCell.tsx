@@ -21,7 +21,7 @@ type BadgeMap = Record<string, { className: string }>;
 interface MoveTableCellProps {
   move: Move;
   columnId: string;
-  renderCommand: (command: string[] | null) => React.ReactNode;
+  renderCommand: (command: string[][] | null) => React.ReactNode;
   renderNotes: (note: string | null) => React.ReactNode;
   copyCommand: (move: Move) => void;
   getStanceInfo: (stance: string, characterId: number) => any;

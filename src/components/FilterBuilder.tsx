@@ -327,11 +327,36 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
   onQuickSearchChange,
   className,
 }) => {
-  const { selectedGame, hitLevels } = useGame();
+  const {
+    selectedGame,
+    hitLevels,
+    gameStances,
+    characterStances,
+    gameProperties,
+    characters,
+  } = useGame();
 
+  // Pass every registry the config factory knows how to use — that's how
+  // stance / properties / *Tags / character fields get their "In list"
+  // option population without any manual plumbing per field.
   const gameConfig: GameFilterConfig = useMemo(
-    () => getGameFilterConfig(selectedGame.id, hitLevels),
-    [selectedGame.id, hitLevels],
+    () =>
+      getGameFilterConfig(
+        selectedGame.id,
+        hitLevels,
+        gameStances,
+        characterStances,
+        gameProperties,
+        characters,
+      ),
+    [
+      selectedGame.id,
+      hitLevels,
+      gameStances,
+      characterStances,
+      gameProperties,
+      characters,
+    ],
   );
 
   const allOperators: FilterOperator[] = useMemo(() => {
@@ -829,9 +854,14 @@ const FilterRow: React.FC<BaseFilterProps & { filter: FilterCondition }> = ({
   const showRange = isRange(filter.condition);
   const field = fields.find((f) => f.id === filter.field);
   const isEnum = fieldType === "enum";
-  const multi =
-    availableConditions.find((op) => op.id === filter.condition)?.input ===
-    "multi";
+  const activeOp = availableConditions.find((op) => op.id === filter.condition);
+  const multi = activeOp?.input === "multi";
+  const hasOptions = (field?.options?.length ?? 0) > 0;
+  // MultiCombobox kicks in whenever the active operator wants a multi-value
+  // AND we know the available options (stance / properties / tags / hit
+  // level / character). This is independent of fieldType === "enum" so
+  // text-typed fields can still offer "In list" alongside contains / equals.
+  const showMultiCombobox = multi && hasOptions;
 
   const numericType = fieldType === "number";
 
@@ -891,62 +921,60 @@ const FilterRow: React.FC<BaseFilterProps & { filter: FilterCondition }> = ({
               aria-label="Maximum value"
             />
           </div>
-        ) : isEnum ? (
-          multi ? (
-            field?.id === "hitLevel" ? (
-              <HitLevelMultiCombobox
-                value={(filter.value || "")
-                  .split(",")
-                  .map((s) => s.trim())
-                  .filter(Boolean)}
-                onChange={(vals) =>
-                  onUpdateCondition(filter.id, "value", vals.join(","))
-                }
-                options={(field?.options ?? []).map((o) => ({
-                  value: o.value,
-                }))}
-                placeholder="Value"
-                className="focus-visible:ring-0 focus-visible:ring-offset-0"
-                aria-label="Select hit levels"
-              />
-            ) : (
-              <MultiCombobox
-                value={(filter.value || "")
-                  .split(",")
-                  .map((s) => s.trim())
-                  .filter(Boolean)}
-                onChange={(vals) =>
-                  onUpdateCondition(filter.id, "value", vals.join(","))
-                }
-                options={(field?.options ?? []).map((o) => ({
-                  label: o.label ?? o.value,
-                  value: o.value,
-                }))}
-                placeholder="Value"
-                className="focus-visible:ring-0 focus-visible:ring-offset-0"
-                aria-label="Select values"
-              />
-            )
+        ) : showMultiCombobox ? (
+          field?.id === "hitLevel" ? (
+            <HitLevelMultiCombobox
+              value={(filter.value || "")
+                .split(",")
+                .map((s) => s.trim())
+                .filter(Boolean)}
+              onChange={(vals) =>
+                onUpdateCondition(filter.id, "value", vals.join(","))
+              }
+              options={(field?.options ?? []).map((o) => ({
+                value: o.value,
+              }))}
+              placeholder="Value"
+              className="focus-visible:ring-0 focus-visible:ring-offset-0"
+              aria-label="Select hit levels"
+            />
           ) : (
-            <Select
-              value={filter.value}
-              onValueChange={(v) => onUpdateCondition(filter.id, "value", v)}
-            >
-              <SelectTrigger
-                className="w-[180px] h-8 focus-visible:ring-0 focus-visible:ring-offset-0"
-                aria-label="Select value"
-              >
-                <SelectValue placeholder="Value" />
-              </SelectTrigger>
-              <SelectContent>
-                {(field?.options ?? []).map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
-                    {opt.label ?? opt.value}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <MultiCombobox
+              value={(filter.value || "")
+                .split(",")
+                .map((s) => s.trim())
+                .filter(Boolean)}
+              onChange={(vals) =>
+                onUpdateCondition(filter.id, "value", vals.join(","))
+              }
+              options={(field?.options ?? []).map((o) => ({
+                label: o.label ?? o.value,
+                value: o.value,
+              }))}
+              placeholder="Value"
+              className="focus-visible:ring-0 focus-visible:ring-offset-0"
+              aria-label="Select values"
+            />
           )
+        ) : isEnum ? (
+          <Select
+            value={filter.value}
+            onValueChange={(v) => onUpdateCondition(filter.id, "value", v)}
+          >
+            <SelectTrigger
+              className="w-[180px] h-8 focus-visible:ring-0 focus-visible:ring-offset-0"
+              aria-label="Select value"
+            >
+              <SelectValue placeholder="Value" />
+            </SelectTrigger>
+            <SelectContent>
+              {(field?.options ?? []).map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label ?? opt.value}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         ) : (
           <DebouncedInput
             type={numericType ? "number" : "text"}

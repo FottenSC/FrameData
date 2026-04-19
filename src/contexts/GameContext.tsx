@@ -183,6 +183,14 @@ interface GameContextType {
    */
   getPropertyInfo: (propertyCode: string) => PropertyInfo | null;
   hitLevels: Record<string, HitLevelInfo>;
+  /**
+   * Raw registries exposed for UI surfaces that need to enumerate every
+   * possible value (the filter builder's multi-select "In list" operator
+   * populates its options from these).
+   */
+  gameStances: Record<string, StanceInfo>;
+  characterStances: Record<number, Record<string, StanceInfo>>;
+  gameProperties: Record<string, PropertyInfo>;
   gameCredits: CreditEntry[];
   gameCreditsDescription: string | null;
 }
@@ -438,6 +446,9 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       getStanceInfo,
       getPropertyInfo,
       hitLevels,
+      gameStances,
+      characterStances,
+      gameProperties,
       gameCredits,
     }),
     [
@@ -457,6 +468,9 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       getStanceInfo,
       getPropertyInfo,
       hitLevels,
+      gameStances,
+      characterStances,
+      gameProperties,
       gameCredits,
     ],
   );

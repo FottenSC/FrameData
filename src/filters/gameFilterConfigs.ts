@@ -1,6 +1,10 @@
 import { GameFilterConfig, FieldConfig } from "./types";
 import type { FilterOperator } from "./types";
-import { HitLevelInfo } from "../contexts/GameContext";
+import type {
+  HitLevelInfo,
+  PropertyInfo,
+  StanceInfo,
+} from "../contexts/GameContext";
 
 // Default field configs shared if a game doesn't override.
 //
@@ -27,64 +31,160 @@ export const defaultFields: FieldConfig[] = [
   { id: "character", label: "Character", type: "text" },
 ];
 
+// ---------------------------------------------------------------------------
+// Option builders
+// ---------------------------------------------------------------------------
+
+/**
+ * Unique sorted stance codes from the game-level registry AND every
+ * character-specific registry. The "In list" dropdown on the stance field
+ * should offer every stance any character could be in.
+ */
+function buildStanceOptions(
+  gameStances: Record<string, StanceInfo>,
+  characterStances: Record<number, Record<string, StanceInfo>>,
+): { value: string; label: string }[] {
+  const seen = new Map<string, StanceInfo>();
+  for (const [code, info] of Object.entries(gameStances)) {
+    if (!seen.has(code)) seen.set(code, info);
+  }
+  for (const charMap of Object.values(characterStances)) {
+    for (const [code, info] of Object.entries(charMap)) {
+      if (!seen.has(code)) seen.set(code, info);
+    }
+  }
+  return [...seen.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([code, info]) => ({
+      value: code,
+      label: info.name && info.name !== code ? `${code} — ${info.name}` : code,
+    }));
+}
+
+function buildOptionsFromRecord(
+  rec: Record<string, { name?: string }>,
+): { value: string; label: string }[] {
+  return Object.entries(rec)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([code, info]) => ({
+      value: code,
+      label: info.name && info.name !== code ? `${code} — ${info.name}` : code,
+    }));
+}
+
+function buildCharacterOptions(
+  characters: { id: number; name: string }[],
+): { value: string; label: string }[] {
+  return [...characters]
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((c) => ({ value: c.name, label: c.name }));
+}
+
+// ---------------------------------------------------------------------------
+// Config factory
+// ---------------------------------------------------------------------------
+
 /**
  * Generates a game-specific filter configuration.
- * @param gameId The ID of the game (e.g., 'Soulcalibur6')
- * @param hitLevels A map of tokens to their info (e.g., { H: { name: 'High', className: '...' } })
+ *
+ * Every registry arg is optional so the factory still works in tests / older
+ * call sites; in production FilterBuilder passes them all in so fields like
+ * stance / properties / tags / character get "In list" dropdowns populated
+ * with their real vocabulary.
  */
 export function getGameFilterConfig(
   gameId: string,
   hitLevels: Record<string, HitLevelInfo> = {},
+  gameStances: Record<string, StanceInfo> = {},
+  characterStances: Record<number, Record<string, StanceInfo>> = {},
+  gameProperties: Record<string, PropertyInfo> = {},
+  characters: { id: number; name: string }[] = [],
 ): GameFilterConfig {
-  // Create options for the hitLevel enum filter using the tokens as values
-  const hitLevelOptions = Object.entries(hitLevels).map(([token, info]) => ({
-    value: token,
-    label: info.name,
-  }));
+  const hitLevelOptions = buildOptionsFromRecord(hitLevels);
+  const stanceOptions = buildStanceOptions(gameStances, characterStances);
+  const propertyOptions = buildOptionsFromRecord(gameProperties);
+  const characterOptions = buildCharacterOptions(characters);
 
-  // Custom operator: checks if any of the selected values appears in the hit level string.
+  // Custom "In list" operator. Relaxed to apply to both `text` and `enum`
+  // fields so any field with an option list can use it; the old code had
+  // this pinned to `enum` only which meant stance / properties / tags
+  // couldn't surface a multi-select even though we knew all their values.
   const inListOperator: FilterOperator = {
     id: "inList",
-    label: "In List",
+    label: "In list",
     input: "multi",
-    appliesTo: ["enum"],
+    appliesTo: ["enum", "text"],
     test: ({ fieldString, value }) => {
       if (!fieldString) return false;
 
-      // Parse user selection list (comma separated tokens)
+      // User-selected values are stored comma-separated by MultiCombobox.
       const selections = (value ?? "")
         .split(",")
         .map((s) => s.trim())
         .filter(Boolean);
       if (selections.length === 0) return false;
 
-      // Normalize field string to tokens (remove extra colons / whitespace)
+      // Split the field's haystack on anything that could be a separator in
+      // our data: whitespace, colons, commas, slashes, parens. Gives a clean
+      // token set so e.g. stance "Back Side, AS" matches a selection of "AS"
+      // but not "SS".
       const normalizedTokens = fieldString
-        .split(/[\s:]+/)
+        .split(/[\s:,\/()]+/)
         .map((t) => t.trim().toLowerCase())
         .filter(Boolean);
       const tokenSet = new Set(normalizedTokens);
       const fieldLower = fieldString.toLowerCase();
 
-      // Match if any selection's token is present
       return selections.some((sel) => {
-        const mappedToken = sel.toLowerCase();
-        return tokenSet.has(mappedToken) || fieldLower.includes(mappedToken);
+        const needle = sel.toLowerCase();
+        return tokenSet.has(needle) || fieldLower.includes(needle);
       });
     },
   };
 
-  // Clone default fields and override hitLevel if hitLevels are provided
+  // Attach enum-like options + allowed operators to the relevant fields.
+  // Keep the default operators available alongside "In list" so users can
+  // still do `stance contains "W"` etc.
+  const defaultEnumOps = ["inList", "contains", "equals", "notEquals"];
+
+  const withOptions = (
+    f: FieldConfig,
+    options: { value: string; label: string }[],
+    allowed = defaultEnumOps,
+  ): FieldConfig => ({
+    ...f,
+    // Keep the type as "text" so contains / equals continue to match.
+    // The FilterBuilder uses the presence of `options` + the operator's
+    // `input === "multi"` to decide when to render a MultiCombobox.
+    type: f.type,
+    options,
+    allowedOperators: allowed,
+  });
+
   const fields = defaultFields.map((f) => {
-    if (f.id === "hitLevel" && hitLevelOptions.length > 0) {
-      return {
-        ...f,
-        type: "enum" as const,
-        allowedOperators: ["inList"],
-        options: hitLevelOptions,
-      };
+    switch (f.id) {
+      case "hitLevel":
+        return hitLevelOptions.length > 0
+          ? withOptions(f, hitLevelOptions, defaultEnumOps)
+          : f;
+      case "stance":
+        return stanceOptions.length > 0
+          ? withOptions(f, stanceOptions, defaultEnumOps)
+          : f;
+      case "properties":
+      case "hitTags":
+      case "counterHitTags":
+      case "blockTags":
+        return propertyOptions.length > 0
+          ? withOptions(f, propertyOptions, defaultEnumOps)
+          : f;
+      case "character":
+        return characterOptions.length > 0
+          ? withOptions(f, characterOptions, defaultEnumOps)
+          : f;
+      default:
+        return { ...f };
     }
-    return { ...f };
   });
 
   const config: GameFilterConfig = {
@@ -92,7 +192,6 @@ export function getGameFilterConfig(
     customOperators: [inListOperator],
   };
 
-  // Add game-specific overrides
   if (gameId === "Tekken8") {
     config.customOperators?.push({
       id: "endsWith",

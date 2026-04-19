@@ -33,7 +33,7 @@
     "KND": {
       "name": "Knockdown",
       "description": "Opponent gets knocked to the ground.",
-      "className": "bg-fuchsia-800 text-white border-white"
+      "className": "bg-fuchsia-800 text-white border-transparent"
     },
     "LH": {
       "name": "Lethal Hit",
@@ -43,7 +43,7 @@
     "LNC": {
       "name": "Launch",
       "description": "Opponent is launched into the air; combo opportunity.",
-      "className": "bg-rose-700 text-white border-white"
+      "className": "bg-rose-700 text-white border-transparent"
     },
     "RE": {
       "name": "Reversal Edge",
@@ -63,7 +63,7 @@
     "STN": {
       "name": "Stun",
       "description": "Opponent is momentarily stunned; punishable recovery.",
-      "className": "bg-pink-700 text-white border-white"
+      "className": "bg-pink-700 text-white border-transparent"
     },
     "TH": {
       "name": "Throw",

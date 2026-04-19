@@ -19,7 +19,12 @@ export const CommandIcon: React.FC<CommandIconProps> = ({
   const sizeClasses = isSlide
     ? "w-3.5 h-3.5 text-[11px]"
     : "w-5 h-5 text-[16px]";
-  const marginClasses = isSlide ? "" : "mx-0.25";
+  // A negative right-margin tucks the slide's right half *under* whatever
+  // follows. In practice the thing following a slide is a normal button
+  // (e.g. `aB`, `bK`), which then sits half-overlapping the slide — visually
+  // communicating "this small input leads into that main press". When a
+  // slide happens to be the last element the negative margin is a no-op.
+  const marginClasses = isSlide ? "-mr-2" : "mx-0.25";
 
   return (
     <div

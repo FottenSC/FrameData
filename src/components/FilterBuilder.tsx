@@ -329,12 +329,26 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
 }) => {
   const {
     selectedGame,
+    selectedCharacterId,
     hitLevels,
     gameStances,
     characterStances,
     gameProperties,
     characters,
   } = useGame();
+
+  // Scope character-specific stances to just what's relevant for the current
+  // view. When viewing a single character (Siegfried), the stance dropdown
+  // should only list game-level stances + Siegfried's own stances — not
+  // every character's stance set. When viewing All Characters we fall back
+  // to the full map so every possible stance is offered.
+  const relevantCharacterStances = useMemo(() => {
+    if (selectedCharacterId == null || selectedCharacterId === -1) {
+      return characterStances;
+    }
+    const only = characterStances[selectedCharacterId];
+    return only ? { [selectedCharacterId]: only } : {};
+  }, [characterStances, selectedCharacterId]);
 
   // Pass every registry the config factory knows how to use — that's how
   // stance / properties / *Tags / character fields get their "In list"
@@ -345,7 +359,7 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
         selectedGame.id,
         hitLevels,
         gameStances,
-        characterStances,
+        relevantCharacterStances,
         gameProperties,
         characters,
       ),
@@ -353,7 +367,7 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
       selectedGame.id,
       hitLevels,
       gameStances,
-      characterStances,
+      relevantCharacterStances,
       gameProperties,
       characters,
     ],

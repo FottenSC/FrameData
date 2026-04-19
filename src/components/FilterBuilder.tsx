@@ -207,55 +207,56 @@ interface PresetSpec {
  * Presets intentionally produce root-level conditions — they compose with
  * whatever the user already has in place via the root AND/OR operator.
  */
+// Tag-field presets use the multi-select "inList" operator (legacy id for
+// "Any of") so they're compatible with the enum typing on those fields.
+const tagPreset = (
+  presetLabel: string,
+  presetTitle: string,
+  idPrefix: string,
+  field: "hitTags" | "counterHitTags" | "blockTags" | "properties",
+  tag: string,
+): PresetSpec => ({
+  label: presetLabel,
+  title: presetTitle,
+  build: () => ({
+    id: uniqueId(idPrefix),
+    type: "condition",
+    field,
+    condition: "inList",
+    value: tag,
+    value2: "",
+  }),
+});
+
 const PRESETS: PresetSpec[] = [
-  {
-    label: "Launchers (hit)",
-    title: "Moves that launch on hit (hitTags contains LNC)",
-    build: () => ({
-      id: uniqueId("preset-lnc-hit"),
-      type: "condition",
-      field: "hitTags",
-      condition: "contains",
-      value: "LNC",
-      value2: "",
-    }),
-  },
-  {
-    label: "Launchers (CH)",
-    title: "Moves that launch on counter-hit",
-    build: () => ({
-      id: uniqueId("preset-lnc-ch"),
-      type: "condition",
-      field: "counterHitTags",
-      condition: "contains",
-      value: "LNC",
-      value2: "",
-    }),
-  },
-  {
-    label: "Knockdown (hit)",
-    title: "Moves that knock down on hit",
-    build: () => ({
-      id: uniqueId("preset-knd-hit"),
-      type: "condition",
-      field: "hitTags",
-      condition: "contains",
-      value: "KND",
-      value2: "",
-    }),
-  },
-  {
-    label: "Stun (hit)",
-    title: "Moves that stun on hit",
-    build: () => ({
-      id: uniqueId("preset-stn-hit"),
-      type: "condition",
-      field: "hitTags",
-      condition: "contains",
-      value: "STN",
-      value2: "",
-    }),
-  },
+  tagPreset(
+    "Launchers (hit)",
+    "Moves that launch on hit",
+    "preset-lnc-hit",
+    "hitTags",
+    "LNC",
+  ),
+  tagPreset(
+    "Launchers (CH)",
+    "Moves that launch on counter-hit",
+    "preset-lnc-ch",
+    "counterHitTags",
+    "LNC",
+  ),
+  tagPreset(
+    "Knockdown (hit)",
+    "Moves that knock down on hit",
+    "preset-knd-hit",
+    "hitTags",
+    "KND",
+  ),
+  tagPreset(
+    "Stun (hit)",
+    "Moves that stun on hit",
+    "preset-stn-hit",
+    "hitTags",
+    "STN",
+  ),
   {
     label: "Plus on block",
     title: "Moves at +1 or better on block",

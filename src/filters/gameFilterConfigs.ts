@@ -124,13 +124,13 @@ export function getGameFilterConfig(
   // fields so any field with an option list can use it; the old code had
   // this pinned to `enum` only which meant stance / properties / tags
   // couldn't surface a multi-select even though we knew all their values.
-  // Shared multi-select predicate used by both "Any of" and "All of".
-  // Picks fieldTokens first (exact atomic match, correct for multi-word
-  // stances and prefix-colliding codes like SC / SCH) and falls back to
-  // splitting fieldString on common separators for accessors that don't
-  // declare a token projection.
+  // Shared multi-select predicate used by the Any-of / All-of / Not-in
+  // operators. Picks fieldTokens first (exact atomic match, correct for
+  // multi-word stances and prefix-colliding codes like SC / SCH) and falls
+  // back to splitting fieldString on common separators for accessors that
+  // don't declare a token projection.
   const multiSelectMatch = (
-    mode: "any" | "all",
+    mode: "any" | "all" | "none",
     fieldString: string | null | undefined,
     fieldTokens: string[] | null | undefined,
     value: string | undefined,
@@ -144,20 +144,28 @@ export function getGameFilterConfig(
     let tokenSet: Set<string>;
     if (fieldTokens && fieldTokens.length > 0) {
       tokenSet = new Set(fieldTokens.map((t) => t.toLowerCase()));
-    } else {
-      if (!fieldString) return false;
+    } else if (fieldString) {
       tokenSet = new Set(
         fieldString
           .split(/[\s:,\/()]+/)
           .map((t) => t.trim().toLowerCase())
           .filter(Boolean),
       );
+    } else {
+      tokenSet = new Set();
     }
 
-    const iter = mode === "any" ? selections.some : selections.every;
-    return iter.call(selections, (sel: string) =>
-      tokenSet.has(sel.toLowerCase()),
-    );
+    const has = (sel: string) => tokenSet.has(sel.toLowerCase());
+    switch (mode) {
+      case "any":
+        return selections.some(has);
+      case "all":
+        return selections.every(has);
+      case "none":
+        // A row with no tokens at all trivially passes "not in" — the
+        // picks aren't there because nothing is there.
+        return selections.every((sel) => !has(sel));
+    }
   };
 
   /** Matches when AT LEAST ONE of the picks is on the row (OR / union). */
@@ -165,7 +173,7 @@ export function getGameFilterConfig(
     id: "inList",
     label: "Any of",
     input: "multi",
-    appliesTo: ["enum", "text"],
+    appliesTo: ["enum"],
     test: ({ fieldString, fieldTokens, value }) =>
       multiSelectMatch("any", fieldString, fieldTokens, value),
   };
@@ -175,56 +183,62 @@ export function getGameFilterConfig(
     id: "allOf",
     label: "All of",
     input: "multi",
-    appliesTo: ["enum", "text"],
+    appliesTo: ["enum"],
     test: ({ fieldString, fieldTokens, value }) =>
       multiSelectMatch("all", fieldString, fieldTokens, value),
   };
 
-  // Attach enum-like options + allowed operators to the relevant fields.
-  // Keep the default operators available alongside the multi-selects so
-  // users can still do `stance contains "W"` etc.
-  const defaultEnumOps = [
-    "inList", // "Any of" — OR semantics (legacy id kept for saved filters)
-    "allOf", // "All of" — AND semantics
-    "contains",
-    "equals",
-    "notEquals",
+  /** Matches when NONE of the picks are on the row (negation of Any-of). */
+  const notInOperator: FilterOperator = {
+    id: "notIn",
+    label: "Not in",
+    input: "multi",
+    appliesTo: ["enum"],
+    test: ({ fieldString, fieldTokens, value }) =>
+      multiSelectMatch("none", fieldString, fieldTokens, value),
+  };
+
+  // Multi-select fields (stance, properties, tags, hit level, character)
+  // offer ONLY the three set-membership operators. Partial string ops like
+  // "contains" / "equals" don't apply to a vocabulary that's already a
+  // known list — the user picks from options rather than typing guesses.
+  const MULTI_SELECT_OPS = [
+    "inList", // "Any of"  — at least one pick present (legacy id)
+    "allOf", // "All of"  — every pick present
+    "notIn", // "Not in"  — none of the picks present
   ];
 
   const withOptions = (
     f: FieldConfig,
     options: { value: string; label: string }[],
-    allowed = defaultEnumOps,
   ): FieldConfig => ({
     ...f,
-    // Keep the type as "text" so contains / equals continue to match.
-    // The FilterBuilder uses the presence of `options` + the operator's
-    // `input === "multi"` to decide when to render a MultiCombobox.
-    type: f.type,
+    // Flip to enum so the "Contains / Equals" text ops (which applyTo
+    // text, not enum) naturally drop out of the operator dropdown.
+    // FilterBuilder renders MultiCombobox for enum + multi operators.
+    type: "enum" as const,
     options,
-    allowedOperators: allowed,
+    allowedOperators: MULTI_SELECT_OPS,
   });
 
   const fields = defaultFields.map((f) => {
     switch (f.id) {
       case "hitLevel":
         return hitLevelOptions.length > 0
-          ? withOptions(f, hitLevelOptions, defaultEnumOps)
+          ? withOptions(f, hitLevelOptions)
           : f;
       case "stance":
-        return stanceOptions.length > 0
-          ? withOptions(f, stanceOptions, defaultEnumOps)
-          : f;
+        return stanceOptions.length > 0 ? withOptions(f, stanceOptions) : f;
       case "properties":
       case "hitTags":
       case "counterHitTags":
       case "blockTags":
         return propertyOptions.length > 0
-          ? withOptions(f, propertyOptions, defaultEnumOps)
+          ? withOptions(f, propertyOptions)
           : f;
       case "character":
         return characterOptions.length > 0
-          ? withOptions(f, characterOptions, defaultEnumOps)
+          ? withOptions(f, characterOptions)
           : f;
       default:
         return { ...f };
@@ -233,7 +247,7 @@ export function getGameFilterConfig(
 
   const config: GameFilterConfig = {
     fields,
-    customOperators: [anyOfOperator, allOfOperator],
+    customOperators: [anyOfOperator, allOfOperator, notInOperator],
   };
 
   if (gameId === "Tekken8") {

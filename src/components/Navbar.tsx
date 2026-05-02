@@ -23,6 +23,7 @@ import {
 } from "./ui/breadcrumb";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
+import { Skeleton } from "./ui/skeleton";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -47,6 +48,7 @@ export const Navbar: React.FC = () => {
   const {
     selectedGame,
     characters,
+    isCharactersLoading,
     selectedCharacterId,
     setSelectedCharacterId,
     notationStyle,
@@ -119,7 +121,11 @@ export const Navbar: React.FC = () => {
                     <BreadcrumbLink asChild>
                       <Link
                         to="/"
-                        className="flex items-center hover:text-foreground/80 transition-colors"
+                        // Adds an underline on hover in addition to the
+                        // colour shift so the link reads as clickable
+                        // even when the user isn't focused on the
+                        // colour change.
+                        className="flex items-center hover:text-foreground/80 hover:underline underline-offset-4 transition-colors"
                       >
                         {gameIcons[selectedGame.id] || (
                           <Gamepad2 className="h-4 w-4 mr-1.5 opacity-70" />
@@ -128,37 +134,58 @@ export const Navbar: React.FC = () => {
                       </Link>
                     </BreadcrumbLink>
                   </BreadcrumbItem>
-                  {characters.length > 0 && (
+                  {/*
+                    Character selector. We want the slot to always be
+                    visible once we've got a game — so on a cold load
+                    (characters list still empty) we render a
+                    skeleton-shaped placeholder the same width as the
+                    real combobox. That avoids the navbar "jumping"
+                    when characters pop in, and makes the loading state
+                    self-explanatory.
+                  */}
+                  {isCharactersLoading && characters.length === 0 ? (
                     <>
                       <BreadcrumbSeparator />
                       <BreadcrumbItem>
-                        <Combobox
-                          value={
-                            selectedCharacterId === -1
-                              ? `-1|All`
-                              : selectedCharacterId
-                                ? `${selectedCharacterId}|${characters.find((c) => c.id === selectedCharacterId)?.name || ""}`
-                                : null
-                          }
-                          onChange={handleCharacterSelect}
-                          options={[
-                            {
-                              label: "All Characters",
-                              value: "-1|All",
-                            },
-                            ...(characters.map((c) => ({
-                              label: c.name,
-                              value: `${c.id}|${c.name}`,
-                            })) as ComboboxOption[]),
-                          ]}
-                          placeholder="Select Character"
-                          className="w-[200px] font-medium"
-                          buttonVariant="ghost"
-                          buttonClassName="border-0 shadow-none hover:bg-muted/40 focus:ring-0 focus-visible:ring-0 focus:outline-none"
-                          aria-label="Select character"
+                        <Skeleton
+                          className="h-7 w-[200px] rounded-md"
+                          aria-label="Loading characters"
                         />
                       </BreadcrumbItem>
                     </>
+                  ) : (
+                    characters.length > 0 && (
+                      <>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                          <Combobox
+                            value={
+                              selectedCharacterId === -1
+                                ? `-1|All`
+                                : selectedCharacterId
+                                  ? `${selectedCharacterId}|${characters.find((c) => c.id === selectedCharacterId)?.name || ""}`
+                                  : null
+                            }
+                            onChange={handleCharacterSelect}
+                            options={[
+                              {
+                                label: "All Characters",
+                                value: "-1|All",
+                              },
+                              ...(characters.map((c) => ({
+                                label: c.name,
+                                value: `${c.id}|${c.name}`,
+                              })) as ComboboxOption[]),
+                            ]}
+                            placeholder="Select Character"
+                            className="w-[200px] font-medium"
+                            buttonVariant="ghost"
+                            buttonClassName="border-0 shadow-none hover:bg-muted/40 focus:ring-0 focus-visible:ring-0 focus:outline-none"
+                            aria-label="Select character"
+                          />
+                        </BreadcrumbItem>
+                      </>
+                    )
                   )}
                 </>
               )}
@@ -182,18 +209,33 @@ export const Navbar: React.FC = () => {
                 {activeFiltersCount === 1 ? "filter" : "filters"}
               </Badge>
 
-              {/* Move count badge */}
-              <Badge
-                variant="outline"
-                className={cn(
-                  "text-xs font-normal hidden sm:inline-flex",
-                  isUpdating && "opacity-50",
-                )}
-              >
-                {filteredMoves}
-                {totalMoves !== filteredMoves && ` / ${totalMoves}`} moves
-                {isUpdating && " ..."}
-              </Badge>
+              {/*
+                Move count badge. On a cold load the toolbar context
+                starts with `totalMoves === 0`, which would read as
+                "0 moves" until data arrives — a misleading readout
+                that users can mistake for an actual empty result. In
+                that state we render a skeleton pill at the same size
+                instead, and only fall back to the badge once we have
+                real numbers or a non-empty stale value to show.
+              */}
+              {isUpdating && totalMoves === 0 ? (
+                <Skeleton
+                  className="h-5 w-20 rounded-md hidden sm:inline-flex"
+                  aria-label="Loading moves"
+                />
+              ) : (
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    "text-xs font-normal hidden sm:inline-flex",
+                    isUpdating && "opacity-50",
+                  )}
+                >
+                  {filteredMoves}
+                  {totalMoves !== filteredMoves && ` / ${totalMoves}`} moves
+                  {isUpdating && " ..."}
+                </Badge>
+              )}
 
               {/* Desktop view - visible on md and up */}
               <button

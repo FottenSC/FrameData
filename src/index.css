@@ -18,8 +18,14 @@
   --accent-foreground: hsl(0, 0%, 98%);
   --destructive: hsl(358, 83%, 66%);
   --destructive-foreground: hsl(0, 0%, 100%);
-  --border: hsla(0, 0%, 100%, 0.1);
-  --input: hsla(0, 0%, 100%, 0.15);
+  /*
+   * Border / input tints derived from the theme foreground via
+   * color-mix so they follow the palette instead of hard-coding white.
+   * `in oklab` gives perceptually uniform mixing (stays neutral grey
+   * instead of drifting blue the way sRGB blends can).
+   */
+  --border: color-mix(in oklab, var(--foreground) 10%, transparent);
+  --input: color-mix(in oklab, var(--foreground) 15%, transparent);
   --ring: hsl(0, 0%, 55%);
   --chart-1: hsl(262, 70%, 50%);
   --chart-2: hsl(160, 60%, 60%);
@@ -32,8 +38,80 @@
   --sidebar-primary-foreground: hsl(0, 0%, 98%);
   --sidebar-accent: hsl(0, 0%, 20%);
   --sidebar-accent-foreground: hsl(0, 0%, 98%);
-  --sidebar-border: hsla(0, 0%, 100%, 0.1);
+  --sidebar-border: color-mix(in oklab, var(--sidebar-foreground) 10%, transparent);
   --sidebar-ring: hsl(0, 0%, 55%);
+}
+
+/*
+ * Native <dialog> styling.
+ *
+ *   - `::backdrop` is the top-layer scrim. We replace the UA default
+ *     (barely-visible) with a proper dimmer that matches the old
+ *     Radix-era overlay.
+ *   - The `open` attribute is added/removed by `.showModal()` /
+ *     `.close()`. When the dialog is NOT open we set `display: none`
+ *     so the element doesn't occupy layout space (a stray non-modal
+ *     dialog in the DOM otherwise takes a block and pushes siblings).
+ */
+dialog::backdrop {
+  background-color: color-mix(in srgb, black 50%, transparent);
+  backdrop-filter: blur(2px);
+}
+
+dialog:not([open]) {
+  display: none;
+}
+
+/*
+ * View Transitions tuning.
+ *
+ * When `document.startViewTransition` is used for a route change, the
+ * browser synthesises a `::view-transition-old(root)` (fading out) and
+ * `::view-transition-new(root)` (fading in) pseudo-element from the
+ * before / after snapshots. The default duration is 250 ms, which can
+ * feel a touch slow — 180 ms reads as "snappy" without being abrupt.
+ *
+ * `prefers-reduced-motion` is honoured at the JS level (our wrapper
+ * skips the transition entirely), but we also set zero-duration here
+ * as a belt-and-braces guard for edge cases where the API fires anyway.
+ */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 180ms;
+  animation-timing-function: ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0ms;
+  }
+}
+
+/*
+ * Prefer balanced line breaks for short-form headings, and the more
+ * intelligent "pretty" wrap for body copy. Both are progressive
+ * enhancements — browsers that don't support them fall back to the
+ * default greedy wrapper, which is what the app got before.
+ *
+ *   - `balance` suits headings up to ~6 lines (the browser optimises
+ *     line lengths so a centred heading doesn't leave one orphan word
+ *     on the last line).
+ *   - `pretty` suits paragraphs (fewer rivers / orphans, no visible
+ *     cost on short text).
+ */
+h1,
+h2,
+h3,
+h4,
+.text-balance,
+[data-text-balance] {
+  text-wrap: balance;
+}
+
+p,
+.text-pretty {
+  text-wrap: pretty;
 }
 
 /* WebKit Scrollbar Styling */
@@ -104,14 +182,17 @@
 /*
  * Toast countdown progress bar.
  *
- * Any Sonner toast that carries the `copied-toast` class (see
- * `showCopiedToast` in src/components/ui/copy-toast.tsx) gets a 2px progress
- * rail at the bottom that scales from full → zero over the toast's lifetime.
+ * `showCopiedToast` (src/components/ui/copy-toast.tsx) renders a
+ * `.copied-toast` card via `toast.custom` with `unstyled: true`. We draw
+ * a 3px emerald rail at the bottom of the card that scales from full →
+ * zero over the toast's lifetime. The animation duration is driven by
+ * the `--toast-duration` custom property set inline per toast, so the
+ * single CSS rule below handles any length.
  *
- * The animation duration is driven by the `--toast-duration` custom property
- * set inline per toast, so a single CSS rule handles any length. We target
- * the Sonner wrapper (`[data-sonner-toast]`) so the rule works regardless of
- * Sonner's `unstyled` / `richColors` state.
+ * The rule targets `.copied-toast` directly (not `[data-sonner-toast]`)
+ * because `unstyled: true` removes Sonner's wrapper attributes. We also
+ * keep the legacy `[data-sonner-toast]` selector below for any toast
+ * that re-introduces the wrapper later.
  */
 @keyframes toastProgress {
   from {
@@ -122,21 +203,44 @@
   }
 }
 
-[data-sonner-toast].copied-toast {
+.copied-toast {
   position: relative;
-  overflow: hidden;
+  /*
+   * Custom toast wrappers don't naturally animate in. Borrow Sonner's
+   * own slide-in keyframes by reusing the same shape: a tiny upward
+   * translate + opacity sweep. Lasts long enough to read as
+   * intentional, short enough not to delay confirmation.
+   */
+  animation: copiedToastIn 180ms ease-out both;
 }
-[data-sonner-toast].copied-toast::after {
+
+@keyframes copiedToastIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.copied-toast::after {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  height: 2px;
-  background: currentColor;
-  opacity: 0.55;
+  height: 3px;
+  background: linear-gradient(
+    to right,
+    color-mix(in oklab, var(--primary) 70%, transparent),
+    var(--primary)
+  );
   transform-origin: left center;
   animation: toastProgress var(--toast-duration, 1800ms) linear forwards;
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
 }
 
 .character-grid-container {
@@ -148,6 +252,16 @@
     /* @apply border-border outline-ring/50; */
     border-color: var(--border);
     outline-color: color-mix(in srgb, var(--ring) 50%, transparent);
+  }
+  /*
+   * Re-instate the historical "buttons get a pointer cursor" affordance
+   * that Tailwind v4's preflight dropped. Applies to raw <button> and
+   * to anything explicitly marked as a button via role. Disabled
+   * buttons opt back out so they don't lie about being interactive.
+   */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
   }
   body {
     background-color: var(--background);
@@ -194,10 +308,10 @@
     transition: background-color 0.2s ease;
   }
   .title-interactive:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: color-mix(in oklab, var(--foreground) 5%, transparent);
   }
   .title-interactive:active {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: color-mix(in oklab, var(--foreground) 10%, transparent);
   }
 
   /* Selection styling */

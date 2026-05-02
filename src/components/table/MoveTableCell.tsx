@@ -174,12 +174,19 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
 
       case "command":
         return (
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-2 group/cmd">
             <span className="flex-1">{renderCommand(move.command)}</span>
             <button
+              type="button"
               onClick={() => copyCommand(move)}
-              className="flex-shrink-0 p-1 rounded hover:bg-muted transition-colors opacity-50 hover:opacity-100"
+              // The icon was easy to miss — it lived at 50% opacity
+              // until hovered. Now it stays at full strength when the
+              // ROW is hovered (group-hover) and becomes a defined
+              // pill on direct hover, with the global cursor: pointer
+              // rule providing the standard click affordance.
+              className="flex-shrink-0 p-1 rounded text-muted-foreground opacity-30 group-hover/cmd:opacity-100 hover:bg-muted hover:text-foreground transition-all focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               title="Copy command"
+              aria-label="Copy command"
             >
               <Copy className="h-3.5 w-3.5" />
             </button>

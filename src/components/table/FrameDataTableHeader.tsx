@@ -28,10 +28,26 @@ export const FrameDataTableHeader: React.FC<FrameDataTableHeaderProps> = ({
           return (
             <TableHead
               key={column.id}
-              className={column.className + " cursor-pointer select-none"}
+              // `hover:bg-muted/40` gives the click target a clear hover
+              // affordance — without it the only signal the header is
+              // sortable was the cursor change, easy to miss. Active
+              // sort column gets a stronger background so it visually
+              // pairs with its arrow indicator.
+              className={
+                column.className +
+                " cursor-pointer select-none transition-colors hover:bg-muted/40 " +
+                (sortColumn === column.id ? "bg-muted/30 " : "")
+              }
               style={style}
               onClick={() => handleSort(column.id as SortableColumn)}
               title={column.friendlyLabel || column.label}
+              aria-sort={
+                sortColumn === column.id
+                  ? sortDirection === "asc"
+                    ? "ascending"
+                    : "descending"
+                  : "none"
+              }
             >
               <div className="flex items-center justify-between gap-1">
                 <span className="whitespace-nowrap flex-1">{column.label}</span>

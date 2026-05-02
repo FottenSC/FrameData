@@ -337,12 +337,12 @@ export const UserSettingsProvider: React.FC<UserSettingsProviderProps> = ({
     () =>
       columnConfigs
         .filter((col) => col.visible)
-        .sort((a, b) => a.order - b.order),
+        .toSorted((a, b) => a.order - b.order),
     [columnConfigs],
   );
 
   const getSortedColumns = useCallback(
-    () => [...columnConfigs].sort((a, b) => a.order - b.order),
+    () => columnConfigs.toSorted((a, b) => a.order - b.order),
     [columnConfigs],
   );
 

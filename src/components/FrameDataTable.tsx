@@ -5,6 +5,7 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useParams, useNavigate } from "@tanstack/react-router";
 import {
   Card,
@@ -41,13 +42,19 @@ const createComparator = (
   getter: (move: Move) => number | string | null,
 ) => {
   const order = direction === "asc" ? 1 : -1;
+  // Null handling is intentionally direction-INDEPENDENT: nulls always
+  // sort to the bottom. Returning a positive number from the comparator
+  // means "A comes after B"; multiplying by `order` would flip nulls to
+  // the top in descending mode, which read as the worst row appearing
+  // first — confusing for users who expect "no value" to mean "no
+  // ranking". So we bypass `order` for the null branches.
   if (fieldType === "number") {
     return (a: Move, b: Move): number => {
       const valA = getter(a) as number | null;
       const valB = getter(b) as number | null;
       if (valA == null && valB == null) return 0;
-      if (valA == null) return order;
-      if (valB == null) return -order;
+      if (valA == null) return 1;
+      if (valB == null) return -1;
       return (valA - valB) * order;
     };
   }
@@ -55,8 +62,8 @@ const createComparator = (
     const valA = getter(a);
     const valB = getter(b);
     if (valA == null && valB == null) return 0;
-    if (valA == null) return order;
-    if (valB == null) return -order;
+    if (valA == null) return 1;
+    if (valB == null) return -1;
     return String(valA).localeCompare(String(valB)) * order;
   };
 };
@@ -117,6 +124,13 @@ export const FrameDataTable: React.FC = () => {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const [activeFilters, setActiveFilters] = useState<FilterItem[]>([]);
+  // Debounce filter changes before feeding them into the (potentially
+  // expensive) `displayedMoves` memo. FilterBuilder already wraps updates
+  // in `startTransition`, so React can interrupt re-renders, but the
+  // filter-evaluation pass itself still runs per keystroke. 120ms is
+  // short enough to feel instant but long enough to coalesce typing
+  // bursts across thousands of rows.
+  const debouncedActiveFilters = useDebouncedValue(activeFilters, 120);
 
   const baseColumns = getVisibleColumns();
   const visibleColumns = useMemo(
@@ -355,29 +369,30 @@ export const FrameDataTable: React.FC = () => {
     if (originalMoves.length === 0) return [];
     let result = originalMoves;
 
-    if (activeFilters.length > 0) {
+    if (debouncedActiveFilters.length > 0) {
       result = result.filter((move) =>
-        activeFilters.every((filter) => applyFilterItem(move, filter)),
+        debouncedActiveFilters.every((filter) => applyFilterItem(move, filter)),
       );
     }
 
     if (sortColumn) {
       const acc = accessors[sortColumn];
       if (acc) {
-        result = [...result];
         const comparator = createComparator(
           sortDirection,
           acc.sortType,
           acc.sortValue,
         );
-        result.sort(comparator);
+        // toSorted is the immutable ES2023 variant — returns a new
+        // sorted array in one step, no copy-then-mutate ceremony.
+        result = result.toSorted(comparator);
       }
     }
     return result;
   }, [
     sortColumn,
     originalMoves,
-    activeFilters,
+    debouncedActiveFilters,
     sortDirection,
     applyFilterItem,
     accessors,
@@ -444,8 +459,13 @@ export const FrameDataTable: React.FC = () => {
   }, [deferredMoves.length, setFilteredMoves]);
 
   useEffect(() => {
-    setIsUpdating(isStale || isPlaceholderData);
-  }, [isStale, isPlaceholderData, setIsUpdating]);
+    // `isUpdating` drives the navbar's "loading" affordances (skeleton
+    // on the move-count badge, "…" suffix). We flip it true for any
+    // in-flight state — cold initial load, background refetch, or a
+    // stale deferred-value transition — so the navbar can show a
+    // skeleton instead of a stale "0 / 0 moves" readout.
+    setIsUpdating(movesLoading || isStale || isPlaceholderData);
+  }, [movesLoading, isStale, isPlaceholderData, setIsUpdating]);
 
   if (error) {
     return (

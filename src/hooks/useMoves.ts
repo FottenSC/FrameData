@@ -1,7 +1,6 @@
 import {
   useQuery,
-  useQueryClient,
-  QueryClient,
+  useQueries,
   keepPreviousData,
 } from "@tanstack/react-query";
 import { Move, MoveOutcome } from "@/types/Move";
@@ -261,23 +260,34 @@ function processMove(raw: any, charId: number, charName: string): Move {
 }
 
 // ---------- Query hook ----------
+//
+// Caching strategy: character JSON only changes on deploy, so we mark each
+// per-character query as `staleTime: Infinity`. Once fetched, react-query
+// will serve the in-memory cache for the rest of the session without any
+// revalidation round-trip. `gcTime` is generous (30 min) so backgrounded
+// tabs don't evict the big "all characters" set on return.
+//
+// The "All" selection is implemented as N parallel per-character queries
+// via `useQueries` rather than a single aggregate query. That gives us two
+// wins:
+//
+//   1. **Progressive display** — rows appear as each character's JSON
+//      lands, instead of waiting for the slowest request.
+//   2. **Cache reuse** — the same query keys back individual character
+//      views, so clicking Astaroth after "All" is instant.
 
-async function fetchAllCharactersMoves(
-  gameId: string,
-  queryClient: QueryClient,
-  characters: Character[],
-): Promise<Move[]> {
-  const allResults = await Promise.all(
-    characters.map((char) =>
-      queryClient.fetchQuery({
-        queryKey: ["moves", gameId, char.id],
-        queryFn: () => fetchCharacterMoves(gameId, char.id, char.name),
-        staleTime: 1000 * 60 * 30,
-      }),
-    ),
-  );
-  return allResults.flat();
-}
+const MOVES_STALE_TIME = Infinity;
+const MOVES_GC_TIME = 1000 * 60 * 30;
+
+/**
+ * Shared empty-array sentinel. Returning `[]` literals every render
+ * would churn referential identity and cascade through downstream
+ * useMemos (displayedMoves, deferredMoves) causing an infinite
+ * re-render loop: fresh `[]` → fresh `displayedMoves` → useDeferredValue
+ * reports stale → toolbar `setIsUpdating(true)` → context propagates →
+ * re-render → fresh `[]` again.
+ */
+const EMPTY_MOVES: readonly Move[] = Object.freeze([]);
 
 interface UseMoveOptions {
   gameId: string | undefined;
@@ -285,27 +295,111 @@ interface UseMoveOptions {
   characters: Character[];
 }
 
+interface UseMovesResult {
+  data: Move[];
+  isLoading: boolean;
+  isPlaceholderData: boolean;
+  error: unknown;
+  /**
+   * Progressive-load telemetry for the "All" case. `loaded` is the number
+   * of characters whose move JSON has already arrived; `total` is the total
+   * number expected. For single-character views these are always 1/1 once
+   * the data lands. Components can use the ratio to show a progress bar
+   * while characters are still being fetched.
+   */
+  loaded: number;
+  total: number;
+}
+
 export function useMoves({
   gameId,
   characterId,
   characters,
-}: UseMoveOptions) {
-  const queryClient = useQueryClient();
+}: UseMoveOptions): UseMovesResult {
+  const isAll = characterId === -1;
 
-  return useQuery({
+  // Single-character path. Disabled when "All" is selected — we fall back
+  // to the per-character fan-out below.
+  const singleQuery = useQuery<Move[]>({
     queryKey: ["moves", gameId, characterId],
-    queryFn: async () => {
-      if (!gameId || characterId === null) return [];
-      if (characterId === -1) {
-        return fetchAllCharactersMoves(gameId, queryClient, characters);
-      }
+    queryFn: () => {
       const charName =
         characters.find((c) => c.id === characterId)?.name || "Unknown";
-      return fetchCharacterMoves(gameId, characterId, charName);
+      return fetchCharacterMoves(gameId!, characterId!, charName);
     },
-    enabled: !!gameId && characterId !== null,
-    staleTime: 1000 * 60 * 5,
-    gcTime: characterId === -1 ? 1000 * 60 * 5 : 1000 * 60 * 15,
+    enabled: !!gameId && characterId !== null && !isAll,
+    staleTime: MOVES_STALE_TIME,
+    gcTime: MOVES_GC_TIME,
     placeholderData: keepPreviousData,
   });
+
+  // "All" path. One useQuery per character running in parallel; `combine`
+  // folds them into a single stable result.
+  //
+  // Why `combine` and not a local `useMemo`: `useQueries` returns a new
+  // array identity on every render, so a `useMemo` keyed on that array
+  // recomputes every render, producing a fresh `{data, isLoading, ...}`
+  // object each time. Downstream consumers (FrameDataTable's
+  // `displayedMoves` memo, `useDeferredValue`) see churning identity and
+  // fall into a re-render loop. react-query's `combine` handles this
+  // correctly: its return value is compared structurally against the
+  // previous one and the prior reference is reused when nothing material
+  // changed.
+  const allResult = useQueries({
+    queries:
+      isAll && gameId
+        ? characters.map((char) => ({
+            queryKey: ["moves", gameId, char.id],
+            queryFn: () => fetchCharacterMoves(gameId, char.id, char.name),
+            staleTime: MOVES_STALE_TIME,
+            gcTime: MOVES_GC_TIME,
+          }))
+        : [],
+    combine: (results): UseMovesResult => {
+      if (results.length === 0) {
+        return {
+          data: EMPTY_MOVES as Move[],
+          isLoading: true,
+          isPlaceholderData: false,
+          error: null,
+          loaded: 0,
+          total: 0,
+        };
+      }
+      const out: Move[] = [];
+      let loaded = 0;
+      let firstError: unknown = null;
+      for (const r of results) {
+        if (r.data) {
+          out.push(...r.data);
+          loaded += 1;
+        }
+        if (!firstError && r.error) firstError = r.error;
+      }
+      const fullyLoaded = loaded === results.length;
+      return {
+        // Hold `data` back until the whole batch is in, then reveal all
+        // at once. See comment in earlier iteration for rationale — a
+        // progressive row-by-row reveal made the skeleton vanish too
+        // early and the table "grew" in a way users read as buggy.
+        data: fullyLoaded ? out : (EMPTY_MOVES as Move[]),
+        isLoading: !fullyLoaded,
+        isPlaceholderData: false,
+        error: firstError,
+        loaded,
+        total: results.length,
+      };
+    },
+  });
+
+  if (isAll) return allResult;
+
+  return {
+    data: singleQuery.data ?? (EMPTY_MOVES as Move[]),
+    isLoading: singleQuery.isLoading,
+    isPlaceholderData: singleQuery.isPlaceholderData,
+    error: singleQuery.error,
+    loaded: singleQuery.data ? 1 : 0,
+    total: 1,
+  };
 }

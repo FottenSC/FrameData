@@ -16,7 +16,8 @@ import {
 } from "@/lib/notation";
 import { useUserSettings } from "./UserSettingsContext";
 import { clearStringCache } from "@/hooks/useMoves";
-import { loadGameData } from "@/lib/loadGameData";
+import { loadGameData, getCachedGameData } from "@/lib/loadGameData";
+import { withViewTransition } from "@/lib/viewTransition";
 
 // Define configuration for a game-specific icon with its alt text
 export interface IconConfig {
@@ -253,32 +254,53 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
   useEffect(() => {
     let cancelled = false;
-    const run = async () => {
-      if (!selectedGame) {
-        setCharacters([]);
-        setIsCharactersLoading(false);
-        setCharacterError("No game selected.");
-        return;
-      }
 
-      // Clear interning caches when switching games to free memory
-      clearStringCache();
+    /** Shared "apply parsed GameData to context state" helper. */
+    const applyGameData = (data: ReturnType<typeof getCachedGameData>) => {
+      if (!data) return;
+      setCharacters(data.characters);
+      setGameCredits(data.credits);
+      setGameCreditsDescription(data.creditsDescription);
+      setGameStances(data.gameStances);
+      setGameProperties(data.gameProperties);
+      setCharacterStances(data.characterStances);
+      setHitLevels(data.hitLevels);
+    };
 
-      setIsCharactersLoading(true);
-      setCharacterError(null);
+    if (!selectedGame) {
       setCharacters([]);
+      setIsCharactersLoading(false);
+      setCharacterError("No game selected.");
+      return;
+    }
 
+    // Cache-hit fast path. If Game.json has already been fetched and
+    // parsed this session, populate state synchronously in this same
+    // render pass. We deliberately do NOT flip `isCharactersLoading` to
+    // true or clear `characters` first — that would force a one-frame
+    // "empty skeleton" flicker on a transition that should feel
+    // instantaneous (especially when the user is just flipping between
+    // two games they've already visited).
+    const cached = getCachedGameData(selectedGame.id);
+    if (cached) {
+      applyGameData(cached);
+      setCharacterError(null);
+      setIsCharactersLoading(false);
+      return;
+    }
+
+    // Cold path: no cache hit, fetch + parse. Only now do we show the
+    // skeleton and drop the stale character list.
+    clearStringCache();
+    setIsCharactersLoading(true);
+    setCharacterError(null);
+    setCharacters([]);
+
+    (async () => {
       try {
         const data = await loadGameData(selectedGame.id);
         if (cancelled) return;
-
-        setCharacters(data.characters);
-        setGameCredits(data.credits);
-        setGameCreditsDescription(data.creditsDescription);
-        setGameStances(data.gameStances);
-        setGameProperties(data.gameProperties);
-        setCharacterStances(data.characterStances);
-        setHitLevels(data.hitLevels);
+        applyGameData(data);
       } catch (err) {
         if (cancelled) return;
         setCharacterError(
@@ -290,9 +312,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       } finally {
         if (!cancelled) setIsCharactersLoading(false);
       }
-    };
+    })();
 
-    run();
     return () => {
       // Guard against a late-arriving response after the user switches games.
       cancelled = true;
@@ -307,39 +328,45 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
   const handleSetSelectedGameById = (gameId: string) => {
     const game = avaliableGames.find((g) => g.id === gameId);
-    if (game && game.id !== selectedGame?.id) {
-      if (typeof React.startTransition === "function") {
-        React.startTransition(() => {
-          setSelectedGame(game);
-          setSelectedCharacterId(null);
-        });
-      } else {
-        setSelectedGame(game);
-        setSelectedCharacterId(null);
-      }
+    if (!game) return;
+
+    // Two layers of smoothing:
+    //   1. `startViewTransition` gives the BROWSER a cross-fade — it
+    //      snapshots old DOM, runs our callback, snapshots new DOM, and
+    //      animates between them. Falls back to a no-op on browsers
+    //      that don't support it.
+    //   2. `React.startTransition` tells REACT this is a non-urgent
+    //      update, so Suspense boundaries can keep the previous route
+    //      mounted until the next one is ready instead of flashing a
+    //      fallback. Combined with the cache-hit fast path in the
+    //      data-loading effect, the result is a smooth crossfade
+    //      rather than a vanish-then-skeleton flash.
+    const apply = () => {
+      if (game.id !== selectedGame?.id) setSelectedGame(game);
+      setSelectedCharacterId(null);
       navigate({ to: `/${game.id}` });
-    } else if (game && game.id === selectedGame?.id) {
+    };
+    withViewTransition(() => {
       if (typeof React.startTransition === "function") {
-        React.startTransition(() => {
-          setSelectedCharacterId(null);
-        });
+        React.startTransition(apply);
       } else {
-        setSelectedCharacterId(null);
+        apply();
       }
-      navigate({ to: `/${game.id}` });
-    }
+    });
   };
 
   const handleSetSelectedCharacterId = (id: number | null) => {
-    if (id !== selectedCharacterId) {
+    if (id === selectedCharacterId) return;
+    // Cross-fade character switches the same way we do game switches.
+    // See the comment in handleSetSelectedGameById for why both layers
+    // of transition are wanted.
+    withViewTransition(() => {
       if (typeof React.startTransition === "function") {
-        React.startTransition(() => {
-          setSelectedCharacterId(id);
-        });
+        React.startTransition(() => setSelectedCharacterId(id));
       } else {
         setSelectedCharacterId(id);
       }
-    }
+    });
   };
 
   // Combine game-specific icons with universal directional icons

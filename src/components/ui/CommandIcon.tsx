@@ -84,7 +84,11 @@ export const CommandIcon: React.FC<CommandIconProps> = ({
       <TooltipTrigger asChild>
         <div
           className={cn(
-            "inline-flex items-center justify-center font-bold align-middle font-sans cursor-default",
+            // `leading-none` collapses the line box to the font's em height
+            // so flex centering aligns on the actual glyph rather than on
+            // the inflated default line-height. Without it tall capitals
+            // (especially with `font-bold`) land a pixel high in the box.
+            "inline-flex items-center justify-center font-bold align-middle font-sans cursor-default leading-none text-center",
             sizeClasses,
             marginClasses,
             isSlide ? "self-end" : "",
@@ -94,7 +98,14 @@ export const CommandIcon: React.FC<CommandIconProps> = ({
             isHeld ? heldClasses : baseClasses,
           )}
         >
-          {code}
+          {/*
+            Wrap the glyph in its own block so the flex container sees a
+            single uniform child. Otherwise the bare text node inherits
+            inline phrasing rules and any side-bearing skew from the font
+            (notable for letters like "K" / "G") shifts the visible glyph
+            off-centre horizontally.
+          */}
+          <span className="block translate-y-[-0.5px]">{code}</span>
         </div>
       </TooltipTrigger>
       <TooltipContent>

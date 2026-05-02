@@ -36,6 +36,7 @@ import type {
 import { MultiCombobox } from "./ui/multi-combobox";
 import { HitLevelMultiCombobox } from "./ui/hitlevel-multi-combobox";
 import { Combobox } from "./ui/combobox";
+import { ComboboxWarmup } from "./ui/combobox-warmup";
 
 export type {
   FilterCondition,
@@ -643,6 +644,13 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
   return (
     <div className={cn("mb-1 custom-search-builder pt-2", className)}>
       {/*
+        Hidden, idle-time warmup of the cmdk + Radix popover render path.
+        See ComboboxWarmup for the rationale — the first user-triggered
+        combobox open used to feel laggy, this primes the cold path
+        before they touch anything.
+      */}
+      <ComboboxWarmup />
+      {/*
         Quick search input = a view into the pinned filter row's value.
         Typing here and editing the first row in the advanced tree are the
         same action: both mutate the PINNED_QUICK_SEARCH_ID condition.
@@ -704,8 +712,22 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
 
       {/* Collapsible advanced builder */}
       <div
-        className="flex items-center gap-2 mb-1 cursor-pointer select-none hover:text-primary transition-colors"
+        // Click target is the whole row — give it a real hover
+        // background plus the existing colour shift so it reads as a
+        // button, not as static text. `-mx-2 px-2 py-1 rounded-md` so
+        // the highlight has padding without changing the row's outer
+        // alignment.
+        className="-mx-2 px-2 py-1 rounded-md flex items-center gap-2 mb-1 cursor-pointer select-none hover:bg-muted/40 hover:text-primary transition-colors"
         onClick={() => setIsExpanded(!isExpanded)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setIsExpanded(!isExpanded);
+          }
+        }}
+        aria-expanded={isExpanded}
       >
         <ChevronDown
           className={cn(

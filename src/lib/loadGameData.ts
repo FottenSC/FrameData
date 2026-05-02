@@ -148,11 +148,28 @@ const parseCharacterStances = (
 };
 
 /**
- * Fetch and parse the Game.json file for a given game id.
- * Throws on network failure; shape errors in the JSON are tolerated and
- * surface as empty registries.
+ * Module-level promise cache.
+ *
+ * Game.json is build-time constant (regenerated only on deploy), so once
+ * fetched and parsed there's nothing to be gained by redoing the work.
+ * Storing the in-flight *promise* (not the resolved value) means:
+ *
+ *   - Concurrent callers — e.g. a hover-prefetch racing a click — share the
+ *     same underlying fetch instead of firing two network requests.
+ *   - A failed fetch self-evicts so a retry can actually retry.
  */
-export async function loadGameData(gameId: string): Promise<GameData> {
+const gameDataCache = new Map<string, Promise<GameData>>();
+
+/**
+ * Synchronously-available cache of already-resolved Game.json payloads.
+ * The promise map above is the source of truth (it also tracks in-flight
+ * fetches); this mirror exists so UI code can detect a cache hit
+ * *without* awaiting a microtask, avoiding a one-frame "loading"
+ * flicker when switching to a game whose data is already in memory.
+ */
+const resolvedGameDataCache = new Map<string, GameData>();
+
+async function doLoadGameData(gameId: string): Promise<GameData> {
   const url = `/Games/${encodeURIComponent(gameId)}/Game.json`;
   const res = await fetch(url);
   if (!res.ok) {
@@ -173,4 +190,83 @@ export async function loadGameData(gameId: string): Promise<GameData> {
     credits: credits.list,
     creditsDescription: credits.description,
   };
+}
+
+/**
+ * Fetch and parse the Game.json file for a given game id. Results are
+ * memoised for the lifetime of the page, so switching between games is
+ * instant after the first visit.
+ */
+export function loadGameData(gameId: string): Promise<GameData> {
+  const cached = gameDataCache.get(gameId);
+  if (cached) return cached;
+
+  const promise = doLoadGameData(gameId)
+    .then((data) => {
+      resolvedGameDataCache.set(gameId, data);
+      return data;
+    })
+    .catch((err) => {
+      // Drop the failed promise so the next call retries instead of
+      // indefinitely replaying the error.
+      gameDataCache.delete(gameId);
+      throw err;
+    });
+  gameDataCache.set(gameId, promise);
+  return promise;
+}
+
+/**
+ * Synchronous cache probe. Returns the fully-parsed `GameData` for
+ * `gameId` if it's already been loaded *and* resolved in this session,
+ * otherwise `null`.
+ *
+ * Intended for UI code that wants to skip a loading indicator when it
+ * can see the data is already in memory — e.g. switching between games
+ * the user has visited before. Callers should still call
+ * {@link loadGameData} as the authoritative source and treat this probe
+ * as a pure optimisation.
+ */
+export function getCachedGameData(gameId: string): GameData | null {
+  return resolvedGameDataCache.get(gameId) ?? null;
+}
+
+/**
+ * Fire-and-forget variant that warms the cache. Intended for hover /
+ * idle-time prefetching; swallows errors so a broken prefetch can't
+ * surface as a rejected promise.
+ */
+export function prefetchGameData(gameId: string): void {
+  loadGameData(gameId).catch(() => {
+    /* prefetch errors are silent — the real load will surface them */
+  });
+}
+
+/**
+ * Pre-warm the browser HTTP cache with all character thumbnail URLs for a
+ * given game. Used on hover of a game tile so that, by the time the
+ * character-selection grid mounts, the 30-odd `<img>` tags resolve from
+ * cache instead of kicking off a fresh concurrent download cascade.
+ *
+ * Uses the Image constructor rather than `<link rel="preload">` because
+ * image preloads are subject to `as="image"` + `imagesrcset` matching
+ * rules that are fiddly to get right from JS; `new Image()` with a `src`
+ * reliably triggers a regular image fetch that the subsequent `<img>`
+ * tag will pick up from cache.
+ */
+export function prefetchCharacterImages(gameId: string): void {
+  const cached = gameDataCache.get(gameId);
+  if (!cached) return;
+  cached
+    .then((data) => {
+      for (const c of data.characters) {
+        if (!c.image) continue;
+        const img = new Image();
+        img.decoding = "async";
+        img.src = c.image;
+      }
+    })
+    .catch(() => {
+      /* swallow — a real load will surface any error */
+    });
 }

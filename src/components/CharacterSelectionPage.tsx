@@ -128,6 +128,13 @@ export const CharacterSelectionPage: React.FC = () => {
                     <img
                       src={character.image}
                       alt={character.name}
+                      // `loading="lazy"` defers off-screen tile loads so
+                      // the 30-tile grid doesn't fire 30 concurrent
+                      // requests on mount. `decoding="async"` lets the
+                      // decoder run off the main thread so image
+                      // arrival doesn't jank the tile animation.
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                   ) : (

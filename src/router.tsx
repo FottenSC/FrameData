@@ -29,7 +29,18 @@ export const rootRoute = createRootRoute({
                 <CreditsModal />
               </Suspense>
               <main className="flex-grow">
-                <Suspense fallback={<div className="p-4">Loading...</div>}>
+                {/*
+                  Empty Suspense fallback by design. With route chunks
+                  prefetched on idle / hover from the game-selection
+                  page, the common case is that the destination chunk is
+                  already in memory — no fallback needed. On a genuine
+                  cache miss a blank flash is still less jarring than a
+                  mid-page "Loading…" text jump, because
+                  `startTransition`-wrapped navigations will keep the
+                  previous route visible until React can show the next
+                  one anyway.
+                */}
+                <Suspense fallback={null}>
                   <Outlet />
                 </Suspense>
               </main>

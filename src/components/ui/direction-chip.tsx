@@ -54,7 +54,11 @@ export const DirectionChip = React.memo(
         <TooltipTrigger asChild>
           <div
             className={cn(
-              "inline-flex items-center justify-center font-bold align-middle font-sans rounded cursor-default",
+              // `leading-none` + an explicit text wrapper keeps the label
+              // optically centred; without it the default line-height
+              // pushes capitals down ~1px inside the chip. See
+              // `CommandIcon` for the matching treatment.
+              "inline-flex items-center justify-center font-bold align-middle font-sans rounded cursor-default leading-none text-center",
               "h-5 text-[13px] relative z-10 border",
               // Motion shorthand needs horizontal breathing room because its
               // label is 2-3 chars ("qcf") not 1-2 ("F" / "UF"). Use px-1.5
@@ -69,7 +73,7 @@ export const DirectionChip = React.memo(
                 : "bg-white text-black border-black",
             )}
           >
-            {token}
+            <span className="block translate-y-[-0.5px]">{token}</span>
           </div>
         </TooltipTrigger>
         <TooltipContent>

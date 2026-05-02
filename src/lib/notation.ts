@@ -287,7 +287,7 @@ function getRegexFor(replacements: Record<string, string>): RegExp | null {
     return null;
   }
   // Longer keys first so "B+K" matches before "B".
-  const sorted = [...keys].sort((a, b) => b.length - a.length);
+  const sorted = keys.toSorted((a, b) => b.length - a.length);
   const escaped = sorted.map((k) =>
     k.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"),
   );

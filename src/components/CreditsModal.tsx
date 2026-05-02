@@ -8,215 +8,290 @@ import {
 } from "@/components/ui/dialog";
 import { useCommand } from "@/contexts/CommandContext";
 import { useGame } from "@/contexts/GameContext";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Github, ExternalLink, Database, Code, Users, Twitter } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+
+/**
+ * Credits modal.
+ *
+ * Layout ported from the original SC6 / HorseData app
+ * (https://github.com/FottenSC/Sc6-HorseData/blob/main/index.html). The
+ * sections mirror the source one-for-one:
+ *
+ *   1. **Intro** — community links: shared framedata sheet, GitHub repo,
+ *      issue tracker, Framecalibur Discord.
+ *   2. **Contributors** — flat per-character list ("Character — handle"),
+ *      with optional Organizer + per-game extras at the top. The
+ *      character credits are populated from `Game.json` so this
+ *      automatically follows the active game (SC6 / Tekken8 / future).
+ *   3. **Site** — site author + library stack.
+ *   4. **Bug reports** — Framecalibur Discord call-out.
+ *
+ * All collapsible sections use the native `<details>` element instead
+ * of a JS-driven Collapse component — accessible by default, no state
+ * to wire, and the chevron + animation are handled by CSS.
+ */
+
+// SC6-specific community resource. The Tekken side of the project
+// doesn't have an equivalent shared sheet, so we conditionally render it.
+const SHARED_SHEET_URLS: Record<string, string> = {
+  SoulCalibur6:
+    "https://docs.google.com/spreadsheets/d/1R3I_LXfqhvFjlHTuj-wSWwwqYmlUf299a3VY9pVyGEw",
+};
+
+// Open Framecalibur community Discord — same link the source modal used.
+const FRAMECALIBUR_DISCORD = "https://discord.gg/XhnVuFe";
+
+// App / repo links.
+const APP_GITHUB = "https://github.com/FottenSC/FrameData";
+const APP_ISSUES = "https://github.com/FottenSC/FrameData/issues";
+const APP_AUTHOR_TWITTER = "https://twitter.com/FottenSC";
+
+// Static library list. Easier to maintain inline than to derive from
+// package.json at runtime — this section reads as marketing copy, not
+// machine-generated, and the source modal does the same.
+const SITE_LIBRARIES: { name: string; url: string }[] = [
+  { name: "React", url: "https://react.dev/" },
+  { name: "Vite", url: "https://vitejs.dev/" },
+  { name: "TanStack Router", url: "https://tanstack.com/router" },
+  { name: "TanStack Query", url: "https://tanstack.com/query" },
+  { name: "TanStack Virtual", url: "https://tanstack.com/virtual" },
+  { name: "Radix UI", url: "https://www.radix-ui.com/" },
+  { name: "Tailwind CSS", url: "https://tailwindcss.com/" },
+  { name: "Lucide", url: "https://lucide.dev/" },
+  { name: "cmdk", url: "https://cmdk.paco.me/" },
+  { name: "Sonner", url: "https://sonner.emilkowal.ski/" },
+  { name: "fflate", url: "https://github.com/101arrowz/fflate" },
+];
+
+const Link: React.FC<React.AnchorHTMLAttributes<HTMLAnchorElement>> = ({
+  className,
+  children,
+  ...rest
+}) => (
+  <a
+    target="_blank"
+    rel="noopener noreferrer"
+    className={
+      "text-primary underline-offset-2 hover:underline " + (className ?? "")
+    }
+    {...rest}
+  >
+    {children}
+  </a>
+);
 
 export function CreditsModal() {
   const { creditsOpen, setCreditsOpen } = useCommand();
-  const { selectedGame, characters, gameCredits, selectedCharacterId, gameCreditsDescription } =
-    useGame();
-  const [showAll, setShowAll] = React.useState(false);
+  const {
+    selectedGame,
+    characters,
+    gameCredits,
+    gameCreditsDescription,
+    isCharactersLoading,
+  } = useGame();
 
-  React.useEffect(() => {
-    if (creditsOpen) {
-      setShowAll(selectedCharacterId === null || selectedCharacterId === -1);
-    }
-  }, [creditsOpen, selectedCharacterId]);
+  // Drop characters with no contributor info — no point rendering an
+  // empty "Character —" line. Sort by name so the list is scan-friendly
+  // (and stable across game-data reloads).
+  const charactersWithCredits = React.useMemo(
+    () =>
+      characters
+        .filter((c) => c.credits && c.credits.length > 0)
+        .toSorted((a, b) => a.name.localeCompare(b.name)),
+    [characters],
+  );
 
-  // Filter characters that have credits
-  const charactersWithCredits = React.useMemo(() => {
-    let chars = characters.filter((c) => c.credits && c.credits.length > 0);
-    if (
-      !showAll &&
-      selectedCharacterId !== null &&
-      selectedCharacterId !== -1
-    ) {
-      chars = chars.filter((c) => c.id === selectedCharacterId);
-    }
-    return chars;
-  }, [characters, showAll, selectedCharacterId]);
+  const sharedSheetUrl = SHARED_SHEET_URLS[selectedGame.id];
+  const dataLoading = isCharactersLoading && characters.length === 0;
 
   return (
     <Dialog open={creditsOpen} onOpenChange={setCreditsOpen}>
       <DialogContent
         style={{ backgroundColor: "var(--background)" }}
-        className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col p-0 gap-0 top-[30%] translate-y-[-30%]"
+        className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col p-0 gap-0 top-[15%] translate-y-0"
       >
-        <DialogHeader className="p-6 pb-4 border-b">
-          <DialogTitle className="text-2xl flex items-center gap-2">
-            Credits
-          </DialogTitle>
-          <DialogDescription>
-            Contributors and data sources for {selectedGame.name} and the
-            application.
+        <DialogHeader className="p-6 pb-3 border-b">
+          <DialogTitle className="text-2xl">Credits</DialogTitle>
+          <DialogDescription className="sr-only">
+            Contributors and site credits for {selectedGame.name}.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-8">
-          {/* Application Section */}
-          <section>
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Code className="h-5 w-5" /> Application
-            </h3>
-            <div className="">
-              <div className="mb-2 text-sm text-muted-foreground whitespace-pre-wrap">
-                Made by Fotten.
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" asChild>
-                  <a
-                    href="https://github.com/Raevhaal/FrameData"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <Github className="mr-2 h-4 w-4" /> GitHub
-                  </a>
-                </Button>
-                <Button variant="outline" size="sm" asChild>
-                  <a
-                    href="https://twitter.com/FottenSC"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <Twitter className="mr-2 h-4 w-4" /> xDotCom
-                  </a>
-                </Button>
-              </div>
-            </div>
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 text-sm leading-relaxed">
+          {/* 1. INTRO — community links */}
+          <section className="space-y-1">
+            {sharedSheetUrl && (
+              <p>
+                Link to the shared framedata:{" "}
+                <Link href={sharedSheetUrl}>Shared framedata</Link>
+              </p>
+            )}
+            <p>
+              Site is open source: <Link href={APP_GITHUB}>GitHub repo</Link>
+            </p>
+            <p>
+              Submit bugs to: <Link href={APP_ISSUES}>Issue tracker</Link>
+            </p>
+            <p>
+              Or reach out:{" "}
+              <Link href={APP_AUTHOR_TWITTER}>@FottenSC on x.com</Link>
+            </p>
           </section>
 
-          {/* Game Data Section */}
+          {/* 2. CONTRIBUTORS */}
           <section>
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Database className="h-5 w-5" /> {selectedGame.name} Data
+            <h3 className="font-semibold mb-2">
+              Thanks to everyone who contributed framedata:
             </h3>
 
             {gameCreditsDescription && (
-              <div className="mb-2 text-sm text-muted-foreground whitespace-pre-wrap">
+              <p className="mb-2 text-muted-foreground whitespace-pre-wrap">
                 {gameCreditsDescription}
-              </div>
+              </p>
             )}
 
-            {/* Game Level Credits (Organizer, etc) */}
-            {gameCredits && gameCredits.length > 0 && (
-              <div className="mb-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {gameCredits.map((c, i) => (
-                    <Card key={i} className="overflow-hidden">
-                      <CardHeader className="p-4 space-y-1">
-                        <div className="flex items-start justify-between gap-2">
-                          <CardTitle className="text-base font-medium leading-none">
-                            {c.name}
-                          </CardTitle>
-                          {c.url && (
-                            <a
-                              href={c.url}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-muted-foreground hover:text-primary transition-colors"
-                            >
-                              <ExternalLink className="h-4 w-4" />
-                            </a>
-                          )}
-                        </div>
-                        {c.role && (
-                          <CardDescription className="text-xs">
-                            {c.role}
-                          </CardDescription>
-                        )}
-                      </CardHeader>
-                    </Card>
-                  ))}
-                </div>
-              </div>
+            {/*
+              Cold-open skeleton. The modal can be triggered before
+              Game.json finishes loading (e.g. from the command palette
+              right after a game switch). Render compact skeleton lines
+              that look roughly like the real "Character — handle" rows.
+            */}
+            {dataLoading ? (
+              <ul className="space-y-1.5">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <li key={i} className="flex items-center gap-2">
+                    <Skeleton className="h-3 w-20" />
+                    <Skeleton className="h-3 w-28" />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <CreditList
+                gameLevel={gameCredits}
+                characters={charactersWithCredits}
+              />
             )}
+          </section>
 
-            {/* Character Specific Credits */}
-            {(charactersWithCredits.length > 0 || !showAll) && (
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-                    Character Data
-                  </h4>
-                </div>
-                <div
-                  className="grid grid-cols-1 md:grid-cols-2 gap-4"
-                  style={{ perspective: "1000px" }}
-                >
-                  {charactersWithCredits.map((char, index) => (
-                    <Card
-                      key={char.id}
-                      className="overflow-hidden animate-character-in"
-                      style={{ animationDelay: `${index * 50}ms` }}
-                    >
-                      <CardHeader className="p-4 space-y-1">
-                        <div className="flex items-center gap-2 mb-2 border-b pb-2">
-                          <span className="font-semibold text-sm">
-                            {char.name}
-                          </span>
-                        </div>
-                        <div className="space-y-2">
-                          {char.credits?.map((c, i) => (
-                            <div
-                              key={i}
-                              className="flex items-center justify-between text-sm"
-                            >
-                              <span>{c.name}</span>
-                              {c.url && (
-                                <a
-                                  href={c.url}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="text-muted-foreground hover:text-primary transition-colors"
-                                >
-                                  <ExternalLink className="h-3 w-3" />
-                                </a>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </CardHeader>
-                    </Card>
-                  ))}
-                  {!showAll && (
-                    <Card
-                      className="overflow-hidden cursor-pointer hover:border-primary/50 transition-colors animate-character-in group"
-                      onClick={() => setShowAll(true)}
-                      style={{
-                        animationDelay: `${charactersWithCredits.length * 50}ms`,
-                      }}
-                    >
-                      <CardHeader className="p-4 flex flex-row items-center justify-center h-full min-h-[100px]">
-                        <div className="flex flex-col items-center gap-2 text-muted-foreground group-hover:text-primary transition-colors">
-                          <Users className="h-8 w-8 group-hover:scale-110 transition-transform duration-300" />
-                          <span className="font-medium">
-                            Show All Characters
-                          </span>
-                        </div>
-                      </CardHeader>
-                    </Card>
-                  )}
-                </div>
-              </div>
-            )}
+          {/* 3. SITE — author + libraries */}
+          <section>
+            <h3 className="font-semibold mb-2">Site</h3>
+            <p className="mb-1">
+              Site by <Link href={APP_AUTHOR_TWITTER}>@FottenSC</Link>{" "}
+              (<Link href={APP_GITHUB}>source</Link>).
+            </p>
+            <p className="mb-1">
+              Originally based on the SC6 / HorseData framedata app — credit to{" "}
+              <Link href="https://github.com/aHorseface/Sc6-HorseData">
+                @Horseface
+              </Link>{" "}
+              for the original UI design.
+            </p>
+            <details className="group mt-2">
+              <summary className="cursor-pointer select-none text-muted-foreground hover:text-foreground transition-colors marker:hidden list-none flex items-center gap-1">
+                <span className="inline-block transition-transform group-open:rotate-90">
+                  ▸
+                </span>
+                <span>Libraries</span>
+              </summary>
+              <ul className="mt-1 ml-4 space-y-0.5">
+                {SITE_LIBRARIES.map((lib) => (
+                  <li key={lib.name}>
+                    <Link href={lib.url}>{lib.name}</Link>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          </section>
 
-            {(!gameCredits || gameCredits.length === 0) &&
-              charactersWithCredits.length === 0 &&
-              showAll && (
-                <div className="text-muted-foreground text-sm italic">
-                  No specific credits available for this game's data.
-                </div>
-              )}
+          {/* 4. BUG REPORTS — Framecalibur */}
+          <section>
+            <h3 className="font-semibold mb-1">
+              Framedata errors can be reported to Framecalibur:
+            </h3>
+            <p className="text-muted-foreground">
+              Problems with the site itself should go to the{" "}
+              <Link href={APP_ISSUES}>issue tracker</Link>.
+            </p>
+            <p>
+              <Link href={FRAMECALIBUR_DISCORD}>Framecalibur Discord</Link>
+            </p>
           </section>
         </div>
       </DialogContent>
     </Dialog>
   );
 }
+
+// ---------- helpers ----------
+
+interface CreditListProps {
+  gameLevel: ReturnType<typeof useGame>["gameCredits"];
+  characters: ReturnType<typeof useGame>["characters"];
+}
+
+/**
+ * The contributor list is two-tiered:
+ *
+ *   - **Game-level**: one line per `gameCredits` entry — used for
+ *     overall organiser / spreadsheet curator credit ("Organizer:
+ *     @unicorn_cz").
+ *   - **Per character**: "Character — handle1 & handle2".
+ *
+ * The full list can run to ~30 lines on SC6, so we wrap the per-character
+ * portion in a `<details>` that defaults open but can be collapsed.
+ */
+const CreditList: React.FC<CreditListProps> = ({ gameLevel, characters }) => {
+  const empty = gameLevel.length === 0 && characters.length === 0;
+
+  if (empty) {
+    return (
+      <p className="italic text-muted-foreground">
+        No specific credits available for this game's data yet.
+      </p>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {gameLevel.length > 0 && (
+        <ul className="space-y-1">
+          {gameLevel.map((c, i) => (
+            <li key={i}>
+              <span className="text-muted-foreground">{c.role ?? "Credit"}</span>
+              {": "}
+              {c.url ? <Link href={c.url}>{c.name}</Link> : c.name}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {characters.length > 0 && (
+        <details open className="group">
+          <summary className="cursor-pointer select-none text-muted-foreground hover:text-foreground transition-colors marker:hidden list-none flex items-center gap-1 mb-1">
+            <span className="inline-block transition-transform group-open:rotate-90">
+              ▸
+            </span>
+            <span>Per character</span>
+          </summary>
+          <ul className="space-y-0.5 ml-4">
+            {characters.map((char) => (
+              <li key={char.id}>
+                <span className="font-medium">{char.name}</span>
+                <span className="text-muted-foreground"> — </span>
+                {char.credits!.map((c, i) => (
+                  <React.Fragment key={i}>
+                    {i > 0 && (
+                      <span className="text-muted-foreground"> &amp; </span>
+                    )}
+                    {c.url ? <Link href={c.url}>{c.name}</Link> : c.name}
+                  </React.Fragment>
+                ))}
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
+    </div>
+  );
+};

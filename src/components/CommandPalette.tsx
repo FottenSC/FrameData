@@ -61,6 +61,39 @@ export function CommandPalette() {
 
   const [searchValue, setSearchValue] = React.useState("");
 
+  // Reset the search query whenever the palette closes. Without this,
+  // re-opening with Cmd+K starts in the same view + leftover query
+  // from the previous use ("voldo" → select Voldo → close → re-open
+  // shows "voldo" still typed and the matching results pinned). We
+  // also reset the view back to "main" so each open is a fresh start.
+  React.useEffect(() => {
+    if (open) return;
+    setSearchValue("");
+    setCurrentView("main");
+  }, [open, setCurrentView]);
+
+  // Native <dialog>.showModal() *should* auto-focus the first focusable
+  // descendant, but in practice cmdk's internal focus management plus
+  // our React effect ordering means the input doesn't reliably end up
+  // focused on open. Drive it explicitly: every time the palette flips
+  // open, focus the search input on the next paint frame so the user
+  // can start typing immediately.
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
+  React.useEffect(() => {
+    if (!open) return;
+    const handle = window.requestAnimationFrame(() => {
+      inputRef.current?.focus();
+      // Place the caret at the end if there's leftover text.
+      const len = inputRef.current?.value.length ?? 0;
+      try {
+        inputRef.current?.setSelectionRange(len, len);
+      } catch {
+        // Some input types (search?) reject setSelectionRange — ignore.
+      }
+    });
+    return () => window.cancelAnimationFrame(handle);
+  }, [open]);
+
   const prefetchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const prefetchCharacter = (character: { id: number; name: string }) => {
@@ -139,6 +172,7 @@ export function CommandPalette() {
           className="[&_[cmdk-group-heading]]:text-muted-foreground **:data-[slot=command-input-wrapper]:h-12 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5"
         >
           <CommandInput
+            ref={inputRef}
             placeholder={
               showTableConfig
                 ? "Configure table columns..."

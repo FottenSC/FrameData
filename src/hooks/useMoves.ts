@@ -1,8 +1,4 @@
-import {
-  useQuery,
-  useQueries,
-  keepPreviousData,
-} from "@tanstack/react-query";
+import { useQuery, useQueries } from "@tanstack/react-query";
 import { Move, MoveOutcome } from "@/types/Move";
 import { DEFAULT_OUTCOME_TAGS, parseOutcome } from "@/lib/parseOutcome";
 
@@ -320,6 +316,14 @@ export function useMoves({
 
   // Single-character path. Disabled when "All" is selected — we fall back
   // to the per-character fan-out below.
+  //
+  // Note: we deliberately do NOT use `keepPreviousData` here. Keeping
+  // the previous character's move list visible while fetching the next
+  // reads as "the wrong character is loaded" to users — they switch to
+  // Astaroth and see Voldo's moves dim for a beat before the table
+  // refreshes. Falling through to react-query's default "no data while
+  // loading" makes the FrameDataTable's existing skeleton kick in for
+  // the brief loading window, which is the clearer signal.
   const singleQuery = useQuery<Move[]>({
     queryKey: ["moves", gameId, characterId],
     queryFn: () => {
@@ -330,7 +334,6 @@ export function useMoves({
     enabled: !!gameId && characterId !== null && !isAll,
     staleTime: MOVES_STALE_TIME,
     gcTime: MOVES_GC_TIME,
-    placeholderData: keepPreviousData,
   });
 
   // "All" path. One useQuery per character running in parallel; `combine`

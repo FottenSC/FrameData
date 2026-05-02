@@ -114,13 +114,17 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
   const virtualItems = rowVirtualizer.getVirtualItems();
   const totalSize = rowVirtualizer.getTotalSize();
 
-  // Recompute on resize
-  useEffect(() => {
-    if (!scrollContainer) return;
-    const ro = new ResizeObserver(() => rowVirtualizer.measure());
-    ro.observe(scrollContainer);
-    return () => ro.disconnect();
-  }, [scrollContainer, rowVirtualizer]);
+  // Note: there's no manual ResizeObserver here on purpose.
+  // `useVirtualizer({ getScrollElement })` installs its OWN observer
+  // on the scroll element internally and handles container resizes
+  // correctly. The previous explicit `new ResizeObserver(() =>
+  // rowVirtualizer.measure())` was both redundant AND actively
+  // harmful: `measure()` invalidates and recomputes EVERY cached row
+  // size, so anything that changed the table area's height (toggling
+  // the FilterBuilder's Advanced panel, switching characters,
+  // expanding hit-levels, even the system devtools opening) triggered
+  // a full row remeasure pass. In Chrome it was fast enough to be
+  // invisible; in Vivaldi/Brave it manifested as obvious toggle lag.
 
   // Render table body content
   const tableBody = (() => {

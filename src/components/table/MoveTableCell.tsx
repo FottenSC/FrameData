@@ -254,9 +254,11 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
         );
 
       case "guardBurst":
-        return (
-          <AdvantagePill advantage={move.guardBurst ?? null} tone="guard" />
-        );
+        // Same colour treatment as Block: green for positive values,
+        // rose for negative (rare/never), grey for null. Reads as a
+        // proper "this much guard damage" pill instead of the previous
+        // dead-grey "guard" tone.
+        return <AdvantagePill advantage={move.guardBurst ?? null} />;
 
       // --- Properties column: one chip per unique property. Chips aggregate
       // ---   move-wide properties (UA / BA / GI / …) AND outcome tags from

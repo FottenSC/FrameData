@@ -37,6 +37,8 @@ import { MultiCombobox } from "./ui/multi-combobox";
 import { HitLevelMultiCombobox } from "./ui/hitlevel-multi-combobox";
 import { Combobox } from "./ui/combobox";
 import { ComboboxWarmup } from "./ui/combobox-warmup";
+import * as SelectPrimitive from "@radix-ui/react-select";
+import { OperatorIcon } from "@/filters/operatorIcons";
 
 export type {
   FilterCondition,
@@ -174,6 +176,50 @@ function pruneInactive(
     }
   }
   return out;
+}
+
+/**
+ * Structural equality for filter trees, used to decide whether the
+ * parent needs to be notified of a change. Walks both trees in
+ * lockstep and short-circuits on the first divergence — replacement
+ * for an earlier `JSON.stringify`-based compare that paid the full
+ * serialisation cost on every notification check, even when the
+ * trees were obviously different (or obviously identical-by-ref).
+ *
+ * Compares only semantic content; the per-row `id` is a random
+ * identifier with no meaning to consumers, so it's deliberately
+ * ignored. That means rebuilding an identical tree with fresh ids
+ * (e.g. after a "Clear all") doesn't generate a spurious change.
+ */
+function conditionsEqual(a: FilterCondition, b: FilterCondition): boolean {
+  return (
+    a.field === b.field &&
+    a.condition === b.condition &&
+    a.value === b.value &&
+    a.value2 === b.value2
+  );
+}
+
+function filterItemsEqual(a: FilterItem, b: FilterItem): boolean {
+  if (a === b) return true;
+  if (a.type === "condition" && b.type === "condition") {
+    return conditionsEqual(a, b);
+  }
+  if (a.type === "group" && b.type === "group") {
+    return (
+      a.operator === b.operator && filterTreesEqual(a.filters, b.filters)
+    );
+  }
+  return false;
+}
+
+function filterTreesEqual(a: FilterItem[], b: FilterItem[]): boolean {
+  if (a === b) return true;
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    if (!filterItemsEqual(a[i], b[i])) return false;
+  }
+  return true;
 }
 
 function countActive(
@@ -320,6 +366,21 @@ const makePinnedQuickSearch = (): FilterCondition => ({
   value2: "",
 });
 
+/**
+ * Default starter row appended below the pinned quick-search. Empty
+ * `value` keeps it inactive so it doesn't filter anything until the
+ * user fills it in — but having it pre-populated makes the most common
+ * follow-up action (filter by impact) one fewer click.
+ */
+const makeDefaultImpactFilter = (): FilterCondition => ({
+  id: uniqueId("filter"),
+  type: "condition",
+  field: "impact",
+  condition: "equals",
+  value: "",
+  value2: "",
+});
+
 export const FilterBuilder: React.FC<FilterBuilderProps> = ({
   onFiltersChange,
   className,
@@ -387,11 +448,16 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
     [gameConfig],
   );
 
-  // Seed state with the pinned quick-search row. It lives at index 0 of
-  // `filters` for its entire lifetime — the top "Quick search" input and the
-  // first row in the advanced tree are two views into this one item.
+  // Seed state with the pinned quick-search row plus an inactive
+  // "Impact equals" starter. The pinned row lives at index 0 for its
+  // entire lifetime — the top "Quick search" input and the first row in
+  // the advanced tree are two views into it. The Impact row sits at
+  // index 1 with an empty value so it doesn't actually filter anything;
+  // it's a one-click-removable "spare slot" that makes the common case
+  // of filtering by impact frame discoverable.
   const [filters, setFilters] = useState<FilterItem[]>(() => [
     makePinnedQuickSearch(),
+    makeDefaultImpactFilter(),
   ]);
   const [rootOperator, setRootOperator] = useState<FilterGroupOperator>("and");
   const [isExpanded, setIsExpanded] = useState(false);
@@ -405,7 +471,11 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
   }, [filters]);
   const quickSearch = pinnedQuickSearch?.value ?? "";
 
-  const lastSentRef = useRef<string | null>(null);
+  // Last filter tree we notified the parent about. Compared against
+  // the current `effectiveFilters` via `filterTreesEqual` to skip
+  // redundant onFiltersChange calls when an unrelated re-render
+  // bubbles a new ref but the semantic content hasn't moved.
+  const lastSentRef = useRef<FilterItem[]>([]);
 
   const getFieldType = useCallback(
     (fieldId: string): FieldType => fieldMap.get(fieldId)?.type ?? "text",
@@ -494,9 +564,8 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
   }, [filters, rootOperator, isRange]);
 
   useEffect(() => {
-    const serialised = JSON.stringify(effectiveFilters);
-    if (serialised === lastSentRef.current) return;
-    lastSentRef.current = serialised;
+    if (filterTreesEqual(effectiveFilters, lastSentRef.current)) return;
+    lastSentRef.current = effectiveFilters;
     if (typeof React.startTransition === "function") {
       React.startTransition(() => onFiltersChange(effectiveFilters));
     } else {
@@ -651,9 +720,12 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
       */}
       <ComboboxWarmup />
       {/*
-        Quick search input = a view into the pinned filter row's value.
-        Typing here and editing the first row in the advanced tree are the
-        same action: both mutate the PINNED_QUICK_SEARCH_ID condition.
+        Quick search input + Advanced-filters toggle live on one line so
+        the toolbar takes a single row instead of three. Layout:
+            [ Quick search ──────────── ] [Clear (n)] [▸ Advanced]
+        Quick search edits the pinned filter row's value (typing here
+        and editing the first row in the advanced tree are the same
+        action — both mutate the PINNED_QUICK_SEARCH_ID condition).
       */}
       <div className="py-2 mb-2 flex items-center gap-2">
         <DebouncedInput
@@ -679,80 +751,105 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
         )}
       </div>
 
-      {/* Preset chips */}
-      <div className="flex flex-wrap gap-1.5 mb-2">
-        {PRESETS.map((preset) => {
-          const active = isPresetActive(preset);
-          return (
-            <Tooltip key={preset.label}>
-              <TooltipTrigger asChild>
-                <button
-                  type="button"
-                  onClick={() => togglePreset(preset)}
-                  aria-pressed={active}
-                  className={cn(
-                    "px-2.5 py-1 rounded-full text-xs font-medium border transition-colors",
-                    active
-                      ? "bg-primary text-primary-foreground border-primary shadow-sm shadow-primary/30"
-                      : "bg-muted/30 hover:bg-muted/60 border-border text-foreground/80",
-                  )}
-                >
-                  {preset.label}
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="max-w-[240px] text-[12px] leading-snug">
-                  {preset.title}
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          );
-        })}
-      </div>
-
-      {/* Collapsible advanced builder */}
-      <div
-        // Click target is the whole row — give it a real hover
-        // background plus the existing colour shift so it reads as a
-        // button, not as static text. `-mx-2 px-2 py-1 rounded-md` so
-        // the highlight has padding without changing the row's outer
-        // alignment.
-        className="-mx-2 px-2 py-1 rounded-md flex items-center gap-2 mb-1 cursor-pointer select-none hover:bg-muted/40 hover:text-primary transition-colors"
-        onClick={() => setIsExpanded(!isExpanded)}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            setIsExpanded(!isExpanded);
-          }
-        }}
-        aria-expanded={isExpanded}
-      >
-        <ChevronDown
-          className={cn(
-            "h-4 w-4 transition-transform duration-300",
-            !isExpanded && "-rotate-90",
+      {/*
+        Filter shortcuts row.
+            [▾ Advanced filters] | [Punishable] [i10+] [Plus on block] …
+        The Advanced toggle reads as a real section header — h3
+        typography, chevron+colour shift on hover — and sits at the
+        START of the row so users scan it first ("here's the catch-all
+        if presets aren't enough"). A subtle vertical divider separates
+        it from the preset chips on the right.
+      */}
+      <div className="mb-2 flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => setIsExpanded(!isExpanded)}
+          aria-expanded={isExpanded}
+          // Header treatment: same font weight and size as a section
+          // h3, plus a clear hover affordance. Negative inline padding
+          // keeps the header flush with the row above when un-hovered
+          // and gives the muted hover bg breathing room when active.
+          className="-mx-1 px-1 py-0.5 rounded inline-flex items-center gap-1.5 text-sm font-medium select-none whitespace-nowrap text-foreground hover:text-primary hover:bg-muted/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <ChevronDown
+            className={cn(
+              "h-4 w-4 transition-transform duration-300",
+              !isExpanded && "-rotate-90",
+            )}
+            aria-hidden
+          />
+          <h3 className="text-sm font-medium leading-none">
+            Advanced filters
+          </h3>
+          {activeCount > 0 && (
+            <span className="text-xs text-muted-foreground font-normal">
+              ({activeCount})
+            </span>
           )}
-        />
-        <h3 className="text-sm font-medium">Advanced filters</h3>
-        {activeCount > 0 && (
-          <span className="text-xs text-muted-foreground">
-            {activeCount} active
-          </span>
-        )}
+        </button>
+
+        <span className="h-5 w-px bg-border" aria-hidden />
+
+        <div className="flex flex-wrap gap-1.5">
+          {PRESETS.map((preset) => {
+            const active = isPresetActive(preset);
+            return (
+              <Tooltip key={preset.label}>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={() => togglePreset(preset)}
+                    aria-pressed={active}
+                    className={cn(
+                      "px-2.5 py-1 rounded-full text-xs font-medium border transition-colors",
+                      active
+                        ? "bg-primary text-primary-foreground border-primary shadow-sm shadow-primary/30"
+                        : "bg-muted/30 hover:bg-muted/60 border-border text-foreground/80",
+                    )}
+                  >
+                    {preset.label}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-[240px] text-[12px] leading-snug">
+                    {preset.title}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            );
+          })}
+        </div>
       </div>
 
-      <div
-        className={cn(
-          "grid transition-all duration-300 ease-in-out",
-          isExpanded
-            ? "grid-rows-[1fr] opacity-100"
-            : "grid-rows-[0fr] opacity-0",
-        )}
-      >
-        <div className="overflow-hidden">
-          <div className="space-y-2 pt-1">
+      {/*
+        Advanced builder.
+        Conditionally rendered — when collapsed, the entire FilterGroupRow
+        subtree is REMOVED from the React tree (and therefore from the
+        DOM). This is the only approach that proved consistent across
+        Vivaldi / Brave-style Chromium variants whose UI shell competes
+        with the page for layout time. Earlier attempts:
+          - `grid-template-rows: 0fr → 1fr` animation: forced full
+            subtree relayout per frame; froze the main thread.
+          - `display: none ↔ block` + opacity fade: fine in Chrome,
+            laggy in Vivaldi.
+          - `content-visibility: hidden ↔ visible` + `will-change` +
+            `allow-discrete`: each toggle accumulated work; the lag
+            grew over time.
+          - Plain `display: none ↔ block` without animation: still
+            laggy in Vivaldi because Radix Popover triggers and
+            Floating UI observers re-measure the whole panel on every
+            display flip.
+        Conditional render sidesteps all of that — there's literally
+        nothing for the browser to lay out / re-measure when the panel
+        isn't there.
+        Filter STATE survives the unmount because it's owned by
+        FilterBuilder via useState. The only thing lost on collapse is
+        any uncommitted draft text inside DebouncedInput rows, which is
+        an acceptable trade for a responsive toggle.
+      */}
+      {isExpanded && (
+        <div className="pt-1">
+          <div className="space-y-2">
             <FilterGroupRow
               group={{
                 id: "root",
@@ -775,7 +872,7 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
             />
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
@@ -927,9 +1024,15 @@ const FilterRow: React.FC<BaseFilterProps & { filter: FilterCondition }> = ({
     <div className="flex items-center justify-between gap-2 group/row">
       <div className="flex items-center gap-2 flex-1 flex-wrap">
         {isPinned ? (
+          // Static label, not a control — render it as plain
+          // muted-foreground text so it doesn't read as another
+          // dropdown trigger sitting next to the editable condition /
+          // value pickers. Layout-equivalent (h-8 + 160px wide) so the
+          // row stays visually aligned with the other filter rows.
           <div
-            className="inline-flex h-8 w-[160px] items-center justify-between rounded-md border border-primary/30 bg-primary/5 px-3 text-sm"
+            className="inline-flex h-8 w-[160px] items-center justify-start px-3 text-sm text-muted-foreground select-none cursor-default"
             title="Pinned quick-search field"
+            aria-label="Pinned field"
           >
             <span className="truncate">
               {field?.label ?? "Stance + Command"}
@@ -959,9 +1062,31 @@ const FilterRow: React.FC<BaseFilterProps & { filter: FilterCondition }> = ({
           </SelectTrigger>
           <SelectContent>
             {availableConditions.map((op) => (
-              <SelectItem key={op.id} value={op.id}>
-                {op.label}
-              </SelectItem>
+              // Render `SelectPrimitive.Item` directly rather than the
+              // shared `SelectItem` wrapper so we can:
+              //
+              //   (1) Show a per-operator icon at the left (Equal,
+              //       Search, Layers, …) instead of a checkmark for
+              //       the currently-selected row. The selected state is
+              //       already conveyed by the trigger's value text — a
+              //       redundant ✓ in the dropdown was visual noise.
+              //
+              //   (2) Keep the same focus / hover / disabled styling
+              //       as SelectItem for consistency with the rest of
+              //       the app's selects.
+              <SelectPrimitive.Item
+                key={op.id}
+                value={op.id}
+                className={cn(
+                  "relative flex w-full cursor-default select-none items-center gap-2 rounded-sm py-1.5 pl-2 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+                )}
+              >
+                <OperatorIcon
+                  operatorId={op.id}
+                  className="h-4 w-4 shrink-0 text-muted-foreground"
+                />
+                <SelectPrimitive.ItemText>{op.label}</SelectPrimitive.ItemText>
+              </SelectPrimitive.Item>
             ))}
           </SelectContent>
         </Select>

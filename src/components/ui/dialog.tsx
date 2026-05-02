@@ -155,12 +155,16 @@ function DialogContent({
       aria-labelledby={titleId}
       aria-describedby={descriptionId}
       onClick={handleClick}
-      // Reset the user-agent stylesheet. Native <dialog> ships with a
-      // default block layout and centred margin:auto; we want the
-      // consuming className to win. `p-0` here is wiped by `p-6` from
-      // the className string — callers pass their own padding.
+      // Centring strategy: explicit `top: 50%` + `left: 50%` plus a
+      // translate of -50%/-50%. Avoid the UA's `inset: 0; margin: auto`
+      // pattern — it computes margins based on ALL four sides being 0,
+      // so a consumer that overrides `top` (e.g. CommandPalette wants
+      // top-of-screen positioning) ends up off-centre because the
+      // bottom: 0 is still being honoured. With translate centring,
+      // overriding just `top` and `translate-y` works as expected and
+      // doesn't disturb horizontal centring.
       className={cn(
-        "bg-background text-foreground fixed inset-0 m-auto w-full max-w-[calc(100%-2rem)] rounded-lg border p-6 shadow-lg grid gap-4 sm:max-w-lg",
+        "bg-background text-foreground fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[calc(100%-2rem)] rounded-lg border p-6 shadow-lg grid gap-4 sm:max-w-lg",
         "max-h-[min(90vh,calc(100vh-2rem))] overflow-visible",
         "open:animate-in open:fade-in-0 open:zoom-in-95",
         className,

@@ -16,73 +16,82 @@ import {
 /**
  * Warmup component for the Combobox / cmdk render path.
  *
- * The first time a user opens any FilterBuilder dropdown, three slow
- * cold-path costs come due in a single frame:
+ * The first time a user opens any FilterBuilder dropdown, several cold
+ * costs come due in a single frame: cmdk mounts and compiles its filter
+ * regex, Radix Popover creates its portal and runs Floating UI's first
+ * positioning pass, React allocates fibers for the option list, etc.
+ * Subsequent opens reuse all of that work.
  *
- *   1. cmdk's `Command` tree mounts for the first time — registering the
- *      filter context, compiling its score regex, etc.
- *   2. Radix Popover creates its portal, runs Floating UI's first
- *      position computation, and installs its focus trap.
- *   3. React allocates fibers for ~150 `CommandItem`s in the largest
- *      lists (stances / properties), and the browser performs first
- *      layout on that subtree.
+ * This component does that work silently during an idle window, then
+ * unmounts itself. By the time the user clicks a real combobox, the
+ * cold path has already run.
  *
- * Subsequent opens reuse the React fibers and warm browser layout
- * caches, so they feel snappy. The user only ever notices the FIRST
- * open feeling laggy.
- *
- * This component eliminates that perceptible lag by silently doing the
- * work during an idle window after the FilterBuilder mounts. We render
- * a real `<Popover>` + `<Command>` pair, programmatically open it
- * (off-screen and aria-hidden so it never appears to the user),
- * close it, and unmount once the cycle has run. The cmdk module's
- * internal regex caches and React's fiber tree are then primed; the
- * user's first real interaction skips all the cold-path costs.
- *
- * The warmup is gated on `requestIdleCallback` so it never competes
- * with the initial paint or any user input that's already in flight.
+ * IMPORTANT — state machine notes:
+ *   - The effect MUST run only once (empty deps). A previous version
+ *     keyed the effect on `phase`, which created a feedback loop:
+ *     scheduling the close-timer and then bumping `phase` re-ran the
+ *     effect, whose cleanup function then cancelled the very close
+ *     timer it had just scheduled. The popover would mount and never
+ *     unmount, leaving cmdk + an open Command subtree alive off-screen
+ *     for the lifetime of the FilterBuilder. Every parent re-render
+ *     (e.g. toggling the Advanced filters panel) then had to reconcile
+ *     that hidden subtree, which is what caused the system-wide lag
+ *     users reported.
+ *   - Wrapped in React.memo to insulate from parent re-renders during
+ *     the brief window where the warmup is still mounted.
  */
-export const ComboboxWarmup: React.FC = () => {
-  const [phase, setPhase] = React.useState<"idle" | "open" | "done">("idle");
+export const ComboboxWarmup = React.memo(function ComboboxWarmup() {
+  const [phase, setPhase] = React.useState<"pending" | "open" | "done">(
+    "pending",
+  );
 
   React.useEffect(() => {
-    if (phase !== "idle") return;
+    let openHandle: number | undefined;
+    let closeHandle: number | undefined;
     const w = window as unknown as {
-      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      requestIdleCallback?: (
+        cb: () => void,
+        opts?: { timeout: number },
+      ) => number;
       cancelIdleCallback?: (handle: number) => void;
     };
-    let openTimer: number | undefined;
-    let closeTimer: number | undefined;
-    let doneTimer: number | undefined;
-    const ric = w.requestIdleCallback;
-    const handle = ric
-      ? ric(
-          () => {
-            // Open on next paint, close on the one after that, unmount
-            // shortly after. Long enough for cmdk + Radix to finish
-            // their first-render work, short enough that the warmup
-            // wrapper releases its memory promptly.
-            setPhase("open");
-            closeTimer = window.setTimeout(() => {
-              setPhase("idle");
-              doneTimer = window.setTimeout(() => setPhase("done"), 100);
-            }, 50);
-          },
-          { timeout: 1500 },
-        )
-      : window.setTimeout(() => setPhase("open"), 200);
+    const usingRic = typeof w.requestIdleCallback === "function";
+
+    const start = () => {
+      setPhase("open");
+      // 80ms is enough for cmdk + Radix Popover to complete their
+      // first-render work; after that we transition straight to
+      // "done", which causes this component to return null and
+      // unmount its Popover subtree from the React tree entirely.
+      closeHandle = window.setTimeout(() => setPhase("done"), 80);
+    };
+
+    if (usingRic) {
+      openHandle = w.requestIdleCallback!(start, { timeout: 1500 });
+    } else {
+      // Fall back to a short setTimeout if requestIdleCallback isn't
+      // available. The warmup is best-effort — running it slightly
+      // later than ideal is fine.
+      openHandle = window.setTimeout(start, 200);
+    }
 
     return () => {
-      if (typeof handle === "number" && ric && w.cancelIdleCallback) {
-        w.cancelIdleCallback(handle);
-      } else if (typeof handle === "number") {
-        window.clearTimeout(handle);
+      if (openHandle != null) {
+        if (usingRic && w.cancelIdleCallback) {
+          w.cancelIdleCallback(openHandle);
+        } else {
+          window.clearTimeout(openHandle);
+        }
       }
-      if (openTimer) window.clearTimeout(openTimer);
-      if (closeTimer) window.clearTimeout(closeTimer);
-      if (doneTimer) window.clearTimeout(doneTimer);
+      if (closeHandle != null) {
+        window.clearTimeout(closeHandle);
+      }
     };
-  }, [phase]);
+    // Empty deps on purpose — see comment in the JSDoc above. Adding
+    // `phase` here would re-arm the effect every time we set it and
+    // trigger a cleanup that cancels the in-flight close timer.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (phase === "done") return null;
 
@@ -129,4 +138,4 @@ export const ComboboxWarmup: React.FC = () => {
       </Popover>
     </div>
   );
-};
+});

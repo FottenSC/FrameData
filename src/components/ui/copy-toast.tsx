@@ -18,14 +18,20 @@ export function showCopiedToast(copiedText: string, duration = 1800) {
   toast.custom(
     (id) => (
       <div
-        className="copied-toast group relative pointer-events-auto flex items-center gap-3 min-w-[260px] max-w-[420px] rounded-lg border border-border bg-card text-card-foreground shadow-lg p-3 pr-9 overflow-hidden"
-        // Sonner sets --toast-duration via the wrapper for the older
-        // `toast.success` API; for `toast.custom` we set it on our own
-        // root so the `::after` rail can pick it up regardless of how
-        // the toast was created.
+        className="copied-toast group relative pointer-events-auto flex items-center gap-3 min-w-[260px] max-w-[420px] rounded-lg border border-border text-card-foreground shadow-lg p-3 pr-9 overflow-hidden"
+        // Two inline-style jobs:
+        //   1. Set `--toast-duration` so the `::after` progress rail
+        //      animates over the same lifetime Sonner uses to dismiss.
+        //   2. Set `background-color` explicitly. With Sonner's
+        //      `unstyled: true` the wrapper has its own dark theme
+        //      background-color of `transparent`, which can win the
+        //      cascade against our `bg-card` Tailwind utility on this
+        //      child div in some Tailwind v4 setups. Forcing it inline
+        //      guarantees the card surface is visible.
         style={
           {
             ["--toast-duration" as string]: `${duration}ms`,
+            backgroundColor: "var(--card)",
           } as React.CSSProperties
         }
       >

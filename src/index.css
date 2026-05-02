@@ -48,19 +48,102 @@
  *   - `::backdrop` is the top-layer scrim. We replace the UA default
  *     (barely-visible) with a proper dimmer that matches the old
  *     Radix-era overlay.
+ *   - The UA stylesheet sets `color: CanvasText` and
+ *     `background-color: Canvas` on <dialog>, which evaluates to
+ *     OS-default light / dark colours regardless of our app theme. The
+ *     `text-foreground` / `bg-background` Tailwind utilities on the
+ *     element WOULD win on specificity, but the UA rule lands on the
+ *     element first and any descendant that hasn't explicitly opted
+ *     into a colour inherits the UA value (notice cmdk's CommandItem
+ *     leaves text colour to inheritance). Forcing the element-level
+ *     colour + background here makes inheritance produce the right
+ *     theme colours throughout the dialog subtree, even for nodes that
+ *     don't carry their own utility classes.
  *   - The `open` attribute is added/removed by `.showModal()` /
  *     `.close()`. When the dialog is NOT open we set `display: none`
  *     so the element doesn't occupy layout space (a stray non-modal
  *     dialog in the DOM otherwise takes a block and pushes siblings).
  */
+dialog {
+  color: var(--foreground);
+  background-color: var(--background);
+
+  /*
+   * Open / close transition.
+   *
+   * Animating a `<dialog>` requires three coordinated tricks because
+   * `display` is normally a discrete property:
+   *   1. Set the "closed" state on the bare `dialog` selector
+   *      (opacity 0, scaled down a hair). Use the `scale` CSS property
+   *      rather than `transform: scale(...)` so we don't clobber any
+   *      `transform: translate(...)` set via Tailwind utilities for
+   *      centring.
+   *   2. Set the "open" state on `dialog[open]`.
+   *   3. Add `display` and `overlay` to the transition list with
+   *      `allow-discrete` so the browser keeps the element rendered
+   *      and in the top layer through the close animation.
+   * The matching `@starting-style` block below provides the from-keyframe
+   * for the open direction (Chromium's animation pipeline needs this
+   * to know what to animate FROM when the element first becomes [open]).
+   */
+  opacity: 0;
+  scale: 0.97;
+  transition:
+    opacity 160ms ease-out,
+    scale 160ms ease-out,
+    display 160ms allow-discrete,
+    overlay 160ms allow-discrete;
+}
+
+dialog[open] {
+  opacity: 1;
+  scale: 1;
+}
+
+@starting-style {
+  dialog[open] {
+    opacity: 0;
+    scale: 0.97;
+  }
+}
+
 dialog::backdrop {
   background-color: color-mix(in srgb, black 50%, transparent);
   backdrop-filter: blur(2px);
+  /* Backdrop fades in/out alongside the dialog itself. */
+  opacity: 0;
+  transition:
+    opacity 160ms ease-out,
+    display 160ms allow-discrete,
+    overlay 160ms allow-discrete;
+}
+
+dialog[open]::backdrop {
+  opacity: 1;
+}
+
+@starting-style {
+  dialog[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  dialog,
+  dialog::backdrop {
+    transition-duration: 0ms;
+  }
 }
 
 dialog:not([open]) {
   display: none;
 }
+
+/*
+ * Advanced filter panel show/hide is now handled by React conditional
+ * render in FilterBuilder.tsx — see the comment block there for why.
+ * No CSS rules needed for the toggle anymore.
+ */
 
 /*
  * View Transitions tuning.
@@ -255,12 +338,16 @@ p,
   }
   /*
    * Re-instate the historical "buttons get a pointer cursor" affordance
-   * that Tailwind v4's preflight dropped. Applies to raw <button> and
-   * to anything explicitly marked as a button via role. Disabled
-   * buttons opt back out so they don't lie about being interactive.
+   * that Tailwind v4's preflight dropped. Limited to genuine <button>
+   * elements; the previous attempt also targeted `[role="button"]`
+   * which Radix sprinkles onto a number of internal wrapper nodes
+   * (Tooltip triggers, Slot composers, drag handles) — that produced a
+   * pointer cursor on bystander elements like tooltip-wrapped icons
+   * and badge-shaped non-interactive labels. Components that ARE
+   * clickable but use `role="button"` on a div now own their cursor
+   * via Tailwind utilities at the call site.
    */
-  button:not(:disabled),
-  [role="button"]:not([aria-disabled="true"]) {
+  button:not(:disabled) {
     cursor: pointer;
   }
   body {

@@ -290,17 +290,26 @@ const CommandRendererInner: React.FC<{ command: string[][] | null }> = ({
     // stay on one line together so `(DF) | (F) | (UF)` reads as a single
     // "choose one of these" group. Line breaks happen between steps, not
     // inside them.
+    //
+    // `items-end` (was `items-center`): within a step, all pills sit on
+    // the same baseline at the bottom. CommandIcon already used
+    // `self-end` for slide variants; the step container now agrees, so
+    // slides and normal buttons bottom-align consistently whether
+    // they're in the same step or in different ones.
     parts.push(
-      <span
-        key={`step-${i}`}
-        className="inline-flex items-center"
-      >
+      <span key={`step-${i}`} className="inline-flex items-end">
         {stepChildren}
       </span>,
     );
   }
 
-  return <span className="inline-flex items-center flex-wrap">{parts}</span>;
+  // Outer wrapper switches `items-center` → `items-end` for the same
+  // reason — when a slide-only step (h-3.5) sits next to a normal-only
+  // step (h-5), centering each step independently puts their bottoms
+  // at different y positions. Bottom-aligning every step makes the
+  // pills' bottoms read as one consistent line across the whole
+  // command, regardless of how steps are split.
+  return <span className="inline-flex items-end flex-wrap">{parts}</span>;
 };
 
 // Memoize to prevent re-renders during table virtualization transitions

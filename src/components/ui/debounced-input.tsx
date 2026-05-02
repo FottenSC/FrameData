@@ -38,7 +38,16 @@ export const DebouncedInput = React.forwardRef<
   }, [onDebouncedChange]);
 
   // Resync when the parent pushes a new value (e.g. Clear All).
+  //
+  // Critically, we also CANCEL any pending debounce timer here. Without
+  // that, a "type then immediately Clear" sequence would race: the
+  // user's keystroke timer fires after Clear has reset state, asserting
+  // the typed value back into the parent and undoing the clear.
   React.useEffect(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
     setDraft(value);
   }, [value]);
 

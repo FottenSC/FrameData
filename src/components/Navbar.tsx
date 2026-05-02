@@ -193,15 +193,22 @@ export const Navbar: React.FC = () => {
           </Breadcrumb>
         </div>
 
-        <div className="flex items-center justify-end space-x-2">
+        <div className="flex items-center justify-end gap-1.5">
           {/* Frame data page toolbar items */}
           {isFrameDataPage && (
             <>
+              {/*
+                Toolbar items all sit on a uniform 32 px (h-8) row so
+                badges, icon buttons, and the notation pill present as
+                one band rather than three different heights. Local
+                padding/icon sizing is balanced inside that constraint.
+              */}
+
               {/* Active filters badge */}
               <Badge
                 variant="outline"
                 className={cn(
-                  "text-xs font-normal hidden sm:inline-flex",
+                  "h-8 px-2.5 text-xs font-normal hidden sm:inline-flex items-center",
                   activeFiltersCount === 0 && "opacity-50",
                 )}
               >
@@ -220,14 +227,14 @@ export const Navbar: React.FC = () => {
               */}
               {isUpdating && totalMoves === 0 ? (
                 <Skeleton
-                  className="h-5 w-20 rounded-md hidden sm:inline-flex"
+                  className="h-8 w-20 rounded-md hidden sm:inline-flex"
                   aria-label="Loading moves"
                 />
               ) : (
                 <Badge
                   variant="outline"
                   className={cn(
-                    "text-xs font-normal hidden sm:inline-flex",
+                    "h-8 px-2.5 text-xs font-normal hidden sm:inline-flex items-center",
                     isUpdating && "opacity-50",
                   )}
                 >
@@ -240,7 +247,7 @@ export const Navbar: React.FC = () => {
               {/* Desktop view - visible on md and up */}
               <button
                 onClick={() => openView("tableConfig")}
-                className="hidden md:inline-flex items-center justify-center p-1.5 text-muted-foreground hover:text-foreground rounded-md border border-border bg-secondary/30 hover:bg-secondary/50 active:scale-95 active:bg-secondary/70 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
+                className="hidden md:inline-flex h-8 w-8 items-center justify-center text-muted-foreground hover:text-foreground rounded-md border border-border bg-secondary/30 hover:bg-secondary/50 active:scale-95 active:bg-secondary/70 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
                 title="Table Configuration"
               >
                 <Settings2 className="h-4 w-4" />
@@ -254,7 +261,7 @@ export const Navbar: React.FC = () => {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button
-                      className="hidden md:inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-muted-foreground hover:text-foreground rounded-md border border-border bg-secondary/30 hover:bg-secondary/50 active:scale-95 active:bg-secondary/70 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
+                      className="hidden md:inline-flex h-8 px-2.5 items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground rounded-md border border-border bg-secondary/30 hover:bg-secondary/50 active:scale-95 active:bg-secondary/70 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
                       title={`Notation: ${notationStyle.name}`}
                       aria-label={`Notation style: ${notationStyle.name}. Click to change.`}
                     >
@@ -299,7 +306,7 @@ export const Navbar: React.FC = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
-                    className="hidden md:inline-flex items-center justify-center p-1.5 text-muted-foreground hover:text-foreground rounded-md border border-border bg-secondary/30 hover:bg-secondary/50 active:scale-95 active:bg-secondary/70 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
+                    className="hidden md:inline-flex h-8 w-8 items-center justify-center text-muted-foreground hover:text-foreground rounded-md border border-border bg-secondary/30 hover:bg-secondary/50 active:scale-95 active:bg-secondary/70 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
                     title="Export"
                   >
                     <Download className="h-4 w-4" />
@@ -326,7 +333,7 @@ export const Navbar: React.FC = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
-                    className="md:hidden inline-flex items-center justify-center p-1.5 text-muted-foreground hover:text-foreground rounded-md border border-border bg-secondary/30 hover:bg-secondary/50 active:scale-95 active:bg-secondary/70 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
+                    className="md:hidden inline-flex h-8 w-8 items-center justify-center text-muted-foreground hover:text-foreground rounded-md border border-border bg-secondary/30 hover:bg-secondary/50 active:scale-95 active:bg-secondary/70 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
                     title="Options"
                   >
                     <MoreVertical className="h-4 w-4" />
@@ -376,10 +383,16 @@ export const Navbar: React.FC = () => {
           <Button
             variant="outline"
             size="icon"
+            // Override the default Button `size="icon"` (h-10 w-10) so
+            // the command-menu trigger matches the 32 px / h-8 toolbar
+            // band the other right-hand items live in. Without the
+            // override it would tower over the badges and icon
+            // buttons next to it.
+            className="h-8 w-8"
             onClick={() => setOpen(true)}
             title="Command Menu (Ctrl+K)"
           >
-            <Command className="h-[1.2rem] w-[1.2rem]" />
+            <Command className="h-4 w-4" />
             <span className="sr-only">Open Command Menu</span>
           </Button>
         </div>

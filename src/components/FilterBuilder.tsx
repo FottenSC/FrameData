@@ -822,30 +822,14 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
       </div>
 
       {/*
-        Advanced builder.
-        Conditionally rendered — when collapsed, the entire FilterGroupRow
-        subtree is REMOVED from the React tree (and therefore from the
-        DOM). This is the only approach that proved consistent across
-        Vivaldi / Brave-style Chromium variants whose UI shell competes
-        with the page for layout time. Earlier attempts:
-          - `grid-template-rows: 0fr → 1fr` animation: forced full
-            subtree relayout per frame; froze the main thread.
-          - `display: none ↔ block` + opacity fade: fine in Chrome,
-            laggy in Vivaldi.
-          - `content-visibility: hidden ↔ visible` + `will-change` +
-            `allow-discrete`: each toggle accumulated work; the lag
-            grew over time.
-          - Plain `display: none ↔ block` without animation: still
-            laggy in Vivaldi because Radix Popover triggers and
-            Floating UI observers re-measure the whole panel on every
-            display flip.
-        Conditional render sidesteps all of that — there's literally
-        nothing for the browser to lay out / re-measure when the panel
-        isn't there.
-        Filter STATE survives the unmount because it's owned by
-        FilterBuilder via useState. The only thing lost on collapse is
-        any uncommitted draft text inside DebouncedInput rows, which is
-        an acceptable trade for a responsive toggle.
+        Advanced builder — conditionally rendered. Filter state lives in
+        FilterBuilder via useState, so the underlying values survive an
+        unmount; only in-flight DebouncedInput drafts get dropped on
+        collapse, which is acceptable for a responsive toggle. (We
+        previously wrapped this in a mount-once / hide-via-CSS pattern
+        to dodge a perceived Vivaldi lag, but that turned out to be a
+        Vivaldi-internal DOM observer that pauses with DevTools open —
+        not a code-side problem. Reverting to the simpler form.)
       */}
       {isExpanded && (
         <div className="pt-1">
@@ -921,10 +905,7 @@ const FilterGroupRow: React.FC<
       type="button"
       onClick={toggleOp}
       className={cn(
-        "flex flex-col items-center justify-center min-w-[36px] px-1.5 select-none border-l border-y rounded-l-md transition-colors",
-        group.operator === "and"
-          ? "bg-primary/10 hover:bg-primary/20 text-primary"
-          : "bg-amber-500/10 hover:bg-amber-500/20 text-amber-500",
+        "flex flex-col items-center justify-center min-w-[36px] px-1.5 select-none border-l border-y rounded-l-md transition-colors bg-secondary hover:bg-accent text-secondary-foreground",
       )}
       aria-label={`Toggle ${group.operator.toUpperCase()} — click to change`}
       title={`Currently ${group.operator.toUpperCase()} — click to switch`}
@@ -1024,14 +1005,21 @@ const FilterRow: React.FC<BaseFilterProps & { filter: FilterCondition }> = ({
     <div className="flex items-center justify-between gap-2 group/row">
       <div className="flex items-center gap-2 flex-1 flex-wrap">
         {isPinned ? (
-          // Static label, not a control — render it as plain
-          // muted-foreground text so it doesn't read as another
-          // dropdown trigger sitting next to the editable condition /
-          // value pickers. Layout-equivalent (h-8 + 160px wide) so the
-          // row stays visually aligned with the other filter rows.
+          // Static label, not a control. Visually we still need the
+          // boxed silhouette of a field selector so the row's
+          // [field][operator][value] rhythm reads as one band — the
+          // border-less version made the row feel "broken". To signal
+          // "you can't interact with this":
+          //   - dashed border (subtly different from the solid borders
+          //     on actual inputs)
+          //   - muted-foreground text + cursor-default
+          //   - no hover state (no bg change, no ring)
+          //   - aria-disabled flagged for AT consumers
+          // Layout-equivalent to the Combobox below (h-8 + 160px wide).
           <div
-            className="inline-flex h-8 w-[160px] items-center justify-start px-3 text-sm text-muted-foreground select-none cursor-default"
-            title="Pinned quick-search field"
+            className="inline-flex h-8 w-[160px] items-center justify-start px-3 rounded-md border border-dashed border-border/60 bg-muted/10 text-sm text-muted-foreground select-none cursor-default"
+            title="Pinned quick-search field — edit via the search box above"
+            aria-disabled="true"
             aria-label="Pinned field"
           >
             <span className="truncate">
@@ -1078,7 +1066,7 @@ const FilterRow: React.FC<BaseFilterProps & { filter: FilterCondition }> = ({
                 key={op.id}
                 value={op.id}
                 className={cn(
-                  "relative flex w-full cursor-default select-none items-center gap-2 rounded-sm py-1.5 pl-2 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+                  "relative flex w-full cursor-default select-none items-center gap-2 rounded-sm py-1.5 pl-2 pr-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
                 )}
               >
                 <OperatorIcon

@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useNavigate } from "@tanstack/react-router";
 
 import {
   Dialog,
@@ -15,7 +14,6 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  CommandSeparator,
   CommandShortcut,
 } from "@/components/ui/command";
 import {
@@ -29,25 +27,19 @@ import {
 } from "lucide-react";
 import { useGame } from "@/contexts/GameContext";
 import { useCommand } from "@/contexts/CommandContext";
-import {
-  useTableConfig,
-  useUserSettings,
-} from "@/contexts/UserSettingsContext";
+import { useUserSettings } from "@/contexts/UserSettingsContext";
 import { getStylesForGame } from "@/lib/notation";
-import type { ColumnConfig } from "@/contexts/UserSettingsContext";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { TableConfigurator } from "@/components/TableConfigurator";
+import { CreditsContent } from "@/components/CreditsContent";
 import { avaliableGames } from "@/contexts/GameContext";
 import { useQueryClient } from "@tanstack/react-query";
 import { fetchCharacterMoves } from "@/hooks/useMoves";
 
 export function CommandPalette() {
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { open, setOpen, currentView, setCurrentView, setCreditsOpen } =
-    useCommand();
+  const { open, setOpen, currentView, setCurrentView } = useCommand();
   const {
     characters,
     selectedGame,
@@ -56,7 +48,6 @@ export function CommandPalette() {
     setSelectedGameById,
   } = useGame();
 
-  const {} = useTableConfig();
   const { getNotationStyleId, setNotationStyle } = useUserSettings();
 
   const [searchValue, setSearchValue] = React.useState("");
@@ -127,6 +118,7 @@ export function CommandPalette() {
   const showTableConfig = currentView === "tableConfig";
   const showGames = currentView === "games";
   const showNotationMappings = currentView === "notationMappings";
+  const showCredits = currentView === "credits";
 
   // TableConfigurator manages its own state
 
@@ -142,13 +134,10 @@ export function CommandPalette() {
     return () => document.removeEventListener("keydown", down);
   }, [open, setOpen]);
 
-  const handleCharacterSelect = (
-    characterId: number,
-    characterName: string,
-  ) => {
+  const handleCharacterSelect = (characterId: number) => {
+    // setSelectedCharacterId navigates; closing the palette is all that's
+    // left to do here.
     setSelectedCharacterId(characterId);
-    const nameForUrl = characterId === -1 ? "All" : characterName;
-    navigate({ to: `/${selectedGame.id}/${encodeURIComponent(nameForUrl)}` });
     setOpen(false);
   };
 
@@ -182,12 +171,16 @@ export function CommandPalette() {
                     ? `Search ${avaliableGames.length} games...`
                     : showNotationMappings
                       ? "Toggle notation mappings..."
-                      : "Type a command or search..."
+                      : showCredits
+                        ? "Credits..."
+                        : "Type a command or search..."
             }
             value={searchValue}
             onValueChange={setSearchValue}
           />
-          <CommandList className={showTableConfig ? "max-h-[500px]" : ""}>
+          <CommandList
+            className={showTableConfig || showCredits ? "max-h-[500px]" : ""}
+          >
             <CommandEmpty>No results found.</CommandEmpty>
             {showTableConfig ? (
               <>
@@ -210,7 +203,7 @@ export function CommandPalette() {
                   </CommandItem>
                   <CommandItem
                     key={-1}
-                    onSelect={() => handleCharacterSelect(-1, "All")}
+                    onSelect={() => handleCharacterSelect(-1)}
                   >
                     <Users className="mr-2 h-4 w-4" />
                     <span>All Characters</span>
@@ -218,9 +211,7 @@ export function CommandPalette() {
                   {characters.map((character) => (
                     <CommandItem
                       key={character.id}
-                      onSelect={() =>
-                        handleCharacterSelect(character.id, character.name)
-                      }
+                      onSelect={() => handleCharacterSelect(character.id)}
                       onMouseEnter={() => prefetchCharacter(character)}
                     >
                       <Users className="mr-2 h-4 w-4" />
@@ -324,6 +315,40 @@ export function CommandPalette() {
                   })}
                 </CommandGroup>
               </>
+            ) : showCredits ? (
+              <>
+                {/*
+                  Credits view — same pattern as the other navigated
+                  views: a "Back to Commands" CommandItem at the top so
+                  the user can keyboard their way back, then the
+                  reusable CreditsContent (sections of links + lists).
+                  Living inside the palette instead of its own Dialog
+                  means it feels like every other "branch" of the
+                  command menu rather than a separate modal that
+                  appears from nowhere.
+                */}
+                <CommandGroup heading="Credits">
+                  <CommandItem
+                    onSelect={goBackToMain}
+                    value="back-to-commands"
+                    className="mb-1"
+                  >
+                    <ChevronLeft className="mr-2 h-4 w-4" />
+                    <span>Back to Commands</span>
+                  </CommandItem>
+                  <div
+                    // The static credits markup isn't a CommandItem
+                    // (it's not selectable), so wrap it in a non-cmdk
+                    // div. Setting `cmdk-group-items=""` is a hint to
+                    // cmdk that this isn't a focusable list — keyboard
+                    // up/down still navigates between the Back item
+                    // and any other CommandItems above it.
+                    className="px-1"
+                  >
+                    <CreditsContent />
+                  </div>
+                </CommandGroup>
+              </>
             ) : (
               <>
                 <CommandGroup heading="Commands">
@@ -359,22 +384,29 @@ export function CommandPalette() {
                   </CommandItem>
                   <CommandItem
                     onSelect={() => {
-                      setCreditsOpen(true);
-                      setOpen(false);
-                    }}
-                  >
-                    <Info className="mr-2 h-4 w-4" />
-                    <span>Credits</span>
-                    <CommandShortcut>→</CommandShortcut>
-                  </CommandItem>
-                  <CommandItem
-                    onSelect={() => {
                       setCurrentView("notationMappings");
                       setSearchValue("");
                     }}
                   >
                     <Languages className="mr-2 h-4 w-4" />
                     <span>Notation Mappings</span>
+                    <CommandShortcut>→</CommandShortcut>
+                  </CommandItem>
+                  {/*
+                    Credits is intentionally the last entry: it's a
+                    reference / "about" item rather than an action the
+                    user takes during normal use, so it sits at the
+                    bottom where similar low-frequency entries live in
+                    most command-menu UX patterns.
+                  */}
+                  <CommandItem
+                    onSelect={() => {
+                      setCurrentView("credits");
+                      setSearchValue("");
+                    }}
+                  >
+                    <Info className="mr-2 h-4 w-4" />
+                    <span>Credits</span>
                     <CommandShortcut>→</CommandShortcut>
                   </CommandItem>
                 </CommandGroup>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import {
   Table,
   TableBody,
@@ -6,7 +6,7 @@ import {
   TableRow as UITableRow,
 } from "@/components/ui/table";
 import { showCopiedToast } from "@/components/ui/copy-toast";
-import { Move, SortableColumn } from "@/types/Move";
+import { Move, SortableColumn, type Command } from "@/types/Move";
 import { ColumnConfig } from "@/contexts/UserSettingsContext";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -25,7 +25,7 @@ interface DataTableContentProps {
   sortColumn: SortableColumn | null;
   sortDirection: "asc" | "desc";
   handleSort: (column: SortableColumn) => void;
-  renderCommand: (command: string[][] | null) => React.ReactNode;
+  renderCommand: (command: Command | null) => React.ReactNode;
   renderNotes: (note: string | null) => React.ReactNode;
   visibleColumns: ColumnConfig[];
   badges?: Record<string, { className: string }>;
@@ -47,28 +47,49 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
   // Get stance info function from context
   const { getStanceInfo, getPropertyInfo, notationStyle } = useGame();
 
-  // Single scroll container ref - component owns its scroll
+  // Single scroll container ref - component owns its scroll. The ref
+  // callback must be stabilised with `useCallback` (empty deps) — without
+  // it, the function identity changes on every render, which makes React
+  // call the OLD callback with `null` and the NEW one with the element on
+  // every commit. That null↔element flicker propagates through
+  // `setScrollContainer`, briefly drops `scrollContainer` to `null`, and
+  // re-runs the resize-observer effect every render.
   const [scrollContainer, setScrollContainer] = useState<HTMLDivElement | null>(
     null,
   );
-  const scrollContainerRef = (node: HTMLDivElement | null) => {
+  const scrollContainerRef = useCallback((node: HTMLDivElement | null) => {
     setScrollContainer(node);
-  };
+  }, []);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(0);
 
-  // Copy command to clipboard. For multi-alt steps we take the first
-  // alternative — clipboard needs ONE concrete input to paste, and the first
-  // alt is the canonical / authored entry. Tokens are translated through
-  // the active notation style so what the user copies matches what they
-  // see on screen.
+  // Copy command to clipboard. We preserve the full OR-structure: every
+  // alternative of every step makes it into the copied text, separated by
+  // `|` (matches `formatCommandFlat`, the same convention used by CSV /
+  // Excel export). AND-pressed buttons inside one alternative are
+  // `+`-joined; each button is translated independently so `A+B` copies as
+  // `1+2` in Tekken notation, not as a regex-replaced blob. Steps are
+  // glued together without a separator — that's the long-standing SC6
+  // copy convention (sequences read as `AAB`, not `A A B`).
   const copyCommand = React.useCallback(
     (move: Move) => {
       const stancePart = move.stance?.join(" ") ?? "";
       const commandPart =
         move.command
-          ?.map((step) => translateToken(step[0] ?? "", notationStyle))
+          ?.map((step) =>
+            step
+              .map((alt) =>
+                alt
+                  .map((btn) => {
+                    const translated = translateToken(btn.b, notationStyle);
+                    return btn.h ? `(${translated})` : translated;
+                  })
+                  .join("+"),
+              )
+              .filter(Boolean)
+              .join("|"),
+          )
           .filter(Boolean)
           .join("") ?? "";
       const textToCopy = stancePart
@@ -114,17 +135,13 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
   const virtualItems = rowVirtualizer.getVirtualItems();
   const totalSize = rowVirtualizer.getTotalSize();
 
-  // Note: there's no manual ResizeObserver here on purpose.
-  // `useVirtualizer({ getScrollElement })` installs its OWN observer
-  // on the scroll element internally and handles container resizes
-  // correctly. The previous explicit `new ResizeObserver(() =>
-  // rowVirtualizer.measure())` was both redundant AND actively
-  // harmful: `measure()` invalidates and recomputes EVERY cached row
-  // size, so anything that changed the table area's height (toggling
-  // the FilterBuilder's Advanced panel, switching characters,
-  // expanding hit-levels, even the system devtools opening) triggered
-  // a full row remeasure pass. In Chrome it was fast enough to be
-  // invisible; in Vivaldi/Brave it manifested as obvious toggle lag.
+  // No manual ResizeObserver — `useVirtualizer({ getScrollElement })`
+  // installs its own observer on the scroll element. An explicit
+  // `new ResizeObserver(() => rowVirtualizer.measure())` here would be
+  // both redundant AND harmful: `measure()` invalidates every cached
+  // row size, so any height change (FilterBuilder toggle, switching
+  // characters, devtools opening) triggered a full row remeasure pass
+  // that froze the table in Vivaldi/Brave.
 
   // Render table body content
   const tableBody = (() => {
@@ -216,7 +233,7 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
         <>
           {slice.map((move) => (
             <TableRow
-              key={move.id}
+              key={`${move.characterId}-${move.id}`}
               move={move}
               visibleColumns={visibleColumns}
               renderCommand={renderCommand}
@@ -281,7 +298,7 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
           const move = displayMoves[virtualRow.index]!;
           return (
             <TableRow
-              key={move.id}
+              key={`${move.characterId}-${move.id}`}
               move={move}
               visibleColumns={visibleColumns}
               renderCommand={renderCommand}
@@ -313,9 +330,8 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Scroll container */}
       <div className="flex-1 min-h-0 overflow-y-auto" ref={scrollContainerRef}>
-        <Table className="table-layout-fixed">
+        <Table>
           <FrameDataTableHeader
             visibleColumns={visibleColumns}
             sortColumn={sortColumn}
@@ -325,7 +341,6 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
           <TableBody>{tableBody}</TableBody>
         </Table>
 
-        {/* Pagination inside scroll area */}
         {usePagination && (
           <PaginationFooter
             currentPage={currentPage}

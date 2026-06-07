@@ -1,6 +1,11 @@
 import { useQuery, useQueries } from "@tanstack/react-query";
-import { Move, MoveOutcome } from "@/types/Move";
-import { DEFAULT_OUTCOME_TAGS, parseOutcome } from "@/lib/parseOutcome";
+import {
+  Move,
+  MoveOutcome,
+  Command,
+  CommandButton,
+  CommandPress,
+} from "@/types/Move";
 
 interface Character {
   id: number;
@@ -59,186 +64,101 @@ export async function fetchCharacterMoves(
 }
 
 // ---------- Normalization ----------
+//
+// Character JSON is produced solely by the FrameDataFactory pipeline and
+// ships in a single canonical shape — there are no legacy on-disk variants
+// left to detect. Reading a move is a flat field-by-field copy into the
+// in-memory {@link Move}: the only work is renaming the stored PascalCase
+// keys, folding Damage/DamageDec into one object, and interning the small
+// recurring string vocabulary.
 
-/** Normalize a string-or-array-of-strings source field into a string[]|null. */
+/** Read a stored `string[] | null` field — drops empties, interns, null when empty. */
 function toStringArray(raw: unknown): string[] | null {
-  if (raw == null) return null;
-  const arr = Array.isArray(raw) ? raw : [raw];
+  if (!Array.isArray(raw)) return null;
   const out: string[] = [];
-  for (const v of arr) {
-    if (v != null && String(v).length > 0) {
-      out.push(intern(String(v))!);
-    }
-  }
-  return out.length > 0 ? out : null;
-}
-
-/** Normalize the `Properties` field — never null, always a string[]. */
-function toPropertyArray(raw: unknown): string[] {
-  return toStringArray(raw) ?? [];
-}
-
-/**
- * Normalize an outcome field (Block / Hit / CounterHit).
- *
- * Accepts BOTH shapes to ease migration:
- *
- *   1. The new structured shape emitted by the Python script, where the JSON
- *      already carries ``{ advantage, tags, raw }``. In that case we just
- *      coerce the types (and intern tag strings).
- *   2. The legacy flat shape where the JSON has two correlated fields — a raw
- *      string like "KND,+16" and a pre-computed numeric "*Dec". Here we fall
- *      through to {@link parseOutcome} so the tag list is recovered on load.
- *
- * This lets the frontend read any character JSON regardless of whether it was
- * produced before or after the data-pipeline refactor.
- */
-function parseOutcomeField(
-  structured: unknown,
-  legacyRaw: unknown,
-  legacyDec: unknown,
-): MoveOutcome {
-  if (
-    structured &&
-    typeof structured === "object" &&
-    !Array.isArray(structured) &&
-    ("advantage" in structured || "tags" in structured || "raw" in structured)
-  ) {
-    const s = structured as {
-      advantage?: unknown;
-      tags?: unknown;
-      raw?: unknown;
-    };
-    const advantage =
-      typeof s.advantage === "number" && Number.isFinite(s.advantage)
-        ? s.advantage
-        : null;
-    const tags = Array.isArray(s.tags)
-      ? s.tags
-          .filter((t): t is string => typeof t === "string" && t.length > 0)
-          .map((t) => intern(t)!)
-      : [];
-    const raw = typeof s.raw === "string" && s.raw.length > 0 ? s.raw : null;
-    return { advantage, tags, raw };
-  }
-
-  return parseOutcome(
-    typeof legacyRaw === "string" ? legacyRaw : null,
-    typeof legacyDec === "number"
-      ? legacyDec
-      : legacyDec != null
-        ? Number(legacyDec)
-        : null,
-    DEFAULT_OUTCOME_TAGS,
-  );
-}
-
-/**
- * Normalize the raw `Command` field into the in-memory nested shape
- * `string[][]` (one array per step, inner array listing alternatives).
- *
- * Accepts BOTH on-disk shapes:
- *
- *  - **Nested** (current): `[["(3)", "(6)", "(9)"], ["A"]]` — emitted by the
- *    Python factory.
- *  - **Flat + "_" sentinel** (legacy): `["(3)", "_", "(6)", "_", "(9)", "A"]`
- *    — older JSON where alternatives were separated by a literal `"_"` token.
- *
- * Tokens are interned so the vocabulary (A / B / 6 / A+G / etc.) collapses
- * to a single heap entry each. Notation translation is NOT applied here —
- * that happens at presentation time.
- */
-function normalizeCommand(raw: unknown): string[][] | null {
-  if (raw == null) return null;
-  if (!Array.isArray(raw)) {
-    // Single scalar (rare path) — wrap as a one-step, one-alt command.
-    const s = String(raw);
-    if (!s) return null;
-    const t = intern(s);
-    return t ? [[t]] : null;
-  }
-  if (raw.length === 0) return null;
-
-  const mapTok = (t: unknown): string | null => {
-    if (t == null) return null;
-    const s = String(t);
-    if (s.length === 0) return null;
-    return intern(s);
-  };
-
-  // Nested shape: first element is itself an array.
-  if (Array.isArray(raw[0])) {
-    const out: string[][] = [];
-    for (const step of raw) {
-      if (!Array.isArray(step)) continue;
-      const alts: string[] = [];
-      for (const tok of step) {
-        const m = mapTok(tok);
-        if (m) alts.push(m);
-      }
-      if (alts.length > 0) out.push(alts);
-    }
-    return out.length > 0 ? out : null;
-  }
-
-  // Legacy flat shape: collapse "_"-separated runs into multi-alt steps.
-  const out: string[][] = [];
-  let i = 0;
-  while (i < raw.length) {
-    const tok = mapTok(raw[i]);
-    if (tok == null) {
-      i += 1;
-      continue;
-    }
-    // Peek: if the next token is "_", walk the alternation run.
-    if (i + 1 < raw.length && raw[i + 1] === "_") {
-      const alts: string[] = [tok];
-      i += 2;
-      while (i < raw.length) {
-        const nxt = mapTok(raw[i]);
-        if (nxt) alts.push(nxt);
-        i += 1;
-        if (raw[i] !== "_") break;
-        i += 1;
-      }
-      out.push(alts);
-    } else {
-      out.push([tok]);
-      i += 1;
-    }
+  for (const v of raw) {
+    if (typeof v === "string" && v.length > 0) out.push(intern(v)!);
   }
   return out.length > 0 ? out : null;
 }
 
 /**
- * Convert a single raw JSON move object into the rich in-memory {@link Move}.
- *
- * The raw shape uses SC6-era field names ("HitDec", "CounterHit", etc.) and
- * represents an outcome as either a string or number. We parse these into
- * structured {@link MoveOutcome} values.
+ * Read one stored outcome object (`Block` / `Hit` / `CounterHit`) into a
+ * {@link MoveOutcome}. The pipeline always emits the structured
+ * `{ advantage, tags, raw }` form; types are coerced defensively and the
+ * tag codes interned (they come from a tiny shared vocabulary).
+ */
+function readOutcome(stored: unknown): MoveOutcome {
+  if (!stored || typeof stored !== "object") {
+    return { advantage: null, tags: [], raw: null };
+  }
+  const s = stored as { advantage?: unknown; tags?: unknown; raw?: unknown };
+  const advantage =
+    typeof s.advantage === "number" && Number.isFinite(s.advantage)
+      ? s.advantage
+      : null;
+  const tags = Array.isArray(s.tags)
+    ? s.tags
+        .filter((t): t is string => typeof t === "string" && t.length > 0)
+        .map((t) => intern(t)!)
+    : [];
+  const raw = typeof s.raw === "string" && s.raw.length > 0 ? s.raw : null;
+  return { advantage, tags, raw };
+}
+
+/**
+ * Convert a stored button leaf — always the object form `{b}` / `{b,h:true}` —
+ * into a {@link CommandButton}. The token is interned so the small alphabet
+ * (A / B / 6 / qcf / …) collapses to one heap entry. Returns `null` for a
+ * malformed leaf.
+ */
+function toButton(leaf: unknown): CommandButton | null {
+  if (!leaf || typeof leaf !== "object") return null;
+  const token = (leaf as { b?: unknown }).b;
+  if (typeof token !== "string" || token.length === 0) return null;
+  const b = intern(token)!;
+  return (leaf as { h?: unknown }).h === true ? { b, h: true } : { b };
+}
+
+/**
+ * Read the stored `Command` into the in-memory {@link Command}: a three-level
+ * steps × alternatives × buttons array of object leaves. Empty alternatives
+ * and steps are dropped; `null` (or any non-array) yields `null`. Notation
+ * translation is NOT applied here — that happens at presentation time.
+ */
+function readCommand(raw: unknown): Command | null {
+  if (!Array.isArray(raw)) return null;
+  const out: Command = [];
+  for (const step of raw) {
+    if (!Array.isArray(step)) continue;
+    const alts: CommandPress[] = [];
+    for (const alt of step) {
+      if (!Array.isArray(alt)) continue;
+      const buttons: CommandButton[] = [];
+      for (const leaf of alt) {
+        const btn = toButton(leaf);
+        if (btn) buttons.push(btn);
+      }
+      if (buttons.length > 0) alts.push(buttons);
+    }
+    if (alts.length > 0) out.push(alts);
+  }
+  return out.length > 0 ? out : null;
+}
+
+/**
+ * Convert one raw JSON move object into the in-memory {@link Move}. The raw
+ * shape uses PascalCase keys and stores damage as two correlated fields
+ * (`Damage` per-hit string + `DamageDec` total); both fold into `damage`.
  */
 function processMove(raw: any, charId: number, charName: string): Move {
-  const mappedCommand = normalizeCommand(raw.Command);
-
-  // Outcomes. The current Python pipeline emits the pre-parsed
-  //     { advantage, tags, raw }
-  // structure directly; older JSON files still in the wild have the flat
-  //     "Block": "KND,+16", "BlockDec": 16
-  // shape. parseOutcomeField accepts either.
-  const block = parseOutcomeField(raw.Block, raw.Block, raw.BlockDec);
-  const hit = parseOutcomeField(raw.Hit, raw.Hit, raw.HitDec);
-  const counterHit = parseOutcomeField(
-    raw.CounterHit,
-    raw.CounterHit,
-    raw.CounterHitDec,
-  );
-
   return {
     id: Number(raw.ID),
     characterId: charId,
     characterName: charName,
-    stringCommand: raw.stringCommand != null ? String(raw.stringCommand) : null,
-    command: mappedCommand,
+    stringCommand:
+      raw.stringCommand != null ? String(raw.stringCommand) : null,
+    command: readCommand(raw.Command),
     stance: toStringArray(raw.Stance),
     hitLevel: toStringArray(raw.HitLevel),
     impact: raw.Impact != null ? Number(raw.Impact) : null,
@@ -246,11 +166,11 @@ function processMove(raw: any, charId: number, charName: string): Move {
       raw: raw.Damage != null ? intern(String(raw.Damage)) : null,
       total: raw.DamageDec != null ? Number(raw.DamageDec) : null,
     },
-    block,
-    hit,
-    counterHit,
+    block: readOutcome(raw.Block),
+    hit: readOutcome(raw.Hit),
+    counterHit: readOutcome(raw.CounterHit),
     guardBurst: raw.GuardBurst != null ? Number(raw.GuardBurst) : null,
-    properties: toPropertyArray(raw.Properties),
+    properties: toStringArray(raw.Properties) ?? [],
     notes: raw.Notes != null ? String(raw.Notes) : null,
   };
 }

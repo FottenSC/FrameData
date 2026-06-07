@@ -31,22 +31,15 @@ export const CharacterSelectionPage: React.FC = () => {
     });
   };
 
+  // setSelectedCharacterId navigates; the id→name lookup and URL build now
+  // live in GameContext, and the route changing is what selects the
+  // character.
   const handleCharacterSelect = (characterId: number) => {
-    const character = characters.find((c) => c.id === characterId);
-    if (character && selectedGame) {
-      setSelectedCharacterId(characterId);
-      navigate({ to: `/${selectedGame.id}/${encodeURIComponent(character.name)}` });
-    } else {
-      console.error("Selected character or game not found during navigation");
-      navigate({ to: "/" });
-    }
+    setSelectedCharacterId(characterId);
   };
 
   const handleAllSelect = () => {
-    if (selectedGame) {
-      setSelectedCharacterId(-1);
-      navigate({ to: `/${selectedGame.id}/All` });
-    }
+    setSelectedCharacterId(-1);
   };
 
   return (
@@ -61,10 +54,10 @@ export const CharacterSelectionPage: React.FC = () => {
           {Array.from({ length: 28 }).map((_, i) => (
             <Card
               key={i}
-              className="flex flex-col items-center overflow-hidden border-muted bg-card"
+              className="flex flex-col items-center overflow-hidden border-muted bg-transparent"
             >
               <Skeleton className="w-full aspect-square rounded-none" />
-              <div className="w-full p-2 bg-card border-t border-border/50">
+              <div className="w-full p-2 bg-transparent border-t border-border/50">
                 <Skeleton className="h-4 w-3/4 mx-auto" />
               </div>
             </Card>
@@ -101,16 +94,16 @@ export const CharacterSelectionPage: React.FC = () => {
           <div className="character-grid-container grid grid-cols-4 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9 gap-3 min-h-[40vh] animate-fadeIn">
             {/* All Characters option */}
             <Card
-              className="group cursor-pointer flex flex-col items-center overflow-hidden hover:shadow-md hover:border-primary/50 transition-all duration-300 border-muted bg-card animate-character-in"
+              className="group cursor-pointer flex flex-col items-center overflow-hidden hover:shadow-md hover:border-primary/50 transition-all duration-300 border-muted bg-transparent animate-character-in"
               style={{ animationDelay: "0ms" }}
               onClick={handleAllSelect}
             >
-              <div className="relative w-full aspect-square bg-muted/50 flex items-center justify-center group-hover:bg-muted transition-colors">
+              <div className="relative w-full aspect-square bg-transparent flex items-center justify-center transition-colors">
                 <span className="text-4xl text-muted-foreground group-hover:scale-110 transition-transform duration-300">
                   👥
                 </span>
               </div>
-              <div className="w-full p-2 bg-card border-t border-border/50">
+              <div className="w-full p-2 bg-transparent border-t border-border/50">
                 <p className="text-xs sm:text-sm font-bold text-center text-card-foreground truncate group-hover:text-primary transition-all">
                   All Characters
                 </p>
@@ -120,10 +113,12 @@ export const CharacterSelectionPage: React.FC = () => {
             {characters.map((character, index) => (
               <Card
                 key={character.id}
-                className="group cursor-pointer flex flex-col items-center overflow-hidden hover:shadow-md hover:border-primary/50 transition-all duration-300 border-muted bg-card animate-character-in"
+                className="group cursor-pointer flex flex-col items-center overflow-hidden hover:shadow-md hover:border-primary/50 transition-all duration-300 border-muted bg-transparent animate-character-in"
                 style={{ animationDelay: `${(index + 1) * 15}ms` }}
-                onClick={() => handleCharacterSelect(character.id)}                onMouseEnter={() => prefetchCharacter(character)}              >
-                <div className="relative w-full aspect-square overflow-hidden bg-muted">
+                onClick={() => handleCharacterSelect(character.id)}
+                onMouseEnter={() => prefetchCharacter(character)}
+              >
+                <div className="relative w-full aspect-square overflow-hidden bg-transparent">
                   {character.image ? (
                     <img
                       src={character.image}
@@ -138,14 +133,14 @@ export const CharacterSelectionPage: React.FC = () => {
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-muted/50">
+                    <div className="w-full h-full flex items-center justify-center bg-transparent">
                       <span className="text-muted-foreground text-xs">
                         No Image
                       </span>
                     </div>
                   )}
                 </div>
-                <div className="w-full p-2 bg-card border-t border-border/50">
+                <div className="w-full p-2 bg-transparent border-t border-border/50">
                   <p className="text-xs sm:text-sm font-bold text-center text-card-foreground truncate group-hover:text-primary transition-all">
                     {character.name}
                   </p>

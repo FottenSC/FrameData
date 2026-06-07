@@ -1,230 +1,60 @@
 "use client";
 
-/**
- * Dialog wrapper — now backed by the native `<dialog>` element.
- *
- * Behavioural notes vs the previous Radix-backed implementation:
- *
- *   - `showModal()` puts the dialog in the browser's **top layer**, which
- *     naturally floats above everything else, locks scroll on the rest
- *     of the page, makes background content `inert`, and traps focus —
- *     all without a portal, overlay div, or focus-trap library.
- *   - The `::backdrop` pseudo-element styles the greyed-out scrim; see
- *     `src/index.css`.
- *   - Escape-to-close, initial focus, and return-focus are all handled
- *     by the user agent.
- *   - Backdrop click is NOT a native dismiss gesture, so we add one by
- *     listening for clicks whose target is the dialog element itself
- *     (clicks on descendants bubble up with target === descendant).
- *
- * API compatibility: consumers that imported
- * `{ Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
- *   DialogFooter, DialogTrigger, DialogClose, DialogOverlay, DialogPortal }`
- * from this module continue to work unchanged. `DialogOverlay` and
- * `DialogPortal` are now compat stubs — the backdrop is drawn by
- * `::backdrop` and the top-layer replaces the portal.
- */
-
 import * as React from "react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { XIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-// ---------- Context ----------
-interface DialogCtxValue {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  dialogRef: React.MutableRefObject<HTMLDialogElement | null>;
-  titleId: string;
-  descriptionId: string;
-}
+const Dialog = DialogPrimitive.Root;
 
-const DialogContext = React.createContext<DialogCtxValue | null>(null);
+const DialogTrigger = DialogPrimitive.Trigger;
 
-function useDialogContext(component: string): DialogCtxValue {
-  const ctx = React.useContext(DialogContext);
-  if (!ctx) {
-    throw new Error(`<${component}> must be rendered inside <Dialog>`);
-  }
-  return ctx;
-}
+const DialogPortal = DialogPrimitive.Portal;
 
-// ---------- Root ----------
-interface DialogProps {
-  /** Controlled open state. */
-  open?: boolean;
-  /** Uncontrolled initial state. */
-  defaultOpen?: boolean;
-  /** Notified every time the open state changes — including Escape /
-   *  backdrop click / programmatic close. */
-  onOpenChange?: (open: boolean) => void;
-  children?: React.ReactNode;
-}
+const DialogClose = DialogPrimitive.Close;
 
-function Dialog({
-  open,
-  defaultOpen = false,
-  onOpenChange,
-  children,
-}: DialogProps) {
-  const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen);
-  const isControlled = open !== undefined;
-  const actualOpen = isControlled ? open : uncontrolledOpen;
+const DialogOverlay = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Overlay>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Overlay
+    ref={ref}
+    className={cn(
+      "fixed inset-0 z-50 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      className,
+    )}
+    {...props}
+  />
+));
+DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
-  const setOpen = React.useCallback(
-    (next: boolean) => {
-      if (!isControlled) setUncontrolledOpen(next);
-      onOpenChange?.(next);
-    },
-    [isControlled, onOpenChange],
-  );
-
-  const dialogRef = React.useRef<HTMLDialogElement | null>(null);
-  const titleId = React.useId();
-  const descriptionId = React.useId();
-
-  const value = React.useMemo(
-    () => ({ open: actualOpen, setOpen, dialogRef, titleId, descriptionId }),
-    [actualOpen, setOpen, titleId, descriptionId],
-  );
-
-  return (
-    <DialogContext.Provider value={value}>{children}</DialogContext.Provider>
-  );
-}
-
-// ---------- Content ----------
-type DialogContentProps = Omit<
-  React.ComponentPropsWithoutRef<"dialog">,
-  "open" | "onClose"
->;
-
-function DialogContent({
-  className,
-  children,
-  onClick,
-  ...props
-}: DialogContentProps) {
-  const { open, setOpen, dialogRef, titleId, descriptionId } =
-    useDialogContext("DialogContent");
-
-  // Drive the native dialog's modal state from React state. We call
-  // showModal/close rather than toggling the `open` attribute because
-  // `open` attribute alone doesn't put the dialog in the top layer.
-  React.useEffect(() => {
-    const el = dialogRef.current;
-    if (!el) return;
-    if (open && !el.open) {
-      try {
-        el.showModal();
-      } catch {
-        // showModal throws if the element is already open with
-        // open-attribute, or disconnected; fall back to a plain show().
-        if (!el.open) el.show();
-      }
-    } else if (!open && el.open) {
-      el.close();
-    }
-  }, [open, dialogRef]);
-
-  // The native 'close' event fires for Escape, form-method=dialog
-  // submits, and explicit .close() calls. Mirror it back to React so
-  // `onOpenChange` receives the dismissal.
-  React.useEffect(() => {
-    const el = dialogRef.current;
-    if (!el) return;
-    const handler = () => setOpen(false);
-    el.addEventListener("close", handler);
-    return () => el.removeEventListener("close", handler);
-  }, [setOpen, dialogRef]);
-
-  // Light-dismiss on backdrop click. A click whose target is the
-  // dialog element itself (not a descendant) landed on the backdrop.
-  const handleClick: React.MouseEventHandler<HTMLDialogElement> = (event) => {
-    onClick?.(event);
-    if (event.defaultPrevented) return;
-    if (event.target === event.currentTarget) {
-      setOpen(false);
-    }
-  };
-
-  return (
-    <dialog
-      ref={dialogRef}
-      data-slot="dialog-content"
-      aria-labelledby={titleId}
-      aria-describedby={descriptionId}
-      onClick={handleClick}
-      // Centring strategy: explicit `top: 50%` + `left: 50%` plus a
-      // translate of -50%/-50%. Avoid the UA's `inset: 0; margin: auto`
-      // pattern — it computes margins based on ALL four sides being 0,
-      // so a consumer that overrides `top` (e.g. CommandPalette wants
-      // top-of-screen positioning) ends up off-centre because the
-      // bottom: 0 is still being honoured. With translate centring,
-      // overriding just `top` and `translate-y` works as expected and
-      // doesn't disturb horizontal centring.
+const DialogContent = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
+>(({ className, children, ...props }, ref) => (
+  <DialogPortal>
+    <DialogOverlay />
+    <DialogPrimitive.Content
+      ref={ref}
       className={cn(
-        "bg-background text-foreground fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[calc(100%-2rem)] rounded-lg border p-6 shadow-lg grid gap-4 sm:max-w-lg",
+        "bg-background text-foreground fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border p-6 shadow-lg duration-200 sm:max-w-lg",
         "max-h-[min(90vh,calc(100vh-2rem))] overflow-visible",
-        "open:animate-in open:fade-in-0 open:zoom-in-95",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
         className,
       )}
       {...props}
     >
       {children}
-      <button
-        type="button"
-        aria-label="Close"
-        onClick={() => setOpen(false)}
-        className="ring-offset-background focus:ring-ring absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
-      >
+      <DialogPrimitive.Close className="ring-offset-background focus:ring-ring absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
         <XIcon />
         <span className="sr-only">Close</span>
-      </button>
-    </dialog>
-  );
-}
+      </DialogPrimitive.Close>
+    </DialogPrimitive.Content>
+  </DialogPortal>
+));
+DialogContent.displayName = DialogPrimitive.Content.displayName;
 
-// ---------- Trigger / Close ----------
-// Simple button wrappers; consumers can always roll their own by calling
-// setOpen through whatever ref / context they prefer.
-function DialogTrigger({
-  onClick,
-  ...props
-}: React.ComponentPropsWithoutRef<"button">) {
-  const { setOpen } = useDialogContext("DialogTrigger");
-  return (
-    <button
-      type="button"
-      data-slot="dialog-trigger"
-      {...props}
-      onClick={(e) => {
-        onClick?.(e);
-        if (!e.defaultPrevented) setOpen(true);
-      }}
-    />
-  );
-}
-
-function DialogClose({
-  onClick,
-  ...props
-}: React.ComponentPropsWithoutRef<"button">) {
-  const { setOpen } = useDialogContext("DialogClose");
-  return (
-    <button
-      type="button"
-      data-slot="dialog-close"
-      {...props}
-      onClick={(e) => {
-        onClick?.(e);
-        if (!e.defaultPrevented) setOpen(false);
-      }}
-    />
-  );
-}
-
-// ---------- Structural sub-parts ----------
 function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -248,50 +78,31 @@ function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function DialogTitle({ className, ...props }: React.ComponentProps<"h2">) {
-  const { titleId } = useDialogContext("DialogTitle");
-  return (
-    <h2
-      id={titleId}
-      data-slot="dialog-title"
-      className={cn("text-lg leading-none font-semibold", className)}
-      {...props}
-    />
-  );
-}
+const DialogTitle = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Title>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Title
+    ref={ref}
+    data-slot="dialog-title"
+    className={cn("text-lg leading-none font-semibold", className)}
+    {...props}
+  />
+));
+DialogTitle.displayName = DialogPrimitive.Title.displayName;
 
-function DialogDescription({
-  className,
-  ...props
-}: React.ComponentProps<"p">) {
-  const { descriptionId } = useDialogContext("DialogDescription");
-  return (
-    <p
-      id={descriptionId}
-      data-slot="dialog-description"
-      className={cn("text-muted-foreground text-sm", className)}
-      {...props}
-    />
-  );
-}
-
-// ---------- Compat stubs ----------
-// Retained so any consumer that still imports these keeps compiling.
-// They're no-ops under the native-dialog implementation:
-//
-//   - `DialogPortal`: native `<dialog>` uses the top layer instead of
-//     a JS-managed portal, so there's nothing to portal. We render
-//     children as-is.
-//   - `DialogOverlay`: the scrim is `::backdrop` styled in CSS; this
-//     component renders nothing so any stray instance collapses away.
-//
-function DialogPortal({ children }: { children?: React.ReactNode }) {
-  return <>{children}</>;
-}
-
-function DialogOverlay(_props: React.ComponentProps<"div">) {
-  return null;
-}
+const DialogDescription = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Description>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Description
+    ref={ref}
+    data-slot="dialog-description"
+    className={cn("text-muted-foreground text-sm", className)}
+    {...props}
+  />
+));
+DialogDescription.displayName = DialogPrimitive.Description.displayName;
 
 export {
   Dialog,

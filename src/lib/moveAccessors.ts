@@ -25,11 +25,18 @@
  * costs nothing at the data layer.
  */
 
-import { formatOutcome } from "./parseOutcome";
-import type { Move, MoveOutcome } from "@/types/Move";
+import {
+  buttonToText,
+  formatOutcome,
+  type Command,
+  type CommandPress,
+  type Move,
+  type MoveOutcome,
+} from "@/types/Move";
 import {
   expandMotionShorthand,
   isMotionShorthand,
+  MOTION_SHORTHAND,
   translateCommand,
   translateToken,
   type NotationStyle,
@@ -40,25 +47,39 @@ const joinOrNull = (xs: string[] | null, sep: string): string | null =>
   xs && xs.length > 0 ? xs.join(sep) : null;
 
 /**
+ * Join an alternative's simultaneously-pressed buttons back into the
+ * canonical `+`-separated token (`[{b:"A"},{b:"B"}]` → `"A+B"`). Held
+ * buttons keep their parens (`[{b:"A",h:true}]` → `"(A)"`). Single-button
+ * alts pass through with no separator.
+ */
+const joinButtons = (alt: CommandPress): string =>
+  alt.map(buttonToText).join("+");
+
+/**
  * Cartesian expansion of a command's OR-steps into concrete input sequences.
  *
- * A command is stored as an ordered list of steps where each step is a list
- * of alternative tokens:
+ * A command is stored as steps × alternatives × simultaneously-pressed
+ * buttons. We collapse the third level by `+`-joining each alternative's
+ * buttons back into the human-readable token, then take the cartesian
+ * product across steps:
  *
- *     [["(2)", "(8)"], ["B+K"]]          → ["(2) B+K", "(8) B+K"]
- *     [["(3)", "(6)", "(9)"], ["A+G"]]   → ["(3) A+G", "(6) A+G", "(9) A+G"]
- *     [["A"], ["A"], ["B"]]              → ["A A B"]
+ *     [[[{b:"2",h}],[{b:"8",h}]], [[{b:"B"},{b:"K"}]]]            → ["(2) B+K", "(8) B+K"]
+ *     [[[{b:"3",h}],[{b:"6",h}],[{b:"9",h}]], [[{b:"A"},{b:"G"}]]] → ["(3) A+G", "(6) A+G", "(9) A+G"]
+ *     [[[{b:"A"}]], [[{b:"A"}]], [[{b:"B"}]]]                     → ["A A B"]
  *
  * Returned strings are space-joined; the search/filter layer normalises
  * further. Empty / null input yields `[""]` so callers can unconditionally
  * iterate without a null-check.
  */
-export function expandCommand(cmd: string[][] | null): string[] {
+export function expandCommand(cmd: Command | null): string[] {
   if (!cmd || cmd.length === 0) return [""];
   return cmd.reduce<string[]>(
     (acc, step) =>
       acc.flatMap((prefix) =>
-        step.map((opt) => (prefix ? `${prefix} ${opt}` : opt)),
+        step.map((alt) => {
+          const tok = joinButtons(alt);
+          return prefix ? `${prefix} ${tok}` : tok;
+        }),
       ),
     [""],
   );
@@ -76,24 +97,38 @@ export function expandCommand(cmd: string[][] | null): string[] {
  * rendering. Only shorthand tokens get expanded; plain tokens pass
  * through.
  *
+ * The function is also bidirectional: rows whose data was authored as a
+ * literal direction sequence (`[2, 3, 6, B]` rather than `[qcf, B]`) get
+ * shorthand-collapsed variants emitted as well, so a user typing "qcfB"
+ * still matches them. The collapse runs on the post-translation strings
+ * by string-substituting each shorthand's expansion (rendered in the
+ * active style) with its label.
+ *
  * Return value is deduped; in the common no-shorthand case this is
  * exactly {@link expandCommand}.
  */
 export function expandCommandWithMotions(
-  cmd: string[][] | null,
+  cmd: Command | null,
   style: NotationStyle | null | undefined,
 ): string[] {
   if (!cmd || cmd.length === 0) return [""];
 
   // For each step, build the list of display variants every alternative
-  // should contribute. A plain token gives one variant (itself); a
-  // shorthand gives TWO — the shorthand label AND its expanded sequence
-  // rendered as a space-joined string. Cartesian-product those across
-  // steps to get all command forms.
+  // should contribute. We flatten the buttons axis into a `+`-joined token
+  // here — motion shorthands like `qcf` are always single-button alts
+  // (compound `+` inputs aren't shorthands), so the join is a no-op for
+  // shorthand cases and produces the canonical `A+B` form for AND-presses.
+  // A plain token gives one variant (itself); a shorthand gives TWO —
+  // the shorthand label AND its expanded sequence rendered as a
+  // space-joined string. Cartesian-product those across steps.
   const stepVariants = cmd.map((step) =>
-    step.flatMap((tok) => {
-      if (!isMotionShorthand(tok)) return [tok];
-      const expansion = expandMotionShorthand(tok) ?? [];
+    step.flatMap((alt) => {
+      const tok = joinButtons(alt);
+      // Shorthand check looks at the bare button name — a held shorthand
+      // like `(qcf)` still has `b: "qcf"` and should expand the same way.
+      const single = alt.length === 1 ? alt[0] : null;
+      if (!single || !isMotionShorthand(single.b)) return [tok];
+      const expansion = expandMotionShorthand(single.b) ?? [];
       const expandedInStyle = expansion
         .map((t) => translateToken(t, style))
         .join(" ");
@@ -109,23 +144,52 @@ export function expandCommandWithMotions(
     [""],
   );
 
-  // Dedup — a no-shorthand command produces the same set as `expandCommand`
-  // but a shorthand-heavy one multiplies: cap the return via a Set.
-  return [...new Set(combinations)];
+  // Reverse-shorthand collapse: for each generated string, scan for the
+  // literal substring that each shorthand expands to (rendered in the
+  // active style — `2 3 6` in numpad, `D DF F` in FBUD, etc.) and emit a
+  // variant with that subsequence replaced by the shorthand label. Catches
+  // rows whose data was authored as separate direction steps rather than
+  // an atomic `qcf` token, so quick-search "qcfB" matches them too.
+  //
+  // String-replace is fine here: we're producing search tokens, not
+  // rendered output, so a slightly-weird collapse like `5 qcf B` still
+  // earns its keep by matching "qcfB" needles. We compile the per-style
+  // expansion strings once outside the per-row loop.
+  const expansionStringsForCollapse: Array<[label: string, str: string]> = [];
+  for (const [label, exp] of Object.entries(MOTION_SHORTHAND)) {
+    const expStr = exp.map((t) => translateToken(t, style)).join(" ");
+    if (expStr) expansionStringsForCollapse.push([label, expStr]);
+  }
+
+  const finalSet = new Set(combinations);
+  for (const s of combinations) {
+    for (const [label, expStr] of expansionStringsForCollapse) {
+      if (s.includes(expStr)) {
+        finalSet.add(s.replaceAll(expStr, label));
+      }
+    }
+  }
+
+  return [...finalSet];
 }
 
 /**
  * Human-readable flat rendering of a command, used for sort keys and CSV /
- * Excel export. Multi-alternative steps collapse to `"a/b/c"`; steps are
- * space-separated. `null` / empty → `null`.
+ * Excel export. Each alternative's buttons are `+`-joined, multi-alternative
+ * steps collapse to `"a|b|c"`, and steps are space-separated. `null` /
+ * empty → `null`.
  *
- *     [["(3)", "(6)", "(9)"], ["A"]] → "(3)/(6)/(9) A"
- *     [["A"], ["A"], ["B"]]          → "A A B"
+ *     [[[{b:"3",h}],[{b:"6",h}],[{b:"9",h}]], [[{b:"A"}]]] → "(3)|(6)|(9) A"
+ *     [[[{b:"A"}]], [[{b:"A"}]], [[{b:"B"}]]]              → "A A B"
+ *     [[[{b:"A"},{b:"B"}]]]                                → "A+B"
  */
-export function formatCommandFlat(cmd: string[][] | null): string | null {
+export function formatCommandFlat(cmd: Command | null): string | null {
   if (!cmd || cmd.length === 0) return null;
   const out = cmd
-    .map((step) => (step.length === 1 ? step[0] : step.join("/")))
+    .map((step) => {
+      const altStrs = step.map(joinButtons);
+      return altStrs.length === 1 ? altStrs[0] : altStrs.join("|");
+    })
     .filter((s) => s.length > 0)
     .join(" ");
   return out.length > 0 ? out : null;
@@ -187,7 +251,7 @@ export function buildFieldAccessors(
    * command-touching accessor so translation is centralised. `null` in →
    * `null` out, mirroring the underlying field.
    */
-  const cmdInStyle = (m: Move): string[][] | null =>
+  const cmdInStyle = (m: Move): Command | null =>
     translateCommand(m.command, style);
 
   return {
@@ -222,11 +286,22 @@ export function buildFieldAccessors(
       // — each shorthand's numpad expansion. That way a quick-search for
       // "qcf 2", "236 2" or "d df f 2" all hit the same move without the
       // user needing to know which notation shape was authored on disk.
+      //
+      // We emit expansions in BOTH the active style AND the canonical
+      // universal form. That makes search bidirectional: a Tekken-FBUD user
+      // typing "236B" still hits a row even though every rendered token in
+      // FBUD is a letter, because the universal numpad form is in the
+      // search corpus regardless of display style. The only memory cost is
+      // a few extra strings per row; substring-search dedups naturally.
       filterTokens: (m) => {
         const translated = cmdInStyle(m);
         if (!translated || translated.length === 0) return null;
-        const expansions = expandCommandWithMotions(translated, style);
-        return expansions.length > 0 ? expansions : null;
+        const styleExpansions = expandCommandWithMotions(translated, style);
+        const universalExpansions = expandCommandWithMotions(m.command, null);
+        const merged = [
+          ...new Set([...styleExpansions, ...universalExpansions]),
+        ];
+        return merged.length > 0 ? merged : null;
       },
       exportValue: (m) => formatCommandFlat(cmdInStyle(m)) ?? "",
     },
@@ -258,8 +333,15 @@ export function buildFieldAccessors(
           .join(" ") || null,
       filterTokens: (m) => {
         const stancePart = joinOrNull(m.stance, " ") ?? "";
-        const expansions = expandCommandWithMotions(cmdInStyle(m), style);
-        const tokens = expansions.map((cmd) =>
+        // Mirror the `command` accessor: emit BOTH the active-style and
+        // the universal-form expansions so any notation a user types
+        // (FBUD letters, numpad, ABCD, shorthand) lands in the haystack.
+        const styleExpansions = expandCommandWithMotions(cmdInStyle(m), style);
+        const universalExpansions = expandCommandWithMotions(m.command, null);
+        const merged = [
+          ...new Set([...styleExpansions, ...universalExpansions]),
+        ];
+        const tokens = merged.map((cmd) =>
           stancePart ? `${stancePart} ${cmd}` : cmd,
         );
         return tokens.length > 0 ? tokens : null;

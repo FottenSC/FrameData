@@ -1,6 +1,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useTableConfig } from "@/contexts/UserSettingsContext";
 import {
   DndContext,
@@ -25,17 +26,36 @@ import {
   restrictToVerticalAxis,
 } from "@dnd-kit/modifiers";
 import { GripVertical } from "lucide-react";
+
 export const TableConfigurator: React.FC = () => {
   const { columnConfigs, setColumnConfigs, restoreDefaults } = useTableConfig();
 
-  // Sort by current order and drive a single list of IDs
-  const sorted = columnConfigs.toSorted((a, b) => a.order - b.order);
-  const [ids, setIds] = React.useState<string[]>(() => sorted.map((c) => c.id));
+  // Local ordered id-list that drives dnd-kit's SortableContext. Seeded from
+  // the persisted column config; kept in sync with it by the effect below.
+  const [ids, setIds] = React.useState<string[]>(() =>
+    columnConfigs.toSorted((a, b) => a.order - b.order).map((c) => c.id),
+  );
 
-  // keep in sync if external changes occur
+  // Re-sync when the column config changes elsewhere (restore-defaults, a
+  // visibility toggle, …).
+  //
+  // This effect MUST depend on `columnConfigs` — referentially stable until
+  // it genuinely changes — and NOT on a freshly-`toSorted()`-ed array. A
+  // per-render array identity would make the effect run on every render, and
+  // `setIds` with a brand-new array reference re-renders → re-runs the
+  // effect → loops forever (React throws "Maximum update depth exceeded").
+  // The functional update returns `prev` untouched when the id order already
+  // matches, so a visibility-only change doesn't churn `ids`.
   React.useEffect(() => {
-    setIds(sorted.map((c) => c.id));
-  }, [sorted]);
+    const next = columnConfigs
+      .toSorted((a, b) => a.order - b.order)
+      .map((c) => c.id);
+    setIds((prev) =>
+      prev.length === next.length && prev.every((id, i) => id === next[i])
+        ? prev
+        : next,
+    );
+  }, [columnConfigs]);
 
   // dnd sensors
   const sensors = useSensors(
@@ -122,6 +142,7 @@ const Row: React.FC<{
   checked: boolean;
   onCheckedChange: (v: boolean) => void;
 }> = ({ id, label, checked, onCheckedChange }) => {
+  const checkboxId = `column-toggle-${id}`;
   const {
     attributes,
     listeners,
@@ -147,22 +168,23 @@ const Row: React.FC<{
         isDragging && "ring-2 ring-primary/50",
       )}
     >
-      <label className="flex items-center gap-2 flex-1 select-none">
-        <input
-          type="checkbox"
+      <div className="flex items-center gap-2 flex-1">
+        <Checkbox
+          id={checkboxId}
           checked={checked}
-          onChange={(e) => onCheckedChange(e.target.checked)}
-          className="h-4 w-4 accent-primary"
+          onCheckedChange={(value) => onCheckedChange(value === true)}
         />
-        <span
-          className={cn(
-            "text-sm font-medium",
-            !checked && "text-muted-foreground line-through",
-          )}
-        >
-          {label}
-        </span>
-      </label>
+        <label htmlFor={checkboxId} className="select-none">
+          <span
+            className={cn(
+              "text-sm font-medium",
+              !checked && "text-muted-foreground line-through",
+            )}
+          >
+            {label}
+          </span>
+        </label>
+      </div>
       <span
         className="ml-auto pl-2 select-none cursor-grab active:cursor-grabbing"
         style={{ touchAction: "none" }}
@@ -175,10 +197,3 @@ const Row: React.FC<{
     </div>
   );
 };
-
-const OverlayItem: React.FC<{ label: string }> = ({ label }) => (
-  <div className="flex items-center gap-3 p-2 rounded border border-primary bg-background/80">
-    <GripVertical className="h-4 w-4 text-muted-foreground" />
-    <span className="text-sm font-medium">{label}</span>
-  </div>
-);

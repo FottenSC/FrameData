@@ -1,0 +1,4078 @@
+[
+  {
+    "ID": 1,
+    "stringCommand": "(back to wall).b,b,UB",
+    "Command": [
+      [
+        [
+          {
+            "b": "4"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "4"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "7"
+          }
+        ]
+      ]
+    ],
+    "Stance": [
+      "Back to wall"
+    ],
+    "Properties": null,
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 35,
+    "Damage": "21",
+    "DamageDec": 21,
+    "Block": {
+      "advantage": 1,
+      "tags": [],
+      "raw": "+1"
+    },
+    "Hit": {
+      "advantage": 34,
+      "tags": [
+        "KND"
+      ],
+      "raw": "+34d"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": null
+  },
+  {
+    "ID": 2,
+    "stringCommand": "1",
+    "Command": [
+      [
+        [
+          {
+            "b": "A"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "h"
+    ],
+    "Impact": 10,
+    "Damage": "5",
+    "DamageDec": 5,
+    "Block": {
+      "advantage": 1,
+      "tags": [],
+      "raw": "+1"
+    },
+    "Hit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "+8"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": null
+  },
+  {
+    "ID": 3,
+    "stringCommand": "1+2+3+4",
+    "Command": [
+      [
+        [
+          {
+            "b": "A"
+          },
+          {
+            "b": "B"
+          },
+          {
+            "b": "C"
+          },
+          {
+            "b": "D"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "sp"
+    ],
+    "Impact": null,
+    "Damage": null,
+    "DamageDec": 0,
+    "Block": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": null
+  },
+  {
+    "ID": 4,
+    "stringCommand": "1+3",
+    "Command": [
+      [
+        [
+          {
+            "b": "A"
+          },
+          {
+            "b": "C"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "HM"
+    ],
+    "HitLevel": [
+      "th(h)"
+    ],
+    "Impact": 12,
+    "Damage": "35",
+    "DamageDec": 35,
+    "Block": {
+      "advantage": -3,
+      "tags": [],
+      "raw": "-3"
+    },
+    "Hit": {
+      "advantage": 0,
+      "tags": [
+        "KND"
+      ],
+      "raw": "+0d"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Homing; Throw escape: 1 or 2; Opponent status on hit: FUFA"
+  },
+  {
+    "ID": 5,
+    "stringCommand": "1,2",
+    "Command": [
+      [
+        [
+          {
+            "b": "A"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "B"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "h",
+      "h"
+    ],
+    "Impact": 10,
+    "Damage": "5,9",
+    "DamageDec": 14,
+    "Block": {
+      "advantage": -3,
+      "tags": [],
+      "raw": "-3"
+    },
+    "Hit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "+8"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": null
+  },
+  {
+    "ID": 6,
+    "stringCommand": "1,2,2",
+    "Command": [
+      [
+        [
+          {
+            "b": "A"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "B"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "B"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "h",
+      "h",
+      "m"
+    ],
+    "Impact": 10,
+    "Damage": "5,9,17",
+    "DamageDec": 31,
+    "Block": {
+      "advantage": -11,
+      "tags": [],
+      "raw": "-11"
+    },
+    "Hit": {
+      "advantage": 3,
+      "tags": [],
+      "raw": "+3"
+    },
+    "CounterHit": {
+      "advantage": 58,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "+58a"
+    },
+    "GuardBurst": null,
+    "Notes": "Combo from 1st CH with 10F delay; Combo from 2nd CH with 10F delay; Move can be delayed by 10F; Input can be delayed by 12F; Cancel to SNK (-13/-2) with DF"
+  },
+  {
+    "ID": 7,
+    "stringCommand": "1,2,3",
+    "Command": [
+      [
+        [
+          {
+            "b": "A"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "B"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "C"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "h",
+      "h",
+      "h"
+    ],
+    "Impact": 10,
+    "Damage": "5,9,18",
+    "DamageDec": 32,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": 3,
+      "tags": [],
+      "raw": "+3"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Transition to -1, +10 SNK with DF; Combo from 1st CH with 7F delay; Move can be delayed by 5F; Input can be delayed by 7F"
+  },
+  {
+    "ID": 8,
+    "stringCommand": "1,2,4",
+    "Command": [
+      [
+        [
+          {
+            "b": "A"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "B"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "D"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "TC"
+    ],
+    "HitLevel": [
+      "h",
+      "h",
+      "m"
+    ],
+    "Impact": 10,
+    "Damage": "5,9,20",
+    "DamageDec": 34,
+    "Block": {
+      "advantage": -13,
+      "tags": [],
+      "raw": "-13"
+    },
+    "Hit": {
+      "advantage": 33,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "+33a (+18)"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Tornado; Combo from 1st or 2nd CH with 2F delay; Move cannot be delayed; Input can be delayed by 2F"
+  },
+  {
+    "ID": 9,
+    "stringCommand": "2",
+    "Command": [
+      [
+        [
+          {
+            "b": "B"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "h"
+    ],
+    "Impact": 10,
+    "Damage": "10",
+    "DamageDec": 10,
+    "Block": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "+0"
+    },
+    "Hit": {
+      "advantage": 6,
+      "tags": [],
+      "raw": "+6"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": null
+  },
+  {
+    "ID": 10,
+    "stringCommand": "2+3",
+    "Command": [
+      [
+        [
+          {
+            "b": "B"
+          },
+          {
+            "b": "C"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "HB"
+    ],
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 16,
+    "Damage": "[12;12]",
+    "DamageDec": 24,
+    "Block": {
+      "advantage": 1,
+      "tags": [],
+      "raw": "+1"
+    },
+    "Hit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "+2c"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Heat Burst; Cancel to r45 with b,b on frame 42; 2 chip damage on block; 12 chip damage on hit; Only deals recoverable damage; Cannot cause a K.O."
+  },
+  {
+    "ID": 11,
+    "stringCommand": "2+4",
+    "Command": [
+      [
+        [
+          {
+            "b": "B"
+          },
+          {
+            "b": "D"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "HM",
+      "FB"
+    ],
+    "HitLevel": [
+      "th(h)"
+    ],
+    "Impact": 12,
+    "Damage": "35",
+    "DamageDec": 35,
+    "Block": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "Hit": {
+      "advantage": 0,
+      "tags": [
+        "KND"
+      ],
+      "raw": "+0d"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Homing; Floor Break; Throw escape: 1 or 2; Opponent status on hit: FUFA; Side switch on hit"
+  },
+  {
+    "ID": 12,
+    "stringCommand": "2,1",
+    "Command": [
+      [
+        [
+          {
+            "b": "B"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "A"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "h",
+      "m"
+    ],
+    "Impact": 10,
+    "Damage": "10,7",
+    "DamageDec": 17,
+    "Block": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
+    "Hit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "+2"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Combo from 1st hit"
+  },
+  {
+    "ID": 13,
+    "stringCommand": "2,3",
+    "Command": [
+      [
+        [
+          {
+            "b": "B"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "C"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "h",
+      "h"
+    ],
+    "Impact": 10,
+    "Damage": "10,13",
+    "DamageDec": 23,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": 3,
+      "tags": [],
+      "raw": "+3"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Transition to -1, +10 SNK with DF; Combo from 1st hit with 2F delay; Move cannot be delayed; Input can be delayed by 2F"
+  },
+  {
+    "ID": 14,
+    "stringCommand": "3",
+    "Command": [
+      [
+        [
+          {
+            "b": "C"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "h"
+    ],
+    "Impact": 14,
+    "Damage": "18",
+    "DamageDec": 18,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": 3,
+      "tags": [],
+      "raw": "+3"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Transition to -1, +10 SNK with DF"
+  },
+  {
+    "ID": 15,
+    "stringCommand": "3+4",
+    "Command": [
+      [
+        [
+          {
+            "b": "C"
+          },
+          {
+            "b": "D"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "BB",
+      "TC"
+    ],
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 18,
+    "Damage": "20",
+    "DamageDec": 20,
+    "Block": {
+      "advantage": -9,
+      "tags": [],
+      "raw": "-9"
+    },
+    "Hit": {
+      "advantage": 19,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "+19a (+2)"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Tornado; Balcony Break"
+  },
+  {
+    "ID": 16,
+    "stringCommand": "4",
+    "Command": [
+      [
+        [
+          {
+            "b": "D"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "h"
+    ],
+    "Impact": 13,
+    "Damage": "16",
+    "DamageDec": 16,
+    "Block": {
+      "advantage": -10,
+      "tags": [],
+      "raw": "-10"
+    },
+    "Hit": {
+      "advantage": 1,
+      "tags": [],
+      "raw": "+1"
+    },
+    "CounterHit": {
+      "advantage": 1,
+      "tags": [],
+      "raw": "+1s"
+    },
+    "GuardBurst": null,
+    "Notes": null
+  },
+  {
+    "ID": 17,
+    "stringCommand": "4,1",
+    "Command": [
+      [
+        [
+          {
+            "b": "D"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "A"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "h",
+      "h"
+    ],
+    "Impact": 13,
+    "Damage": "16,14",
+    "DamageDec": 30,
+    "Block": {
+      "advantage": -5,
+      "tags": [],
+      "raw": "-5"
+    },
+    "Hit": {
+      "advantage": 5,
+      "tags": [],
+      "raw": "+5"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "+31a (+24) from 1st CH; Combo from 1st hit"
+  },
+  {
+    "ID": 18,
+    "stringCommand": "4,3",
+    "Command": [
+      [
+        [
+          {
+            "b": "D"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "C"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "BB"
+    ],
+    "HitLevel": [
+      "h",
+      "h"
+    ],
+    "Impact": 13,
+    "Damage": "16,21",
+    "DamageDec": 37,
+    "Block": {
+      "advantage": -1,
+      "tags": [],
+      "raw": "-1"
+    },
+    "Hit": {
+      "advantage": 26,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "+26a (+17)"
+    },
+    "CounterHit": {
+      "advantage": 71,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "+71a (51)"
+    },
+    "GuardBurst": null,
+    "Notes": "Balcony Break"
+  },
+  {
+    "ID": 19,
+    "stringCommand": "4,4",
+    "Command": [
+      [
+        [
+          {
+            "b": "D"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "D"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "FB"
+    ],
+    "HitLevel": [
+      "h",
+      "m"
+    ],
+    "Impact": 13,
+    "Damage": "16,25",
+    "DamageDec": 41,
+    "Block": {
+      "advantage": -13,
+      "tags": [],
+      "raw": "-13"
+    },
+    "Hit": {
+      "advantage": 20,
+      "tags": [
+        "KND"
+      ],
+      "raw": "+20d"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Aerial combo from 1st CH; When combo from 1st CH:; Floor Break"
+  },
+  {
+    "ID": 20,
+    "stringCommand": "b+1",
+    "Command": [
+      [
+        [
+          {
+            "b": "4"
+          },
+          {
+            "b": "A"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "HE",
+      "HD"
+    ],
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 19,
+    "Damage": "20",
+    "DamageDec": 20,
+    "Block": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "+0c"
+    },
+    "Hit": {
+      "advantage": 6,
+      "tags": [],
+      "raw": "+6c"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Heat Engager; Heat Dash +67a (+50); Transition to +0c, +6c FC with D"
+  },
+  {
+    "ID": 21,
+    "stringCommand": "b+1+3",
+    "Command": [
+      [
+        [
+          {
+            "b": "4"
+          },
+          {
+            "b": "A"
+          },
+          {
+            "b": "C"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "sp"
+    ],
+    "Impact": null,
+    "Damage": "15 (15)",
+    "DamageDec": 30,
+    "Block": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Removes Recoverable Health; Alternate input: b+2+4; Punch parry; Hit throw on successful parry; Side switch on parry"
+  },
+  {
+    "ID": 22,
+    "stringCommand": "b+2",
+    "Command": [
+      [
+        [
+          {
+            "b": "4"
+          },
+          {
+            "b": "B"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "m(th)"
+    ],
+    "Impact": 14,
+    "Damage": "12,16",
+    "DamageDec": 28,
+    "Block": {
+      "advantage": -9,
+      "tags": [],
+      "raw": "-9"
+    },
+    "Hit": {
+      "advantage": -2,
+      "tags": [
+        "KND"
+      ],
+      "raw": "-2d"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Removes Recoverable Health; Transition to attack throw on standing front hit"
+  },
+  {
+    "ID": 23,
+    "stringCommand": "b+3",
+    "Command": [
+      [
+        [
+          {
+            "b": "4"
+          },
+          {
+            "b": "C"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 19,
+    "Damage": "17",
+    "DamageDec": 17,
+    "Block": {
+      "advantage": 1,
+      "tags": [],
+      "raw": "+1c"
+    },
+    "Hit": {
+      "advantage": 3,
+      "tags": [],
+      "raw": "+3c"
+    },
+    "CounterHit": {
+      "advantage": 14,
+      "tags": [],
+      "raw": "+14c"
+    },
+    "GuardBurst": null,
+    "Notes": "5 chip damage on block"
+  },
+  {
+    "ID": 24,
+    "stringCommand": "b+3+4",
+    "Command": [
+      [
+        [
+          {
+            "b": "4"
+          },
+          {
+            "b": "C"
+          },
+          {
+            "b": "D"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "PC",
+      "BB"
+    ],
+    "HitLevel": [
+      "h"
+    ],
+    "Impact": 16,
+    "Damage": "25",
+    "DamageDec": 25,
+    "Block": {
+      "advantage": -9,
+      "tags": [],
+      "raw": "-9"
+    },
+    "Hit": {
+      "advantage": 19,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "+19a (+9)"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Balcony Break; +0 frame advantage and 10 chip damage on block after absorbing an attack in power crush state"
+  },
+  {
+    "ID": 25,
+    "stringCommand": "b+4",
+    "Command": [
+      [
+        [
+          {
+            "b": "4"
+          },
+          {
+            "b": "D"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 17,
+    "Damage": "23",
+    "DamageDec": 23,
+    "Block": {
+      "advantage": -15,
+      "tags": [],
+      "raw": "-15"
+    },
+    "Hit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "+4"
+    },
+    "CounterHit": {
+      "advantage": 29,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "+29a (+23)"
+    },
+    "GuardBurst": null,
+    "Notes": null
+  },
+  {
+    "ID": 26,
+    "stringCommand": "Back throw",
+    "Command": null,
+    "Stance": [
+      "Back throw"
+    ],
+    "Properties": null,
+    "HitLevel": [
+      "th(h)"
+    ],
+    "Impact": 12,
+    "Damage": "50",
+    "DamageDec": 50,
+    "Block": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "Hit": {
+      "advantage": 0,
+      "tags": [
+        "KND"
+      ],
+      "raw": "+0d"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Removes Recoverable Health; Throw escape: none; Opponent status on hit: FUFA; Side switch on hit"
+  },
+  {
+    "ID": 27,
+    "stringCommand": "BT.2",
+    "Command": [
+      [
+        [
+          {
+            "b": "B"
+          }
+        ]
+      ]
+    ],
+    "Stance": [
+      "BT"
+    ],
+    "Properties": null,
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 14,
+    "Damage": "20",
+    "DamageDec": 20,
+    "Block": {
+      "advantage": -3,
+      "tags": [],
+      "raw": "-3"
+    },
+    "Hit": {
+      "advantage": 42,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "+42a"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": null
+  },
+  {
+    "ID": 28,
+    "stringCommand": "D*,u+2",
+    "Command": [
+      [
+        [
+          {
+            "b": "2",
+            "h": true
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "8"
+          },
+          {
+            "b": "B"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "BB",
+      "TC"
+    ],
+    "HitLevel": [
+      "h"
+    ],
+    "Impact": 17,
+    "Damage": "35",
+    "DamageDec": 35,
+    "Block": {
+      "advantage": 6,
+      "tags": [],
+      "raw": "+6"
+    },
+    "Hit": {
+      "advantage": 30,
+      "tags": [
+        "KND"
+      ],
+      "raw": "+30d"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Balcony Break; Tornado; Alternate input: SNK.D*,u+2; 12 chip damage on block; FUFA knockdown on hit; Powered up during Heat; Read more"
+  },
+  {
+    "ID": 29,
+    "stringCommand": "d+1",
+    "Command": [
+      [
+        [
+          {
+            "b": "2"
+          },
+          {
+            "b": "A"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "l"
+    ],
+    "Impact": 20,
+    "Damage": "16",
+    "DamageDec": 16,
+    "Block": {
+      "advantage": -13,
+      "tags": [],
+      "raw": "-13"
+    },
+    "Hit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "+4"
+    },
+    "CounterHit": {
+      "advantage": 28,
+      "tags": [],
+      "raw": "+28g"
+    },
+    "GuardBurst": null,
+    "Notes": "Partially restores remaining Heat time on hit"
+  },
+  {
+    "ID": 30,
+    "stringCommand": "d+2",
+    "Command": [
+      [
+        [
+          {
+            "b": "2"
+          },
+          {
+            "b": "B"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 18,
+    "Damage": "15",
+    "DamageDec": 15,
+    "Block": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "Hit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "+8"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Jab evasion"
+  },
+  {
+    "ID": 31,
+    "stringCommand": "d+3",
+    "Command": [
+      [
+        [
+          {
+            "b": "2"
+          },
+          {
+            "b": "C"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "l"
+    ],
+    "Impact": 16,
+    "Damage": "12",
+    "DamageDec": 12,
+    "Block": {
+      "advantage": -14,
+      "tags": [],
+      "raw": "-14"
+    },
+    "Hit": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "+0"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Transition to -10, +4 SNK with DF"
+  },
+  {
+    "ID": 32,
+    "stringCommand": "d+4",
+    "Command": [
+      [
+        [
+          {
+            "b": "2"
+          },
+          {
+            "b": "D"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "l"
+    ],
+    "Impact": 19,
+    "Damage": "10",
+    "DamageDec": 10,
+    "Block": {
+      "advantage": -12,
+      "tags": [],
+      "raw": "-12"
+    },
+    "Hit": {
+      "advantage": 1,
+      "tags": [],
+      "raw": "+1"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": null
+  },
+  {
+    "ID": 33,
+    "stringCommand": "db+1+2",
+    "Command": [
+      [
+        [
+          {
+            "b": "1"
+          },
+          {
+            "b": "A"
+          },
+          {
+            "b": "B"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "UB"
+    ],
+    "HitLevel": [
+      "ub!(m)"
+    ],
+    "Impact": 64,
+    "Damage": "40",
+    "DamageDec": 40,
+    "Block": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "Hit": {
+      "advantage": 42,
+      "tags": [],
+      "raw": "+42 (+11)"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": null
+  },
+  {
+    "ID": 34,
+    "stringCommand": "db+2",
+    "Command": [
+      [
+        [
+          {
+            "b": "1"
+          },
+          {
+            "b": "B"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 14,
+    "Damage": "11",
+    "DamageDec": 11,
+    "Block": {
+      "advantage": -10,
+      "tags": [],
+      "raw": "-10"
+    },
+    "Hit": {
+      "advantage": 1,
+      "tags": [],
+      "raw": "+1"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Transition to SNK with input db+2,DF (-3/+8/+8)"
+  },
+  {
+    "ID": 35,
+    "stringCommand": "db+2,1",
+    "Command": [
+      [
+        [
+          {
+            "b": "1"
+          },
+          {
+            "b": "B"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "A"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "HE",
+      "HD",
+      "BB"
+    ],
+    "HitLevel": [
+      "m",
+      "h"
+    ],
+    "Impact": 14,
+    "Damage": "11,24",
+    "DamageDec": 35,
+    "Block": {
+      "advantage": -11,
+      "tags": [],
+      "raw": "-11"
+    },
+    "Hit": {
+      "advantage": 15,
+      "tags": [],
+      "raw": "+15c"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Balcony Break; Heat Engager; Heat Dash +43d (+35); Combo from 1st hit with 10?F delay; Move can be delayed by 8F; Input can be delayed by 10F; Forces tech backroll on hit"
+  },
+  {
+    "ID": 36,
+    "stringCommand": "db+3",
+    "Command": [
+      [
+        [
+          {
+            "b": "1"
+          },
+          {
+            "b": "C"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "l"
+    ],
+    "Impact": 20,
+    "Damage": "12",
+    "DamageDec": 12,
+    "Block": {
+      "advantage": -17,
+      "tags": [],
+      "raw": "-17"
+    },
+    "Hit": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": null
+  },
+  {
+    "ID": 37,
+    "stringCommand": "db+3,4",
+    "Command": [
+      [
+        [
+          {
+            "b": "1"
+          },
+          {
+            "b": "C"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "D"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "TC"
+    ],
+    "HitLevel": [
+      "l",
+      "h"
+    ],
+    "Impact": 20,
+    "Damage": "12,20",
+    "DamageDec": 32,
+    "Block": {
+      "advantage": -13,
+      "tags": [],
+      "raw": "-13"
+    },
+    "Hit": {
+      "advantage": 68,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "+68a (+52)"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Tornado; Counter hit combo from 1st hit"
+  },
+  {
+    "ID": 38,
+    "stringCommand": "db+4",
+    "Command": [
+      [
+        [
+          {
+            "b": "1"
+          },
+          {
+            "b": "D"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "TC"
+    ],
+    "HitLevel": [
+      "h"
+    ],
+    "Impact": 20,
+    "Damage": "23",
+    "DamageDec": 23,
+    "Block": {
+      "advantage": -13,
+      "tags": [],
+      "raw": "-13"
+    },
+    "Hit": {
+      "advantage": 28,
+      "tags": [],
+      "raw": "+28 (+18)"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Tornado"
+  },
+  {
+    "ID": 39,
+    "stringCommand": "df+1",
+    "Command": [
+      [
+        [
+          {
+            "b": "3"
+          },
+          {
+            "b": "A"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 13,
+    "Damage": "12",
+    "DamageDec": 12,
+    "Block": {
+      "advantage": -1,
+      "tags": [],
+      "raw": "-1"
+    },
+    "Hit": {
+      "advantage": 5,
+      "tags": [],
+      "raw": "+5"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Tracks SSR/SWR completely"
+  },
+  {
+    "ID": 40,
+    "stringCommand": "df+2",
+    "Command": [
+      [
+        [
+          {
+            "b": "3"
+          },
+          {
+            "b": "B"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 15,
+    "Damage": "13",
+    "DamageDec": 13,
+    "Block": {
+      "advantage": -7,
+      "tags": [],
+      "raw": "-7"
+    },
+    "Hit": {
+      "advantage": 34,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "+34a (+24)"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Only launches standing opponents; +4s on hit against crouching opponents; Launches crouching on CH"
+  },
+  {
+    "ID": 41,
+    "stringCommand": "df+3",
+    "Command": [
+      [
+        [
+          {
+            "b": "3"
+          },
+          {
+            "b": "C"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "HM"
+    ],
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 17,
+    "Damage": "20",
+    "DamageDec": 20,
+    "Block": {
+      "advantage": -13,
+      "tags": [],
+      "raw": "-13"
+    },
+    "Hit": {
+      "advantage": 21,
+      "tags": [
+        "KND"
+      ],
+      "raw": "+21d"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Homing"
+  },
+  {
+    "ID": 42,
+    "stringCommand": "df+3+4",
+    "Command": [
+      [
+        [
+          {
+            "b": "3"
+          },
+          {
+            "b": "C"
+          },
+          {
+            "b": "D"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "sp"
+    ],
+    "Impact": null,
+    "Damage": null,
+    "DamageDec": 0,
+    "Block": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Transitions to SNK; Transition to r1? FC with SNK.DB"
+  },
+  {
+    "ID": 43,
+    "stringCommand": "df+4",
+    "Command": [
+      [
+        [
+          {
+            "b": "3"
+          },
+          {
+            "b": "D"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 14,
+    "Damage": "13",
+    "DamageDec": 13,
+    "Block": {
+      "advantage": -7,
+      "tags": [],
+      "raw": "-7"
+    },
+    "Hit": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "+0"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": null
+  },
+  {
+    "ID": 44,
+    "stringCommand": "df+4,1",
+    "Command": [
+      [
+        [
+          {
+            "b": "3"
+          },
+          {
+            "b": "D"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "A"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "m",
+      "m"
+    ],
+    "Impact": 14,
+    "Damage": "13,10",
+    "DamageDec": 23,
+    "Block": {
+      "advantage": -9,
+      "tags": [],
+      "raw": "-9"
+    },
+    "Hit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "+2"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Transition to -2, +9 SNK with DF; Combo from 1st hit"
+  },
+  {
+    "ID": 45,
+    "stringCommand": "df+4,1,3",
+    "Command": [
+      [
+        [
+          {
+            "b": "3"
+          },
+          {
+            "b": "D"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "A"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "C"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "BB"
+    ],
+    "HitLevel": [
+      "m",
+      "m",
+      "m"
+    ],
+    "Impact": 14,
+    "Damage": "13,10,28",
+    "DamageDec": 51,
+    "Block": {
+      "advantage": -13,
+      "tags": [],
+      "raw": "-13"
+    },
+    "Hit": {
+      "advantage": 19,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "+19a (+9)"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Balcony Break; Combo from 2nd CH with 3F delay; Move can be delayed by 10F; Input can be delayed by 11F"
+  },
+  {
+    "ID": 46,
+    "stringCommand": "df+4,3",
+    "Command": [
+      [
+        [
+          {
+            "b": "3"
+          },
+          {
+            "b": "D"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "C"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "BB"
+    ],
+    "HitLevel": [
+      "m",
+      "h"
+    ],
+    "Impact": 14,
+    "Damage": "13,23",
+    "DamageDec": 36,
+    "Block": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
+    "Hit": {
+      "advantage": 23,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "+23a (+14)"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Balcony Break; Combo from 1st hit"
+  },
+  {
+    "ID": 47,
+    "stringCommand": "f+2",
+    "Command": [
+      [
+        [
+          {
+            "b": "6"
+          },
+          {
+            "b": "B"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "h"
+    ],
+    "Impact": 12,
+    "Damage": "10",
+    "DamageDec": 10,
+    "Block": {
+      "advantage": -8,
+      "tags": [],
+      "raw": "-8"
+    },
+    "Hit": {
+      "advantage": -2,
+      "tags": [],
+      "raw": "-2"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": null
+  },
+  {
+    "ID": 48,
+    "stringCommand": "f+2,3",
+    "Command": [
+      [
+        [
+          {
+            "b": "6"
+          },
+          {
+            "b": "B"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "C"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "TC"
+    ],
+    "HitLevel": [
+      "h",
+      "h"
+    ],
+    "Impact": 12,
+    "Damage": "10,23",
+    "DamageDec": 33,
+    "Block": {
+      "advantage": -12,
+      "tags": [],
+      "raw": "-12"
+    },
+    "Hit": {
+      "advantage": 21,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "+21a (+16)"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Tornado; Combo from 1st hit with 7F delay; Move can be delayed by 9F; Input can be delayed by 10F"
+  },
+  {
+    "ID": 49,
+    "stringCommand": "f+2,4",
+    "Command": [
+      [
+        [
+          {
+            "b": "6"
+          },
+          {
+            "b": "B"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "D"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "h",
+      "l"
+    ],
+    "Impact": 12,
+    "Damage": "10,16",
+    "DamageDec": 26,
+    "Block": {
+      "advantage": -13,
+      "tags": [],
+      "raw": "-13"
+    },
+    "Hit": {
+      "advantage": 2,
+      "tags": [],
+      "raw": "+2"
+    },
+    "CounterHit": {
+      "advantage": 29,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "+29a"
+    },
+    "GuardBurst": null,
+    "Notes": "Combo from 1st hit with 3F delay; Transition to -11, +4, +31a SNK with DF; Move can be delayed by 10F; Input can be delayed by 11F"
+  },
+  {
+    "ID": 50,
+    "stringCommand": "f+2,4,4",
+    "Command": [
+      [
+        [
+          {
+            "b": "6"
+          },
+          {
+            "b": "B"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "D"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "D"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "BB"
+    ],
+    "HitLevel": [
+      "h",
+      "l",
+      "h"
+    ],
+    "Impact": 12,
+    "Damage": "10,16,21",
+    "DamageDec": 47,
+    "Block": {
+      "advantage": -7,
+      "tags": [],
+      "raw": "-7"
+    },
+    "Hit": {
+      "advantage": 10,
+      "tags": [],
+      "raw": "+10g"
+    },
+    "CounterHit": {
+      "advantage": 14,
+      "tags": [],
+      "raw": "+14c"
+    },
+    "GuardBurst": null,
+    "Notes": "Strong Aerial Tailspin; Balcony Break; Aerial combo from 2nd CH"
+  },
+  {
+    "ID": 51,
+    "stringCommand": "f+3",
+    "Command": [
+      [
+        [
+          {
+            "b": "6"
+          },
+          {
+            "b": "C"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 20,
+    "Damage": "17",
+    "DamageDec": 17,
+    "Block": {
+      "advantage": -5,
+      "tags": [],
+      "raw": "-5"
+    },
+    "Hit": {
+      "advantage": 6,
+      "tags": [],
+      "raw": "+6"
+    },
+    "CounterHit": {
+      "advantage": 13,
+      "tags": [],
+      "raw": "+13c"
+    },
+    "GuardBurst": null,
+    "Notes": "Good right sidestep tracking; Transition to SNK (-3/+8/+15c) with DF"
+  },
+  {
+    "ID": 52,
+    "stringCommand": "f+3+4",
+    "Command": [
+      [
+        [
+          {
+            "b": "6"
+          },
+          {
+            "b": "C"
+          },
+          {
+            "b": "D"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "FB"
+    ],
+    "HitLevel": [
+      "m",
+      "m"
+    ],
+    "Impact": 22,
+    "Damage": "20",
+    "DamageDec": 20,
+    "Block": {
+      "advantage": 3,
+      "tags": [],
+      "raw": "+3c"
+    },
+    "Hit": {
+      "advantage": 11,
+      "tags": [],
+      "raw": "+11c"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "6 chip damage on block; Transitions to SNK; Floor Break"
+  },
+  {
+    "ID": 53,
+    "stringCommand": "f+4",
+    "Command": [
+      [
+        [
+          {
+            "b": "6"
+          },
+          {
+            "b": "D"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "HM",
+      "BB"
+    ],
+    "HitLevel": [
+      "h"
+    ],
+    "Impact": 15,
+    "Damage": "24",
+    "DamageDec": 24,
+    "Block": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "+0"
+    },
+    "Hit": {
+      "advantage": 13,
+      "tags": [],
+      "raw": "+13g"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Balcony Break; Homing; 7 chip damage on block"
+  },
+  {
+    "ID": 54,
+    "stringCommand": "f,b+2",
+    "Command": [
+      [
+        [
+          {
+            "b": "6"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "4"
+          },
+          {
+            "b": "B"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "TC"
+    ],
+    "HitLevel": [
+      "h"
+    ],
+    "Impact": 14,
+    "Damage": "42",
+    "DamageDec": 42,
+    "Block": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
+    "Hit": {
+      "advantage": 0,
+      "tags": [
+        "KND"
+      ],
+      "raw": "+0d"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Tornado; Removes Recoverable Health; Transition to attack throw on standing front hit; Quick input properties during Heat; See also: f:b+2"
+  },
+  {
+    "ID": 55,
+    "stringCommand": "f,F+3",
+    "Command": [
+      [
+        [
+          {
+            "b": "6"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "6",
+            "h": true
+          },
+          {
+            "b": "C"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "TC"
+    ],
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 17,
+    "Damage": "23",
+    "DamageDec": 23,
+    "Block": {
+      "advantage": -12,
+      "tags": [],
+      "raw": "-12"
+    },
+    "Hit": {
+      "advantage": 63,
+      "tags": [],
+      "raw": "+63 (+48)"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Tornado; Alternate input: f,f,F+3; Hit throw which side switches"
+  },
+  {
+    "ID": 56,
+    "stringCommand": "f,f,F+2",
+    "Command": [
+      [
+        [
+          {
+            "b": "6"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "6"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "6",
+            "h": true
+          },
+          {
+            "b": "B"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "BB"
+    ],
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 17,
+    "Damage": "30",
+    "DamageDec": 30,
+    "Block": {
+      "advantage": 5,
+      "tags": [],
+      "raw": "+5"
+    },
+    "Hit": {
+      "advantage": 13,
+      "tags": [],
+      "raw": "+13c"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Balcony Break; chip damage on block; during Heat, partially restores remaining Heat time; Forces tech backroll on hit; Jab evasion"
+  },
+  {
+    "ID": 57,
+    "stringCommand": "f:b+2",
+    "Command": [
+      [
+        [
+          {
+            "b": "6:4"
+          },
+          {
+            "b": "B"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "TC"
+    ],
+    "HitLevel": [
+      "h"
+    ],
+    "Impact": 13,
+    "Damage": "42",
+    "DamageDec": 42,
+    "Block": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
+    "Hit": {
+      "advantage": 0,
+      "tags": [
+        "KND"
+      ],
+      "raw": "+0d"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Tornado; Removes Recoverable Health; Transition to attack throw on standing front hit; Quick input properties during Heat; Partially restores remaining Heat time on hit; input must be less or equal to 6 frames; (example : 2 frames of f, 3 frames of neutral, 1 frame of b, then b+2)"
+  },
+  {
+    "ID": 58,
+    "stringCommand": "FC.df+2",
+    "Command": [
+      [
+        [
+          {
+            "b": "3"
+          },
+          {
+            "b": "B"
+          }
+        ]
+      ]
+    ],
+    "Stance": [
+      "FC"
+    ],
+    "Properties": [
+      "BB"
+    ],
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 18,
+    "Damage": "21",
+    "DamageDec": 21,
+    "Block": {
+      "advantage": -9,
+      "tags": [],
+      "raw": "-9"
+    },
+    "Hit": {
+      "advantage": 17,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "+17a (+8)"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Strong Aerial Tailspin; Balcony Break; Partially restore remaining Heat time on hit"
+  },
+  {
+    "ID": 59,
+    "stringCommand": "FC.df+4",
+    "Command": [
+      [
+        [
+          {
+            "b": "3"
+          },
+          {
+            "b": "D"
+          }
+        ]
+      ]
+    ],
+    "Stance": [
+      "FC"
+    ],
+    "Properties": null,
+    "HitLevel": [
+      "l"
+    ],
+    "Impact": 16,
+    "Damage": "16",
+    "DamageDec": 16,
+    "Block": {
+      "advantage": -14,
+      "tags": [],
+      "raw": "-14"
+    },
+    "Hit": {
+      "advantage": 1,
+      "tags": [],
+      "raw": "+1"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Transition to -11, +4 SNK with DF"
+  },
+  {
+    "ID": 60,
+    "stringCommand": "FC.df+4,1",
+    "Command": [
+      [
+        [
+          {
+            "b": "3"
+          },
+          {
+            "b": "D"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "A"
+          }
+        ]
+      ]
+    ],
+    "Stance": [
+      "FC"
+    ],
+    "Properties": [
+      "BB"
+    ],
+    "HitLevel": [
+      "l",
+      "h"
+    ],
+    "Impact": 16,
+    "Damage": "16,20",
+    "DamageDec": 36,
+    "Block": {
+      "advantage": -2,
+      "tags": [],
+      "raw": "-2"
+    },
+    "Hit": {
+      "advantage": 24,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "+24a (+15)"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Balcony Break; Combo from 1st CH"
+  },
+  {
+    "ID": 61,
+    "stringCommand": "FC.df,d,DF",
+    "Command": [
+      [
+        [
+          {
+            "b": "3"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "2"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "3",
+            "h": true
+          }
+        ]
+      ]
+    ],
+    "Stance": [
+      "FC"
+    ],
+    "Properties": null,
+    "HitLevel": [
+      "sp"
+    ],
+    "Impact": null,
+    "Damage": null,
+    "DamageDec": 0,
+    "Block": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "Hit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": null
+  },
+  {
+    "ID": 62,
+    "stringCommand": "FC.df,d,DF+3",
+    "Command": [
+      [
+        [
+          {
+            "b": "3"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "2"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "3",
+            "h": true
+          },
+          {
+            "b": "C"
+          }
+        ]
+      ]
+    ],
+    "Stance": [
+      "FC"
+    ],
+    "Properties": null,
+    "HitLevel": [
+      "l"
+    ],
+    "Impact": 16,
+    "Damage": "17",
+    "DamageDec": 17,
+    "Block": {
+      "advantage": -23,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "-23a"
+    },
+    "Hit": {
+      "advantage": 7,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "+7a"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Transitions to SNK on hit"
+  },
+  {
+    "ID": 63,
+    "stringCommand": "H.2+3",
+    "Command": [
+      [
+        [
+          {
+            "b": "B"
+          },
+          {
+            "b": "C"
+          }
+        ]
+      ]
+    ],
+    "Stance": [
+      "H"
+    ],
+    "Properties": [
+      "HS",
+      "BB",
+      "TH"
+    ],
+    "HitLevel": [
+      "l",
+      "t"
+    ],
+    "Impact": 20,
+    "Damage": "40",
+    "DamageDec": 40,
+    "Block": {
+      "advantage": -14,
+      "tags": [],
+      "raw": "-14"
+    },
+    "Hit": {
+      "advantage": 24,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "+24a (+14)"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Balcony Break; Heat Smash; Transition to attack throw on 1st hit; 8 chip damage on block"
+  },
+  {
+    "ID": 64,
+    "stringCommand": "H.D*,u+2",
+    "Command": [
+      [
+        [
+          {
+            "b": "2",
+            "h": true
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "8"
+          },
+          {
+            "b": "B"
+          }
+        ]
+      ]
+    ],
+    "Stance": [
+      "H"
+    ],
+    "Properties": [
+      "BB",
+      "TC"
+    ],
+    "HitLevel": [
+      "h"
+    ],
+    "Impact": 17,
+    "Damage": "35",
+    "DamageDec": 35,
+    "Block": {
+      "advantage": 13,
+      "tags": [],
+      "raw": "+13"
+    },
+    "Hit": {
+      "advantage": 63,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "+63a (+47)"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Balcony Break; Tornado; Guard break; Read more"
+  },
+  {
+    "ID": 65,
+    "stringCommand": "H.f+1+2",
+    "Command": [
+      [
+        [
+          {
+            "b": "6"
+          },
+          {
+            "b": "A"
+          },
+          {
+            "b": "B"
+          }
+        ]
+      ]
+    ],
+    "Stance": [
+      "H"
+    ],
+    "Properties": [
+      "FB",
+      "SP"
+    ],
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 16,
+    "Damage": "15,25 (17)",
+    "DamageDec": 57,
+    "Block": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "+4c SNK"
+    },
+    "Hit": {
+      "advantage": 27,
+      "tags": [
+        "KND"
+      ],
+      "raw": "+27d (-8)"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Floor Break; Spike; 32 damage with scaling from 1st hit; Transition to SNK on hit or block; Consumes 450F of remaining Heat time"
+  },
+  {
+    "ID": 66,
+    "stringCommand": "Left throw",
+    "Command": null,
+    "Stance": [
+      "Left throw"
+    ],
+    "Properties": null,
+    "HitLevel": [
+      "th(h)"
+    ],
+    "Impact": 12,
+    "Damage": "40",
+    "DamageDec": 40,
+    "Block": {
+      "advantage": -3,
+      "tags": [],
+      "raw": "-3"
+    },
+    "Hit": {
+      "advantage": 0,
+      "tags": [
+        "KND"
+      ],
+      "raw": "+0d"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Throw escape: 1; Opponent status on hit: FUFT; Side switch on hit"
+  },
+  {
+    "ID": 67,
+    "stringCommand": "R.df+1+2",
+    "Command": [
+      [
+        [
+          {
+            "b": "3"
+          },
+          {
+            "b": "A"
+          },
+          {
+            "b": "B"
+          }
+        ]
+      ]
+    ],
+    "Stance": [
+      "R"
+    ],
+    "Properties": [
+      "TH"
+    ],
+    "HitLevel": [
+      "m",
+      "t"
+    ],
+    "Impact": 20,
+    "Damage": "55+",
+    "DamageDec": 55,
+    "Block": {
+      "advantage": -18,
+      "tags": [],
+      "raw": "-18"
+    },
+    "Hit": {
+      "advantage": 0,
+      "tags": [
+        "KND"
+      ],
+      "raw": "+0d"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Rage Art; Removes Recoverable Health; Reversal Break; Damage increases with lower health, maximum 82; Freezes match timer on activation and on hit; Restores recoverable health on hit; Transition to attack throw on hit; Consumes Rage"
+  },
+  {
+    "ID": 68,
+    "stringCommand": "Right throw",
+    "Command": null,
+    "Stance": [
+      "Right throw"
+    ],
+    "Properties": null,
+    "HitLevel": [
+      "th(h)"
+    ],
+    "Impact": 12,
+    "Damage": "40",
+    "DamageDec": 40,
+    "Block": {
+      "advantage": -3,
+      "tags": [],
+      "raw": "-3"
+    },
+    "Hit": {
+      "advantage": 0,
+      "tags": [
+        "KND"
+      ],
+      "raw": "+0d"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Removes Recoverable Health; Throw escape: 2; Opponent status on hit: FUFA"
+  },
+  {
+    "ID": 69,
+    "stringCommand": "SNK.1",
+    "Command": [
+      [
+        [
+          {
+            "b": "A"
+          }
+        ]
+      ]
+    ],
+    "Stance": [
+      "SNK"
+    ],
+    "Properties": null,
+    "HitLevel": [
+      "h"
+    ],
+    "Impact": 12,
+    "Damage": "10",
+    "DamageDec": 10,
+    "Block": {
+      "advantage": -1,
+      "tags": [],
+      "raw": "-1"
+    },
+    "Hit": {
+      "advantage": 5,
+      "tags": [],
+      "raw": "+5"
+    },
+    "CounterHit": {
+      "advantage": 14,
+      "tags": [],
+      "raw": "+14"
+    },
+    "GuardBurst": null,
+    "Notes": null
+  },
+  {
+    "ID": 70,
+    "stringCommand": "SNK.1+2",
+    "Command": [
+      [
+        [
+          {
+            "b": "A"
+          },
+          {
+            "b": "B"
+          }
+        ]
+      ]
+    ],
+    "Stance": [
+      "SNK"
+    ],
+    "Properties": [
+      "HE",
+      "HD",
+      "FB"
+    ],
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 19,
+    "Damage": "21",
+    "DamageDec": 21,
+    "Block": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "+4c"
+    },
+    "Hit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "+8c"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Heat Engager; Heat Dash +67a (+50); Floor Break; 6 chip damage on block"
+  },
+  {
+    "ID": 71,
+    "stringCommand": "SNK.2",
+    "Command": [
+      [
+        [
+          {
+            "b": "B"
+          }
+        ]
+      ]
+    ],
+    "Stance": [
+      "SNK"
+    ],
+    "Properties": [
+      "BB"
+    ],
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 15,
+    "Damage": "17",
+    "DamageDec": 17,
+    "Block": {
+      "advantage": -9,
+      "tags": [],
+      "raw": "-9"
+    },
+    "Hit": {
+      "advantage": 8,
+      "tags": [],
+      "raw": "+8"
+    },
+    "CounterHit": {
+      "advantage": 23,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "+23a (+6)"
+    },
+    "GuardBurst": null,
+    "Notes": "Balcony BreakOn counterhit"
+  },
+  {
+    "ID": 72,
+    "stringCommand": "SNK.3",
+    "Command": [
+      [
+        [
+          {
+            "b": "C"
+          }
+        ]
+      ]
+    ],
+    "Stance": [
+      "SNK"
+    ],
+    "Properties": [
+      "TC"
+    ],
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 20,
+    "Damage": "23",
+    "DamageDec": 23,
+    "Block": {
+      "advantage": -12,
+      "tags": [],
+      "raw": "-12"
+    },
+    "Hit": {
+      "advantage": 63,
+      "tags": [],
+      "raw": "+63 (+48)"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Tornado; Hit throw which side switches"
+  },
+  {
+    "ID": 73,
+    "stringCommand": "SNK.4",
+    "Command": [
+      [
+        [
+          {
+            "b": "D"
+          }
+        ]
+      ]
+    ],
+    "Stance": [
+      "SNK"
+    ],
+    "Properties": null,
+    "HitLevel": [
+      "l"
+    ],
+    "Impact": 20,
+    "Damage": "20",
+    "DamageDec": 20,
+    "Block": {
+      "advantage": -14,
+      "tags": [],
+      "raw": "-14"
+    },
+    "Hit": {
+      "advantage": 3,
+      "tags": [],
+      "raw": "+3c"
+    },
+    "CounterHit": {
+      "advantage": 14,
+      "tags": [],
+      "raw": "+14c"
+    },
+    "GuardBurst": null,
+    "Notes": null
+  },
+  {
+    "ID": 74,
+    "stringCommand": "SNK.df+1",
+    "Command": [
+      [
+        [
+          {
+            "b": "3"
+          },
+          {
+            "b": "A"
+          }
+        ]
+      ]
+    ],
+    "Stance": [
+      "SNK"
+    ],
+    "Properties": null,
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 15,
+    "Damage": "12",
+    "DamageDec": 12,
+    "Block": {
+      "advantage": -5,
+      "tags": [],
+      "raw": "-5"
+    },
+    "Hit": {
+      "advantage": 6,
+      "tags": [],
+      "raw": "+6"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Good left sidestep tracking"
+  },
+  {
+    "ID": 75,
+    "stringCommand": "SNK.df+1,2",
+    "Command": [
+      [
+        [
+          {
+            "b": "3"
+          },
+          {
+            "b": "A"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "B"
+          }
+        ]
+      ]
+    ],
+    "Stance": [
+      "SNK"
+    ],
+    "Properties": [
+      "TC"
+    ],
+    "HitLevel": [
+      "m",
+      "h"
+    ],
+    "Impact": 15,
+    "Damage": "12,40",
+    "DamageDec": 52,
+    "Block": {
+      "advantage": -4,
+      "tags": [],
+      "raw": "-4"
+    },
+    "Hit": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "0"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Tornado; Removes Recoverable Health; Combo from 1st hit with 10F delay; Move can be delayed by 9F; Input can be delayed by 10F; Transition to attack throw on standing front hit"
+  },
+  {
+    "ID": 76,
+    "stringCommand": "SNK.df+1,3",
+    "Command": [
+      [
+        [
+          {
+            "b": "3"
+          },
+          {
+            "b": "A"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "C"
+          }
+        ]
+      ]
+    ],
+    "Stance": [
+      "SNK"
+    ],
+    "Properties": [
+      "HE",
+      "HD",
+      "BB"
+    ],
+    "HitLevel": [
+      "m",
+      "m"
+    ],
+    "Impact": 15,
+    "Damage": "12,28",
+    "DamageDec": 40,
+    "Block": {
+      "advantage": -13,
+      "tags": [],
+      "raw": "-13"
+    },
+    "Hit": {
+      "advantage": 19,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "+19a (+9)"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Heat Engager; Heat Dash  +43d (+35); Balcony Break; Combo from 1st hit with 1F delay; Move can be delayed by 6F; Input can be delayed by 7F"
+  },
+  {
+    "ID": 77,
+    "stringCommand": "SS.1+2",
+    "Command": [
+      [
+        [
+          {
+            "b": "A"
+          },
+          {
+            "b": "B"
+          }
+        ]
+      ]
+    ],
+    "Stance": [
+      "SS"
+    ],
+    "Properties": null,
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 19,
+    "Damage": "23",
+    "DamageDec": 23,
+    "Block": {
+      "advantage": 3,
+      "tags": [],
+      "raw": "+3"
+    },
+    "Hit": {
+      "advantage": 22,
+      "tags": [],
+      "raw": "+22g"
+    },
+    "CounterHit": {
+      "advantage": 35,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "+35a"
+    },
+    "GuardBurst": null,
+    "Notes": "Partially restore remaining Heat time on hit; Sidestep takes 9f; effective startup i28; 6 chip damage on block"
+  },
+  {
+    "ID": 78,
+    "stringCommand": "SS.2",
+    "Command": [
+      [
+        [
+          {
+            "b": "B"
+          }
+        ]
+      ]
+    ],
+    "Stance": [
+      "SS"
+    ],
+    "Properties": null,
+    "HitLevel": [
+      "l"
+    ],
+    "Impact": 20,
+    "Damage": "14",
+    "DamageDec": 14,
+    "Block": {
+      "advantage": -12,
+      "tags": [],
+      "raw": "-12"
+    },
+    "Hit": {
+      "advantage": 1,
+      "tags": [],
+      "raw": "+1c"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Sidestep takes 9f; effective startup i29"
+  },
+  {
+    "ID": 79,
+    "stringCommand": "uf+1",
+    "Command": [
+      [
+        [
+          {
+            "b": "9"
+          },
+          {
+            "b": "A"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "HE",
+      "HD",
+      "BB"
+    ],
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 24,
+    "Damage": "25",
+    "DamageDec": 25,
+    "Block": {
+      "advantage": 1,
+      "tags": [],
+      "raw": "+1"
+    },
+    "Hit": {
+      "advantage": 20,
+      "tags": [
+        "KND"
+      ],
+      "raw": "+20d"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Balcony Break; Heat Engager; Heat Dash +67a (+50); 10 chip damage on block; during Heat, partially restore remaining Heat time; Cancel to FC with input uf+1,D"
+  },
+  {
+    "ID": 80,
+    "stringCommand": "uf+1+2",
+    "Command": [
+      [
+        [
+          {
+            "b": "9"
+          },
+          {
+            "b": "A"
+          },
+          {
+            "b": "B"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": [
+      "FB"
+    ],
+    "HitLevel": [
+      "th(h)"
+    ],
+    "Impact": 12,
+    "Damage": "40",
+    "DamageDec": 40,
+    "Block": {
+      "advantage": -3,
+      "tags": [],
+      "raw": "-3"
+    },
+    "Hit": {
+      "advantage": 0,
+      "tags": [
+        "KND"
+      ],
+      "raw": "+0d"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Floor Break; Throw escape: 1+2; Opponent status on hit: FUFA; Side switch on hit"
+  },
+  {
+    "ID": 81,
+    "stringCommand": "uf+3",
+    "Command": [
+      [
+        [
+          {
+            "b": "9"
+          },
+          {
+            "b": "C"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 25,
+    "Damage": "22",
+    "DamageDec": 22,
+    "Block": {
+      "advantage": -7,
+      "tags": [],
+      "raw": "-7"
+    },
+    "Hit": {
+      "advantage": 24,
+      "tags": [],
+      "raw": "+24"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Alternate input: ub+3 or u+3"
+  },
+  {
+    "ID": 82,
+    "stringCommand": "uf+4",
+    "Command": [
+      [
+        [
+          {
+            "b": "9"
+          },
+          {
+            "b": "D"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 15,
+    "Damage": "13",
+    "DamageDec": 13,
+    "Block": {
+      "advantage": -13,
+      "tags": [],
+      "raw": "-13"
+    },
+    "Hit": {
+      "advantage": 33,
+      "tags": [],
+      "raw": "+33 (+23)"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Alternate input: ub+4 or u+4"
+  },
+  {
+    "ID": 83,
+    "stringCommand": "uf,n,4",
+    "Command": [
+      [
+        [
+          {
+            "b": "9"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "5"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "D"
+          }
+        ]
+      ]
+    ],
+    "Stance": null,
+    "Properties": null,
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 23,
+    "Damage": "20",
+    "DamageDec": 20,
+    "Block": {
+      "advantage": -13,
+      "tags": [],
+      "raw": "-13"
+    },
+    "Hit": {
+      "advantage": 32,
+      "tags": [],
+      "raw": "+32 (+22)"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": null
+  },
+  {
+    "ID": 84,
+    "stringCommand": "ws1",
+    "Command": [
+      [
+        [
+          {
+            "b": "A"
+          }
+        ]
+      ]
+    ],
+    "Stance": [
+      "WS"
+    ],
+    "Properties": null,
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 14,
+    "Damage": "17",
+    "DamageDec": 17,
+    "Block": {
+      "advantage": -2,
+      "tags": [],
+      "raw": "-2"
+    },
+    "Hit": {
+      "advantage": 4,
+      "tags": [],
+      "raw": "+4"
+    },
+    "CounterHit": {
+      "advantage": 14,
+      "tags": [],
+      "raw": "+14"
+    },
+    "GuardBurst": null,
+    "Notes": null
+  },
+  {
+    "ID": 85,
+    "stringCommand": "ws2",
+    "Command": [
+      [
+        [
+          {
+            "b": "B"
+          }
+        ]
+      ]
+    ],
+    "Stance": [
+      "WS"
+    ],
+    "Properties": null,
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 16,
+    "Damage": "21",
+    "DamageDec": 21,
+    "Block": {
+      "advantage": -17,
+      "tags": [],
+      "raw": "-17"
+    },
+    "Hit": {
+      "advantage": 57,
+      "tags": [],
+      "raw": "+57"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": null
+  },
+  {
+    "ID": 86,
+    "stringCommand": "ws3",
+    "Command": [
+      [
+        [
+          {
+            "b": "C"
+          }
+        ]
+      ]
+    ],
+    "Stance": [
+      "WS"
+    ],
+    "Properties": null,
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 13,
+    "Damage": "9",
+    "DamageDec": 9,
+    "Block": {
+      "advantage": -11,
+      "tags": [],
+      "raw": "-11"
+    },
+    "Hit": {
+      "advantage": 0,
+      "tags": [],
+      "raw": "0"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": "Transition to -7, +4 SNK with DF"
+  },
+  {
+    "ID": 87,
+    "stringCommand": "ws3,3",
+    "Command": [
+      [
+        [
+          {
+            "b": "C"
+          }
+        ]
+      ],
+      [
+        [
+          {
+            "b": "C"
+          }
+        ]
+      ]
+    ],
+    "Stance": [
+      "WS"
+    ],
+    "Properties": [
+      "BB",
+      "TC"
+    ],
+    "HitLevel": [
+      "m",
+      "m"
+    ],
+    "Impact": 13,
+    "Damage": "9,25",
+    "DamageDec": 34,
+    "Block": {
+      "advantage": -13,
+      "tags": [],
+      "raw": "-13"
+    },
+    "Hit": {
+      "advantage": 11,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "+11a (+2)"
+    },
+    "CounterHit": {
+      "advantage": 43,
+      "tags": [
+        "LNC"
+      ],
+      "raw": "+43a (-4)"
+    },
+    "GuardBurst": null,
+    "Notes": "Tornado; Balcony Break"
+  },
+  {
+    "ID": 88,
+    "stringCommand": "ws4",
+    "Command": [
+      [
+        [
+          {
+            "b": "D"
+          }
+        ]
+      ]
+    ],
+    "Stance": [
+      "WS"
+    ],
+    "Properties": null,
+    "HitLevel": [
+      "m"
+    ],
+    "Impact": 11,
+    "Damage": "16",
+    "DamageDec": 16,
+    "Block": {
+      "advantage": -6,
+      "tags": [],
+      "raw": "-6"
+    },
+    "Hit": {
+      "advantage": 5,
+      "tags": [],
+      "raw": "+5"
+    },
+    "CounterHit": {
+      "advantage": null,
+      "tags": [],
+      "raw": null
+    },
+    "GuardBurst": null,
+    "Notes": null
+  }
+]

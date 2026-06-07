@@ -6,7 +6,6 @@ import React, {
   useCallback,
 } from "react";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
-import { useParams, useNavigate } from "@tanstack/react-router";
 import {
   Card,
   CardContent,
@@ -14,7 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import { useGame, avaliableGames } from "../contexts/GameContext";
+import { useGame } from "../contexts/GameContext";
 import { useTableConfig } from "../contexts/UserSettingsContext";
 import { useToolbar } from "../contexts/ToolbarContext";
 import { Skeleton } from "./ui/skeleton";
@@ -23,7 +22,14 @@ import { FilterBuilder } from "./FilterBuilder";
 import { CommandRenderer } from "@/components/renderers/CommandRenderer";
 import { NotesRenderer } from "@/components/renderers/NotesRenderer";
 import { FrameDataTableContent } from "@/components/table/FrameDataTableContent";
-import { Move, FilterItem, SortableColumn } from "../types/Move";
+import { Move, FilterItem, SortableColumn, type Command } from "../types/Move";
+import {
+  getCoreRowModel,
+  getSortedRowModel,
+  useReactTable,
+  type ColumnDef,
+  type SortingState,
+} from "@tanstack/react-table";
 import { builtinOperators, operatorById } from "../filters/operators";
 import { getGameFilterConfig } from "../filters/gameFilterConfigs";
 import type { FieldConfig, FieldType, FilterOperator } from "../filters/types";
@@ -31,57 +37,14 @@ import { useMoves } from "@/hooks/useMoves";
 import { buildFieldAccessors } from "@/lib/moveAccessors";
 import { exportCsv, exportExcel, type ExportCell } from "@/lib/export";
 
-/**
- * Generic comparator factory. Accepts a primitive-valued getter and produces
- * a `(a, b) => number` suitable for `Array.prototype.sort`. null values always
- * sort to the end regardless of direction.
- */
-const createComparator = (
-  direction: "asc" | "desc",
-  fieldType: "string" | "number",
-  getter: (move: Move) => number | string | null,
-) => {
-  const order = direction === "asc" ? 1 : -1;
-  // Null handling is intentionally direction-INDEPENDENT: nulls always
-  // sort to the bottom. Returning a positive number from the comparator
-  // means "A comes after B"; multiplying by `order` would flip nulls to
-  // the top in descending mode, which read as the worst row appearing
-  // first — confusing for users who expect "no value" to mean "no
-  // ranking". So we bypass `order` for the null branches.
-  if (fieldType === "number") {
-    return (a: Move, b: Move): number => {
-      const valA = getter(a) as number | null;
-      const valB = getter(b) as number | null;
-      if (valA == null && valB == null) return 0;
-      if (valA == null) return 1;
-      if (valB == null) return -1;
-      return (valA - valB) * order;
-    };
-  }
-  return (a: Move, b: Move): number => {
-    const valA = getter(a);
-    const valB = getter(b);
-    if (valA == null && valB == null) return 0;
-    if (valA == null) return 1;
-    if (valB == null) return -1;
-    return String(valA).localeCompare(String(valB)) * order;
-  };
-};
-
 export const FrameDataTable: React.FC = () => {
-  const params = useParams({ strict: false }) as {
-    gameId?: string;
-    characterName?: string;
-  };
-  const { gameId, characterName } = params;
-
-  const navigate = useNavigate();
+  // Navigation state is read straight off the route — `selectedGame` and
+  // `selectedCharacterId` are derived from the URL inside GameContext, so
+  // this component never has to sync the two.
   const {
     selectedGame,
-    setSelectedGameById,
     characters,
     selectedCharacterId,
-    setSelectedCharacterId,
     notationStyle,
     hitLevels,
   } = useGame();
@@ -132,14 +95,19 @@ export const FrameDataTable: React.FC = () => {
   // bursts across thousands of rows.
   const debouncedActiveFilters = useDebouncedValue(activeFilters, 120);
 
-  const baseColumns = getVisibleColumns();
-  const visibleColumns = useMemo(
-    () =>
-      selectedCharacterId !== -1
-        ? baseColumns.filter((c) => c.id !== "character")
-        : baseColumns,
-    [selectedCharacterId, baseColumns],
-  );
+  // `getVisibleColumns()` allocates a fresh array on every call, so it must
+  // NOT be invoked bare in the render body — doing so would hand `useMemo` a
+  // new `baseColumns` identity each render, defeating the memo and cascading
+  // a fresh `visibleColumns` (and `deferredVisibleColumns`) through to every
+  // memoised `TableRow`. Depending on the `useCallback`-stable
+  // `getVisibleColumns` instead means this only recomputes when the column
+  // config or the selected character actually changes.
+  const visibleColumns = useMemo(() => {
+    const cols = getVisibleColumns();
+    return selectedCharacterId !== -1
+      ? cols.filter((c) => c.id !== "character")
+      : cols;
+  }, [selectedCharacterId, getVisibleColumns]);
 
   useEffect(() => {
     if (selectedCharacterId === -1) {
@@ -155,114 +123,10 @@ export const FrameDataTable: React.FC = () => {
     }
   }, [selectedCharacterId, sortColumn]);
 
-  // Sync URL with selected character (including "All")
-  useEffect(() => {
-    if (
-      selectedCharacterId !== null &&
-      characters.length > 0 &&
-      selectedGame.id
-    ) {
-      const selectedChar = characters.find((c) => c.id === selectedCharacterId);
-      if (selectedCharacterId === -1) {
-        const expectedUrlName = encodeURIComponent("All");
-        const currentUrlName = characterName
-          ? encodeURIComponent(decodeURIComponent(characterName))
-          : undefined;
-        if (expectedUrlName !== currentUrlName) {
-          navigate({
-            to: `/${selectedGame.id}/${expectedUrlName}`,
-            replace: true,
-          });
-        }
-      } else if (selectedChar) {
-        const expectedUrlName = encodeURIComponent(selectedChar.name);
-        const currentUrlName = characterName
-          ? encodeURIComponent(decodeURIComponent(characterName))
-          : undefined;
-        if (expectedUrlName !== currentUrlName) {
-          navigate({
-            to: `/${selectedGame.id}/${expectedUrlName}`,
-            replace: true,
-          });
-        }
-      }
-    }
-  }, [
-    selectedCharacterId,
-    characters,
-    selectedGame.id,
-    navigate,
-    characterName,
-  ]);
-
-  const initialGameSyncDoneRef = React.useRef(false);
-
-  useEffect(() => {
-    if (!selectedGame) return;
-
-    if (
-      gameId &&
-      gameId !== selectedGame.id &&
-      !initialGameSyncDoneRef.current
-    ) {
-      const game = avaliableGames.find((g) => g.id === gameId);
-      if (game) {
-        setSelectedGameById(gameId);
-        initialGameSyncDoneRef.current = true;
-        return;
-      }
-    }
-
-    if (!initialGameSyncDoneRef.current) {
-      initialGameSyncDoneRef.current = true;
-    }
-
-    if (
-      characterName &&
-      characters.length > 0 &&
-      (selectedCharacterId === null ||
-        (!characters.some((c) => c.id === selectedCharacterId) &&
-          selectedCharacterId !== -1))
-    ) {
-      const decodedName = decodeURIComponent(characterName);
-      if (decodedName.toLowerCase() === "all") {
-        setSelectedCharacterId(-1);
-      } else {
-        const characterFromName = characters.find(
-          (c) => c.name.toLowerCase() === decodedName.toLowerCase(),
-        );
-        if (characterFromName) {
-          setSelectedCharacterId(characterFromName.id);
-        } else {
-          const firstCharacter = characters[0];
-          if (firstCharacter) {
-            setSelectedCharacterId(firstCharacter.id);
-          } else {
-            setSelectedCharacterId(null);
-          }
-        }
-      }
-    } else if (
-      !characterName &&
-      characters.length > 0 &&
-      (selectedCharacterId === null ||
-        (!characters.some((c) => c.id === selectedCharacterId) &&
-          selectedCharacterId !== -1))
-    ) {
-      const firstCharacter = characters[0];
-      if (firstCharacter) {
-        setSelectedCharacterId(firstCharacter.id);
-      }
-    }
-  }, [
-    gameId,
-    characterName,
-    selectedGame.id,
-    characters,
-    selectedCharacterId,
-    setSelectedGameById,
-    setSelectedCharacterId,
-  ]);
+  // URL ↔ selection sync used to live here as two effects. It's gone:
+  // GameContext derives `selectedGame` / `selectedCharacterId` from the
+  // route, and the route loaders (router.tsx) redirect away invalid game
+  // or character segments before this component ever renders.
 
   // Notation translation is now a pure presentation concern — flipping the
   // style just swaps the memoised accessor bundle and re-renders. Nothing
@@ -281,7 +145,7 @@ export const FrameDataTable: React.FC = () => {
   );
 
   const renderCommand = useCallback(
-    (command: string[][] | null) => <CommandRenderer command={command} />,
+    (command: Command | null) => <CommandRenderer command={command} />,
     [],
   );
   const renderNotes = useCallback(
@@ -365,7 +229,7 @@ export const FrameDataTable: React.FC = () => {
     [opsById, getFieldAs],
   );
 
-  const displayedMoves = useMemo(() => {
+  const filteredMovesForTable = useMemo(() => {
     if (originalMoves.length === 0) return [];
     let result = originalMoves;
 
@@ -374,66 +238,91 @@ export const FrameDataTable: React.FC = () => {
         debouncedActiveFilters.every((filter) => applyFilterItem(move, filter)),
       );
     }
-
-    if (sortColumn) {
-      const acc = accessors[sortColumn];
-      if (acc) {
-        const comparator = createComparator(
-          sortDirection,
-          acc.sortType,
-          acc.sortValue,
-        );
-        // toSorted is the immutable ES2023 variant — returns a new
-        // sorted array in one step, no copy-then-mutate ceremony.
-        result = result.toSorted(comparator);
-      }
-    }
     return result;
-  }, [
-    sortColumn,
-    originalMoves,
-    debouncedActiveFilters,
-    sortDirection,
-    applyFilterItem,
-    accessors,
-  ]);
+  }, [originalMoves, debouncedActiveFilters, applyFilterItem]);
+
+  const sorting = useMemo<SortingState>(
+    () =>
+      sortColumn ? [{ id: sortColumn, desc: sortDirection === "desc" }] : [],
+    [sortColumn, sortDirection],
+  );
+
+  const tableColumns = useMemo<ColumnDef<Move>[]>(() => {
+    const ids = new Set<string>(visibleColumns.map((c) => c.id));
+    if (sortColumn) ids.add(sortColumn);
+    return Array.from(ids).map((id) => {
+      const acc = accessors[id];
+      return {
+        id,
+        accessorFn: (move) => {
+          const value = acc?.sortValue(move);
+          return value == null ? undefined : value;
+        },
+        sortingFn: acc?.sortType === "number" ? "basic" : "alphanumeric",
+        sortUndefined: "last",
+      };
+    });
+  }, [accessors, sortColumn, visibleColumns]);
+
+  const table = useReactTable({
+    data: filteredMovesForTable,
+    columns: tableColumns,
+    state: { sorting },
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+  });
+
+  const displayedMoves = useMemo(
+    () => table.getRowModel().rows.map((row) => row.original),
+    [table, filteredMovesForTable, sorting],
+  );
 
   const deferredMoves = useDeferredValue(displayedMoves);
   const deferredSelectedCharacterId = useDeferredValue(selectedCharacterId);
   const deferredVisibleColumns = useDeferredValue(visibleColumns);
   const isStale = deferredMoves !== displayedMoves;
 
-  const handleExport = (format: "csv" | "excel") => {
-    const rows = displayedMoves;
-    if (!rows || rows.length === 0) return;
-    const headers = visibleColumns.map((c) => c.label);
-    const fieldIds = visibleColumns.map((c) => c.id);
+  const handleExport = useCallback(
+    (format: "csv" | "excel") => {
+      const rows = displayedMoves;
+      if (!rows || rows.length === 0) return;
+      const headers = visibleColumns.map((c) => c.label);
+      const fieldIds = visibleColumns.map((c) => c.id);
 
-    // Build typed row data (numbers stay numbers so the Excel exporter can
-    // tag numeric cells with x:num and Excel won't coerce them to text).
-    const tableRows: ExportCell[][] = rows.map((m) =>
-      fieldIds.map<ExportCell>((fid) => {
-        const acc = accessors[fid];
-        if (!acc) return "";
-        const v = acc.exportValue(m);
-        return (v as ExportCell) ?? "";
-      }),
-    );
+      // Build typed row data (numbers stay numbers so the Excel exporter can
+      // tag numeric cells with x:num and Excel won't coerce them to text).
+      const tableRows: ExportCell[][] = rows.map((m) =>
+        fieldIds.map<ExportCell>((fid) => {
+          const acc = accessors[fid];
+          if (!acc) return "";
+          const v = acc.exportValue(m);
+          return (v as ExportCell) ?? "";
+        }),
+      );
 
-    // Friendly filename: "SoulCalibur6_Astaroth" beats "SoulCalibur6_3".
-    const characterLabel =
-      selectedCharacterId === -1
-        ? "All"
-        : (characters.find((c) => c.id === selectedCharacterId)?.name ??
-          String(selectedCharacterId));
-    const basename = `${selectedGame.id || "export"}_${characterLabel}`;
+      // Friendly filename: "SoulCalibur6_Astaroth" beats "SoulCalibur6_3".
+      const characterLabel =
+        selectedCharacterId === -1
+          ? "All"
+          : (characters.find((c) => c.id === selectedCharacterId)?.name ??
+            String(selectedCharacterId));
+      const basename = `${selectedGame.id || "export"}_${characterLabel}`;
 
-    if (format === "excel") {
-      exportExcel(headers, tableRows, basename);
-    } else {
-      exportCsv(headers, tableRows, basename);
-    }
-  };
+      if (format === "excel") {
+        exportExcel(headers, tableRows, basename);
+      } else {
+        exportCsv(headers, tableRows, basename);
+      }
+    },
+    [
+      displayedMoves,
+      visibleColumns,
+      accessors,
+      selectedCharacterId,
+      characters,
+      selectedGame.id,
+    ],
+  );
 
   const handleFiltersChange = useCallback((filters: FilterItem[]) => {
     setActiveFilters(filters);
@@ -484,10 +373,10 @@ export const FrameDataTable: React.FC = () => {
   }
 
   return (
-    <div className="h-full flex flex-col pl-4 pr-4 flex-grow">
+    <div className="h-full flex flex-col pl-4 pr-4 grow">
       {selectedCharacterId ? (
         <div className="h-full flex flex-col overflow-hidden">
-          <div className="pb-0 flex-shrink-0">
+          <div className="pb-0 shrink-0">
             {movesLoading && originalMoves.length === 0 ? (
               <div className="flex flex-wrap gap-2 p-4 border rounded-lg bg-card/50">
                 <Skeleton className="h-10 w-32" />

@@ -1,5 +1,5 @@
 import React from "react";
-import { Move } from "@/types/Move";
+import { Move, type Command } from "@/types/Move";
 import { Badge } from "@/components/ui/badge";
 import {
   Tooltip,
@@ -21,7 +21,7 @@ type BadgeMap = Record<string, { className: string }>;
 interface MoveTableCellProps {
   move: Move;
   columnId: string;
-  renderCommand: (command: string[][] | null) => React.ReactNode;
+  renderCommand: (command: Command | null) => React.ReactNode;
   renderNotes: (note: string | null) => React.ReactNode;
   copyCommand: (move: Move) => void;
   getStanceInfo: (stance: string, characterId: number) => any;
@@ -148,7 +148,7 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
                 const chip = (
                   <Badge
                     variant="secondary"
-                    className="whitespace-nowrap border border-zinc-500"
+                    className="whitespace-nowrap border border-zinc-500 bg-transparent"
                   >
                     {s}
                   </Badge>
@@ -184,7 +184,7 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
               // ROW is hovered (group-hover) and becomes a defined
               // pill on direct hover, with the global cursor: pointer
               // rule providing the standard click affordance.
-              className="flex-shrink-0 p-1 rounded text-muted-foreground opacity-30 group-hover/cmd:opacity-100 hover:bg-muted hover:text-foreground transition-all focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="shrink-0 p-1 rounded text-muted-foreground opacity-30 group-hover/cmd:opacity-100 hover:bg-muted hover:text-foreground transition-all focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               title="Copy command"
               aria-label="Copy command"
             >

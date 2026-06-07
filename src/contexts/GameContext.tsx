@@ -8,7 +8,7 @@ import React, {
   ReactNode,
 } from "react";
 import { Gamepad2, Sword } from "lucide-react";
-import { useNavigate, useParams, useLocation } from "@tanstack/react-router";
+import { useNavigate, useParams } from "@tanstack/react-router";
 import {
   getNotationStyle,
   getStylesForGame,
@@ -16,7 +16,11 @@ import {
 } from "@/lib/notation";
 import { useUserSettings } from "./UserSettingsContext";
 import { clearStringCache } from "@/hooks/useMoves";
-import { loadGameData, getCachedGameData } from "@/lib/loadGameData";
+import {
+  loadGameData,
+  getCachedGameData,
+  type GameCommunity,
+} from "@/lib/loadGameData";
 import { withViewTransition } from "@/lib/viewTransition";
 
 // Define configuration for a game-specific icon with its alt text
@@ -197,6 +201,13 @@ interface GameContextType {
   gameProperties: Record<string, PropertyInfo>;
   gameCredits: CreditEntry[];
   gameCreditsDescription: string | null;
+  /**
+   * Per-game community / external-resource links surfaced in the
+   * credits view (shared spreadsheet, discord, …). Each game's
+   * `Game.json` carries its own; games without a `community` block
+   * yield an empty object here.
+   */
+  gameCommunity: GameCommunity;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -211,27 +222,39 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     gameId?: string;
     characterName?: string;
   };
-  const location = useLocation();
-
-  const [selectedGame, setSelectedGame] = useState<Game>(() => {
-    const gameFromUrl = params.gameId
+  // `selectedGame` is derived from the URL — the route's `$gameId` segment
+  // is the single source of truth. On routes without that segment (the
+  // landing page) fall back to the last-used game so the Navbar still has
+  // a coherent game to display.
+  const selectedGame = useMemo<Game>(() => {
+    const fromUrl = params.gameId
       ? avaliableGames.find((g) => g.id === params.gameId)
-      : null;
-    const savedGameId = !gameFromUrl
-      ? localStorage.getItem("selectedGameId")
-      : null;
-    const gameFromStorage = savedGameId
-      ? avaliableGames.find((g) => g.id === savedGameId)
-      : null;
-    return gameFromUrl || gameFromStorage || avaliableGames[0];
-  });
+      : undefined;
+    if (fromUrl) return fromUrl;
+    const savedId = localStorage.getItem("selectedGameId");
+    const fromStorage = savedId
+      ? avaliableGames.find((g) => g.id === savedId)
+      : undefined;
+    return fromStorage || avaliableGames[0];
+  }, [params.gameId]);
 
   const [isCharactersLoading, setIsCharactersLoading] = useState(true);
   const [characterError, setCharacterError] = useState<string | null>(null);
   const [characters, setCharacters] = useState<Character[]>([]);
-  const [selectedCharacterId, setSelectedCharacterId] = useState<number | null>(
-    null,
-  );
+  // `selectedCharacterId` is derived from the URL's `$characterName`
+  // segment. -1 is the "All characters" sentinel; an unknown name (or no
+  // segment) yields null. The id↔name mapping needs the loaded character
+  // list, so this stays null until `characters` arrives, then resolves.
+  const selectedCharacterId = useMemo<number | null>(() => {
+    const seg = params.characterName;
+    if (!seg) return null;
+    const name = decodeURIComponent(seg);
+    if (name.toLowerCase() === "all") return -1;
+    const match = characters.find(
+      (c) => c.name.toLowerCase() === name.toLowerCase(),
+    );
+    return match ? match.id : null;
+  }, [params.characterName, characters]);
   // Game-level stances (shared across all characters)
   const [gameStances, setGameStances] = useState<Record<string, StanceInfo>>(
     {},
@@ -251,6 +274,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     string | null
   >(null);
   const [gameCredits, setGameCredits] = useState<CreditEntry[]>([]);
+  const [gameCommunity, setGameCommunity] = useState<GameCommunity>({});
 
   useEffect(() => {
     let cancelled = false;
@@ -261,6 +285,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       setCharacters(data.characters);
       setGameCredits(data.credits);
       setGameCreditsDescription(data.creditsDescription);
+      setGameCommunity(data.community);
       setGameStances(data.gameStances);
       setGameProperties(data.gameProperties);
       setCharacterStances(data.characterStances);
@@ -326,48 +351,48 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     }
   }, [selectedGame?.id]);
 
-  const handleSetSelectedGameById = (gameId: string) => {
-    const game = avaliableGames.find((g) => g.id === gameId);
-    if (!game) return;
+  // The two setters are navigation-only: `selectedGame` and
+  // `selectedCharacterId` are derived from the resulting URL, so there is
+  // no local state to write. Two layers of smoothing wrap the navigation:
+  //   1. `withViewTransition` gives the BROWSER a cross-fade — it snapshots
+  //      old DOM, runs the navigation, snapshots new DOM, animates between
+  //      them. A no-op on browsers without the View Transitions API.
+  //   2. `React.startTransition` marks the route swap non-urgent so
+  //      Suspense boundaries keep the previous route mounted until the
+  //      next one is ready instead of flashing a fallback.
+  const handleSetSelectedGameById = useCallback(
+    (gameId: string) => {
+      if (!avaliableGames.some((g) => g.id === gameId)) return;
+      withViewTransition(() => {
+        React.startTransition(() => {
+          navigate({ to: `/${gameId}` });
+        });
+      });
+    },
+    [navigate],
+  );
 
-    // Two layers of smoothing:
-    //   1. `startViewTransition` gives the BROWSER a cross-fade — it
-    //      snapshots old DOM, runs our callback, snapshots new DOM, and
-    //      animates between them. Falls back to a no-op on browsers
-    //      that don't support it.
-    //   2. `React.startTransition` tells REACT this is a non-urgent
-    //      update, so Suspense boundaries can keep the previous route
-    //      mounted until the next one is ready instead of flashing a
-    //      fallback. Combined with the cache-hit fast path in the
-    //      data-loading effect, the result is a smooth crossfade
-    //      rather than a vanish-then-skeleton flash.
-    const apply = () => {
-      if (game.id !== selectedGame?.id) setSelectedGame(game);
-      setSelectedCharacterId(null);
-      navigate({ to: `/${game.id}` });
-    };
-    withViewTransition(() => {
-      if (typeof React.startTransition === "function") {
-        React.startTransition(apply);
-      } else {
-        apply();
+  const handleSetSelectedCharacterId = useCallback(
+    (id: number | null) => {
+      // null → the game's character-select page; -1 → the "All" view;
+      // any other id → that character's page (resolved to its name for
+      // the URL). An unknown id is ignored.
+      let to = `/${selectedGame.id}`;
+      if (id === -1) {
+        to = `/${selectedGame.id}/All`;
+      } else if (id !== null) {
+        const name = characters.find((c) => c.id === id)?.name;
+        if (!name) return;
+        to = `/${selectedGame.id}/${encodeURIComponent(name)}`;
       }
-    });
-  };
-
-  const handleSetSelectedCharacterId = (id: number | null) => {
-    if (id === selectedCharacterId) return;
-    // Cross-fade character switches the same way we do game switches.
-    // See the comment in handleSetSelectedGameById for why both layers
-    // of transition are wanted.
-    withViewTransition(() => {
-      if (typeof React.startTransition === "function") {
-        React.startTransition(() => setSelectedCharacterId(id));
-      } else {
-        setSelectedCharacterId(id);
-      }
-    });
-  };
+      withViewTransition(() => {
+        React.startTransition(() => {
+          navigate({ to });
+        });
+      });
+    },
+    [navigate, selectedGame.id, characters],
+  );
 
   // Combine game-specific icons with universal directional icons
   const combinedIcons = useMemo(() => {
@@ -385,6 +410,19 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     (iconName: string, isHeld: boolean = false): string => {
       const upperIconName = iconName.toUpperCase();
       const heldSuffix = isHeld ? "-" : "";
+      // Numpad direction icons (1–9 plus held variants) are byte-identical
+      // across every game we support, so they live ONCE under the shared
+      // `/Icons/` root. Game-specific icons (UA, BA, KND, LP, …) still
+      // resolve under `/Games/{id}/Icons/` because they're authored per
+      // game. The check is a single-character comparison; cheap to run on
+      // the render hot path.
+      if (
+        iconName.length === 1 &&
+        iconName >= "1" &&
+        iconName <= "9"
+      ) {
+        return `/Icons/${upperIconName}${heldSuffix}.svg`;
+      }
       return `/Games/${selectedGame.id}/Icons/${upperIconName}${heldSuffix}.svg`;
     },
     [selectedGame.id],
@@ -473,6 +511,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       characterStances,
       gameProperties,
       gameCredits,
+      gameCommunity,
     }),
     [
       selectedGame,
@@ -494,6 +533,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       characterStances,
       gameProperties,
       gameCredits,
+      gameCommunity,
     ],
   );
 

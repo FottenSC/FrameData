@@ -1,6 +1,6 @@
 import React from "react";
 import { TableCell, TableRow as UITableRow } from "@/components/ui/table";
-import { Move } from "@/types/Move";
+import { Move, type Command } from "@/types/Move";
 import { ColumnConfig } from "@/contexts/UserSettingsContext";
 import type { PropertyInfo } from "@/contexts/GameContext";
 import { MoveTableCell } from "./MoveTableCell";
@@ -8,7 +8,7 @@ import { MoveTableCell } from "./MoveTableCell";
 interface TableRowProps {
   move: Move;
   visibleColumns: ColumnConfig[];
-  renderCommand: (command: string[][] | null) => React.ReactNode;
+  renderCommand: (command: Command | null) => React.ReactNode;
   renderNotes: (note: string | null) => React.ReactNode;
   copyCommand: (move: Move) => void;
   getStanceInfo: (stance: string, characterId: number) => any;
@@ -43,7 +43,7 @@ export const TableRow: React.FC<TableRowProps> = React.memo(
         if (column.maxWidth) style.maxWidth = column.maxWidth;
         return (
           <TableCell
-            key={`${move.id}-${column.id}`}
+            key={`${move.characterId}-${move.id}-${column.id}`}
             className={column.className}
             style={style}
           >

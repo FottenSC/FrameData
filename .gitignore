@@ -28,13 +28,26 @@ Thumbs.db
 # Logs
 logs
 *.log
+*.err
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log* 
+
+# Python cache artifacts
+__pycache__/
+*.py[cod]
 
 # Deployment timestamp
 public/timestamp.json 
 
 # Ignore the stuff directory
-stuff/ 
+stuff/
 debugStances.txt
+
+# Claude Code personal settings
+.claude/settings.local.json
+
+# Claude Code agent worktrees — transient checkouts. Must stay ignored so
+# build tooling (Tailwind's content scanner in particular) doesn't pick up
+# stale class strings from an out-of-date copy of the source.
+.claude/worktrees/

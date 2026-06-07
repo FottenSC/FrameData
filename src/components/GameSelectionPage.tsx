@@ -84,12 +84,17 @@ export const GameSelectionPage: React.FC = () => {
         {avaliableGames.map((game) => (
           <Card
             key={game.id}
-            className="hover:shadow-lg transition-shadow duration-200 cursor-pointer flex flex-col"
+            // Hover treatment matches the character-tile cards on the
+            // next page: shadow lift + primary-tinted border + subtle
+            // bg shift. The single shadow change wasn't enough — many
+            // users couldn't distinguish a hovered card from an
+            // unhovered one at a glance.
+            className="cursor-pointer flex flex-col transition-all duration-200 hover:shadow-lg hover:border-primary/50 bg-transparent"
             onClick={() => handleGameSelect(game.id)}
             onMouseEnter={() => handleGameHover(game.id)}
             onFocus={() => handleGameHover(game.id)}
           >
-            <CardHeader className="flex-grow">
+            <CardHeader className="grow">
               <h2 className="font-semibold leading-none tracking-tight flex items-center justify-center text-xl">
                 {game.icon || <Gamepad2 className="h-5 w-5 mr-2 opacity-70" />}
                 {game.name}

@@ -40,7 +40,7 @@ export function showCopiedToast(copiedText: string, duration = 1800) {
           without competing with the copied text — the chip behind it
           is the actual content, not a stock green checkmark.
         */}
-        <div className="flex-shrink-0 grid place-items-center w-8 h-8 rounded-full bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/25">
+        <div className="shrink-0 grid place-items-center w-8 h-8 rounded-full bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/25">
           <ClipboardCheck className="h-4 w-4" />
         </div>
 

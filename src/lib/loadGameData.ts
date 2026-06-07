@@ -20,6 +20,31 @@ import type {
   StanceInfo,
 } from "@/contexts/GameContext";
 
+/**
+ * A community link surfaced in the credits view. Per-game so each
+ * fighter's discord / spreadsheet / etc. lives next to its data
+ * instead of being hardcoded into the React component.
+ */
+export interface CommunityLink {
+  /** Display name, e.g. "Framecalibur" or "Shared framedata spreadsheet". */
+  label: string;
+  /** Hyperlink target. */
+  url: string;
+  /** Optional one-line clarifier shown beneath the label. */
+  description?: string;
+}
+
+/**
+ * Per-game community / external resource bundle. Optional everywhere —
+ * games without an entry simply don't render that link in the credits.
+ */
+export interface GameCommunity {
+  /** Link to the canonical shared spreadsheet contributors edit. */
+  dataSheet?: CommunityLink;
+  /** Link to the community discord where data errors should be reported. */
+  discord?: CommunityLink;
+}
+
 /** Fully-parsed payload derived from Game.json. */
 export interface GameData {
   characters: Character[];
@@ -38,6 +63,12 @@ export interface GameData {
   /** Credits block. Accepts either a legacy array or the object form. */
   credits: CreditEntry[];
   creditsDescription: string | null;
+  /**
+   * External community links surfaced in the credits view (shared
+   * spreadsheet, discord, …). Empty object when the game's `Game.json`
+   * has no `community` block.
+   */
+  community: GameCommunity;
 }
 
 /** Shape of a generic code->descriptor record in Game.json. */
@@ -82,11 +113,12 @@ const parseHitLevels = (source: unknown): Record<string, HitLevelInfo> => {
   for (const [code, info] of Object.entries(
     source as Record<string, string | CodeRecord>,
   )) {
+    const normalizedCode = code.toUpperCase();
     if (typeof info === "string") {
-      out[code] = { name: info, description: "", className: "" };
+      out[normalizedCode] = { name: info, description: "", className: "" };
     } else {
-      out[code] = {
-        name: info?.name || code,
+      out[normalizedCode] = {
+        name: info?.name || normalizedCode,
         description: info?.description || "",
         className: info?.className || "",
       };
@@ -120,6 +152,28 @@ const parseCredits = (
     };
   }
   return { list: [], description: null };
+};
+
+const parseCommunityLink = (source: unknown): CommunityLink | undefined => {
+  if (!source || typeof source !== "object") return undefined;
+  const s = source as { label?: unknown; url?: unknown; description?: unknown };
+  const url = typeof s.url === "string" ? s.url : "";
+  const label = typeof s.label === "string" ? s.label : "";
+  if (!url || !label) return undefined;
+  const description =
+    typeof s.description === "string" ? s.description : undefined;
+  return { url, label, description };
+};
+
+const parseCommunity = (source: unknown): GameCommunity => {
+  if (!source || typeof source !== "object") return {};
+  const s = source as { dataSheet?: unknown; discord?: unknown };
+  const out: GameCommunity = {};
+  const dataSheet = parseCommunityLink(s.dataSheet);
+  if (dataSheet) out.dataSheet = dataSheet;
+  const discord = parseCommunityLink(s.discord);
+  if (discord) out.discord = discord;
+  return out;
 };
 
 const parseCharacters = (source: unknown, gameId: string): Character[] => {
@@ -189,6 +243,7 @@ async function doLoadGameData(gameId: string): Promise<GameData> {
     hitLevels: parseHitLevels(data?.hitLevels),
     credits: credits.list,
     creditsDescription: credits.description,
+    community: parseCommunity(data?.community),
   };
 }
 

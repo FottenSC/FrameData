@@ -17,6 +17,27 @@ import {
 
 export type ComboboxOption = { label: string; value: string };
 
+interface MultiComboboxRenderArgs {
+  selectedValues: string[];
+  selectedOptions: ComboboxOption[];
+  placeholder: string;
+}
+
+interface MultiComboboxProps {
+  value: string[];
+  onChange: (value: string[]) => void;
+  options: ComboboxOption[];
+  placeholder?: string;
+  emptyText?: string;
+  className?: string;
+  contentClassName?: string;
+  searchPlaceholder?: string;
+  renderTriggerValue?: (args: MultiComboboxRenderArgs) => React.ReactNode;
+  renderOption?: (option: ComboboxOption, checked: boolean) => React.ReactNode;
+  getOptionSearchValue?: (option: ComboboxOption) => string;
+  "aria-label"?: string;
+}
+
 /**
  * Multi-select dropdown used by the filter builder's "In list" operator.
  *
@@ -35,16 +56,13 @@ export function MultiCombobox({
   placeholder = "Select…",
   emptyText = "No results found.",
   className,
+  contentClassName,
+  searchPlaceholder = "Search…",
+  renderTriggerValue,
+  renderOption,
+  getOptionSearchValue,
   "aria-label": ariaLabel,
-}: {
-  value: string[];
-  onChange: (value: string[]) => void;
-  options: ComboboxOption[];
-  placeholder?: string;
-  emptyText?: string;
-  className?: string;
-  "aria-label"?: string;
-}) {
+}: MultiComboboxProps) {
   const [open, setOpen] = React.useState(false);
   const selectedSet = React.useMemo(() => new Set(value), [value]);
 
@@ -68,6 +86,24 @@ export function MultiCombobox({
     return (v: string) => map.get(v) ?? v;
   }, [options]);
 
+  const selectedOptions = React.useMemo(
+    () =>
+      value.map(
+        (v) =>
+          options.find((o) => o.value === v) ?? {
+            value: v,
+            label: v,
+          },
+      ),
+    [options, value],
+  );
+
+  const triggerValue = renderTriggerValue?.({
+    selectedValues: value,
+    selectedOptions,
+    placeholder,
+  });
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -85,65 +121,69 @@ export function MultiCombobox({
             // overflowing.
             "group inline-flex min-h-8 min-w-[200px] max-w-full items-center gap-1 rounded-md border border-input bg-background px-2 py-1 text-sm",
             "ring-offset-background transition-colors",
-            "hover:bg-accent/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+            "hover:bg-accent/40 hover:border-input/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             "disabled:cursor-not-allowed disabled:opacity-50",
             className,
           )}
         >
           <span className="flex flex-1 flex-wrap items-center gap-1 text-left">
-            {value.length === 0 ? (
-              <span className="text-muted-foreground">{placeholder}</span>
-            ) : (
-              value.map((v) => (
-                <span
-                  key={v}
-                  className="inline-flex items-center gap-0.5 rounded bg-primary/15 pl-1.5 pr-0.5 py-0 text-[11px] font-medium text-foreground ring-1 ring-primary/30"
-                >
-                  <span className="leading-none">{labelFor(v)}</span>
-                  {/*
+            {triggerValue ??
+              (value.length === 0 ? (
+                <span className="text-muted-foreground">{placeholder}</span>
+              ) : (
+                value.map((v) => (
+                  <span
+                    key={v}
+                    className="inline-flex items-center gap-0.5 rounded bg-primary/15 pl-1.5 pr-0.5 py-0 text-[11px] font-medium text-foreground ring-1 ring-primary/30"
+                  >
+                    <span className="leading-none">{labelFor(v)}</span>
+                    {/*
                     Nested button for the remove action. onPointerDown is used
                     (rather than onClick) so we can stopPropagation before
                     Radix's PopoverTrigger fires — otherwise clicking × also
                     opens the popover.
                   */}
-                  <span
-                    role="button"
-                    tabIndex={0}
-                    aria-label={`Remove ${labelFor(v)}`}
-                    onPointerDown={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      remove(v);
-                    }}
-                    onKeyDown={(e) => {
-                      if (
-                        e.key === "Enter" ||
-                        e.key === " " ||
-                        e.key === "Backspace" ||
-                        e.key === "Delete"
-                      ) {
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Remove ${labelFor(v)}`}
+                      onPointerDown={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
                         remove(v);
-                      }
-                    }}
-                    className="inline-flex h-4 w-4 items-center justify-center rounded-sm hover:bg-primary/25"
-                  >
-                    <X className="h-3 w-3" />
+                      }}
+                      onKeyDown={(e) => {
+                        if (
+                          e.key === "Enter" ||
+                          e.key === " " ||
+                          e.key === "Backspace" ||
+                          e.key === "Delete"
+                        ) {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          remove(v);
+                        }
+                      }}
+                      className="inline-flex h-4 w-4 items-center justify-center rounded-sm hover:bg-primary/25"
+                    >
+                      <X className="h-3 w-3" />
+                    </span>
                   </span>
-                </span>
-              ))
-            )}
+                ))
+              ))}
           </span>
           <ChevronsUpDown className="ml-1 h-4 w-4 shrink-0 opacity-50" />
         </button>
       </PopoverTrigger>
       <PopoverContent
-        className="p-0 bg-secondary text-secondary-foreground border border-input w-[260px]"
+        className={cn(
+          "p-0 bg-secondary text-secondary-foreground border border-input w-[260px]",
+          contentClassName,
+        )}
         align="start"
       >
         <Command>
-          <CommandInput placeholder="Search…" />
+          <CommandInput placeholder={searchPlaceholder} />
           <CommandList>
             <CommandEmpty>{emptyText}</CommandEmpty>
             <CommandGroup>
@@ -152,32 +192,38 @@ export function MultiCombobox({
                 return (
                   <CommandItem
                     key={opt.value}
-                    value={opt.label}
+                    value={getOptionSearchValue?.(opt) ?? opt.label}
                     onSelect={() => toggle(opt.value)}
                   >
-                    <span
-                      className={cn(
-                        "mr-2 flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border",
-                        checked
-                          ? "bg-primary border-primary text-primary-foreground"
-                          : "border-muted-foreground/50",
-                      )}
-                      aria-hidden
-                    >
-                      {checked && (
-                        <svg viewBox="0 0 12 12" className="h-3 w-3">
-                          <path
-                            d="M2 6l3 3 5-6"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      )}
-                    </span>
-                    {opt.label}
+                    {renderOption ? (
+                      renderOption(opt, checked)
+                    ) : (
+                      <>
+                        <span
+                          className={cn(
+                            "mr-2 flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border",
+                            checked
+                              ? "bg-primary border-primary text-primary-foreground"
+                              : "border-muted-foreground/50",
+                          )}
+                          aria-hidden
+                        >
+                          {checked && (
+                            <svg viewBox="0 0 12 12" className="h-3 w-3">
+                              <path
+                                d="M2 6l3 3 5-6"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          )}
+                        </span>
+                        {opt.label}
+                      </>
+                    )}
                   </CommandItem>
                 );
               })}

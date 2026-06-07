@@ -62,50 +62,96 @@ export const CommandIcon: React.FC<CommandIconProps> = ({
 }) => {
   const baseClasses = "border border-black bg-white text-black rounded";
   const heldClasses = "bg-black text-white border border-white rounded";
-  // Slide inputs (lowercase letters in the source) render at a smaller size
-  // so they read as a secondary / chained input next to regular button pills.
-  const sizeClasses = isSlide
+  // Visible pill size. Slides render at a reduced size so they read as
+  // a secondary / chained input next to regular button pills. Normal
+  // pills use min-w + px-1 (matching DirectionChip) so two-letter codes
+  // like "BT" expand the pill instead of clipping out of a fixed 20px box.
+  const pillSizeClasses = isSlide
     ? "w-3.5 h-3.5 text-[11px]"
-    : "w-5 h-5 text-[16px]";
-  // Negative right-margin pulls the next element ~half a slide-width to the
-  // left so they overlap. Only applied when caller confirmed the next thing
-  // is a regular button; a slide followed by another slide stays tidy.
-  const marginClasses = isSlide ? (overlapNext ? "-mr-2" : "") : "mx-0.25";
-  // Slides render ABOVE their overlapping normal neighbour so the full slide
-  // pill stays visible — the normal button's left edge sits underneath the
-  // slide's right edge, not vice versa.
+    : "min-w-5 h-5 px-1 text-[16px]";
+  // Negative right-margin pulls the next element ~half a slide-width
+  // to the left so they overlap. Only applied when caller confirmed
+  // the next thing is a regular button.
+  const overlapMargin = isSlide && overlapNext ? "-mr-2" : "";
+  // Slides render ABOVE their overlapping normal neighbour so the full
+  // slide pill stays visible — the normal button's left edge sits
+  // underneath the slide's right edge, not vice versa.
   const zClasses = isSlide ? "z-20" : "z-10";
 
   const code = input.toUpperCase();
   const { title, description } = tooltipCopy(code, isSlide, isHeld);
 
+  // The visible pill. For both variants we use the same inner shape;
+  // the OUTER wrapper (below for slides, the pill itself for normals)
+  // is what the parent flex container sees.
+  //
+  // `leading-none` collapses the line box to the font's em height so
+  // flex centering aligns on the actual glyph rather than on the
+  // inflated default line-height (without it, bold capitals like K/G
+  // land a pixel high in the box). The inner span wraps the glyph in a
+  // block so per-letter side-bearing skew doesn't shift it
+  // horizontally.
+  const pill = (
+    <div
+      className={cn(
+        "inline-flex items-center justify-center font-bold font-sans cursor-default leading-none text-center",
+        pillSizeClasses,
+        "button-icon",
+        isHeld ? heldClasses : baseClasses,
+      )}
+    >
+      <span className="block translate-y-[-0.5px]">{code}</span>
+    </div>
+  );
+
+  // Normal buttons: pill IS the trigger. Margin/z/positioning live on
+  // the pill itself.
+  if (!isSlide) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div
+            className={cn(
+              "inline-flex items-center justify-center align-middle relative mx-0.25",
+              zClasses,
+            )}
+          >
+            {pill}
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          <ChipTooltipContent
+            code={code}
+            title={title}
+            description={description}
+          />
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  // Slides: wrap the small pill in an outer h-5 box (same height as
+  // normal buttons) with the pill anchored at the bottom via
+  // `items-end`. The outer box is only the pill's WIDTH so the
+  // overlap math (-mr-2 for overlapNext) and `+`-compound layout
+  // (a+b → K) keep working — the wrapper takes the same horizontal
+  // space the bare slide pill used to take, just with extra
+  // (transparent) headroom above. Net effect: slide bottoms always
+  // share a baseline with adjacent normal-button bottoms, regardless
+  // of which flex alignment the parent uses, so we never need
+  // `self-end` or special parent items-end any more.
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <div
           className={cn(
-            // `leading-none` collapses the line box to the font's em height
-            // so flex centering aligns on the actual glyph rather than on
-            // the inflated default line-height. Without it tall capitals
-            // (especially with `font-bold`) land a pixel high in the box.
-            "inline-flex items-center justify-center font-bold align-middle font-sans cursor-default leading-none text-center",
-            sizeClasses,
-            marginClasses,
-            isSlide ? "self-end" : "",
-            "button-icon",
-            "relative",
+            "inline-flex items-end justify-center align-middle relative",
+            "w-3.5 h-5", // pill width × normal button height
+            overlapMargin,
             zClasses,
-            isHeld ? heldClasses : baseClasses,
           )}
         >
-          {/*
-            Wrap the glyph in its own block so the flex container sees a
-            single uniform child. Otherwise the bare text node inherits
-            inline phrasing rules and any side-bearing skew from the font
-            (notable for letters like "K" / "G") shifts the visible glyph
-            off-centre horizontally.
-          */}
-          <span className="block translate-y-[-0.5px]">{code}</span>
+          {pill}
         </div>
       </TooltipTrigger>
       <TooltipContent>

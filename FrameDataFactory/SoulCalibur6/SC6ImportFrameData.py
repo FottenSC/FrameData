@@ -662,21 +662,71 @@ def split_by_delimiter(value, delimiter="::"):
     return parts if parts else None
 
 
+def _to_button_obj(token):
+    """Wrap a single button token in the canonical object form:
+
+        ``"A"``     -> ``{"b": "A"}``
+        ``"(6)"``   -> ``{"b": "6", "h": True}``
+
+    Empty / non-string input returns ``None``. Held is the only flag the
+    on-disk schema currently knows about; further leaf-level metadata
+    (slide, just-frame, …) can attach as additional optional keys without
+    breaking older readers.
+    """
+    if not isinstance(token, str):
+        return None
+    token = token.strip()
+    if not token:
+        return None
+    if len(token) >= 2 and token[0] == "(" and token[-1] == ")":
+        inner = token[1:-1].strip()
+        if inner:
+            return {"b": inner, "h": True}
+    return {"b": token}
+
+
+def _split_buttons(token):
+    """Split an authored token on ``+`` to recover the simultaneously-pressed
+    buttons, returning each as a button object (see :func:`_to_button_obj`).
+
+        ``"A+B"``       -> ``[{"b": "A"}, {"b": "B"}]``
+        ``"(A)+(B)"``   -> ``[{"b": "A", "h": True}, {"b": "B", "h": True}]``
+
+    A token without ``+`` comes back as a single-element list. Empty
+    fragments are dropped.
+    """
+    if not token:
+        return []
+    if "+" not in token:
+        obj = _to_button_obj(token)
+        return [obj] if obj else []
+    out = []
+    for part in token.split("+"):
+        obj = _to_button_obj(part)
+        if obj is not None:
+            out.append(obj)
+    return out
+
+
 def split_command(value, delimiter="::"):
-    """Parse an authored command string into an ordered list of steps, where
-    each step is itself a list of alternative tokens the player may pick.
+    """Parse an authored command string into the canonical three-level
+    nested list ``steps -> alternatives -> simultaneously-pressed buttons``,
+    where each leaf is a button *object* (``{"b": "A"}`` /
+    ``{"b": "A", "h": True}``).
 
-    The authored format uses ``::`` as the step separator and ``:_:`` inside
-    a single ``::``-part to mark OR-alternatives between otherwise-equivalent
-    tokens:
+    The authored format uses ``::`` as the step separator, ``:_:`` between
+    OR-alternatives inside a step, and ``+`` between AND-pressed buttons
+    inside one alternative:
 
-        ``":A::B+K:"``                  -> [["A"], ["B+K"]]
-        ``":(3):_:(6):_:(9)::A:"``      -> [["(3)", "(6)", "(9)"], ["A"]]
-        ``":A::A::B:"``                 -> [["A"], ["A"], ["B"]]
+        ``":A::B+K:"``                  -> [[[{b:A}]], [[{b:B},{b:K}]]]
+        ``":(3):_:(6):_:(9)::A:"``      -> [[[{b:3,h}],[{b:6,h}],[{b:9,h}]], [[{b:A}]]]
+        ``":A::A::B:"``                 -> [[[{b:A}]], [[{b:A}]], [[{b:B}]]]
+        ``":A+B:"``                     -> [[[{b:A},{b:B}]]]
+        ``":(A)+(B):"``                 -> [[[{b:A,h},{b:B,h}]]]
 
-    Returning a nested shape instead of a flat list with ``"_"`` sentinels
-    removes the need for the frontend to walk a state machine to recover
-    the OR-branches — every step is uniformly a list.
+    Object leaves let consumers introspect held / future flags atomically
+    without string surgery, and search can match a button without parsing
+    ``+`` or stripping parens.
     """
     try:
         if pd.isna(value):
@@ -694,14 +744,20 @@ def split_command(value, delimiter="::"):
             alternatives = []
             for sub in part.split(":_:"):
                 cleaned = sub.strip().strip(":")
-                if cleaned:
-                    alternatives.append(cleaned)
+                if not cleaned:
+                    continue
+                buttons = _split_buttons(cleaned)
+                if buttons:
+                    alternatives.append(buttons)
             if alternatives:
                 steps.append(alternatives)
         else:
             cleaned = part.strip().strip(":")
-            if cleaned:
-                steps.append([cleaned])
+            if not cleaned:
+                continue
+            buttons = _split_buttons(cleaned)
+            if buttons:
+                steps.append([buttons])
 
     return steps if steps else None
 

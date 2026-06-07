@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useLocation, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import {
   Gamepad2,
   Sword,
@@ -43,8 +43,6 @@ const gameIcons: Record<string, React.ReactNode> = {
 };
 
 export const Navbar: React.FC = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
   const {
     selectedGame,
     characters,
@@ -67,38 +65,15 @@ export const Navbar: React.FC = () => {
   // Check if we're on a frame data page (has character selected)
   const isFrameDataPage = selectedCharacterId !== null;
 
-  const isActive = (path: string) => location.pathname === path;
-
   const handleCharacterSelect = (value: string | null) => {
     if (!value) {
-      // Handle case where selection is cleared (empty value)
       setSelectedCharacterId(null);
-      navigate({ to: `/${selectedGame.id}` });
       return;
     }
-
-    // Parse the composite value "id|name"
-    const [idString, name] = value.split("|");
-    const selectedId = Number(idString);
-
-    if (!isNaN(selectedId) && name) {
-      // No-op if choosing the currently active character and URL segment already matches
-      if (
-        selectedCharacterId === selectedId &&
-        decodeURIComponent(
-          location.pathname.split("/")[2] || "",
-        ).toLowerCase() === name.toLowerCase()
-      ) {
-        return;
-      }
-      setSelectedCharacterId(selectedId); // Set the ID in context
-      // Navigate using the name directly from the parsed value
-      navigate({ to: `/${selectedGame.id}/${encodeURIComponent(name)}` });
-    } else {
-      // Failed to parse selection, no debug logging
-      setSelectedCharacterId(null);
-      navigate({ to: `/${selectedGame.id}` });
-    }
+    // The Combobox emits a composite "id|name" value; the id is all we
+    // need — setSelectedCharacterId resolves the name and navigates.
+    const id = Number(value.split("|")[0]);
+    setSelectedCharacterId(Number.isNaN(id) ? null : id);
   };
 
   return (

@@ -57,7 +57,7 @@ export const PaginationFooter: React.FC<PaginationFooterProps> = ({
   const pageNumbers = getPageNumbers(currentPage, totalPages);
 
   return (
-    <div className="flex-shrink-0 flex items-center justify-end px-4 py-2 border-t border-card-border bg-card">
+    <div className="flex items-center justify-end px-4 py-2 border-t border-card-border">
       <Pagination>
         <PaginationContent>
           <PaginationItem>

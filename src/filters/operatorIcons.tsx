@@ -4,8 +4,8 @@ import {
   EqualNot,
   Search,
   ChevronsRight,
-  ChevronsUp,
-  ChevronsDown,
+  ChevronRight,
+  ChevronLeft,
   ArrowLeftRight,
   ArrowLeftRightIcon,
   Layers,
@@ -33,11 +33,14 @@ import {
 type IconCmp = React.ComponentType<{ className?: string }>;
 
 export const OPERATOR_ICONS: Record<string, IconCmp> = {
-  // Numeric / scalar
+  // Numeric / scalar. ChevronRight/Left visually mirror the
+  // mathematical `>` and `<` glyphs; the previous ChevronsUp/Down
+  // pair read as "scroll up / scroll down" and lost the comparison
+  // semantics entirely.
   equals: Equal,
   notEquals: EqualNot,
-  greaterThan: ChevronsUp,
-  lessThan: ChevronsDown,
+  greaterThan: ChevronRight,
+  lessThan: ChevronLeft,
   between: ArrowLeftRight,
   notBetween: ArrowLeftRightIcon,
 

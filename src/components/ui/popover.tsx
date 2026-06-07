@@ -16,7 +16,14 @@ const PopoverContent = React.forwardRef<
       align={align}
       sideOffset={sideOffset}
       className={cn(
-        "z-50 w-[--radix-popover-trigger-width] min-w-40 rounded-md border border-zinc-800 bg-zinc-950 text-zinc-50 shadow-md outline-hidden p-1",
+        // The popover width is pinned to the trigger width via Radix's
+        // exposed CSS variable. The variable MUST be wrapped in an explicit
+        // `var()`: Tailwind v4 dropped v3's habit of auto-wrapping a bare
+        // custom property in an arbitrary value, so the unwrapped form
+        // compiled to an invalid `width` declaration the browser discarded
+        // (leaving the popover content-width). select.tsx pins its width
+        // to the trigger the same way.
+        "z-50 w-[var(--radix-popover-trigger-width)] min-w-40 rounded-md border border-zinc-800 bg-zinc-950 text-zinc-50 shadow-md outline-hidden p-1",
         className,
       )}
       {...props}

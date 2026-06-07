@@ -7,9 +7,9 @@
  * like "+28 on hit, knocks down" as a single structured value rather than
  * munging them into a free-form string.
  *
- * The raw JSON source uses flat "Hit"/"HitDec"/"CounterHit"/etc. fields;
- * see {@link parseOutcome} and {@link processRawMove} for the normalization layer
- * that converts the stored shape into this richer in-memory representation.
+ * The raw JSON stores these as PascalCase fields with structured outcome
+ * objects; `processMove` in `useMoves` reads that shape into this in-memory
+ * representation.
  */
 
 /**
@@ -42,16 +42,29 @@ export interface Move {
 
   stringCommand: string | null;
   /**
-   * Command input as an ordered list of "steps". Each step is itself a list
-   * of alternative tokens the player can choose from — single-alternative
-   * steps (the common case) have length 1; OR-steps authored as e.g.
-   * `(3)_(6)_(9) A` become `[["(3)", "(6)", "(9)"], ["A"]]`.
+   * Command input — a {@link Command}, indexed as
+   * `command[stepIdx][altIdx][buttonIdx]`:
    *
-   * This replaces the older flat shape with a literal `"_"` sentinel token
-   * between alternatives. The normaliser in useMoves accepts both formats
-   * for backwards compatibility with older JSON on disk.
+   *   1. **Steps** are sequential — the outer array preserves "press these
+   *      in order".
+   *   2. **Alternatives** are OR-branches inside one step. Single-alt steps
+   *      (the common case) have length 1; an OR-step authored as
+   *      `(3)_(6)_(9) A` becomes a step with three alternatives.
+   *   3. **Buttons** are the simultaneous AND-pressed inputs that make up
+   *      one alternative, each a {@link CommandButton} (`{b:"A"}` plain,
+   *      `{b:"A",h:true}` held).
+   *
+   * Example: `(3)_(6)_(9) A+B` →
+   *
+   *     [
+   *       [ [{b:"3",h:true}], [{b:"6",h:true}], [{b:"9",h:true}] ],
+   *       [ [{b:"A"},{b:"B"}] ],
+   *     ]
+   *
+   * On disk the command is stored in exactly this three-level object-leaf
+   * shape; `readCommand` in useMoves validates and reads it on load.
    */
-  command: string[][] | null;
+  command: Command | null;
   stance: string[] | null;
   hitLevel: string[] | null;
 
@@ -85,6 +98,64 @@ export const EMPTY_DAMAGE: MoveDamage = Object.freeze({
   raw: null,
   total: null,
 });
+
+/**
+ * Concise human-readable rendering of an outcome — used for CSV / Excel
+ * export and as a sort key.
+ *
+ *   { advantage: 28, tags: ["KND"] }   -> "+28 KND"
+ *   { advantage: -6, tags: [] }        -> "-6"
+ *   { advantage: null, tags: ["KND"] } -> "KND"
+ */
+export function formatOutcome(o: MoveOutcome): string {
+  const parts: string[] = [];
+  if (o.advantage !== null) {
+    parts.push((o.advantage > 0 ? "+" : "") + o.advantage);
+  }
+  if (o.tags.length > 0) {
+    parts.push(o.tags.join(" "));
+  }
+  return parts.join(" ") || (o.raw ?? "");
+}
+
+// ----- Command model -----
+//
+// A command is a three-level structure: STEPS (sequential) → ALTERNATIVES
+// (OR-branches inside a step) → BUTTONS (simultaneously-pressed inputs that
+// make up one alternative). Each leaf is a `CommandButton` object so held /
+// future flags can be read structurally without string surgery.
+
+/**
+ * A single button in a command — the leaf of a {@link Command}.
+ *
+ *   - `b` — the button token in the universal authoring alphabet (`A`/`B`/
+ *     `C`/`D` for buttons, `1`-`9` numpad digits for directions, motion
+ *     shorthands like `qcf`/`dp`, lowercase letters like `a` for slides).
+ *   - `h` — `true` when the button is held for the duration. Omitted when
+ *     false so the on-disk JSON stays compact for the common case.
+ */
+export interface CommandButton {
+  b: string;
+  h?: true;
+}
+
+/** One alternative within a step — the buttons pressed at the same instant (AND). */
+export type CommandPress = CommandButton[];
+
+/** One step — a list of OR-alternatives. Single-alt steps are the common case. */
+export type CommandStep = CommandPress[];
+
+/** A full command — an ordered sequence of steps. */
+export type Command = CommandStep[];
+
+/**
+ * Render a single button as the canonical text form used by sort, search,
+ * and CSV export. Held buttons get parens (`{b:"A",h:true}` → `"(A)"`),
+ * plain buttons pass through as their `b` value. Co-located with the type
+ * so consumers don't reinvent the convention.
+ */
+export const buttonToText = (b: CommandButton): string =>
+  b.h ? `(${b.b})` : b.b;
 
 // ----- Filter model (unchanged shape, preserved for consumers) -----
 

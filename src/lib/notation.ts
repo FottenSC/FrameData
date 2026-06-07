@@ -18,6 +18,8 @@
  * game id it lists under `games`.
  */
 
+import type { Command } from "@/types/Move";
+
 export interface NotationStyle {
   /** Stable id used in storage. Do not rename without a migration. */
   id: string;
@@ -357,18 +359,29 @@ export function applyNotationStyle(
 }
 
 /**
- * Translate every token of a nested-step command array. Preserves the
- * outer structure (one inner array per step, alternatives inside) and
- * returns a freshly-allocated shape so callers can safely mutate or
- * memoise without worrying about shared references.
+ * Translate every button of a three-level command (steps × alternatives ×
+ * buttons). Each leaf's `b` field is run through {@link translateToken};
+ * the `h` (held) flag is preserved verbatim because it isn't a notation
+ * concern. Returns a freshly-allocated shape so callers can safely mutate
+ * or memoise without worrying about shared references — when a token is
+ * unchanged by the active style we reuse the original button object to
+ * avoid an unnecessary allocation.
  *
- * Passing `null` style short-circuits to returning the input as-is.
+ * Passing a `null` style short-circuits to returning the input as-is.
  */
 export function translateCommand(
-  cmd: string[][] | null,
+  cmd: Command | null,
   style: NotationStyle | null | undefined,
-): string[][] | null {
+): Command | null {
   if (cmd === null) return null;
   if (!style) return cmd;
-  return cmd.map((step) => step.map((t) => translateToken(t, style)));
+  return cmd.map((step) =>
+    step.map((alt) =>
+      alt.map((btn) => {
+        const translated = translateToken(btn.b, style);
+        if (translated === btn.b) return btn;
+        return btn.h ? { b: translated, h: true } : { b: translated };
+      }),
+    ),
+  );
 }

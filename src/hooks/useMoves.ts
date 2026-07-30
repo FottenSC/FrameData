@@ -1,39 +1,19 @@
-import { useQuery, useQueries } from "@tanstack/react-query";
+import { queryOptions, useQuery, useQueries } from "@tanstack/react-query";
+import type { Move } from "@/types/Move";
+import { clearMoveDataStringCache } from "@/lib/decodeMoveDataV2";
+import { fetchCharacterMovesDirect } from "@/lib/fetchCharacterMovesDirect";
 import {
-  Move,
-  MoveOutcome,
-  Command,
-  CommandButton,
-  CommandPress,
-} from "@/types/Move";
+  loadCharacterMovesInWorker,
+  MoveWorkerUnavailableError,
+} from "@/lib/moveDataWorkerClient";
 
 interface Character {
   id: number;
   name: string;
 }
 
-// ---------- String interning ----------
-//
-// Large characters generate thousands of Move objects whose stance/command/hit-level
-// strings are overwhelmingly drawn from a small vocabulary. Interning those common
-// short strings collapses them to a single JS heap object and cuts allocation churn
-// dramatically.
-//
-// We deliberately do NOT intern notes or unique commands (length > 40) — those
-// are almost always unique and interning them would defeat GC.
-const stringCache = new Map<string, string>();
-
 export function clearStringCache() {
-  stringCache.clear();
-}
-
-function intern(s: string | null): string | null {
-  if (s === null) return null;
-  if (s.length > 40) return s;
-  const cached = stringCache.get(s);
-  if (cached !== undefined) return cached;
-  stringCache.set(s, s);
-  return s;
+  clearMoveDataStringCache();
 }
 
 // ---------- Data fetching ----------
@@ -49,130 +29,19 @@ export async function fetchCharacterMoves(
   gameId: string,
   characterId: number,
   characterName: string,
+  signal?: AbortSignal,
 ): Promise<Move[]> {
-  const res = await fetch(
-    `/Games/${encodeURIComponent(gameId)}/Characters/${encodeURIComponent(
-      String(characterId),
-    )}.json`,
-  );
-  if (!res.ok) return [];
-  const data = await res.json();
-  if (!Array.isArray(data)) return [];
+  const url = `/Games/${encodeURIComponent(
+    gameId,
+  )}/Characters/${encodeURIComponent(String(characterId))}.json`;
+  const request = { gameId, characterId, characterName, url };
 
-  const internedCharName = intern(characterName)!;
-  return data.map((m: any) => processMove(m, characterId, internedCharName));
-}
-
-// ---------- Normalization ----------
-//
-// Character JSON is produced solely by the FrameDataFactory pipeline and
-// ships in a single canonical shape — there are no legacy on-disk variants
-// left to detect. Reading a move is a flat field-by-field copy into the
-// in-memory {@link Move}: the only work is renaming the stored PascalCase
-// keys, folding Damage/DamageDec into one object, and interning the small
-// recurring string vocabulary.
-
-/** Read a stored `string[] | null` field — drops empties, interns, null when empty. */
-function toStringArray(raw: unknown): string[] | null {
-  if (!Array.isArray(raw)) return null;
-  const out: string[] = [];
-  for (const v of raw) {
-    if (typeof v === "string" && v.length > 0) out.push(intern(v)!);
+  try {
+    return await loadCharacterMovesInWorker(request, signal);
+  } catch (error) {
+    if (!(error instanceof MoveWorkerUnavailableError)) throw error;
+    return fetchCharacterMovesDirect(request, signal);
   }
-  return out.length > 0 ? out : null;
-}
-
-/**
- * Read one stored outcome object (`Block` / `Hit` / `CounterHit`) into a
- * {@link MoveOutcome}. The pipeline always emits the structured
- * `{ advantage, tags, raw }` form; types are coerced defensively and the
- * tag codes interned (they come from a tiny shared vocabulary).
- */
-function readOutcome(stored: unknown): MoveOutcome {
-  if (!stored || typeof stored !== "object") {
-    return { advantage: null, tags: [], raw: null };
-  }
-  const s = stored as { advantage?: unknown; tags?: unknown; raw?: unknown };
-  const advantage =
-    typeof s.advantage === "number" && Number.isFinite(s.advantage)
-      ? s.advantage
-      : null;
-  const tags = Array.isArray(s.tags)
-    ? s.tags
-        .filter((t): t is string => typeof t === "string" && t.length > 0)
-        .map((t) => intern(t)!)
-    : [];
-  const raw = typeof s.raw === "string" && s.raw.length > 0 ? s.raw : null;
-  return { advantage, tags, raw };
-}
-
-/**
- * Convert a stored button leaf — always the object form `{b}` / `{b,h:true}` —
- * into a {@link CommandButton}. The token is interned so the small alphabet
- * (A / B / 6 / qcf / …) collapses to one heap entry. Returns `null` for a
- * malformed leaf.
- */
-function toButton(leaf: unknown): CommandButton | null {
-  if (!leaf || typeof leaf !== "object") return null;
-  const token = (leaf as { b?: unknown }).b;
-  if (typeof token !== "string" || token.length === 0) return null;
-  const b = intern(token)!;
-  return (leaf as { h?: unknown }).h === true ? { b, h: true } : { b };
-}
-
-/**
- * Read the stored `Command` into the in-memory {@link Command}: a three-level
- * steps × alternatives × buttons array of object leaves. Empty alternatives
- * and steps are dropped; `null` (or any non-array) yields `null`. Notation
- * translation is NOT applied here — that happens at presentation time.
- */
-function readCommand(raw: unknown): Command | null {
-  if (!Array.isArray(raw)) return null;
-  const out: Command = [];
-  for (const step of raw) {
-    if (!Array.isArray(step)) continue;
-    const alts: CommandPress[] = [];
-    for (const alt of step) {
-      if (!Array.isArray(alt)) continue;
-      const buttons: CommandButton[] = [];
-      for (const leaf of alt) {
-        const btn = toButton(leaf);
-        if (btn) buttons.push(btn);
-      }
-      if (buttons.length > 0) alts.push(buttons);
-    }
-    if (alts.length > 0) out.push(alts);
-  }
-  return out.length > 0 ? out : null;
-}
-
-/**
- * Convert one raw JSON move object into the in-memory {@link Move}. The raw
- * shape uses PascalCase keys and stores damage as two correlated fields
- * (`Damage` per-hit string + `DamageDec` total); both fold into `damage`.
- */
-function processMove(raw: any, charId: number, charName: string): Move {
-  return {
-    id: Number(raw.ID),
-    characterId: charId,
-    characterName: charName,
-    stringCommand:
-      raw.stringCommand != null ? String(raw.stringCommand) : null,
-    command: readCommand(raw.Command),
-    stance: toStringArray(raw.Stance),
-    hitLevel: toStringArray(raw.HitLevel),
-    impact: raw.Impact != null ? Number(raw.Impact) : null,
-    damage: {
-      raw: raw.Damage != null ? intern(String(raw.Damage)) : null,
-      total: raw.DamageDec != null ? Number(raw.DamageDec) : null,
-    },
-    block: readOutcome(raw.Block),
-    hit: readOutcome(raw.Hit),
-    counterHit: readOutcome(raw.CounterHit),
-    guardBurst: raw.GuardBurst != null ? Number(raw.GuardBurst) : null,
-    properties: toStringArray(raw.Properties) ?? [],
-    notes: raw.Notes != null ? String(raw.Notes) : null,
-  };
 }
 
 // ---------- Query hook ----------
@@ -195,6 +64,19 @@ function processMove(raw: any, charId: number, charName: string): Move {
 const MOVES_STALE_TIME = Infinity;
 const MOVES_GC_TIME = 1000 * 60 * 30;
 
+export function characterMovesQueryOptions(
+  gameId: string,
+  character: Character,
+) {
+  return queryOptions({
+    queryKey: ["moves", gameId, character.id] as const,
+    queryFn: ({ signal }) =>
+      fetchCharacterMoves(gameId, character.id, character.name, signal),
+    staleTime: MOVES_STALE_TIME,
+    gcTime: MOVES_GC_TIME,
+  });
+}
+
 /**
  * Shared empty-array sentinel. Returning `[]` literals every render
  * would churn referential identity and cascade through downstream
@@ -211,7 +93,7 @@ interface UseMoveOptions {
   characters: Character[];
 }
 
-interface UseMovesResult {
+export interface UseMovesResult {
   data: Move[];
   isLoading: boolean;
   isPlaceholderData: boolean;
@@ -225,6 +107,47 @@ interface UseMovesResult {
    */
   loaded: number;
   total: number;
+}
+
+interface MoveQueryResult {
+  data?: Move[];
+  error?: unknown;
+}
+
+export function combineMoveQueryResults(
+  results: readonly MoveQueryResult[],
+): UseMovesResult {
+  if (results.length === 0) {
+    return {
+      data: EMPTY_MOVES as Move[],
+      isLoading: true,
+      isPlaceholderData: false,
+      error: null,
+      loaded: 0,
+      total: 0,
+    };
+  }
+
+  const out: Move[] = [];
+  let loaded = 0;
+  let firstError: unknown = null;
+  for (const result of results) {
+    if (result.data !== undefined) {
+      out.push(...result.data);
+      loaded += 1;
+    }
+    if (!firstError && result.error) firstError = result.error;
+  }
+
+  const fullyLoaded = loaded === results.length && !firstError;
+  return {
+    data: fullyLoaded ? out : (EMPTY_MOVES as Move[]),
+    isLoading: !fullyLoaded && !firstError,
+    isPlaceholderData: false,
+    error: firstError,
+    loaded,
+    total: results.length,
+  };
 }
 
 export function useMoves({
@@ -244,16 +167,15 @@ export function useMoves({
   // refreshes. Falling through to react-query's default "no data while
   // loading" makes the FrameDataTable's existing skeleton kick in for
   // the brief loading window, which is the clearer signal.
-  const singleQuery = useQuery<Move[]>({
-    queryKey: ["moves", gameId, characterId],
-    queryFn: () => {
-      const charName =
-        characters.find((c) => c.id === characterId)?.name || "Unknown";
-      return fetchCharacterMoves(gameId!, characterId!, charName);
-    },
+  const selectedCharacter = {
+    id: characterId ?? -1,
+    name:
+      characters.find((character) => character.id === characterId)?.name ??
+      "Unknown",
+  };
+  const singleQuery = useQuery({
+    ...characterMovesQueryOptions(gameId ?? "", selectedCharacter),
     enabled: !!gameId && characterId !== null && !isAll,
-    staleTime: MOVES_STALE_TIME,
-    gcTime: MOVES_GC_TIME,
   });
 
   // "All" path. One useQuery per character running in parallel; `combine`
@@ -271,48 +193,14 @@ export function useMoves({
   const allResult = useQueries({
     queries:
       isAll && gameId
-        ? characters.map((char) => ({
-            queryKey: ["moves", gameId, char.id],
-            queryFn: () => fetchCharacterMoves(gameId, char.id, char.name),
-            staleTime: MOVES_STALE_TIME,
-            gcTime: MOVES_GC_TIME,
-          }))
+        ? characters.map((character) =>
+            characterMovesQueryOptions(gameId, character),
+          )
         : [],
-    combine: (results): UseMovesResult => {
-      if (results.length === 0) {
-        return {
-          data: EMPTY_MOVES as Move[],
-          isLoading: true,
-          isPlaceholderData: false,
-          error: null,
-          loaded: 0,
-          total: 0,
-        };
-      }
-      const out: Move[] = [];
-      let loaded = 0;
-      let firstError: unknown = null;
-      for (const r of results) {
-        if (r.data) {
-          out.push(...r.data);
-          loaded += 1;
-        }
-        if (!firstError && r.error) firstError = r.error;
-      }
-      const fullyLoaded = loaded === results.length;
-      return {
-        // Hold `data` back until the whole batch is in, then reveal all
-        // at once. See comment in earlier iteration for rationale — a
-        // progressive row-by-row reveal made the skeleton vanish too
-        // early and the table "grew" in a way users read as buggy.
-        data: fullyLoaded ? out : (EMPTY_MOVES as Move[]),
-        isLoading: !fullyLoaded,
-        isPlaceholderData: false,
-        error: firstError,
-        loaded,
-        total: results.length,
-      };
-    },
+    // Hold `data` back until the whole batch is in, then reveal all at once.
+    // Progressive row-by-row reveal made the table grow in a way users read
+    // as buggy, while the progress counters still communicate forward motion.
+    combine: combineMoveQueryResults,
   });
 
   if (isAll) return allResult;

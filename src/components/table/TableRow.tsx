@@ -14,7 +14,7 @@ interface TableRowProps {
   getStanceInfo: (stance: string, characterId: number) => any;
   getPropertyInfo: (prop: string) => PropertyInfo | null;
   badges?: Record<string, { className: string }>;
-  measureRef?: (el: HTMLTableRowElement | null) => void;
+  measureRef?: React.Ref<HTMLTableRowElement>;
   dataIndex?: number;
 }
 

@@ -23,6 +23,12 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import requests
 
+FACTORY_ROOT = Path(__file__).resolve().parent.parent
+if str(FACTORY_ROOT) not in sys.path:
+    sys.path.insert(0, str(FACTORY_ROOT))
+
+from common.move_data_v2 import build_payload, write_payload_atomic
+
 WAVU_BASE = "https://wavu.wiki"
 WAVU_API = f"{WAVU_BASE}/w/api.php"
 WAVU_FILE = f"{WAVU_BASE}/t/Special:Redirect/file"
@@ -1110,8 +1116,7 @@ def write_character_files(records: List[Dict[str, Any]],
         for idx, m in enumerate(moves, start=1):
             m["ID"] = idx
         out_path = characters_dir / f"{cid}.json"
-        with open(out_path, "w", encoding="utf-8") as f:
-            json.dump(moves, f, ensure_ascii=False, indent=2)
+        write_payload_atomic(out_path, build_payload(moves))
     print(f"  wrote {len(grouped)} character files to {characters_dir}")
 
 

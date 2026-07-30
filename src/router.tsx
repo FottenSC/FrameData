@@ -11,13 +11,25 @@ import { loadGameData } from "./lib/loadGameData";
 import { CommandProvider } from "./contexts/CommandContext";
 import { UserSettingsProvider } from "./contexts/UserSettingsContext";
 import { ToolbarProvider } from "./contexts/ToolbarContext";
-import React, { Suspense } from 'react';
+import React, { Suspense } from "react";
+import { CommandPaletteLoader } from "./components/CommandPaletteLoader";
 
 // Lazy load components
-const CommandPalette = React.lazy(() => import('./components/CommandPalette').then(m => ({ default: m.CommandPalette })))
-const GameSelectionPage = React.lazy(() => import('./components/GameSelectionPage').then(m => ({ default: m.GameSelectionPage })))
-const CharacterSelectionPage = React.lazy(() => import('./components/CharacterSelectionPage').then(m => ({ default: m.CharacterSelectionPage })))
-const FrameDataTable = React.lazy(() => import('./components/FrameDataTable').then(m => ({ default: m.FrameDataTable })))
+const GameSelectionPage = React.lazy(() =>
+  import("./components/GameSelectionPage").then((m) => ({
+    default: m.GameSelectionPage,
+  })),
+);
+const CharacterSelectionPage = React.lazy(() =>
+  import("./components/CharacterSelectionPage").then((m) => ({
+    default: m.CharacterSelectionPage,
+  })),
+);
+const FrameDataTable = React.lazy(() =>
+  import("./components/FrameDataTable").then((m) => ({
+    default: m.FrameDataTable,
+  })),
+);
 
 // Root Route (Layout)
 export const rootRoute = createRootRoute({
@@ -26,12 +38,10 @@ export const rootRoute = createRootRoute({
       <GameProvider>
         <CommandProvider>
           <ToolbarProvider>
-            <div className="min-h-screen flex flex-col bg-background text-foreground">
+            <div className="h-dvh overflow-hidden flex flex-col bg-background text-foreground">
               <Navbar />
-              <Suspense fallback={null}>
-                <CommandPalette />
-              </Suspense>
-              <main className="flex-grow">
+              <CommandPaletteLoader />
+              <main className="flex-1 min-h-0 flex flex-col overflow-hidden">
                 {/*
                   Empty Suspense fallback by design. With route chunks
                   prefetched on idle / hover from the game-selection
@@ -53,14 +63,14 @@ export const rootRoute = createRootRoute({
       </GameProvider>
     </UserSettingsProvider>
   ),
-})
+});
 
 // Index Route (Game Selection)
 export const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/',
+  path: "/",
   component: GameSelectionPage,
-})
+});
 
 // Game Route — character-selection page for one game.
 export const gameRoute = createRoute({
@@ -74,7 +84,7 @@ export const gameRoute = createRoute({
     }
   },
   component: CharacterSelectionPage,
-})
+});
 
 // Character Route — the frame-data table for one character (or "All").
 export const characterRoute = createRoute({
@@ -117,18 +127,18 @@ export const characterRoute = createRoute({
     }
   },
   component: FrameDataTable,
-})
+});
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
   gameRoute,
   characterRoute,
-])
+]);
 
-export const router = createRouter({ routeTree })
+export const router = createRouter({ routeTree });
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface Register {
-    router: typeof router
+    router: typeof router;
   }
 }

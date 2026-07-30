@@ -36,6 +36,8 @@ import type { FieldConfig, FieldType, FilterOperator } from "../filters/types";
 import { useMoves } from "@/hooks/useMoves";
 import { buildFieldAccessors } from "@/lib/moveAccessors";
 import { exportCsv, exportExcel, type ExportCell } from "@/lib/export";
+import { Toaster } from "sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export const FrameDataTable: React.FC = () => {
   // Navigation state is read straight off the route — `selectedGame` and
@@ -63,6 +65,8 @@ export const FrameDataTable: React.FC = () => {
     isLoading: movesLoading,
     isPlaceholderData,
     error: movesError,
+    loaded: loadedCharacters,
+    total: totalCharacters,
   } = useMoves({
     gameId: selectedGame?.id,
     characterId: selectedCharacterId,
@@ -87,6 +91,7 @@ export const FrameDataTable: React.FC = () => {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const [activeFilters, setActiveFilters] = useState<FilterItem[]>([]);
+  const [quickSearch, setQuickSearch] = useState("");
   // Debounce filter changes before feeding them into the (potentially
   // expensive) `displayedMoves` memo. FilterBuilder already wraps updates
   // in `startTransition`, so React can interrupt re-renders, but the
@@ -233,13 +238,27 @@ export const FrameDataTable: React.FC = () => {
     if (originalMoves.length === 0) return [];
     let result = originalMoves;
 
+    // Quick search is an independent first pass. Advanced filters only see
+    // the already-narrowed result and retain their own grouping semantics.
+    if (quickSearch.trim() !== "") {
+      const quickFilter: FilterItem = {
+        id: "__main_quick_search__",
+        type: "condition",
+        field: "input",
+        condition: "quickContains",
+        value: quickSearch,
+        value2: "",
+      };
+      result = result.filter((move) => applyFilterItem(move, quickFilter));
+    }
+
     if (debouncedActiveFilters.length > 0) {
       result = result.filter((move) =>
         debouncedActiveFilters.every((filter) => applyFilterItem(move, filter)),
       );
     }
     return result;
-  }, [originalMoves, debouncedActiveFilters, applyFilterItem]);
+  }, [originalMoves, quickSearch, debouncedActiveFilters, applyFilterItem]);
 
   const sorting = useMemo<SortingState>(
     () =>
@@ -328,9 +347,15 @@ export const FrameDataTable: React.FC = () => {
     setActiveFilters(filters);
   }, []);
 
+  const handleQuickSearchChange = useCallback((query: string) => {
+    setQuickSearch(query);
+  }, []);
+
   useEffect(() => {
-    setActiveFiltersCount(activeFilters.length);
-  }, [activeFilters.length, setActiveFiltersCount]);
+    setActiveFiltersCount(
+      activeFilters.length + (quickSearch.trim() === "" ? 0 : 1),
+    );
+  }, [activeFilters.length, quickSearch, setActiveFiltersCount]);
 
   useEffect(() => {
     exportHandler.current = handleExport;
@@ -373,66 +398,86 @@ export const FrameDataTable: React.FC = () => {
   }
 
   return (
-    <div className="h-full flex flex-col pl-4 pr-4 grow">
-      {selectedCharacterId ? (
-        <div className="h-full flex flex-col overflow-hidden">
-          <div className="pb-0 shrink-0">
-            {movesLoading && originalMoves.length === 0 ? (
-              <div className="flex flex-wrap gap-2 p-4 border rounded-lg bg-card/50">
+    <TooltipProvider
+      delayDuration={150}
+      skipDelayDuration={500}
+      disableHoverableContent
+    >
+      <Toaster position="top-left" theme="dark" richColors />
+      <div className="h-full flex flex-col pl-4 pr-4 grow">
+        {selectedCharacterId ? (
+          <div className="h-full flex flex-col overflow-hidden">
+            <div className="pb-0 shrink-0">
+              {movesLoading && originalMoves.length === 0 ? (
+                <div className="flex flex-wrap gap-2 p-4 border rounded-lg bg-card/50">
+                  <Skeleton className="h-10 w-32" />
+                  <Skeleton className="h-10 w-48" />
+                  <Skeleton className="h-10 w-24" />
+                  {selectedCharacterId === -1 && totalCharacters > 0 && (
+                    <p
+                      className="basis-full text-sm text-muted-foreground"
+                      role="status"
+                      aria-live="polite"
+                    >
+                      Loading character data… {loadedCharacters}/
+                      {totalCharacters}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <FilterBuilder
+                  onFiltersChange={handleFiltersChange}
+                  onQuickSearchChange={handleQuickSearchChange}
+                />
+              )}
+            </div>
+            <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+              <div
+                className={cn(
+                  "flex-1 min-h-0 h-full",
+                  (isStale || isPlaceholderData) &&
+                    "opacity-70 transition-opacity",
+                )}
+              >
+                <FrameDataTableContent
+                  moves={deferredMoves}
+                  movesLoading={movesLoading || isStale || isPlaceholderData}
+                  sortColumn={sortColumn}
+                  sortDirection={sortDirection}
+                  handleSort={handleSort}
+                  renderCommand={renderCommand}
+                  renderNotes={renderNotes}
+                  visibleColumns={deferredVisibleColumns}
+                  badges={selectedGame.badges}
+                  isAllCharacters={deferredSelectedCharacterId === -1}
+                />
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="h-full flex flex-col pt-2">
+            <div className="p-4 border rounded-lg bg-card/50 mb-4">
+              <div className="flex flex-wrap gap-2">
                 <Skeleton className="h-10 w-32" />
                 <Skeleton className="h-10 w-48" />
                 <Skeleton className="h-10 w-24" />
               </div>
-            ) : (
-              <FilterBuilder onFiltersChange={handleFiltersChange} />
-            )}
-          </div>
-          <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
-            <div
-              className={cn(
-                "flex-1 min-h-0 h-full",
-                (isStale || isPlaceholderData) &&
-                  "opacity-70 transition-opacity",
-              )}
-            >
-              <FrameDataTableContent
-                moves={deferredMoves}
-                movesLoading={movesLoading || isStale || isPlaceholderData}
-                sortColumn={sortColumn}
-                sortDirection={sortDirection}
-                handleSort={handleSort}
-                renderCommand={renderCommand}
-                renderNotes={renderNotes}
-                visibleColumns={deferredVisibleColumns}
-                badges={selectedGame.badges}
-                isAllCharacters={deferredSelectedCharacterId === -1}
-              />
+            </div>
+            <div className="flex-1 border rounded-lg overflow-hidden">
+              <div className="p-4 space-y-4">
+                {Array.from({ length: 10 }).map((_, i) => (
+                  <div key={i} className="flex gap-4">
+                    <Skeleton className="h-8 flex-1" />
+                    <Skeleton className="h-8 flex-1" />
+                    <Skeleton className="h-8 flex-1" />
+                    <Skeleton className="h-8 flex-1" />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      ) : (
-        <div className="h-full flex flex-col pt-2">
-          <div className="p-4 border rounded-lg bg-card/50 mb-4">
-            <div className="flex flex-wrap gap-2">
-              <Skeleton className="h-10 w-32" />
-              <Skeleton className="h-10 w-48" />
-              <Skeleton className="h-10 w-24" />
-            </div>
-          </div>
-          <div className="flex-1 border rounded-lg overflow-hidden">
-            <div className="p-4 space-y-4">
-              {Array.from({ length: 10 }).map((_, i) => (
-                <div key={i} className="flex gap-4">
-                  <Skeleton className="h-8 flex-1" />
-                  <Skeleton className="h-8 flex-1" />
-                  <Skeleton className="h-8 flex-1" />
-                  <Skeleton className="h-8 flex-1" />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </TooltipProvider>
   );
 };

@@ -196,9 +196,9 @@ export function formatCommandFlat(cmd: Command | null): string | null {
 }
 
 /**
- * Outcome-tag "search string" used by text filters. Joins parsed tags with the
- * raw authored string so queries like "contains KND" find both structured tag
- * matches and unusual author variations ("BREAK", "knockdown", etc.).
+ * Outcome-tag "search string" used by text filters. V2 omits raw text when it
+ * is exactly reconstructible from advantage/tags, so any raw value present
+ * here is exceptional authored context worth retaining in search/export.
  */
 const outcomeTagSearchString = (o: MoveOutcome): string | null => {
   const parts: string[] = [];
@@ -246,13 +246,57 @@ export interface FieldAccessor {
 export function buildFieldAccessors(
   style: NotationStyle | null | undefined,
 ): Record<string, FieldAccessor> {
+  const translatedCommandCache = new WeakMap<Move, Command | null>();
+  const commandSearchTokensCache = new WeakMap<Move, string[] | null>();
+  const inputSearchTokensCache = new WeakMap<Move, string[] | null>();
+
   /**
    * Get the command in the user's current notation. Called from every
    * command-touching accessor so translation is centralised. `null` in →
    * `null` out, mirroring the underlying field.
    */
-  const cmdInStyle = (m: Move): Command | null =>
-    translateCommand(m.command, style);
+  const cmdInStyle = (m: Move): Command | null => {
+    if (translatedCommandCache.has(m)) {
+      return translatedCommandCache.get(m) ?? null;
+    }
+    const translated = translateCommand(m.command, style);
+    translatedCommandCache.set(m, translated);
+    return translated;
+  };
+
+  const commandSearchTokens = (m: Move): string[] | null => {
+    if (commandSearchTokensCache.has(m)) {
+      return commandSearchTokensCache.get(m) ?? null;
+    }
+
+    const translated = cmdInStyle(m);
+    if (!translated || translated.length === 0) {
+      commandSearchTokensCache.set(m, null);
+      return null;
+    }
+
+    const styleExpansions = expandCommandWithMotions(translated, style);
+    const universalExpansions = expandCommandWithMotions(m.command, null);
+    const merged = [...new Set([...styleExpansions, ...universalExpansions])];
+    const result = merged.length > 0 ? merged : null;
+    commandSearchTokensCache.set(m, result);
+    return result;
+  };
+
+  const inputSearchTokens = (m: Move): string[] | null => {
+    if (inputSearchTokensCache.has(m)) {
+      return inputSearchTokensCache.get(m) ?? null;
+    }
+
+    const stancePart = joinOrNull(m.stance, " ") ?? "";
+    const commandTokens = commandSearchTokens(m) ?? [""];
+    const tokens = commandTokens.map((command) =>
+      stancePart ? `${stancePart} ${command}` : command,
+    );
+    const result = tokens.length > 0 ? tokens : null;
+    inputSearchTokensCache.set(m, result);
+    return result;
+  };
 
   return {
     character: {
@@ -293,16 +337,7 @@ export function buildFieldAccessors(
       // FBUD is a letter, because the universal numpad form is in the
       // search corpus regardless of display style. The only memory cost is
       // a few extra strings per row; substring-search dedups naturally.
-      filterTokens: (m) => {
-        const translated = cmdInStyle(m);
-        if (!translated || translated.length === 0) return null;
-        const styleExpansions = expandCommandWithMotions(translated, style);
-        const universalExpansions = expandCommandWithMotions(m.command, null);
-        const merged = [
-          ...new Set([...styleExpansions, ...universalExpansions]),
-        ];
-        return merged.length > 0 ? merged : null;
-      },
+      filterTokens: commandSearchTokens,
       exportValue: (m) => formatCommandFlat(cmdInStyle(m)) ?? "",
     },
 
@@ -331,21 +366,7 @@ export function buildFieldAccessors(
         [joinOrNull(m.stance, " "), formatCommandFlat(cmdInStyle(m))]
           .filter(Boolean)
           .join(" ") || null,
-      filterTokens: (m) => {
-        const stancePart = joinOrNull(m.stance, " ") ?? "";
-        // Mirror the `command` accessor: emit BOTH the active-style and
-        // the universal-form expansions so any notation a user types
-        // (FBUD letters, numpad, ABCD, shorthand) lands in the haystack.
-        const styleExpansions = expandCommandWithMotions(cmdInStyle(m), style);
-        const universalExpansions = expandCommandWithMotions(m.command, null);
-        const merged = [
-          ...new Set([...styleExpansions, ...universalExpansions]),
-        ];
-        const tokens = merged.map((cmd) =>
-          stancePart ? `${stancePart} ${cmd}` : cmd,
-        );
-        return tokens.length > 0 ? tokens : null;
-      },
+      filterTokens: inputSearchTokens,
       exportValue: (m) =>
         [joinOrNull(m.stance, " "), formatCommandFlat(cmdInStyle(m))]
           .filter(Boolean)
@@ -389,8 +410,7 @@ export function buildFieldAccessors(
       sortValue: (m) => outcomeTagSearchString(m.block),
       sortType: "string",
       filterString: (m) => outcomeTagSearchString(m.block),
-      filterTokens: (m) =>
-        m.block.tags.length > 0 ? [...m.block.tags] : null,
+      filterTokens: (m) => (m.block.tags.length > 0 ? [...m.block.tags] : null),
       exportValue: (m) => outcomeTagSearchString(m.block) ?? "",
     },
 
@@ -439,8 +459,7 @@ export function buildFieldAccessors(
       sortType: "string",
       filterString: (m) =>
         m.properties.length > 0 ? m.properties.join(" ") : null,
-      filterTokens: (m) =>
-        m.properties.length > 0 ? [...m.properties] : null,
+      filterTokens: (m) => (m.properties.length > 0 ? [...m.properties] : null),
       exportValue: (m) =>
         m.properties.length > 0 ? m.properties.join(", ") : "",
     },
@@ -453,4 +472,3 @@ export function buildFieldAccessors(
     },
   };
 }
-

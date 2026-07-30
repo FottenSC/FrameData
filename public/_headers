@@ -1,0 +1,8 @@
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/Games/*
+  Cache-Control: public, max-age=3600, must-revalidate
+
+/Icons/*
+  Cache-Control: public, max-age=3600, must-revalidate

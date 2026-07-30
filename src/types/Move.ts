@@ -7,9 +7,9 @@
  * like "+28 on hit, knocks down" as a single structured value rather than
  * munging them into a free-form string.
  *
- * The raw JSON stores these as PascalCase fields with structured outcome
- * objects; `processMove` in `useMoves` reads that shape into this in-memory
- * representation.
+ * Character JSON uses the sparse camelCase V2 transport shape.
+ * `decodeCharacterMovesV2` fills omitted defaults and injects character
+ * identity into this in-memory representation.
  */
 
 /**
@@ -62,7 +62,7 @@ export interface Move {
    *     ]
    *
    * On disk the command is stored in exactly this three-level object-leaf
-   * shape; `readCommand` in useMoves validates and reads it on load.
+   * shape; the V2 decoder validates and reads it on load.
    */
   command: Command | null;
   stance: string[] | null;

@@ -208,8 +208,20 @@ export const NOTATION_STYLES: NotationStyle[] = [
     // treats it as a first-class direction (compact text chip with the
     // expansion in the tooltip) rather than trying to parse it as a button.
     directionTokens: [
-      "F", "B", "U", "D", "UF", "UB", "DF", "DB", "N",
-      "qcf", "qcb", "hcf", "hcb", "dp",
+      "F",
+      "B",
+      "U",
+      "D",
+      "UF",
+      "UB",
+      "DF",
+      "DB",
+      "N",
+      "qcf",
+      "qcb",
+      "hcf",
+      "hcb",
+      "dp",
     ],
     directionRenderMode: "text",
     replacements: {
@@ -326,6 +338,7 @@ export function translateToken(
   style: NotationStyle | null | undefined,
 ): string {
   if (!style) return token;
+  if (isMotionShorthand(token)) return token;
   const regex = getRegexFor(style.replacements);
   if (!regex) return token;
   let cache = tokenCache.get(style);
@@ -374,7 +387,7 @@ export function translateCommand(
   style: NotationStyle | null | undefined,
 ): Command | null {
   if (cmd === null) return null;
-  if (!style) return cmd;
+  if (!style || !getRegexFor(style.replacements)) return cmd;
   return cmd.map((step) =>
     step.map((alt) =>
       alt.map((btn) => {

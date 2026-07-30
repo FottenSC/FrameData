@@ -78,7 +78,7 @@ export default defineConfig({
     },
   },
   build: {
-    sourcemap: true,
+    sourcemap: false,
     // Vite's default is 500 KB; the frame-data table UI plus its vendor
     // deps (react, tanstack, radix, dnd-kit, cmdk, lucide) comfortably
     // exceed that without being a real problem. Bump the warning so the
@@ -120,20 +120,8 @@ export default defineConfig({
           ) {
             return "vendor-table";
           }
-          if (id.includes("@radix-ui")) {
-            return "vendor-radix";
-          }
           if (id.includes("@dnd-kit")) {
             return "vendor-dnd";
-          }
-          if (id.includes("lucide-react")) {
-            return "vendor-icons";
-          }
-          if (id.includes("cmdk")) {
-            return "vendor-cmdk";
-          }
-          if (id.includes("sonner")) {
-            return "vendor-sonner";
           }
           if (id.includes("fflate")) {
             return "vendor-fflate";

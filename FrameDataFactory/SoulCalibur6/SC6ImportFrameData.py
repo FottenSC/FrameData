@@ -6,6 +6,12 @@ import os
 import json
 from pathlib import Path
 
+FACTORY_ROOT = Path(__file__).resolve().parent.parent
+if str(FACTORY_ROOT) not in sys.path:
+    sys.path.insert(0, str(FACTORY_ROOT))
+
+from common.move_data_v2 import build_payload, write_payload_atomic
+
 
 def project_root() -> Path:
     return Path(sys.path[0]).parent.parent
@@ -793,8 +799,7 @@ for c in characters_manifest:
     cname = c["name"]
     moves_df = frameData[frameData["Character"] == cname]
     moves_list = [move_row_to_dict(row) for _, row in moves_df.iterrows()]
-    with open(moves_dir / f"{cid}.json", "w", encoding="utf-8") as f:
-        json.dump(moves_list, f, ensure_ascii=False, indent=2)
+    write_payload_atomic(moves_dir / f"{cid}.json", build_payload(moves_list))
 
 
 print("Soulcalibur6 frame data export complete.")

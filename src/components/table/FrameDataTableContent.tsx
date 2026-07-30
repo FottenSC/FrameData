@@ -18,6 +18,7 @@ import { TableRow } from "./TableRow";
 import { FrameDataTableHeader } from "./FrameDataTableHeader";
 
 const PAGE_SIZE = 300;
+const getMoveKey = (move: Move): string => `${move.characterId}:${move.id}`;
 
 interface DataTableContentProps {
   moves: Move[];
@@ -117,6 +118,13 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
     const start = currentPage * PAGE_SIZE;
     return moves.slice(start, start + PAGE_SIZE);
   }, [moves, usePagination, currentPage]);
+  const getItemKey = useCallback(
+    (index: number) => {
+      const move = displayMoves[index];
+      return move ? getMoveKey(move) : index;
+    },
+    [displayMoves],
+  );
 
   // Page change handler
   const handlePageChange = (page: number) => {
@@ -129,6 +137,7 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
     count: displayMoves.length,
     getScrollElement: () => scrollContainer,
     estimateSize: () => 40,
+    getItemKey,
     overscan: 15,
   });
 
@@ -233,7 +242,7 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
         <>
           {slice.map((move) => (
             <TableRow
-              key={`${move.characterId}-${move.id}`}
+              key={getMoveKey(move)}
               move={move}
               visibleColumns={visibleColumns}
               renderCommand={renderCommand}
@@ -298,7 +307,7 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
           const move = displayMoves[virtualRow.index]!;
           return (
             <TableRow
-              key={`${move.characterId}-${move.id}`}
+              key={virtualRow.key}
               move={move}
               visibleColumns={visibleColumns}
               renderCommand={renderCommand}
@@ -308,9 +317,7 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
               getPropertyInfo={getPropertyInfo}
               badges={badges}
               dataIndex={virtualRow.index}
-              measureRef={(el) => {
-                if (el) rowVirtualizer.measureElement(el);
-              }}
+              measureRef={rowVirtualizer.measureElement}
             />
           );
         })}

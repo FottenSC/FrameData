@@ -219,6 +219,7 @@ export function getGameFilterConfig(
    */
   const normalizeQuick = (s: string): string =>
     s.replace(/[^a-zA-Z0-9+]/g, "").toLowerCase();
+  const normalizedQuickTokenCache = new WeakMap<string[], string[]>();
 
   const quickContainsOperator: FilterOperator = {
     id: "quickContains",
@@ -229,7 +230,12 @@ export function getGameFilterConfig(
       const needle = normalizeQuick(value ?? "");
       if (!needle) return true;
       if (fieldTokens && fieldTokens.length > 0) {
-        return fieldTokens.some((t) => normalizeQuick(t).includes(needle));
+        let normalizedTokens = normalizedQuickTokenCache.get(fieldTokens);
+        if (!normalizedTokens) {
+          normalizedTokens = fieldTokens.map(normalizeQuick);
+          normalizedQuickTokenCache.set(fieldTokens, normalizedTokens);
+        }
+        return normalizedTokens.some((token) => token.includes(needle));
       }
       return normalizeQuick(fieldString ?? "").includes(needle);
     },
@@ -276,18 +282,14 @@ export function getGameFilterConfig(
           ],
         };
       case "hitLevel":
-        return hitLevelOptions.length > 0
-          ? withOptions(f, hitLevelOptions)
-          : f;
+        return hitLevelOptions.length > 0 ? withOptions(f, hitLevelOptions) : f;
       case "stance":
         return stanceOptions.length > 0 ? withOptions(f, stanceOptions) : f;
       case "properties":
       case "hitTags":
       case "counterHitTags":
       case "blockTags":
-        return propertyOptions.length > 0
-          ? withOptions(f, propertyOptions)
-          : f;
+        return propertyOptions.length > 0 ? withOptions(f, propertyOptions) : f;
       case "character":
         return characterOptions.length > 0
           ? withOptions(f, characterOptions)

@@ -18,6 +18,16 @@ import type { PropertyInfo } from "@/contexts/GameContext";
 
 type BadgeMap = Record<string, { className: string }>;
 
+interface DerivedMoveProperties {
+  propertySet: ReadonlySet<string>;
+  entries: ReadonlyArray<{
+    tag: string;
+    sources: PropertySources;
+  }>;
+}
+
+const derivedPropertiesCache = new WeakMap<Move, DerivedMoveProperties>();
+
 interface MoveTableCellProps {
   move: Move;
   columnId: string;
@@ -50,7 +60,7 @@ interface MoveTableCellProps {
 function renderOutcomeCell(
   advantage: number | null,
   tags: string[],
-  moveProperties: string[],
+  moveProperties: ReadonlySet<string>,
   sources: PropertySources,
   getPropertyInfo: (prop: string) => PropertyInfo | null,
   badges: BadgeMap | undefined,
@@ -62,8 +72,7 @@ function renderOutcomeCell(
   // UA, for instance, is echoed into every outcome's tags array by the
   // data pipeline so per-channel filters work — but the Properties column
   // is where it belongs visually.
-  const propertySet = new Set(moveProperties);
-  const outcomeOnlyTags = tags.filter((t) => !propertySet.has(t));
+  const outcomeOnlyTags = tags.filter((t) => !moveProperties.has(t));
   if (outcomeOnlyTags.length > 0) {
     return (
       <div className="flex flex-wrap gap-0.5 justify-center">
@@ -91,10 +100,11 @@ function renderOutcomeCell(
  * Order: move-wide properties first (so UA / BA / GI etc. stay stable at the
  * left), then outcome-only tags in insertion order.
  */
-function aggregateProperties(move: Move): Array<{
-  tag: string;
-  sources: PropertySources;
-}> {
+function getDerivedMoveProperties(move: Move): DerivedMoveProperties {
+  const cached = derivedPropertiesCache.get(move);
+  if (cached) return cached;
+
+  const propertySet = new Set(move.properties);
   const map = new Map<string, PropertySources>();
 
   for (const p of move.properties) {
@@ -114,7 +124,15 @@ function aggregateProperties(move: Move): Array<{
     map.set(t, { ...prev, onBlock: true });
   }
 
-  return Array.from(map.entries()).map(([tag, sources]) => ({ tag, sources }));
+  const derived: DerivedMoveProperties = {
+    propertySet,
+    entries: Array.from(map.entries()).map(([tag, sources]) => ({
+      tag,
+      sources,
+    })),
+  };
+  derivedPropertiesCache.set(move, derived);
+  return derived;
 }
 
 export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
@@ -223,35 +241,41 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
       //
       // Players keep a quick visual for pure-tag outcomes (e.g. "KND on
       // hit, no number"), without any cross-column colour mismatch.
-      case "block":
+      case "block": {
+        const { propertySet } = getDerivedMoveProperties(move);
         return renderOutcomeCell(
           move.block.advantage,
           move.block.tags,
-          move.properties,
+          propertySet,
           { onBlock: true },
           getPropertyInfo,
           badges,
         );
+      }
 
-      case "hit":
+      case "hit": {
+        const { propertySet } = getDerivedMoveProperties(move);
         return renderOutcomeCell(
           move.hit.advantage,
           move.hit.tags,
-          move.properties,
+          propertySet,
           { onHit: true },
           getPropertyInfo,
           badges,
         );
+      }
 
-      case "counterHit":
+      case "counterHit": {
+        const { propertySet } = getDerivedMoveProperties(move);
         return renderOutcomeCell(
           move.counterHit.advantage,
           move.counterHit.tags,
-          move.properties,
+          propertySet,
           { onCounterHit: true },
           getPropertyInfo,
           badges,
         );
+      }
 
       case "guardBurst":
         // Same colour treatment as Block: green for positive values,
@@ -265,7 +289,7 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
       // ---   hit / counter-hit / block. A chip's tooltip tells you which
       // ---   channel(s) the tag fires on.
       case "properties": {
-        const entries = aggregateProperties(move);
+        const { entries } = getDerivedMoveProperties(move);
         if (entries.length === 0) return <>—</>;
         return (
           <div className="flex flex-wrap gap-0.5">

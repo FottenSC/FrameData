@@ -35,7 +35,7 @@ import { TableConfigurator } from "@/components/TableConfigurator";
 import { CreditsContent } from "@/components/CreditsContent";
 import { avaliableGames } from "@/contexts/GameContext";
 import { useQueryClient } from "@tanstack/react-query";
-import { fetchCharacterMoves } from "@/hooks/useMoves";
+import { characterMovesQueryOptions } from "@/hooks/useMoves";
 
 export function CommandPalette() {
   const queryClient = useQueryClient();
@@ -95,12 +95,9 @@ export function CommandPalette() {
     }
 
     prefetchTimeoutRef.current = setTimeout(() => {
-      queryClient.prefetchQuery({
-        queryKey: ["moves", selectedGame.id, character.id],
-        queryFn: () =>
-          fetchCharacterMoves(selectedGame.id, character.id, character.name),
-        staleTime: 1000 * 60 * 5, // 5 minutes
-      });
+      void queryClient.prefetchQuery(
+        characterMovesQueryOptions(selectedGame.id, character),
+      );
     }, 150); // 150ms delay to avoid prefetching while scrolling/moving mouse quickly
   };
 
@@ -121,18 +118,6 @@ export function CommandPalette() {
   const showCredits = currentView === "credits";
 
   // TableConfigurator manages its own state
-
-  React.useEffect(() => {
-    const down = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        setOpen(!open);
-      }
-    };
-
-    document.addEventListener("keydown", down);
-    return () => document.removeEventListener("keydown", down);
-  }, [open, setOpen]);
 
   const handleCharacterSelect = (characterId: number) => {
     // setSelectedCharacterId navigates; closing the palette is all that's

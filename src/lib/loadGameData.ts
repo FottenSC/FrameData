@@ -296,32 +296,3 @@ export function prefetchGameData(gameId: string): void {
     /* prefetch errors are silent — the real load will surface them */
   });
 }
-
-/**
- * Pre-warm the browser HTTP cache with all character thumbnail URLs for a
- * given game. Used on hover of a game tile so that, by the time the
- * character-selection grid mounts, the 30-odd `<img>` tags resolve from
- * cache instead of kicking off a fresh concurrent download cascade.
- *
- * Uses the Image constructor rather than `<link rel="preload">` because
- * image preloads are subject to `as="image"` + `imagesrcset` matching
- * rules that are fiddly to get right from JS; `new Image()` with a `src`
- * reliably triggers a regular image fetch that the subsequent `<img>`
- * tag will pick up from cache.
- */
-export function prefetchCharacterImages(gameId: string): void {
-  const cached = gameDataCache.get(gameId);
-  if (!cached) return;
-  cached
-    .then((data) => {
-      for (const c of data.characters) {
-        if (!c.image) continue;
-        const img = new Image();
-        img.decoding = "async";
-        img.src = c.image;
-      }
-    })
-    .catch(() => {
-      /* swallow — a real load will surface any error */
-    });
-}

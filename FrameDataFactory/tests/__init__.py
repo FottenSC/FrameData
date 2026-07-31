@@ -1,1 +1,0 @@
-"""FrameDataFactory test suite."""

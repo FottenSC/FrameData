@@ -353,11 +353,11 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
   // The two setters are navigation-only: `selectedGame` and
   // `selectedCharacterId` are derived from the resulting URL, so there is
-  // no local state to write. Two layers of smoothing wrap the navigation:
+  // no local state to write. Game selection uses two layers of smoothing:
   //   1. `withViewTransition` gives the BROWSER a cross-fade — it snapshots
   //      old DOM, runs the navigation, snapshots new DOM, animates between
   //      them. A no-op on browsers without the View Transitions API.
-  //   2. `React.startTransition` marks the route swap non-urgent so
+  //   2. `React.startTransition` marks the game route swap non-urgent so
   //      Suspense boundaries keep the previous route mounted until the
   //      next one is ready instead of flashing a fallback.
   const handleSetSelectedGameById = useCallback(
@@ -385,11 +385,13 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
         if (!name) return;
         to = `/${selectedGame.id}/${encodeURIComponent(name)}`;
       }
-      withViewTransition(() => {
-        React.startTransition(() => {
-          navigate({ to });
-        });
-      });
+      // Character swaps are deliberately urgent. Wrapping this navigation in
+      // startTransition/viewTransition allowed a fast move-data request to
+      // finish before React committed the loading render, so the existing
+      // table skeleton was skipped and the previous character remained on
+      // screen. An immediate route update lets the cold-query skeleton render;
+      // cached character data still appears without a loading flash.
+      void navigate({ to });
     },
     [navigate, selectedGame.id, characters],
   );

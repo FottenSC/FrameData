@@ -300,6 +300,13 @@ export const FrameDataTable: React.FC = () => {
   const deferredSelectedCharacterId = useDeferredValue(selectedCharacterId);
   const deferredVisibleColumns = useDeferredValue(visibleColumns);
   const isStale = deferredMoves !== displayedMoves;
+  // A character swap starts with an empty query result. Do not let the
+  // deferred value keep the previous character's rows mounted during that
+  // cold load, otherwise FrameDataTableContent never reaches its skeleton
+  // branch. Cached characters still render immediately because movesLoading
+  // is false for them.
+  const showMoveSkeleton = movesLoading && originalMoves.length === 0;
+  const tableMoves = showMoveSkeleton ? originalMoves : deferredMoves;
 
   const handleExport = useCallback(
     (format: "csv" | "excel") => {
@@ -435,12 +442,13 @@ export const FrameDataTable: React.FC = () => {
               <div
                 className={cn(
                   "flex-1 min-h-0 h-full",
-                  (isStale || isPlaceholderData) &&
+                  !showMoveSkeleton &&
+                    (isStale || isPlaceholderData) &&
                     "opacity-70 transition-opacity",
                 )}
               >
                 <FrameDataTableContent
-                  moves={deferredMoves}
+                  moves={tableMoves}
                   movesLoading={movesLoading || isStale || isPlaceholderData}
                   sortColumn={sortColumn}
                   sortDirection={sortDirection}

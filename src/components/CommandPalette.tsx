@@ -164,9 +164,9 @@ export function CommandPalette() {
                     ? `Search ${avaliableGames.length} games...`
                     : showNotationMappings
                       ? "Toggle notation mappings..."
-                    : showSettings
-                      ? "Settings..."
-                      : showCredits
+                      : showSettings
+                        ? "Settings..."
+                        : showCredits
                           ? "Credits..."
                           : "Type a command or search..."
             }
@@ -329,20 +329,13 @@ export function CommandPalette() {
                   keywords={["cards", "table", "mobile", "layout"]}
                   aria-pressed={cardLayoutEnabled}
                   onSelect={() => setCardLayoutEnabled(!cardLayoutEnabled)}
-                  className="items-start py-3"
                 >
-                  <LayoutGrid className="mr-2 mt-0.5 h-4 w-4" />
-                  <div className="flex min-w-0 flex-1 flex-col">
-                    <span>Move card layout</span>
-                    <span className="text-[11px] leading-4 text-muted-foreground">
-                      Defaults on for mobile and off for desktop. Your choice is
-                      remembered.
-                    </span>
-                  </div>
+                  <LayoutGrid className="mr-2 h-4 w-4" />
+                  <span className="min-w-0 flex-1">Card layout</span>
                   <div
                     aria-hidden="true"
                     className={cn(
-                      "relative mt-0.5 h-5 w-9 shrink-0 rounded-full border transition-colors",
+                      "relative h-5 w-9 shrink-0 rounded-full border transition-colors",
                       cardLayoutEnabled
                         ? "border-primary bg-primary"
                         : "border-border bg-muted",

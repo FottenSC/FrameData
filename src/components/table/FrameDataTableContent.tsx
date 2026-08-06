@@ -277,7 +277,7 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
                 <div
                   role="table"
                   aria-label="Sortable frame data columns"
-                  className="mx-2 overflow-hidden rounded-b-md border-x border-b border-card-border bg-muted/30"
+                  className="mx-auto w-[calc(100%_-_1rem)] max-w-[35rem] overflow-hidden rounded-b-md border-x border-b border-card-border bg-muted/30"
                 >
                   <div
                     role="row"
@@ -324,7 +324,9 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
                 </div>
               </div>
             )}
-            <div className="space-y-2 p-2">{renderCardBody()}</div>
+            <div className="relative z-0 mx-auto w-full max-w-xl space-y-2 p-2">
+              {renderCardBody()}
+            </div>
           </>
         ) : (
           <Table>

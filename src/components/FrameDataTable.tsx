@@ -51,7 +51,8 @@ export const FrameDataTable: React.FC = () => {
     hitLevels,
   } = useGame();
 
-  const { getVisibleColumns, updateColumnVisibility } = useTableConfig();
+  const { getVisibleColumns, updateColumnVisibility, cardLayoutEnabled } =
+    useTableConfig();
   const {
     setActiveFiltersCount,
     exportHandler,
@@ -299,6 +300,10 @@ export const FrameDataTable: React.FC = () => {
   const deferredMoves = useDeferredValue(displayedMoves);
   const deferredSelectedCharacterId = useDeferredValue(selectedCharacterId);
   const deferredVisibleColumns = useDeferredValue(visibleColumns);
+  // Keep the settings control responsive while React replaces as many as 300
+  // table rows with cards (or vice versa). The old layout remains visible for
+  // the brief transition instead of making the input wait on that render.
+  const deferredCardLayoutEnabled = useDeferredValue(cardLayoutEnabled);
   const isStale = deferredMoves !== displayedMoves;
   // A character swap starts with an empty query result. Do not let the
   // deferred value keep the previous character's rows mounted during that
@@ -458,6 +463,7 @@ export const FrameDataTable: React.FC = () => {
                   visibleColumns={deferredVisibleColumns}
                   badges={selectedGame.badges}
                   isAllCharacters={deferredSelectedCharacterId === -1}
+                  useCardLayout={deferredCardLayoutEnabled}
                 />
               </div>
             </div>

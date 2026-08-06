@@ -6,6 +6,44 @@ const TooltipProvider = TooltipPrimitive.Provider;
 const Tooltip = TooltipPrimitive.Root;
 const TooltipTrigger = TooltipPrimitive.Trigger;
 
+interface InteractiveTooltipProps {
+  trigger: React.ReactNode;
+  children: React.ReactNode;
+}
+
+/**
+ * Keeps the usual hover/focus tooltip behavior, and adds tap-to-toggle for
+ * devices that do not have a hover-capable pointer.
+ */
+const InteractiveTooltip: React.FC<InteractiveTooltipProps> = ({
+  trigger,
+  children,
+}) => {
+  const [open, setOpen] = React.useState(false);
+
+  const handleClick = () => {
+    if (window.matchMedia("(hover: none)").matches) {
+      setOpen((current) => !current);
+    }
+  };
+
+  return (
+    <Tooltip open={open} onOpenChange={setOpen}>
+      <TooltipTrigger asChild>
+        <button
+          type="button"
+          className="inline-flex appearance-none border-0 bg-transparent p-0 text-inherit"
+          onClick={handleClick}
+          aria-expanded={open}
+        >
+          {trigger}
+        </button>
+      </TooltipTrigger>
+      <TooltipContent>{children}</TooltipContent>
+    </Tooltip>
+  );
+};
+
 const TooltipContent = React.forwardRef<
   React.ElementRef<typeof TooltipPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content> & {
@@ -46,4 +84,10 @@ const TooltipContent = React.forwardRef<
 );
 TooltipContent.displayName = TooltipPrimitive.Content.displayName;
 
-export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider };
+export {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
+  InteractiveTooltip,
+};

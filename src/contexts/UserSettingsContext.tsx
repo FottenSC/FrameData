@@ -187,6 +187,11 @@ interface UserSettingsContextType {
   /** Set (or replace) the active style id for a game. */
   setNotationStyle: (gameId: string, styleId: string) => void;
 
+  /** Render frame data as cards instead of a table. */
+  cardLayoutEnabled: boolean;
+  /** Save an explicit layout choice, overriding the responsive default. */
+  setCardLayoutEnabled: (enabled: boolean) => void;
+
   // Table config
   columnConfigs: ColumnConfig[];
   setColumnConfigs: React.Dispatch<React.SetStateAction<ColumnConfig[]>>;
@@ -208,6 +213,43 @@ interface UserSettingsProviderProps {
 export const UserSettingsProvider: React.FC<UserSettingsProviderProps> = ({
   children,
 }) => {
+  // Card layout defaults to the viewport: on below the `md` breakpoint and
+  // off above it. We only store an explicit user choice, so a first visit on
+  // desktop still gets the table and a first visit on mobile gets cards.
+  const [cardLayoutOverride, setCardLayoutOverride] = useState<boolean | null>(
+    () => {
+      try {
+        const saved = localStorage.getItem("cardLayoutEnabled");
+        if (saved === "true") return true;
+        if (saved === "false") return false;
+      } catch {
+        // Fall through to the responsive default.
+      }
+      return null;
+    },
+  );
+  const [isMobileViewport, setIsMobileViewport] = useState(
+    () => window.matchMedia("(max-width: 767px)").matches,
+  );
+
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 767px)");
+    const handleChange = (event: MediaQueryListEvent) =>
+      setIsMobileViewport(event.matches);
+    setIsMobileViewport(query.matches);
+    query.addEventListener("change", handleChange);
+    return () => query.removeEventListener("change", handleChange);
+  }, []);
+
+  const cardLayoutEnabled = cardLayoutOverride ?? isMobileViewport;
+  const setCardLayoutEnabled = useCallback((enabled: boolean) => {
+    setCardLayoutOverride(enabled);
+    try {
+      localStorage.setItem("cardLayoutEnabled", String(enabled));
+    } catch {
+      // The in-memory preference still works when storage is unavailable.
+    }
+  }, []);
   // --- Notation style (one per game) ---------------------------------------
   //
   // Stored as `{ [gameId]: styleId }`. Initial read also migrates the legacy
@@ -351,6 +393,8 @@ export const UserSettingsProvider: React.FC<UserSettingsProviderProps> = ({
       notationStyleByGame,
       getNotationStyleId,
       setNotationStyle,
+      cardLayoutEnabled,
+      setCardLayoutEnabled,
       columnConfigs,
       setColumnConfigs,
       updateColumnVisibility,
@@ -363,6 +407,8 @@ export const UserSettingsProvider: React.FC<UserSettingsProviderProps> = ({
       notationStyleByGame,
       getNotationStyleId,
       setNotationStyle,
+      cardLayoutEnabled,
+      setCardLayoutEnabled,
       columnConfigs,
       updateColumnVisibility,
       reorderColumns,

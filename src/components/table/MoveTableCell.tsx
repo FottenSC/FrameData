@@ -1,11 +1,7 @@
 import React from "react";
 import { Move, type Command } from "@/types/Move";
 import { Badge } from "@/components/ui/badge";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { InteractiveTooltip } from "@/components/ui/tooltip";
 import { Copy } from "lucide-react";
 import { ExpandableHitLevels } from "@/components/icons/ExpandableHitLevels";
 import {
@@ -42,6 +38,7 @@ interface MoveTableCellProps {
    */
   getPropertyInfo: (prop: string) => PropertyInfo | null;
   badges?: BadgeMap;
+  layout?: "table" | "card";
 }
 
 /**
@@ -145,6 +142,7 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
     getStanceInfo,
     getPropertyInfo,
     badges,
+    layout = "table",
   }) => {
     switch (columnId) {
       case "character":
@@ -153,7 +151,11 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
       case "stance":
         if (!move.stance || move.stance.length === 0) return <>—</>;
         return (
-          <div className="flex flex-wrap gap-0.5 justify-end">
+          <div
+            className={`flex flex-wrap gap-0.5 ${
+              layout === "card" ? "justify-start" : "justify-end"
+            }`}
+          >
             {move.stance
               .filter((s) => s && s.trim() !== "")
               .map((s, i) => {
@@ -175,16 +177,13 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
                   return <React.Fragment key={i}>{chip}</React.Fragment>;
                 }
                 return (
-                  <Tooltip key={i}>
-                    <TooltipTrigger asChild>{chip}</TooltipTrigger>
-                    <TooltipContent>
-                      <ChipTooltipContent
-                        code={s}
-                        title={stanceInfo.name || s}
-                        description={stanceInfo.description}
-                      />
-                    </TooltipContent>
-                  </Tooltip>
+                  <InteractiveTooltip key={i} trigger={chip}>
+                    <ChipTooltipContent
+                      code={s}
+                      title={stanceInfo.name || s}
+                      description={stanceInfo.description}
+                    />
+                  </InteractiveTooltip>
                 );
               })}
           </div>
@@ -202,7 +201,9 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
               // ROW is hovered (group-hover) and becomes a defined
               // pill on direct hover, with the global cursor: pointer
               // rule providing the standard click affordance.
-              className="shrink-0 p-1 rounded text-muted-foreground opacity-30 group-hover/cmd:opacity-100 hover:bg-muted hover:text-foreground transition-all focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className={`shrink-0 rounded text-muted-foreground group-hover/cmd:opacity-100 hover:bg-muted hover:text-foreground transition-all focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                layout === "card" ? "p-2 -mr-2 opacity-100" : "p-1 opacity-30"
+              }`}
               title="Copy command"
               aria-label="Copy command"
             >
@@ -308,7 +309,13 @@ export const MoveTableCell: React.FC<MoveTableCellProps> = React.memo(
 
       case "notes":
         return (
-          <div className="max-w-full truncate overflow-x-hidden overflow-y-visible">
+          <div
+            className={
+              layout === "card"
+                ? "max-w-full whitespace-normal break-words"
+                : "max-w-full truncate overflow-x-hidden overflow-y-visible"
+            }
+          >
             {renderNotes(move.notes)}
           </div>
         );

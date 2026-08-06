@@ -1,10 +1,6 @@
 import React, { memo } from "react";
 import { Badge } from "./badge";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { InteractiveTooltip } from "@/components/ui/tooltip";
 import {
   ChipTooltipContent,
   type SourceChannel,
@@ -163,17 +159,14 @@ export const PropertyChip = memo<PropertyChipProps>(
     if (!hasTooltip) return chip;
 
     return (
-      <Tooltip>
-        <TooltipTrigger asChild>{chip}</TooltipTrigger>
-        <TooltipContent>
-          <ChipTooltipContent
-            code={tag}
-            title={info?.name || tag}
-            description={info?.description}
-            sources={channels}
-          />
-        </TooltipContent>
-      </Tooltip>
+      <InteractiveTooltip trigger={chip}>
+        <ChipTooltipContent
+          code={tag}
+          title={info?.name || tag}
+          description={info?.description}
+          sources={channels}
+        />
+      </InteractiveTooltip>
     );
   },
 );

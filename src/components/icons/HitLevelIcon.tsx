@@ -1,10 +1,6 @@
 import React from "react";
 import { useGame } from "@/contexts/GameContext";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { InteractiveTooltip } from "@/components/ui/tooltip";
 import { ChipTooltipContent } from "@/components/ui/chip-tooltip";
 
 /**
@@ -50,16 +46,13 @@ export const HitLevelIcon = React.memo(({ level }: { level: string }) => {
   if (!levelInfo) return icon;
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>{icon}</TooltipTrigger>
-      <TooltipContent>
-        <ChipTooltipContent
-          code={effectiveLevel}
-          title={levelInfo.name || effectiveLevel}
-          description={levelInfo.description}
-        />
-      </TooltipContent>
-    </Tooltip>
+    <InteractiveTooltip trigger={icon}>
+      <ChipTooltipContent
+        code={effectiveLevel}
+        title={levelInfo.name || effectiveLevel}
+        description={levelInfo.description}
+      />
+    </InteractiveTooltip>
   );
 });
 HitLevelIcon.displayName = "HitLevelIcon";

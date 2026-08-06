@@ -6,6 +6,7 @@ export type CommandView =
   | "notationMappings"
   | "characters"
   | "games"
+  | "settings"
   | "credits";
 
 interface CommandContextType {

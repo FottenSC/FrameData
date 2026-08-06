@@ -24,6 +24,8 @@ import {
   Info,
   Languages,
   Check,
+  LayoutGrid,
+  Settings,
 } from "lucide-react";
 import { useGame } from "@/contexts/GameContext";
 import { useCommand } from "@/contexts/CommandContext";
@@ -48,7 +50,12 @@ export function CommandPalette() {
     setSelectedGameById,
   } = useGame();
 
-  const { getNotationStyleId, setNotationStyle } = useUserSettings();
+  const {
+    getNotationStyleId,
+    setNotationStyle,
+    cardLayoutEnabled,
+    setCardLayoutEnabled,
+  } = useUserSettings();
 
   const [searchValue, setSearchValue] = React.useState("");
 
@@ -115,6 +122,7 @@ export function CommandPalette() {
   const showTableConfig = currentView === "tableConfig";
   const showGames = currentView === "games";
   const showNotationMappings = currentView === "notationMappings";
+  const showSettings = currentView === "settings";
   const showCredits = currentView === "credits";
 
   // TableConfigurator manages its own state
@@ -156,15 +164,21 @@ export function CommandPalette() {
                     ? `Search ${avaliableGames.length} games...`
                     : showNotationMappings
                       ? "Toggle notation mappings..."
+                    : showSettings
+                      ? "Settings..."
                       : showCredits
-                        ? "Credits..."
-                        : "Type a command or search..."
+                          ? "Credits..."
+                          : "Type a command or search..."
             }
             value={searchValue}
             onValueChange={setSearchValue}
           />
           <CommandList
-            className={showTableConfig || showCredits ? "max-h-[500px]" : ""}
+            className={
+              showTableConfig || showSettings || showCredits
+                ? "max-h-[500px]"
+                : ""
+            }
           >
             <CommandEmpty>No results found.</CommandEmpty>
             {showTableConfig ? (
@@ -300,6 +314,54 @@ export function CommandPalette() {
                   })}
                 </CommandGroup>
               </>
+            ) : showSettings ? (
+              <CommandGroup heading="Settings">
+                <CommandItem
+                  onSelect={goBackToMain}
+                  value="back-to-commands"
+                  className="mb-1"
+                >
+                  <ChevronLeft className="mr-2 h-4 w-4" />
+                  <span>Back to Commands</span>
+                </CommandItem>
+                <CommandItem
+                  value="setting-card-layout"
+                  keywords={["cards", "table", "mobile", "layout"]}
+                  aria-pressed={cardLayoutEnabled}
+                  onSelect={() => setCardLayoutEnabled(!cardLayoutEnabled)}
+                  className="items-start py-3"
+                >
+                  <LayoutGrid className="mr-2 mt-0.5 h-4 w-4" />
+                  <div className="flex min-w-0 flex-1 flex-col">
+                    <span>Move card layout</span>
+                    <span className="text-[11px] leading-4 text-muted-foreground">
+                      Defaults on for mobile and off for desktop. Your choice is
+                      remembered.
+                    </span>
+                  </div>
+                  <div
+                    aria-hidden="true"
+                    className={cn(
+                      "relative mt-0.5 h-5 w-9 shrink-0 rounded-full border transition-colors",
+                      cardLayoutEnabled
+                        ? "border-primary bg-primary"
+                        : "border-border bg-muted",
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "absolute top-0.5 h-3.5 w-3.5 rounded-full bg-white shadow-sm transition-transform",
+                        cardLayoutEnabled
+                          ? "translate-x-[17px]"
+                          : "translate-x-0.5",
+                      )}
+                    />
+                  </div>
+                  <CommandShortcut>
+                    {cardLayoutEnabled ? "On" : "Off"}
+                  </CommandShortcut>
+                </CommandItem>
+              </CommandGroup>
             ) : showCredits ? (
               <>
                 {/*
@@ -375,6 +437,16 @@ export function CommandPalette() {
                   >
                     <Languages className="mr-2 h-4 w-4" />
                     <span>Notation Mappings</span>
+                    <CommandShortcut>→</CommandShortcut>
+                  </CommandItem>
+                  <CommandItem
+                    onSelect={() => {
+                      setCurrentView("settings");
+                      setSearchValue("");
+                    }}
+                  >
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
                     <CommandShortcut>→</CommandShortcut>
                   </CommandItem>
                   {/*

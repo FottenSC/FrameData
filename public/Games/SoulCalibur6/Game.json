@@ -1,5 +1,10 @@
 {
   "properties": {
+    "AT": {
+      "name": "Attack Throw",
+      "description": "A standard attack that shifts to a throw-like cutscene when certain conditions are fulfilled.",
+      "className": "bg-[#ff01ff] text-black border-white ring-1 ring-black"
+    },
     "BA": {
       "name": "Break Attack",
       "description": "Generally plus, inflicts guard damage and counters GI and Reversal edge.",
@@ -10,6 +15,11 @@
       "description": "",
       "className": ""
     },
+    "CE": {
+      "name": "Critical Edge",
+      "description": "A powerful attack that consumes one full bar of Soul Gauge.",
+      "className": "bg-red-600 text-white border-white"
+    },
     "DZY": {
       "name": "",
       "description": "",
@@ -19,6 +29,11 @@
       "name": "",
       "description": "",
       "className": ""
+    },
+    "GC": {
+      "name": "Guard Crush",
+      "description": "Causes a guard crush, leaving the opponent vulnerable.",
+      "className": "bg-blue-400 text-zinc-900 border-white"
     },
     "GI": {
       "name": "Guard Impact",
@@ -49,6 +64,11 @@
       "name": "Reversal Edge",
       "description": "Rock paper scissors mini-game.",
       "className": "bg-white text-zinc-900 border-black"
+    },
+    "SC": {
+      "name": "Costs Soul Charge",
+      "description": "Consumes Soul Charge while performing the move.",
+      "className": "bg-sky-300 text-zinc-900 border-white"
     },
     "SLC": {
       "name": "",
@@ -193,15 +213,15 @@
       "stances": {
         "AGS": {
           "name": "Aggression Shift",
-          "description": ""
+          "description": "A stance where 2B dashes towards the opponent at high speed."
         },
         "AL": {
           "name": "Aerial Leap",
-          "description": ""
+          "description": "A stance where 2B jumps high into the air."
         },
         "ANG": {
           "name": "Angler Stance",
-          "description": ""
+          "description": "A stance where 2B sits on a holographic stool."
         }
       },
       "image": "2b.webp",
@@ -217,20 +237,20 @@
       "name": "Amy",
       "stances": {
         "AS": {
-          "name": "",
-          "description": ""
+          "name": "Amaryllis Spin",
+          "description": "Amy's command dash stance."
         },
         "HP": {
-          "name": "",
-          "description": ""
+          "name": "Biondetta Parry",
+          "description": "Amy's high aGI stance."
         },
         "LP": {
-          "name": "",
-          "description": ""
+          "name": "Lilith Parry",
+          "description": "Amy's mid aGI stance."
         },
         "MP": {
-          "name": "",
-          "description": ""
+          "name": "Merrow Parry",
+          "description": "Amy's low aGI stance."
         },
         "RRP": {
           "name": "Red Rose Perception",
@@ -266,24 +286,24 @@
       "name": "Azwel",
       "stances": {
         "BOB": {
-          "name": "",
-          "description": ""
+          "name": "Beauty of Balance",
+          "description": "Azwel's dual swords stance."
         },
         "COE": {
-          "name": "",
-          "description": ""
+          "name": "Comedy of Errors",
+          "description": "Azwel's spear and shield stance."
         },
         "TOW": {
-          "name": "",
-          "description": ""
+          "name": "Tragedy of War",
+          "description": "Azwel's greataxe stance."
         },
         "Weaponless": {
           "name": "Weaponless",
           "description": ""
         },
         "almighty": {
-          "name": "",
-          "description": ""
+          "name": "Almighty",
+          "description": "A state where Azwel has each of his weapons 'equipped'."
         },
         "ax": {
           "name": "Axe?",
@@ -319,24 +339,24 @@
       "name": "Cassandra",
       "stances": {
         "AS": {
-          "name": "",
-          "description": ""
+          "name": "Angel Step",
+          "description": "Cassandra's command dash stance. Term shared with Sophitia."
         },
         "AT": {
-          "name": "",
-          "description": ""
+          "name": "Angel Twirl",
+          "description": "Cassandra's backdash stance."
         },
         "DF": {
-          "name": "",
-          "description": ""
+          "name": "Divine Force",
+          "description": "Cassandra's unique power-up mechanic."
         },
         "Quake": {
           "name": "",
           "description": ""
         },
         "TS": {
-          "name": "",
-          "description": ""
+          "name": "Titanic Struggle",
+          "description": "Cassandra's tackle attack throw."
         }
       },
       "image": "Cassandra.webp",
@@ -353,11 +373,11 @@
       "stances": {
         "DC": {
           "name": "Dread Charge",
-          "description": ""
+          "description": "Cervantes' iconic stance."
         },
         "DS": {
           "name": "Dread Storm",
-          "description": ""
+          "description": "Cervantes' new stance accessed by leaning against a wall."
         },
         "Wall": {
           "name": "",
@@ -406,7 +426,7 @@
       "stances": {
         "AVN": {
           "name": "Avenger",
-          "description": ""
+          "description": "Groh's split swords stance."
         }
       },
       "image": "Groh.webp",
@@ -429,32 +449,32 @@
       "name": "Haohmaru",
       "stances": {
         "BKN": {
-          "name": "",
-          "description": ""
+          "name": "Bare Knuckles",
+          "description": "Haohmaru's unarmed stance."
         },
         "LH": {
           "name": "",
           "description": ""
         },
         "RG": {
-          "name": "",
-          "description": ""
+          "name": "Max Rage",
+          "description": "Haohmaru's unique powerup."
         },
         "RT": {
           "name": "",
           "description": ""
         },
         "RXP": {
-          "name": "",
-          "description": ""
+          "name": "Rage Explosion",
+          "description": "Haohmaru's unique Soul Charge variant."
         },
         "STG": {
-          "name": "",
-          "description": ""
+          "name": "Stagger",
+          "description": "A state Haohmaru enters when his Power Slashes are blocked."
         },
         "WF": {
-          "name": "",
-          "description": ""
+          "name": "Warrior's Focus",
+          "description": "Haohmaru's command dash stance."
         }
       },
       "image": "Haohmaru.webp",
@@ -470,12 +490,12 @@
       "name": "Hilde",
       "stances": {
         "SPR": {
-          "name": "Spear",
-          "description": ""
+          "name": "Spear Regalia",
+          "description": "Hilde's spear powerup."
         },
         "SWR": {
-          "name": "Sword",
-          "description": ""
+          "name": "Sword Regalia",
+          "description": "Hilde's sword powerup."
         },
         "c": {
           "name": "Charge",
@@ -571,16 +591,16 @@
           "description": ""
         },
         "SE": {
-          "name": "",
-          "description": ""
+          "name": "Serpent's Embrace",
+          "description": "Ivy's stance where she coils Valentine around her shoulders."
         },
         "SE Midair Opponent": {
           "name": "",
           "description": ""
         },
         "SL": {
-          "name": "",
-          "description": ""
+          "name": "Spiral Lust",
+          "description": "Ivy's stance where she lays Valentine on the floor."
         }
       },
       "image": "Ivy.webp",
@@ -600,12 +620,12 @@
       "name": "Kilik",
       "stances": {
         "BP": {
-          "name": "",
-          "description": ""
+          "name": "Back Parry",
+          "description": "Kilik's stance where he aligns his staff with his back."
         },
         "MO": {
           "name": "Monument",
-          "description": ""
+          "description": "Kilik's stance where he holds his staff in front of him."
         },
         "WD": {
           "name": "",
@@ -629,32 +649,32 @@
           "description": ""
         },
         "BL": {
-          "name": "",
-          "description": ""
+          "name": "Behind Lower",
+          "description": "Maxi stance"
         },
         "LI": {
-          "name": "",
-          "description": ""
+          "name": "Left Inner",
+          "description": "Maxi stance"
         },
         "LO": {
-          "name": "",
-          "description": ""
+          "name": "Left Outer",
+          "description": "Maxi stance"
         },
         "NG": {
-          "name": "",
-          "description": ""
+          "name": "Wavering Light/Neutral Guard",
+          "description": "Maxi stance"
         },
         "RC": {
-          "name": "",
-          "description": ""
+          "name": "Right Cross",
+          "description": "Maxi stance"
         },
         "RO": {
-          "name": "",
-          "description": ""
+          "name": "Right Outer",
+          "description": "Maxi stance"
         },
         "SSR": {
-          "name": "",
-          "description": ""
+          "name": "Seven Stars Rebirth",
+          "description": "Maxi Mechanic"
         }
       },
       "image": "Maxi.webp",
@@ -670,20 +690,20 @@
       "name": "Mitsurugi",
       "stances": {
         "MST": {
-          "name": "",
-          "description": ""
+          "name": "Mist Step",
+          "description": "Mitsurugi's Ko Gasumi stance."
         },
         "RLC": {
-          "name": "",
-          "description": ""
+          "name": "Relic",
+          "description": "Mitsurugi's iaido stance."
         },
         "SS": {
-          "name": "",
-          "description": ""
+          "name": "Silent Step",
+          "description": "Mitsurugi's command dash stance."
         },
         "Shura": {
-          "name": "Shura",
-          "description": ""
+          "name": "Shura Blade",
+          "description": "Mitsurugi's unique powerup."
         }
       },
       "image": "Mitsurugi.webp",
@@ -702,28 +722,28 @@
       "name": "Nightmare",
       "stances": {
         "GS": {
-          "name": "",
-          "description": ""
+          "name": "Grim Stride",
+          "description": "Nightmare's command dash stance."
         },
         "Hit": {
           "name": "",
           "description": ""
         },
         "NBS": {
-          "name": "",
-          "description": ""
+          "name": "Night Behind Stance",
+          "description": "Nightmare's stance where he holds his sword along his back."
         },
         "NLS": {
-          "name": "",
-          "description": ""
+          "name": "Night Lower Stance",
+          "description": "Nightmare's stance where he holds his sword against the ground."
         },
         "NSS": {
-          "name": "",
-          "description": ""
+          "name": "Night Side Stance",
+          "description": "Nightmare's stance where he holds his sword to his side."
         },
         "NTC": {
-          "name": "",
-          "description": ""
+          "name": "Night Terror Charge",
+          "description": "Nightmare's unique powerup."
         }
       },
       "image": "Nightmare.webp",
@@ -739,24 +759,24 @@
       "name": "Raphael",
       "stances": {
         "AG": {
-          "name": "",
-          "description": ""
+          "name": "Arriere Gambit",
+          "description": "Raphael's quick backstep stance."
         },
         "Evade": {
           "name": "",
           "description": ""
         },
         "PR": {
-          "name": "",
-          "description": ""
+          "name": "Preparation",
+          "description": "Raphael's advancing fencing stance."
         },
         "QP": {
-          "name": "",
-          "description": ""
+          "name": "Quick Parade",
+          "description": "Raphael's standing aGI stance."
         },
         "SE": {
-          "name": "",
-          "description": ""
+          "name": "Shadow Evade",
+          "description": "Raphael's evasive deep lean back stance."
         }
       },
       "image": "Raphael.webp",
@@ -776,8 +796,8 @@
           "description": ""
         },
         "LS": {
-          "name": "",
-          "description": ""
+          "name": "Lingering Step",
+          "description": "Seong Mi-na's evasive backstep stance."
         }
       },
       "image": "Seong-mi-na.webp",
@@ -793,24 +813,24 @@
       "name": "Setsuka",
       "stances": {
         "SKY stage I": {
-          "name": "",
-          "description": ""
+          "name": "Shrouded Sky Stage I",
+          "description": "Setsuka's iaido stance."
         },
         "SKY stage II": {
-          "name": "",
-          "description": ""
+          "name": "Shrouded Sky Stage II",
+          "description": "Setsuka's iaido stance."
         },
         "SKY stage III": {
-          "name": "",
-          "description": ""
+          "name": "Shrouded Sky Stage III",
+          "description": "Setsuka's iaido stance."
         },
         "Sky": {
-          "name": "",
-          "description": ""
+          "name": "Shrouded Sky",
+          "description": "Setsuka's iaido stance."
         },
         "WoH": {
-          "name": "",
-          "description": ""
+          "name": "Wings of Heaven",
+          "description": "Setsuka's floating umbrella stance."
         }
       },
       "image": "Setsuka.webp",
@@ -826,24 +846,24 @@
       "name": "Siegfried",
       "stances": {
         "DL": {
-          "name": "",
-          "description": ""
+          "name": "Dark Legacy",
+          "description": "Siegfried's unique powerup."
         },
         "SBH": {
-          "name": "",
-          "description": ""
+          "name": "Base Hold",
+          "description": "Siegfried's stance where he crouches and holds his sword at an angle."
         },
         "SCH": {
-          "name": "",
-          "description": ""
+          "name": "Chief Hold",
+          "description": "Siegfried's stance where he holds his sword along his back."
         },
         "SRSH": {
-          "name": "",
-          "description": ""
+          "name": "Reverse Side Hold",
+          "description": "Siegfried's stance where he holds his sword to his side, but using his non-dominant hand."
         },
         "SSH": {
-          "name": "",
-          "description": ""
+          "name": "Side Hold",
+          "description": "Siegfried's stance where he holds his sword to his side."
         }
       },
       "image": "Siegfried.webp",
@@ -864,7 +884,7 @@
       "stances": {
         "AS": {
           "name": "Angel Step",
-          "description": "Entered by pressing ↓ ↘ →"
+          "description": "Sophitia's command dash stance. Shared with Cassandra."
         },
         "Hit": {
           "name": "",
@@ -872,7 +892,7 @@
         },
         "TAS": {
           "name": "Twin Angel Step",
-          "description": "Entered by pressing ↓ ↘ → →"
+          "description": "Sophitia's second command dash stance, accessed from Angel Step."
         }
       },
       "image": "Sophitia.webp",
@@ -888,28 +908,28 @@
       "name": "Taki",
       "stances": {
         "DB": {
-          "name": "",
-          "description": ""
+          "name": "Distorted Breeze",
+          "description": "Taki's stance where she hops to either side."
         },
         "DOWN": {
           "name": "",
           "description": ""
         },
         "PO": {
-          "name": "",
-          "description": ""
+          "name": "Possession",
+          "description": "Taki's iconic stance."
         },
         "SG": {
           "name": "",
           "description": ""
         },
         "STK": {
-          "name": "",
-          "description": ""
+          "name": "Stalker",
+          "description": "Taki's command jump stance."
         },
         "WRO": {
-          "name": "",
-          "description": ""
+          "name": "Wind Roll",
+          "description": "Taki's rolling stance."
         }
       },
       "image": "Taki.webp",
@@ -933,16 +953,16 @@
           "description": ""
         },
         "WNC": {
-          "name": "",
-          "description": ""
+          "name": "Wind Charmer",
+          "description": "Talim's sidestep stance."
         },
         "WNF": {
-          "name": "",
-          "description": ""
+          "name": "Wind Fury",
+          "description": "Talim's sitting stance."
         },
         "WNS": {
-          "name": "",
-          "description": ""
+          "name": "Wind Sault",
+          "description": "Talim's jumping stance."
         }
       },
       "image": "Talim.webp",
@@ -958,16 +978,16 @@
       "name": "Tira",
       "stances": {
         "GS": {
-          "name": "Gloomy",
-          "description": "Purple particles are shown when entering this stance. \nIt gets replaced by Gloomy Coda once Tira has switched moodes 9 times."
+          "name": "Gloomy (Side)",
+          "description": "Tira's secondary state, indicated by a Purple indicator next to her name. She also hold her weapon in a different manner than when in Jolly."
         },
         "JS": {
-          "name": "Jolly",
-          "description": "Yellow particles are shown when entering this stance."
+          "name": "Jolly (Side)",
+          "description": "Tira's primary state, indicated by a Orange indicator next to her name. She also hold her weapon in a different manner than when in Gloomy."
         },
         "UD": {
           "name": "Updraft",
-          "description": "When Tira flys up into the air."
+          "description": "Tira's command jump stance."
         }
       },
       "image": "Tira.webp",
@@ -983,36 +1003,36 @@
       "name": "Voldo",
       "stances": {
         "BS": {
-          "name": "",
-          "description": ""
+          "name": "Blind Stance",
+          "description": "Voldo when backturned."
         },
         "CR": {
-          "name": "",
-          "description": ""
+          "name": "Cagliostro Rush",
+          "description": "Voldo's crawling command dash stance."
         },
         "DOWN": {
           "name": "",
           "description": ""
         },
         "DR": {
-          "name": "",
-          "description": ""
+          "name": "Death Roll",
+          "description": "Voldo's \"swimming\" stance, accessible only in SC. AKA Land Fish"
         },
         "MC": {
-          "name": "",
-          "description": ""
+          "name": "Mantis Crawl",
+          "description": "Voldo's stance where he crawls on all fours."
         },
         "MCFT": {
-          "name": "",
-          "description": ""
+          "name": "Mantis Crawl Feet Towards",
+          "description": "Specifies which direction Voldo is facing during Mantis Crawl."
         },
         "MCFT far": {
-          "name": "",
-          "description": ""
+          "name": "Mantis Crawl Feet Towards (Far)",
+          "description": "Specifies which direction Voldo is facing during Mantis Crawl."
         },
         "MCHT": {
-          "name": "",
-          "description": ""
+          "name": "Mantis Crawl Head Towards",
+          "description": "Specifies which direction Voldo is facing during Mantis Crawl."
         },
         "vs crouch": {
           "name": "Vs Crouch",
@@ -1036,24 +1056,24 @@
       "name": "Xianghua",
       "stances": {
         "BHH": {
-          "name": "",
-          "description": ""
+          "name": "Bea Her Hua",
+          "description": "Xianghua stance"
         },
         "HL": {
-          "name": "",
-          "description": ""
+          "name": "Hou Lee",
+          "description": "Xianghua stance"
         },
         "PXS": {
-          "name": "",
-          "description": ""
+          "name": "Playful Xia Sheng",
+          "description": "Xianghua stance"
         },
         "Quake": {
           "name": "",
           "description": ""
         },
         "SXS": {
-          "name": "",
-          "description": ""
+          "name": "Silent Xia Sheng",
+          "description": "Xianghua stance"
         },
         "WD": {
           "name": "",
@@ -1078,19 +1098,19 @@
         },
         "DGF": {
           "name": "Manji Dragonfly",
-          "description": "Yoshimitsu uses his blade to fly."
+          "description": "Yoshimitsu stance that has him hovering in the air using his sword like a helicopter propeller."
         },
         "FLE": {
-          "name": "Flea Stance",
-          "description": "While Yoshimitsu is standing on his blade"
+          "name": "Flea",
+          "description": "Yoshimitsu stance where he balances atop the hilt of his sword with all of his limbs."
         },
         "IND": {
-          "name": "Indian Stance",
-          "description": "While Yoshimitsu is sitting on the ground meditating."
+          "name": "Meditation",
+          "description": "Yoshimitsu's sitting stance."
         },
         "SGDF": {
-          "name": "Super Dragonfly",
-          "description": "Enhanced version of Manji Dragonfly that can be performed while in Soulcharge."
+          "name": "Super Manji Dragonfly",
+          "description": "Much higher altitude DGF stance accessible only in SC."
         }
       },
       "image": "Yoshimitsu.webp",
@@ -1114,16 +1134,16 @@
           "description": ""
         },
         "TS1": {
-          "name": "One curse",
-          "description": "One curse is consumed"
+          "name": "Time Stop (1)",
+          "description": "Zasalamel's ability to use curse orbs to stop time. The number represents the number of orbs."
         },
         "TS2": {
-          "name": "Two curses",
-          "description": "Two curses are consumed"
+          "name": "Time Stop (2)",
+          "description": "Zasalamel's ability to use curse orbs to stop time. The number represents the number of orbs."
         },
         "TS3": {
-          "name": "Three curses",
-          "description": "Three curses are consumed"
+          "name": "Time Stop (3)",
+          "description": "Zasalamel's ability to use curse orbs to stop time. The number represents the number of orbs."
         },
         "partial": {
           "name": "",
@@ -1148,6 +1168,11 @@
       "role": "Organizer",
       "name": "@unicorn_cz",
       "url": "https://twitter.com/unicorn_cz"
+    },
+    {
+      "role": "Reference",
+      "name": "SuperCombo Wiki",
+      "url": "https://wiki.supercombo.gg/w/Soulcalibur_VI"
     }
   ],
   "community": {

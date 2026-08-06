@@ -35,7 +35,7 @@ export const FrameDataTableHeader: React.FC<FrameDataTableHeaderProps> = ({
               // pairs with its arrow indicator.
               className={
                 column.className +
-                " bg-background cursor-pointer select-none transition-colors hover:bg-muted/40 " +
+                " relative bg-background before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:z-40 before:h-px before:bg-background before:content-[''] cursor-pointer select-none transition-colors hover:bg-muted/40 " +
                 (sortColumn === column.id ? "bg-muted/30 " : "")
               }
               style={style}

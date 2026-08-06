@@ -365,5 +365,5 @@ const CommandRendererInner: React.FC<{ command: Command | null }> = ({
   return <span className="inline-flex items-center flex-wrap">{parts}</span>;
 };
 
-// Memoize to prevent re-renders during table virtualization transitions
+// Avoid rebuilding command markup during unrelated table state changes.
 export const CommandRenderer = React.memo(CommandRendererInner);

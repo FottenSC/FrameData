@@ -12,16 +12,7 @@ export const ExpandableHitLevels: React.FC<{
   const canExpand = levels.length > maxIconsToShow + 1;
   const handleToggle = () => {
     if (!canExpand) return;
-    // Wrap the state flip in `startTransition` so React treats the
-    // expand/collapse as a non-urgent update. The click feedback paints
-    // immediately, the heavy work — mounting the additional
-    // HitLevelIcon + Tooltip subtrees and the virtualizer's row-height
-    // remeasure that follows — runs in the background frame and can be
-    // interrupted by other input. Without this, expanding a row with
-    // 12+ levels in a long virtualised table noticeably stutters.
-    React.startTransition(() => {
-      setIsExpanded((prev) => !prev);
-    });
+    setIsExpanded((prev) => !prev);
   };
 
   if (levels.length === 0) {
@@ -30,8 +21,8 @@ export const ExpandableHitLevels: React.FC<{
 
   // Always RENDER all icons; just hide the overflow when collapsed via
   // CSS. That way the costly per-icon mount work (Tooltip wrapper,
-  // useGame subscription) happens once on row mount — amortised by the
-  // virtualizer — instead of all at once on expand. Toggle is then a
+  // useGame subscription) happens once on row mount instead of all at once
+  // on expand. Toggle is then a
   // pure class swap, which is what makes the interaction feel instant.
   //
   // The few rows that have ≤ maxIconsToShow + 1 levels go through the

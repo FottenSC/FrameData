@@ -14,8 +14,6 @@ interface TableRowProps {
   getStanceInfo: (stance: string, characterId: number) => any;
   getPropertyInfo: (prop: string) => PropertyInfo | null;
   badges?: Record<string, { className: string }>;
-  measureRef?: React.Ref<HTMLTableRowElement>;
-  dataIndex?: number;
 }
 
 export const TableRow: React.FC<TableRowProps> = React.memo(
@@ -28,14 +26,8 @@ export const TableRow: React.FC<TableRowProps> = React.memo(
     getStanceInfo,
     getPropertyInfo,
     badges,
-    measureRef,
-    dataIndex,
   }) => (
-    <UITableRow
-      className="border-b-card-border"
-      data-index={dataIndex}
-      ref={measureRef}
-    >
+    <UITableRow className="border-b-card-border">
       {visibleColumns.map((column) => {
         const style: React.CSSProperties = {};
         if (column.width) style.width = column.width;

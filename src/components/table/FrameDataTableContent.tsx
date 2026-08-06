@@ -221,7 +221,7 @@ const FrameDataTableContentInner: React.FC<DataTableContentProps> = ({
             sortDirection={sortDirection}
             handleSort={handleSort}
           />
-          <TableBody>{tableBody}</TableBody>
+          <TableBody className="relative z-0">{tableBody}</TableBody>
         </Table>
 
         {usePagination && (

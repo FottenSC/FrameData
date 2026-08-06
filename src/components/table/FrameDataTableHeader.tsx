@@ -18,7 +18,7 @@ export const FrameDataTableHeader: React.FC<FrameDataTableHeaderProps> = ({
   handleSort,
 }) => {
   return (
-    <TableHeader>
+    <TableHeader className="sticky top-0 z-30 bg-background">
       <TableRow className="border-b-card-border">
         {visibleColumns.map((column) => {
           const style: React.CSSProperties = {};
@@ -35,7 +35,7 @@ export const FrameDataTableHeader: React.FC<FrameDataTableHeaderProps> = ({
               // pairs with its arrow indicator.
               className={
                 column.className +
-                " cursor-pointer select-none transition-colors hover:bg-muted/40 " +
+                " bg-background cursor-pointer select-none transition-colors hover:bg-muted/40 " +
                 (sortColumn === column.id ? "bg-muted/30 " : "")
               }
               style={style}

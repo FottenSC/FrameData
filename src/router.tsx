@@ -14,6 +14,50 @@ import { ToolbarProvider } from "./contexts/ToolbarContext";
 import React, { Suspense } from "react";
 import { CommandPaletteLoader } from "./components/CommandPaletteLoader";
 
+const LAST_VISITED_PATH_KEY = "lastVisitedPath";
+
+const rememberVisitedPath = (gameId: string, characterName?: string) => {
+  try {
+    localStorage.setItem(
+      LAST_VISITED_PATH_KEY,
+      `/${encodeURIComponent(gameId)}${characterName ? `/${encodeURIComponent(characterName)}` : ""}`,
+    );
+  } catch {
+    // The app still works when browser storage is unavailable.
+  }
+};
+
+const restoreVisitedPath = () => {
+  if (
+    window.location.pathname !== "/" ||
+    window.location.search !== "" ||
+    window.location.hash !== ""
+  ) {
+    return;
+  }
+
+  try {
+    const storedPath = localStorage.getItem(LAST_VISITED_PATH_KEY);
+    const segments = storedPath?.split("/").filter(Boolean);
+    const gameId = segments?.[0] ? decodeURIComponent(segments[0]) : null;
+
+    if (
+      !storedPath?.startsWith("/") ||
+      !segments ||
+      segments.length < 1 ||
+      segments.length > 2 ||
+      !avaliableGames.some((game) => game.id === gameId)
+    ) {
+      if (storedPath) localStorage.removeItem(LAST_VISITED_PATH_KEY);
+      return;
+    }
+
+    window.history.replaceState(window.history.state, "", storedPath);
+  } catch {
+    // A malformed value or unavailable storage leaves the visitor at `/`.
+  }
+};
+
 // Lazy load components
 const GameSelectionPage = React.lazy(() =>
   import("./components/GameSelectionPage").then((m) => ({
@@ -82,6 +126,7 @@ export const gameRoute = createRoute({
     if (!avaliableGames.some((g) => g.id === params.gameId)) {
       throw redirect({ to: "/" });
     }
+    rememberVisitedPath(params.gameId);
   },
   component: CharacterSelectionPage,
 });
@@ -99,7 +144,13 @@ export const characterRoute = createRoute({
       throw redirect({ to: "/" });
     }
     const name = decodeURIComponent(params.characterName);
-    if (name.toLowerCase() === "all") return;
+    rememberVisitedPath(
+      params.gameId,
+      name.toLowerCase() === "all" ? "All" : name,
+    );
+    if (name.toLowerCase() === "all") {
+      return;
+    }
     let data;
     try {
       data = await loadGameData(params.gameId);
@@ -134,6 +185,11 @@ const routeTree = rootRoute.addChildren([
   gameRoute,
   characterRoute,
 ]);
+
+// Restore only when the browser initially opens the bare root URL. Because
+// this runs once, before the router is created, later in-app navigation to `/`
+// (including the horse logo) keeps showing the game-selection page.
+restoreVisitedPath();
 
 export const router = createRouter({ routeTree });
 

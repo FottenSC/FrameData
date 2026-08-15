@@ -43,6 +43,9 @@ const knownColumnIds = new Set([
   "properties",
   "notes",
 ]);
+const structuralButtonPattern = /[:~_/<>]|\.\.\./;
+const zeroWidthPattern = /[\u200b-\u200d\ufeff]/;
+const plainDamagePattern = /^\d+(?:\s*,\s*\d+)*$/;
 
 let gameCount = 0;
 let fileCount = 0;
@@ -108,6 +111,24 @@ for (const entry of fs.readdirSync(gamesRoot, { withFileTypes: true })) {
     );
   }
 
+  const sharedStances = new Set(Object.keys(game.stances ?? {}));
+  const stancesByCharacterId = new Map(
+    game.characters
+      .filter(
+        (character) =>
+          typeof character === "object" &&
+          character !== null &&
+          Number.isInteger(character.id),
+      )
+      .map((character) => [
+        character.id,
+        new Set([
+          ...sharedStances,
+          ...Object.keys(character.stances ?? {}),
+        ]),
+      ]),
+  );
+
   const expectedFiles = new Set(manifestIds.map((id) => `${id}.json`));
   const actualFiles = fs
     .readdirSync(charactersDir)
@@ -130,6 +151,11 @@ for (const entry of fs.readdirSync(gamesRoot, { withFileTypes: true })) {
     fileCount += 1;
     const filePath = path.join(charactersDir, fileName);
     const payload = readJson(filePath);
+    if (zeroWidthPattern.test(JSON.stringify(payload))) {
+      failures.push(
+        `${entry.name}/Characters/${fileName}: contains an invisible zero-width character`,
+      );
+    }
     if (!validatePayload(payload)) {
       const details = ajv.errorsText(validatePayload.errors, {
         dataVar: path.relative(repoRoot, filePath),
@@ -140,6 +166,7 @@ for (const entry of fs.readdirSync(gamesRoot, { withFileTypes: true })) {
     }
 
     const ids = new Set();
+    const knownStances = stancesByCharacterId.get(Number.parseInt(fileName, 10));
     for (const [index, move] of payload.moves.entries()) {
       if (ids.has(move.id)) {
         failures.push(
@@ -147,6 +174,61 @@ for (const entry of fs.readdirSync(gamesRoot, { withFileTypes: true })) {
         );
       }
       ids.add(move.id);
+      if ((move.damage?.total ?? 0) >= 1000) {
+        failures.push(
+          `${entry.name}/Characters/${fileName}: implausible damage total ${move.damage.total} at moves[${index}] (${move.stringCommand ?? "unknown command"})`,
+        );
+      }
+
+      const damageRaw = move.damage?.raw;
+      const hasDamageTotal = Object.hasOwn(move.damage ?? {}, "total");
+      if (
+        entry.name === "Tekken8" &&
+        damageRaw &&
+        plainDamagePattern.test(damageRaw)
+      ) {
+        const expectedTotal = damageRaw
+          .split(",")
+          .reduce((sum, part) => sum + Number.parseInt(part.trim(), 10), 0);
+        if (!hasDamageTotal || move.damage.total !== expectedTotal) {
+          failures.push(
+            `${entry.name}/Characters/${fileName}: damage total must equal ${expectedTotal} for ${JSON.stringify(damageRaw)} at moves[${index}] (${move.stringCommand ?? "unknown command"})`,
+          );
+        }
+      } else if (entry.name === "Tekken8" && damageRaw && hasDamageTotal) {
+        failures.push(
+          `${entry.name}/Characters/${fileName}: ambiguous damage ${JSON.stringify(damageRaw)} must not have a computed total at moves[${index}] (${move.stringCommand ?? "unknown command"})`,
+        );
+      }
+
+      for (const stance of move.stance ?? []) {
+        if (!knownStances?.has(stance)) {
+          failures.push(
+            `${entry.name}/Characters/${fileName}: unknown stance ${JSON.stringify(stance)} at moves[${index}] (${move.stringCommand ?? "unknown command"})`,
+          );
+        }
+        if (
+          entry.name === "Tekken8" &&
+          stance !== "CH" &&
+          stance.split(".").includes("CH")
+        ) {
+          failures.push(
+            `${entry.name}/Characters/${fileName}: counter-hit condition must be a separate CH stance at moves[${index}] (${move.stringCommand ?? "unknown command"})`,
+          );
+        }
+      }
+
+      for (const step of move.command ?? []) {
+        for (const alternative of step) {
+          for (const button of alternative) {
+            if (structuralButtonPattern.test(button.b)) {
+              failures.push(
+                `${entry.name}/Characters/${fileName}: structural separator embedded in command token ${JSON.stringify(button.b)} at moves[${index}] (${move.stringCommand ?? "unknown command"})`,
+              );
+            }
+          }
+        }
+      }
     }
     moveCount += payload.moves.length;
   }

@@ -156,10 +156,8 @@ export const UserSettingsProvider: React.FC<UserSettingsProviderProps> = ({
 
 export const useUserSettings = (): UserSettingsContextType => {
   const context = useContext(UserSettingsContext);
-  if (context === undefined) {
-    throw new Error(
-      "useUserSettings must be used within a UserSettingsProvider",
-    );
+  if (process.env.NODE_ENV !== "production" && context === undefined) {
+    throw new Error("Missing UserSettingsProvider");
   }
-  return context;
+  return context!;
 };

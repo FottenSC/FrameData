@@ -564,8 +564,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
 export const useGame = (): GameContextType => {
   const context = useContext(GameContext);
-  if (context === undefined) {
-    throw new Error("useGame must be used within a GameProvider");
+  if (process.env.NODE_ENV !== "production" && context === undefined) {
+    throw new Error("Missing GameProvider");
   }
-  return context;
+  return context!;
 };

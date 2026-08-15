@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useState, ReactNode, useCallback, useMemo } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useCallback,
+  useMemo,
+} from "react";
 
 export type CommandView =
   | "main"
@@ -39,25 +46,26 @@ export function CommandProvider({ children }: CommandProviderProps) {
     setOpen(newOpen);
   }, []);
 
-  const value = useMemo(() => ({
-    open,
-    setOpen: handleSetOpen,
-    currentView,
-    setCurrentView,
-    openView,
-  }), [open, handleSetOpen, currentView, openView]);
+  const value = useMemo(
+    () => ({
+      open,
+      setOpen: handleSetOpen,
+      currentView,
+      setCurrentView,
+      openView,
+    }),
+    [open, handleSetOpen, currentView, openView],
+  );
 
   return (
-    <CommandContext.Provider value={value}>
-      {children}
-    </CommandContext.Provider>
+    <CommandContext.Provider value={value}>{children}</CommandContext.Provider>
   );
 }
 
 export function useCommand() {
   const context = useContext(CommandContext);
-  if (context === undefined) {
-    throw new Error("useCommand must be used within a CommandProvider");
+  if (process.env.NODE_ENV !== "production" && context === undefined) {
+    throw new Error("Missing CommandProvider");
   }
-  return context;
+  return context!;
 }

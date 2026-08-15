@@ -80,6 +80,15 @@ SHARED_STANCES: Dict[str, Tuple[str, str]] = {
     # descriptors with no button command following.
     "Back to wall":  ("Back to wall",          ""),
     "2 steps or more": ("2 steps or more",      ""),
+    "After 2 steps": ("After 2 steps",          ""),
+    "During Enemy wall stun": ("During Enemy wall stun", ""),
+    "While down, facing up": ("While down, facing up", ""),
+    "While in the air": ("While in the air",    ""),
+    "While landing":  ("While landing",         ""),
+    "Wall stun":      ("Wall stun",             ""),
+    "Behind 1 throw": ("Behind 1 throw",        ""),
+    "Behind 2 throw": ("Behind 2 throw",        ""),
+    "Tackle reverse": ("Tackle reverse",        ""),
     "Left throw":    ("Left throw",            ""),
     "Right throw":   ("Right throw",           ""),
     "Back throw":    ("Back throw",            ""),
@@ -294,10 +303,24 @@ def first_int(value: Optional[str]) -> Optional[int]:
     return int(m.group(0)) if m else None
 
 
-def sum_damage(value: Optional[str]) -> int:
+_PLAIN_DAMAGE_RE = re.compile(r"\d+(?:\s*,\s*\d+)*")
+
+
+def sum_damage(value: Optional[str]) -> Optional[int]:
+    """Return a total only when every damage value is unambiguous.
+
+    Wavu uses brackets, parentheses, slashes, semicolons, and trailing plus
+    signs for conditional, scaled, recoverable, or alternate damage values.
+    Adding every digit in those strings invents totals (for example
+    ``22,37 (25)`` became 84). Preserve those expressions as raw damage and
+    let the UI display them verbatim instead.
+    """
     if not value:
         return 0
-    return sum(int(n) for n in re.findall(r"\d+", value))
+    normalized = value.strip()
+    if not _PLAIN_DAMAGE_RE.fullmatch(normalized):
+        return None
+    return sum(int(part.strip()) for part in normalized.split(","))
 
 
 def clean_notes(raw: Optional[str]) -> str:
@@ -308,7 +331,7 @@ def clean_notes(raw: Optional[str]) -> str:
     if not raw:
         return ""
 
-    text = html.unescape(raw)
+    text = html.unescape(raw).replace("​", "")
     text = _MOVEDATA_ICON.sub(lambda m: m.group(1).strip(), text)
     m = _DOTLIST_PLAINLIST.search(text)
     if m:
@@ -351,7 +374,15 @@ def walk_parent_chain(row: Dict[str, Any], by_id: Dict[str, Dict[str, Any]],
         parts.append(cur.get(field) or "")
         parent_id = cur.get("parent")
         cur = by_id.get(parent_id) if parent_id else None
-    return "".join(reversed(parts)).lstrip(",").strip()
+    ordered_parts = [str(part).strip() for part in reversed(parts) if part]
+    if field in {"target", "damage", "startup"}:
+        # Wavu's child rows are inconsistent here: some per-hit deltas include
+        # a leading comma while others (for example Jack-8's SIT damage) omit
+        # it. Every non-empty fragment represents another hit, so join these
+        # fields with exactly one comma instead of producing merged values
+        # such as damage `10101010`, hit level `mm`, or startup `i1215`.
+        return ",".join(part.strip(",") for part in ordered_parts)
+    return "".join(ordered_parts).lstrip(",").strip()
 
 
 # ---------------------------------------------------------------------------
@@ -550,18 +581,17 @@ def _convert_part(part: str) -> List[str]:
     return [prefix + converted]
 
 
-# Step-internal separators wavu uses besides `,`:
-#   `:`  just-frame chain (Lee's `1:1:1:1` Mist-Step combo timing)
-#   `~`  immediate-link / hold-into operator (`3~3` etc.)
-# We split on all of them so the atoms inside still get converted, and
-# preserve the original separator in output positions for fidelity.
-_STEP_SEP_RE = re.compile(r"([,:~])")
+# Sequential separators (`:`, `~`) and alternative separators (`_`, `/`)
+# used inside Wavu command strings. We preserve them through universal
+# conversion; parse_command then maps them onto the schema's step and
+# alternative layers.
+_STEP_SEP_RE = re.compile(r"([,:~_/<])")
 
 
 def convert_to_universal(raw_command: str) -> str:
     """Translate a Tekken-native input string into universal notation.
 
-    Splits the input on `,`, `:`, and `~` while keeping the separators
+    Splits the input on `,`, `:`, `~`, `_`, `/`, and `<` while keeping separators
     in place; each between-separator chunk is then split on `+` for
     simultaneous parts and atom-converted independently. Stance
     prefixes, parenthetical context tags, and unrecognised text
@@ -573,7 +603,7 @@ def convert_to_universal(raw_command: str) -> str:
 
     out: List[str] = []
     for chunk in _STEP_SEP_RE.split(raw_command):
-        if chunk in (",", ":", "~") or not chunk.strip():
+        if chunk in (",", ":", "~", "_", "/", "<") or not chunk.strip():
             out.append(chunk)
             continue
         converted_parts: List[str] = []
@@ -729,7 +759,18 @@ def parse_command(raw_command: str) -> Tuple[List[List[List[Dict[str, object]]]]
                 continue
             m = _STANCE_PREFIX_RE.match(s)
             if m:
-                stances.append(m.group(1))
+                stance = m.group(1)
+                # CH is a condition, not part of a character stance code.
+                # `SSH.CH.1` therefore means SSH + CH, just as `CH.WS.2`
+                # means CH + WS.
+                stance_parts = stance.split(".")
+                if "CH" in stance_parts:
+                    remaining = ".".join(p for p in stance_parts if p != "CH")
+                    if remaining:
+                        stances.append(remaining)
+                    stances.append("CH")
+                else:
+                    stances.append(stance)
                 s = s[m.end():]
                 continue
             break
@@ -741,17 +782,45 @@ def parse_command(raw_command: str) -> Tuple[List[List[List[Dict[str, object]]]]
         return [], stances
 
     steps: List[List[List[Dict[str, object]]]] = []
-    for raw_step in text.split(","):
-        step = _peel_prefixes(raw_step.strip())
-        if not step:
-            continue
-        buttons = [
-            obj
-            for obj in (_to_button_obj(b) for b in step.split("+"))
-            if obj is not None
-        ]
-        if buttons:
-            steps.append([buttons])
+    for raw_step in re.split(r"[,:~<]", text):
+        alternatives: List[List[Dict[str, object]]] = []
+        for raw_alternative in re.split(r"[_/]", raw_step):
+            alternative = _peel_prefixes(raw_alternative.strip())
+            if not alternative:
+                continue
+            buttons = [
+                obj
+                for obj in (_to_button_obj(b) for b in alternative.split("+"))
+                if obj is not None
+            ]
+            if buttons:
+                alternatives.append(buttons)
+
+        if alternatives:
+            # Wavu abbreviates alternatives by writing a shared leading
+            # direction only once: `b+3_4` means `b+3` OR `b+4`. Repeat that
+            # direction for alternatives that start directly with a button.
+            shared_directions: List[Dict[str, object]] = []
+            for button in alternatives[0]:
+                token = str(button.get("b", ""))
+                if token in _MOTION_SHORTHAND or (
+                    len(token) == 1 and token in "123456789"
+                ):
+                    shared_directions.append(button)
+                else:
+                    break
+            if shared_directions:
+                for index in range(1, len(alternatives)):
+                    first = str(alternatives[index][0].get("b", ""))
+                    starts_with_direction = first in _MOTION_SHORTHAND or (
+                        len(first) == 1 and first in "123456789"
+                    )
+                    if not starts_with_direction:
+                        alternatives[index] = [
+                            *[dict(button) for button in shared_directions],
+                            *alternatives[index],
+                        ]
+            steps.append(alternatives)
 
     # Dedup while preserving first-seen order — `H.1,H.2` should yield
     # `["H"]`, not `["H", "H"]`.
@@ -770,6 +839,9 @@ _STANCE_VARIANT_TRANSLATIONS: Dict[str, str] = {
     # column gets a clean code; the per-character stance dict carries
     # the human-friendly "Clockwork two spins" description.
     "CLK(Two spins)": "CLK2",
+    # Steve's free-text `after_2steps+1` is a condition plus a button,
+    # not an underscore-separated alternative.
+    "after_2steps": "(After 2 steps).",
 }
 
 _WS_DOTTED_RE = re.compile(r"\bws\.")
@@ -784,6 +856,8 @@ _WR_BARE_RE = re.compile(r"\bwr(?=[0-9])")
 # matching arbitrary lowercase words like `host.` or `hint.`.
 _LOWERCASE_HEAT_RE = re.compile(r"\bh([A-Z][A-Z0-9]*)\.")
 _CH_SPACE_PREFIX_RE = re.compile(r"^CH\s+(?=\S)")
+_COUNTER_HIT_SUFFIX_RE = re.compile(r"\s*\(counterhit\)\s*$", re.IGNORECASE)
+_WALL_STUN_SUFFIX_RE = re.compile(r"\s*\(wall stun\)\s*$", re.IGNORECASE)
 
 
 def _normalize_input_string(s: str) -> str:
@@ -801,7 +875,12 @@ def _normalize_input_string(s: str) -> str:
     """
     if not s:
         return s
+    s = s.replace("...", "")
     s = _CH_SPACE_PREFIX_RE.sub("CH.", s)
+    s = re.sub(r"^BT\+", "BT.", s)
+    s = re.sub(r"^UT,", "UT.", s)
+    s = re.sub(r"^While in the air\s+", "(While in the air).", s)
+    s = re.sub(r"^While landing\s+", "(While landing).", s)
     for src, dst in _STANCE_VARIANT_TRANSLATIONS.items():
         s = s.replace(src, dst)
     s = _LOWERCASE_HEAT_RE.sub(r"H.\1.", s)
@@ -812,6 +891,77 @@ def _normalize_input_string(s: str) -> str:
     s = _WR_DOTTED_RE.sub("WR.", s)
     s = _WR_BARE_RE.sub("WR.", s)
     return s
+
+
+_COMMAND_BRANCH_RE = re.compile(r"/\s+")
+
+
+def parse_input_command(
+    raw_command: str,
+) -> Tuple[List[List[List[Dict[str, object]]]], List[str]]:
+    """Parse a complete Wavu input, including alternate command branches."""
+    parse_input = _normalize_input_string(raw_command).strip()
+
+    extra_stances: List[str] = []
+    full_parenthetical = re.fullmatch(r"\(([^)]+)\)", parse_input)
+    if full_parenthetical:
+        label = full_parenthetical.group(1).strip()
+        return [], [_canonicalize_multiword_stance(label) or label]
+
+    if _COUNTER_HIT_SUFFIX_RE.search(parse_input):
+        parse_input = _COUNTER_HIT_SUFFIX_RE.sub("", parse_input)
+        extra_stances.append("CH")
+    if _WALL_STUN_SUFFIX_RE.search(parse_input):
+        parse_input = _WALL_STUN_SUFFIX_RE.sub("", parse_input)
+        extra_stances.append("Wall stun")
+
+    # Parenthetical conditions can contain commas, so lift them before the
+    # command is split into sequential steps.
+    paren_match = re.match(r"^\(([^)]+)\)(?:\.|\s+)", parse_input)
+    if paren_match:
+        label = paren_match.group(1).strip()
+        extra_stances.append(
+            _canonicalize_multiword_stance(label)
+            or _PAREN_PREFIX_NORMALIZE.get(label.lower(), label)
+        )
+        parse_input = parse_input[paren_match.end():]
+    else:
+        multi_match = _MULTIWORD_PREFIX_RE.match(parse_input)
+        if multi_match:
+            canonical = _canonicalize_multiword_stance(multi_match.group(1))
+            if canonical:
+                extra_stances.append(canonical)
+                parse_input = parse_input[multi_match.end():]
+
+    parsed_branches = [
+        parse_command(convert_to_universal(branch.strip()))
+        for branch in _COMMAND_BRANCH_RE.split(parse_input)
+        if branch.strip()
+    ]
+    if not parsed_branches:
+        return [], extra_stances
+
+    branch_commands = [command for command, _ in parsed_branches]
+    merged_steps: List[List[List[Dict[str, object]]]] = []
+    for index in range(max((len(command) for command in branch_commands), default=0)):
+        alternatives: List[List[Dict[str, object]]] = []
+        for command in branch_commands:
+            if index >= len(command):
+                continue
+            for alternative in command[index]:
+                if alternative not in alternatives:
+                    alternatives.append(alternative)
+        if alternatives:
+            merged_steps.append(alternatives)
+
+    stances = extra_stances + [
+        stance for _, branch_stances in parsed_branches for stance in branch_stances
+    ]
+    seen: set = set()
+    unique_stances = [
+        stance for stance in stances if not (stance in seen or seen.add(stance))
+    ]
+    return merged_steps, unique_stances
 
 
 # ---------------------------------------------------------------------------
@@ -873,27 +1023,7 @@ def row_to_move(row: Dict[str, Any], by_id: Dict[str, Dict[str, Any]],
     # against what wavu published. `_normalize_input_string` rewrites
     # wavu shorthand (`ws1` → `WS.1`, `CLK(Two spins)` → `CLK2`) on
     # the parse copy so stance extraction sees a canonical form.
-    parse_input = _normalize_input_string(raw_command)
-
-    # Multi-word stance prefixes (`Back Throw 1+3`, `Back Throw.1+3`)
-    # are lifted *before* universal conversion so the residue button
-    # input atom-converts cleanly (`1+3` → `A+C`). Whole-line and
-    # `(Back Throw)`-wrapped variants are still handled inside
-    # parse_command — those have no residue.
-    extra_stances: List[str] = []
-    multi_match = (
-        _MULTIWORD_WRAPPED_PREFIX_RE.match(parse_input)
-        or _MULTIWORD_PREFIX_RE.match(parse_input)
-    )
-    if multi_match:
-        canonical = _canonicalize_multiword_stance(multi_match.group(1))
-        if canonical:
-            extra_stances.append(canonical)
-            parse_input = parse_input[multi_match.end():]
-
-    universal_command = convert_to_universal(parse_input)
-    command_steps, stance_list = parse_command(universal_command)
-    stance_list = extra_stances + stance_list
+    command_steps, stance_list = parse_input_command(raw_command)
 
     hit_level_str = walk_parent_chain(row, by_id, "target")
     # Wiki authors mix upper- and lowercase (`m,M`); normalise to lower so

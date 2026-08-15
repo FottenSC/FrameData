@@ -36,29 +36,30 @@ export function ToolbarProvider({ children }: ToolbarProviderProps) {
   const [filteredMoves, setFilteredMoves] = useState(0);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const value = useMemo(() => ({
-    activeFiltersCount,
-    setActiveFiltersCount,
-    exportHandler,
-    totalMoves,
-    setTotalMoves,
-    filteredMoves,
-    setFilteredMoves,
-    isUpdating,
-    setIsUpdating,
-  }), [activeFiltersCount, totalMoves, filteredMoves, isUpdating]);
+  const value = useMemo(
+    () => ({
+      activeFiltersCount,
+      setActiveFiltersCount,
+      exportHandler,
+      totalMoves,
+      setTotalMoves,
+      filteredMoves,
+      setFilteredMoves,
+      isUpdating,
+      setIsUpdating,
+    }),
+    [activeFiltersCount, totalMoves, filteredMoves, isUpdating],
+  );
 
   return (
-    <ToolbarContext.Provider value={value}>
-      {children}
-    </ToolbarContext.Provider>
+    <ToolbarContext.Provider value={value}>{children}</ToolbarContext.Provider>
   );
 }
 
 export function useToolbar() {
   const context = useContext(ToolbarContext);
-  if (context === undefined) {
-    throw new Error("useToolbar must be used within a ToolbarProvider");
+  if (process.env.NODE_ENV !== "production" && context === undefined) {
+    throw new Error("Missing ToolbarProvider");
   }
-  return context;
+  return context!;
 }

@@ -8,10 +8,9 @@ import type {
 
 // Default field configs shared if a game doesn't override.
 //
-// Note the addition of `blockTags` / `hitTags` / `counterHitTags`. The
-// `block`/`hit`/`counterHit` fields remain numeric (matching frame advantage);
-// the *Tags fields are text-only and let users explicitly query outcome tags
-// like KND, LNC or STN independent of the numeric advantage.
+// The internal `blockTags` / `hitTags` / `counterHitTags` ids are retained for
+// compatibility, but the UI presents them as outcome Properties. The
+// `block`/`hit`/`counterHit` fields remain numeric frame-advantage filters.
 export const defaultFields: FieldConfig[] = [
   { id: "input", label: "Stance + Command", type: "text" },
   { id: "stance", label: "Stance", type: "text" },
@@ -19,12 +18,48 @@ export const defaultFields: FieldConfig[] = [
   { id: "hitLevel", label: "Hit Level", type: "text" },
   { id: "impact", label: "Impact", type: "number" },
   { id: "damage", label: "Damage", type: "number" },
-  { id: "block", label: "Block (adv)", type: "number" },
-  { id: "blockTags", label: "Block tags", type: "text" },
-  { id: "hit", label: "Hit (adv)", type: "number" },
-  { id: "hitTags", label: "Hit tags", type: "text" },
-  { id: "counterHit", label: "Counter Hit (adv)", type: "number" },
-  { id: "counterHitTags", label: "Counter Hit tags", type: "text" },
+  {
+    id: "block",
+    label: "Block",
+    description:
+      "Numeric frame advantage when blocked. Example: Less Than -9 finds moves that are -10 or worse.",
+    type: "number",
+  },
+  {
+    id: "blockTags",
+    label: "Block Properties",
+    description:
+      "Properties applied on block. Example: Any of KND finds moves that knock down when blocked.",
+    type: "text",
+  },
+  {
+    id: "hit",
+    label: "Hit",
+    description:
+      "Numeric frame advantage on a normal hit. Example: Greater Than 0 finds moves that leave you plus.",
+    type: "number",
+  },
+  {
+    id: "hitTags",
+    label: "Hit Properties",
+    description:
+      "Properties applied on a normal hit. Example: Any of LNC finds moves that launch.",
+    type: "text",
+  },
+  {
+    id: "counterHit",
+    label: "Counter Hit",
+    description:
+      "Numeric frame advantage on counter hit. Example: Greater Than 9 finds moves that give at least +10.",
+    type: "number",
+  },
+  {
+    id: "counterHitTags",
+    label: "Counter Hit Properties",
+    description:
+      "Properties applied on counter hit. Example: Any of KND finds moves that knock down.",
+    type: "text",
+  },
   { id: "guardBurst", label: "Guard Burst", type: "number" },
   { id: "properties", label: "Properties", type: "text" },
   { id: "notes", label: "Notes", type: "text" },

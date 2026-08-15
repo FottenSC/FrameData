@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/table";
 import { showCopiedToast } from "@/components/ui/copy-toast";
 import { Move, SortableColumn, type Command } from "@/types/Move";
-import { ColumnConfig } from "@/contexts/UserSettingsContext";
+import type { ColumnConfig } from "@/contexts/TableConfigContext";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TooltipProvider } from "@/components/ui/tooltip";

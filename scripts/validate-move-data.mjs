@@ -4,7 +4,10 @@ import process from "node:process";
 import { fileURLToPath } from "node:url";
 import Ajv2020 from "ajv/dist/2020.js";
 
-const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const repoRoot = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "..",
+);
 const gamesRoot = path.join(repoRoot, "public", "Games");
 const schemaPath = path.join(
   repoRoot,
@@ -25,6 +28,22 @@ const schema = readJson(schemaPath);
 const ajv = new Ajv2020({ allErrors: true, strict: true });
 const validatePayload = ajv.compile(schema);
 
+const knownColumnIds = new Set([
+  "character",
+  "stance",
+  "command",
+  "rawCommand",
+  "hitLevel",
+  "impact",
+  "damage",
+  "block",
+  "hit",
+  "counterHit",
+  "guardBurst",
+  "properties",
+  "notes",
+]);
+
 let gameCount = 0;
 let fileCount = 0;
 let moveCount = 0;
@@ -40,6 +59,23 @@ for (const entry of fs.readdirSync(gamesRoot, { withFileTypes: true })) {
   gameCount += 1;
 
   const game = readJson(gamePath);
+  if (!Array.isArray(game.availableColumns)) {
+    failures.push(`${entry.name}/Game.json: availableColumns must be an array`);
+  } else {
+    const seenColumns = new Set();
+    for (const [index, columnId] of game.availableColumns.entries()) {
+      if (typeof columnId !== "string" || !knownColumnIds.has(columnId)) {
+        failures.push(
+          `${entry.name}/Game.json: availableColumns[${index}] is unknown: ${JSON.stringify(columnId)}`,
+        );
+      } else if (seenColumns.has(columnId)) {
+        failures.push(
+          `${entry.name}/Game.json: duplicate available column ${columnId}`,
+        );
+      }
+      seenColumns.add(columnId);
+    }
+  }
   if (!Array.isArray(game.characters)) {
     failures.push(`${entry.name}/Game.json: characters must be an array`);
     continue;
@@ -76,7 +112,9 @@ for (const entry of fs.readdirSync(gamesRoot, { withFileTypes: true })) {
   const actualFiles = fs
     .readdirSync(charactersDir)
     .filter((name) => name.endsWith(".json"))
-    .sort((left, right) => left.localeCompare(right, undefined, { numeric: true }));
+    .sort((left, right) =>
+      left.localeCompare(right, undefined, { numeric: true }),
+    );
   for (const expected of expectedFiles) {
     if (!actualFiles.includes(expected)) {
       failures.push(`${entry.name}/Characters/${expected}: file is missing`);
@@ -115,7 +153,9 @@ for (const entry of fs.readdirSync(gamesRoot, { withFileTypes: true })) {
 }
 
 if (failures.length > 0) {
-  console.error(`Move-data validation failed with ${failures.length} error(s):`);
+  console.error(
+    `Move-data validation failed with ${failures.length} error(s):`,
+  );
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }

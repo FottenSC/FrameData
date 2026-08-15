@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from "./ui/card";
 import { useGame } from "../contexts/GameContext";
-import { useTableConfig } from "../contexts/UserSettingsContext";
+import { useTableConfig } from "../contexts/TableConfigContext";
 import { useToolbar } from "../contexts/ToolbarContext";
 import { Skeleton } from "./ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -38,6 +38,7 @@ import { buildFieldAccessors } from "@/lib/moveAccessors";
 import { exportCsv, exportExcel, type ExportCell } from "@/lib/export";
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { isColumnId } from "@/lib/columns";
 
 export const FrameDataTable: React.FC = () => {
   // Navigation state is read straight off the route — `selectedGame` and
@@ -45,6 +46,7 @@ export const FrameDataTable: React.FC = () => {
   // this component never has to sync the two.
   const {
     selectedGame,
+    availableColumns,
     characters,
     selectedCharacterId,
     notationStyle,
@@ -128,6 +130,17 @@ export const FrameDataTable: React.FC = () => {
     }
   }, [selectedCharacterId, sortColumn]);
 
+  useEffect(() => {
+    if (
+      availableColumns.length > 0 &&
+      sortColumn &&
+      isColumnId(sortColumn) &&
+      !availableColumns.includes(sortColumn)
+    ) {
+      setSortColumn(null);
+    }
+  }, [availableColumns, sortColumn]);
+
   // URL ↔ selection sync used to live here as two effects. It's gone:
   // GameContext derives `selectedGame` / `selectedCharacterId` from the
   // route, and the route loaders (router.tsx) redirect away invalid game
@@ -159,8 +172,8 @@ export const FrameDataTable: React.FC = () => {
   );
 
   const gameFilterConfig = useMemo(
-    () => getGameFilterConfig(selectedGame.id, hitLevels),
-    [selectedGame.id, hitLevels],
+    () => getGameFilterConfig(selectedGame.id, availableColumns, hitLevels),
+    [selectedGame.id, availableColumns, hitLevels],
   );
 
   const fieldMap = useMemo(

@@ -19,6 +19,7 @@ import type {
   PropertyInfo,
   StanceInfo,
 } from "@/contexts/GameContext";
+import { isColumnId, type ColumnId } from "@/lib/columns";
 
 /**
  * A community link surfaced in the credits view. Per-game so each
@@ -47,6 +48,8 @@ export interface GameCommunity {
 
 /** Fully-parsed payload derived from Game.json. */
 export interface GameData {
+  /** Shared table-column ids this game supports. */
+  availableColumns: ColumnId[];
   characters: Character[];
   /** Game-level stances. Shared across all characters. */
   gameStances: Record<string, StanceInfo>;
@@ -184,8 +187,32 @@ const parseCharacters = (source: unknown, gameId: string): Character[] => {
     image: c.image
       ? `/Games/${encodeURIComponent(gameId)}/Images/${c.image}`
       : undefined,
+    wikiUrl: typeof c.wikiUrl === "string" ? c.wikiUrl : undefined,
     credits: Array.isArray(c.credits) ? c.credits : undefined,
   }));
+};
+
+const parseAvailableColumns = (source: unknown, gameId: string): ColumnId[] => {
+  if (!Array.isArray(source)) {
+    throw new Error(`${gameId}/Game.json: availableColumns must be an array`);
+  }
+  const columns: ColumnId[] = [];
+  const seen = new Set<ColumnId>();
+  for (const value of source) {
+    if (!isColumnId(value)) {
+      throw new Error(
+        `${gameId}/Game.json: unknown available column ${JSON.stringify(value)}`,
+      );
+    }
+    if (seen.has(value)) {
+      throw new Error(
+        `${gameId}/Game.json: duplicate available column ${JSON.stringify(value)}`,
+      );
+    }
+    seen.add(value);
+    columns.push(value);
+  }
+  return columns;
 };
 
 const parseCharacterStances = (
@@ -236,6 +263,7 @@ async function doLoadGameData(gameId: string): Promise<GameData> {
   const credits = parseCredits(data?.credits, data?.creditsDescription);
 
   return {
+    availableColumns: parseAvailableColumns(data?.availableColumns, gameId),
     characters: parseCharacters(data?.characters, gameId),
     gameStances: parseStances(data?.stances),
     characterStances: parseCharacterStances(data?.characters),

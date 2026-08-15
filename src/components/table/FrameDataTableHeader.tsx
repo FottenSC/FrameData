@@ -2,7 +2,7 @@ import React from "react";
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { SortableColumn } from "@/types/Move";
-import { ColumnConfig } from "@/contexts/UserSettingsContext";
+import type { ColumnConfig } from "@/contexts/TableConfigContext";
 
 interface FrameDataTableHeaderProps {
   visibleColumns: ColumnConfig[];

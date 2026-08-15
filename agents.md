@@ -8,3 +8,5 @@ We still havent shipped v1 so dont be afraid of making pruposing larger changes 
 Breaking changes are fine, dont be afraid.
 
 Don't reccomend going over to a all.json for the all characters option
+
+work on one fucking branch and thats main dipshit.

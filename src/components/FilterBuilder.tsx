@@ -178,6 +178,22 @@ function pruneInactive(
   return out;
 }
 
+function pruneUnavailableFields(
+  items: FilterItem[],
+  availableFieldIds: ReadonlySet<string>,
+): FilterItem[] {
+  const next: FilterItem[] = [];
+  for (const item of items) {
+    if (item.type !== "group") {
+      if (availableFieldIds.has(item.field)) next.push(item);
+      continue;
+    }
+    const children = pruneUnavailableFields(item.filters, availableFieldIds);
+    if (children.length > 0) next.push({ ...item, filters: children });
+  }
+  return next;
+}
+
 /**
  * Structural equality for filter trees, used to decide whether the
  * parent needs to be notified of a change. Walks both trees in
@@ -379,6 +395,7 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
 }) => {
   const {
     selectedGame,
+    availableColumns,
     selectedCharacterId,
     hitLevels,
     gameStances,
@@ -407,6 +424,7 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
     () =>
       getGameFilterConfig(
         selectedGame.id,
+        availableColumns,
         hitLevels,
         gameStances,
         relevantCharacterStances,
@@ -415,6 +433,7 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
       ),
     [
       selectedGame.id,
+      availableColumns,
       hitLevels,
       gameStances,
       relevantCharacterStances,
@@ -439,6 +458,10 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
     () => new Map(gameConfig.fields.map((f) => [f.id, f as FieldConfig])),
     [gameConfig],
   );
+  const availableFieldIds = useMemo(
+    () => new Set(gameConfig.fields.map((field) => field.id)),
+    [gameConfig.fields],
+  );
 
   // Quick search is intentionally separate from the advanced filter tree.
   // The parent applies it first, then evaluates the structured filters.
@@ -448,6 +471,14 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
   const [rootOperator, setRootOperator] = useState<FilterGroupOperator>("and");
   const [isExpanded, setIsExpanded] = useState(readAdvancedFiltersExpanded);
   const [quickSearch, setQuickSearch] = useState("");
+
+  useEffect(() => {
+    if (availableColumns.length === 0) return;
+    setFilters((previous) => {
+      const next = pruneUnavailableFields(previous, availableFieldIds);
+      return filterTreesEqual(previous, next) ? previous : next;
+    });
+  }, [availableColumns.length, availableFieldIds]);
 
   useEffect(() => {
     try {

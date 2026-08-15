@@ -10,9 +10,14 @@ import { GameProvider, avaliableGames } from "./contexts/GameContext";
 import { loadGameData } from "./lib/loadGameData";
 import { CommandProvider } from "./contexts/CommandContext";
 import { UserSettingsProvider } from "./contexts/UserSettingsContext";
+import { TableConfigProvider } from "./contexts/TableConfigContext";
 import { ToolbarProvider } from "./contexts/ToolbarContext";
 import React, { Suspense } from "react";
 import { CommandPaletteLoader } from "./components/CommandPaletteLoader";
+import {
+  findCharacterByRouteName,
+  getCharacterRouteName,
+} from "./lib/characterRoute";
 
 // Lazy load components
 const GameSelectionPage = React.lazy(() =>
@@ -36,13 +41,14 @@ export const rootRoute = createRootRoute({
   component: () => (
     <UserSettingsProvider>
       <GameProvider>
-        <CommandProvider>
-          <ToolbarProvider>
-            <div className="h-dvh overflow-hidden flex flex-col bg-background text-foreground">
-              <Navbar />
-              <CommandPaletteLoader />
-              <main className="flex-1 min-h-0 flex flex-col overflow-hidden">
-                {/*
+        <TableConfigProvider>
+          <CommandProvider>
+            <ToolbarProvider>
+              <div className="h-dvh overflow-hidden flex flex-col bg-background text-foreground">
+                <Navbar />
+                <CommandPaletteLoader />
+                <main className="flex-1 min-h-0 flex flex-col overflow-hidden">
+                  {/*
                   Empty Suspense fallback by design. With route chunks
                   prefetched on idle / hover from the game-selection
                   page, the common case is that the destination chunk is
@@ -53,13 +59,14 @@ export const rootRoute = createRootRoute({
                   previous route visible until React can show the next
                   one anyway.
                 */}
-                <Suspense fallback={null}>
-                  <Outlet />
-                </Suspense>
-              </main>
-            </div>
-          </ToolbarProvider>
-        </CommandProvider>
+                  <Suspense fallback={null}>
+                    <Outlet />
+                  </Suspense>
+                </main>
+              </div>
+            </ToolbarProvider>
+          </CommandProvider>
+        </TableConfigProvider>
       </GameProvider>
     </UserSettingsProvider>
   ),
@@ -108,8 +115,10 @@ export const characterRoute = createRoute({
       // through GameContext rather than redirecting on a transient fault.
       return;
     }
-    const known = data.characters.some(
-      (c) => c.name.toLowerCase() === name.toLowerCase(),
+    const known = findCharacterByRouteName(
+      params.gameId,
+      name,
+      data.characters,
     );
     if (!known) {
       // Pattern + params form (not a template string): the router's typed
@@ -120,10 +129,22 @@ export const characterRoute = createRoute({
         first
           ? {
               to: "/$gameId/$characterName",
-              params: { gameId: params.gameId, characterName: first.name },
+              params: {
+                gameId: params.gameId,
+                characterName: getCharacterRouteName(params.gameId, first.name),
+              },
             }
           : { to: "/$gameId", params: { gameId: params.gameId } },
       );
+    }
+
+    const canonicalName = getCharacterRouteName(params.gameId, known.name);
+    if (name !== canonicalName) {
+      throw redirect({
+        to: "/$gameId/$characterName",
+        params: { gameId: params.gameId, characterName: canonicalName },
+        replace: true,
+      });
     }
   },
   component: FrameDataTable,

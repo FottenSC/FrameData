@@ -7,6 +7,7 @@ import { Skeleton } from "./ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { characterMovesQueryOptions } from "@/hooks/useMoves";
+import { ExternalLink } from "lucide-react";
 
 export const CharacterSelectionPage: React.FC = () => {
   const { gameId } = useParams({ strict: false }) as { gameId: string };
@@ -155,6 +156,20 @@ export const CharacterSelectionPage: React.FC = () => {
                   onMouseLeave={cancelCharacterPrefetch}
                 >
                   <div className="relative w-full aspect-square overflow-hidden bg-transparent">
+                    {character.wikiUrl && (
+                      <a
+                        href={character.wikiUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Open ${character.name} on Wavu Wiki`}
+                        title={`Open ${character.name} on Wavu Wiki`}
+                        className="absolute right-1.5 top-1.5 z-10 rounded-md border border-border/70 bg-background/85 p-1.5 text-muted-foreground shadow-sm backdrop-blur-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        onClick={(event) => event.stopPropagation()}
+                        onKeyDown={(event) => event.stopPropagation()}
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </a>
+                    )}
                     {character.image ? (
                       <img
                         src={character.image}

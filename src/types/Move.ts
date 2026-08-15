@@ -11,6 +11,7 @@
  * `decodeCharacterMovesV2` fills omitted defaults and injects character
  * identity into this in-memory representation.
  */
+import type { ColumnId } from "@/lib/columns";
 
 /**
  * A single outcome channel (block / hit / counter-hit).
@@ -184,18 +185,4 @@ export type FilterItem = FilterCondition | FilterGroup;
  * {@link SortableColumn} also includes the derived "rawCommand" and "input"
  * columns that are not direct fields on {@link Move}.
  */
-export type SortableColumn =
-  | "character"
-  | "stance"
-  | "command"
-  | "rawCommand"
-  | "input"
-  | "hitLevel"
-  | "impact"
-  | "damage"
-  | "block"
-  | "hit"
-  | "counterHit"
-  | "guardBurst"
-  | "properties"
-  | "notes";
+export type SortableColumn = ColumnId | "input";

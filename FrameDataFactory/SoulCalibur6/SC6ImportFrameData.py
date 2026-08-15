@@ -12,6 +12,12 @@ if str(FACTORY_ROOT) not in sys.path:
 
 from common.move_data_v2 import build_payload, write_payload_atomic
 
+AVAILABLE_COLUMNS = [
+    "character", "stance", "command", "rawCommand", "hitLevel", "impact",
+    "damage", "block", "hit", "counterHit", "guardBurst", "properties",
+    "notes",
+]
+
 
 def project_root() -> Path:
     return Path(sys.path[0]).parent.parent
@@ -597,6 +603,7 @@ for prop_key in sorted(property_codes_used):
 
 # Write Game.json
 game_manifest = {
+    "availableColumns": AVAILABLE_COLUMNS,
     "properties": properties_dict,
     "stances": existing_game_stances,
     "hitLevels": existing_game_data.get("hitLevels", {

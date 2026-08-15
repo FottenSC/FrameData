@@ -22,6 +22,11 @@ import {
   type GameCommunity,
 } from "@/lib/loadGameData";
 import { withViewTransition } from "@/lib/viewTransition";
+import type { ColumnId } from "@/lib/columns";
+import {
+  findCharacterByRouteName,
+  getCharacterRouteName,
+} from "@/lib/characterRoute";
 
 // Define configuration for a game-specific icon with its alt text
 export interface IconConfig {
@@ -55,6 +60,8 @@ export interface Character {
   id: number;
   name: string;
   image?: string;
+  /** Canonical external wiki page for this character, when provided. */
+  wikiUrl?: string;
   credits?: CreditEntry[];
 }
 
@@ -159,6 +166,8 @@ const DIRECTIONAL_ICONS: Pick<IconConfig, "code" | "iconClasses">[] = [
 
 interface GameContextType {
   selectedGame: Game;
+  /** Shared table columns supported by the active game's Game.json. */
+  availableColumns: ColumnId[];
   setSelectedGameById: (gameId: string) => void;
   isCharactersLoading: boolean;
   characterError: string | null;
@@ -250,11 +259,9 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     if (!seg) return null;
     const name = decodeURIComponent(seg);
     if (name.toLowerCase() === "all") return -1;
-    const match = characters.find(
-      (c) => c.name.toLowerCase() === name.toLowerCase(),
-    );
+    const match = findCharacterByRouteName(selectedGame.id, name, characters);
     return match ? match.id : null;
-  }, [params.characterName, characters]);
+  }, [params.characterName, characters, selectedGame.id]);
   // Game-level stances (shared across all characters)
   const [gameStances, setGameStances] = useState<Record<string, StanceInfo>>(
     {},
@@ -275,6 +282,14 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   >(null);
   const [gameCredits, setGameCredits] = useState<CreditEntry[]>([]);
   const [gameCommunity, setGameCommunity] = useState<GameCommunity>({});
+  const [loadedColumns, setLoadedColumns] = useState<ColumnId[]>([]);
+  const [loadedColumnsGameId, setLoadedColumnsGameId] = useState<string | null>(
+    null,
+  );
+  const availableColumns = useMemo(
+    () => (loadedColumnsGameId === selectedGame.id ? loadedColumns : []),
+    [loadedColumns, loadedColumnsGameId, selectedGame.id],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -283,6 +298,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     const applyGameData = (data: ReturnType<typeof getCachedGameData>) => {
       if (!data) return;
       setCharacters(data.characters);
+      setLoadedColumns(data.availableColumns);
+      setLoadedColumnsGameId(selectedGame.id);
       setGameCredits(data.credits);
       setGameCreditsDescription(data.creditsDescription);
       setGameCommunity(data.community);
@@ -320,6 +337,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     setIsCharactersLoading(true);
     setCharacterError(null);
     setCharacters([]);
+    setLoadedColumns([]);
+    setLoadedColumnsGameId(null);
 
     (async () => {
       try {
@@ -383,7 +402,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       } else if (id !== null) {
         const name = characters.find((c) => c.id === id)?.name;
         if (!name) return;
-        to = `/${selectedGame.id}/${encodeURIComponent(name)}`;
+        const routeName = getCharacterRouteName(selectedGame.id, name);
+        to = `/${selectedGame.id}/${encodeURIComponent(routeName)}`;
       }
       // Character swaps are deliberately urgent. Wrapping this navigation in
       // startTransition/viewTransition allowed a fast move-data request to
@@ -418,11 +438,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       // resolve under `/Games/{id}/Icons/` because they're authored per
       // game. The check is a single-character comparison; cheap to run on
       // the render hot path.
-      if (
-        iconName.length === 1 &&
-        iconName >= "1" &&
-        iconName <= "9"
-      ) {
+      if (iconName.length === 1 && iconName >= "1" && iconName <= "9") {
         return `/Icons/${upperIconName}${heldSuffix}.svg`;
       }
       return `/Games/${selectedGame.id}/Icons/${upperIconName}${heldSuffix}.svg`;
@@ -494,6 +510,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const contextValue: GameContextType = useMemo(
     () => ({
       selectedGame,
+      availableColumns,
       setSelectedGameById: handleSetSelectedGameById,
       isCharactersLoading,
       characterError,
@@ -517,6 +534,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     }),
     [
       selectedGame,
+      availableColumns,
       handleSetSelectedGameById,
       isCharactersLoading,
       characterError,

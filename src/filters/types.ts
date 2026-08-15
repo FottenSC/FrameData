@@ -25,6 +25,7 @@ export interface FilterOperator {
 
 export interface FieldConfig {
   id: string; // e.g., 'impact', 'command'
+  requiredColumn: ColumnId;
   label: string; // UI label
   description?: string; // Hover/help text, ideally with a concrete example
   type: FieldType;
@@ -38,3 +39,4 @@ export interface GameFilterConfig {
   // optional extra operators in addition to defaults, keyed by id
   customOperators?: FilterOperator[];
 }
+import type { ColumnId } from "@/lib/columns";

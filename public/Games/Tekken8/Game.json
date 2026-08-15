@@ -1,4 +1,18 @@
 {
+  "availableColumns": [
+    "character",
+    "stance",
+    "command",
+    "rawCommand",
+    "hitLevel",
+    "impact",
+    "damage",
+    "block",
+    "hit",
+    "counterHit",
+    "properties",
+    "notes"
+  ],
   "properties": {
     "HE": {
       "name": "Heat Engager",
@@ -87,6 +101,10 @@
     }
   },
   "stances": {
+    "CH": {
+      "name": "Counter Hit",
+      "description": "Move requires a counter hit."
+    },
     "WS": {
       "name": "While Standing",
       "description": "Move performed while rising from a crouch."
@@ -155,6 +173,10 @@
       "name": "Back to wall",
       "description": ""
     },
+    "2 steps or more": {
+      "name": "2 steps or more",
+      "description": ""
+    },
     "Left throw": {
       "name": "Left throw",
       "description": ""
@@ -165,6 +187,14 @@
     },
     "Back throw": {
       "name": "Back throw",
+      "description": ""
+    },
+    "Left Side Throw": {
+      "name": "Left Side Throw",
+      "description": ""
+    },
+    "Right Side Throw": {
+      "name": "Right Side Throw",
       "description": ""
     }
   },
@@ -243,7 +273,8 @@
           "description": "Enter with f+3+4"
         }
       },
-      "image": "Alisa.webp"
+      "image": "Alisa.webp",
+      "wikiUrl": "https://wavu.wiki/t/Alisa"
     },
     {
       "id": 2,
@@ -270,7 +301,8 @@
           "description": "Enter with db+2"
         }
       },
-      "image": "Anna.webp"
+      "image": "Anna.webp",
+      "wikiUrl": "https://wavu.wiki/t/Anna"
     },
     {
       "id": 3,
@@ -289,10 +321,6 @@
           "description": "Enter with f+3+4"
         },
         "BM": {
-          "name": "",
-          "description": ""
-        },
-        "CH.WS": {
           "name": "",
           "description": ""
         },
@@ -325,7 +353,8 @@
           "description": ""
         }
       },
-      "image": "Armor King.webp"
+      "image": "Armor King.webp",
+      "wikiUrl": "https://wavu.wiki/t/Armor_King"
     },
     {
       "id": 4,
@@ -352,7 +381,8 @@
           "description": ""
         }
       },
-      "image": "Asuka.webp"
+      "image": "Asuka.webp",
+      "wikiUrl": "https://wavu.wiki/t/Asuka"
     },
     {
       "id": 5,
@@ -379,7 +409,8 @@
           "description": ""
         }
       },
-      "image": "Azucena.webp"
+      "image": "Azucena.webp",
+      "wikiUrl": "https://wavu.wiki/t/Azucena"
     },
     {
       "id": 6,
@@ -406,7 +437,8 @@
           "description": "Enter with qcb"
         }
       },
-      "image": "Bryan.webp"
+      "image": "Bryan.webp",
+      "wikiUrl": "https://wavu.wiki/t/Bryan"
     },
     {
       "id": 7,
@@ -421,16 +453,13 @@
           "description": ""
         }
       },
-      "image": "Claudio.webp"
+      "image": "Claudio.webp",
+      "wikiUrl": "https://wavu.wiki/t/Claudio"
     },
     {
       "id": 8,
       "name": "Clive",
       "stances": {
-        "CH": {
-          "name": "",
-          "description": ""
-        },
         "GAR": {
           "name": "Updraft",
           "description": "Enter with uf"
@@ -452,7 +481,8 @@
           "description": "Enter with 3+4"
         }
       },
-      "image": "Clive.webp"
+      "image": "Clive.webp",
+      "wikiUrl": "https://wavu.wiki/t/Clive"
     },
     {
       "id": 9,
@@ -475,7 +505,8 @@
           "description": ""
         }
       },
-      "image": "Devil Jin.webp"
+      "image": "Devil Jin.webp",
+      "wikiUrl": "https://wavu.wiki/t/Devil_Jin"
     },
     {
       "id": 10,
@@ -502,7 +533,8 @@
           "description": ""
         }
       },
-      "image": "Dragunov.webp"
+      "image": "Dragunov.webp",
+      "wikiUrl": "https://wavu.wiki/t/Dragunov"
     },
     {
       "id": 11,
@@ -529,7 +561,8 @@
           "description": "Enter with d+3+4"
         }
       },
-      "image": "Eddy.webp"
+      "image": "Eddy.webp",
+      "wikiUrl": "https://wavu.wiki/t/Eddy"
     },
     {
       "id": 12,
@@ -548,7 +581,8 @@
           "description": "Enter with Enter stance through landing: GRF.1+2, df+3+4,GRF.3, GRF.4*, GRF.3*"
         }
       },
-      "image": "Fahkumram.webp"
+      "image": "Fahkumram.webp",
+      "wikiUrl": "https://wavu.wiki/t/Fahkumram"
     },
     {
       "id": 13,
@@ -567,7 +601,8 @@
           "description": "Enter with f+3+4"
         }
       },
-      "image": "Feng.webp"
+      "image": "Feng.webp",
+      "wikiUrl": "https://wavu.wiki/t/Feng"
     },
     {
       "id": 14,
@@ -602,7 +637,8 @@
           "description": ""
         }
       },
-      "image": "Heihachi.webp"
+      "image": "Heihachi.webp",
+      "wikiUrl": "https://wavu.wiki/t/Heihachi"
     },
     {
       "id": 15,
@@ -637,7 +673,8 @@
           "description": "Enter with f,n,4"
         }
       },
-      "image": "Hwoarang.webp"
+      "image": "Hwoarang.webp",
+      "wikiUrl": "https://wavu.wiki/t/Hwoarang"
     },
     {
       "id": 16,
@@ -664,7 +701,8 @@
           "description": ""
         }
       },
-      "image": "Jack-8.webp"
+      "image": "Jack-8.webp",
+      "wikiUrl": "https://wavu.wiki/t/Jack-8"
     },
     {
       "id": 17,
@@ -683,7 +721,8 @@
           "description": "Enter with f+3+4 or b3+4"
         }
       },
-      "image": "Jin.webp"
+      "image": "Jin.webp",
+      "wikiUrl": "https://wavu.wiki/t/Jin"
     },
     {
       "id": 18,
@@ -714,7 +753,8 @@
           "description": ""
         }
       },
-      "image": "Jun.webp"
+      "image": "Jun.webp",
+      "wikiUrl": "https://wavu.wiki/t/Jun"
     },
     {
       "id": 19,
@@ -741,7 +781,8 @@
           "description": ""
         }
       },
-      "image": "Kazuya.webp"
+      "image": "Kazuya.webp",
+      "wikiUrl": "https://wavu.wiki/t/Kazuya"
     },
     {
       "id": 20,
@@ -876,7 +917,8 @@
           "description": ""
         }
       },
-      "image": "King.webp"
+      "image": "King.webp",
+      "wikiUrl": "https://wavu.wiki/t/King"
     },
     {
       "id": 21,
@@ -903,7 +945,8 @@
           "description": "Enter with d+3+4"
         }
       },
-      "image": "Kuma.webp"
+      "image": "Kuma.webp",
+      "wikiUrl": "https://wavu.wiki/t/Kuma"
     },
     {
       "id": 22,
@@ -946,7 +989,8 @@
           "description": ""
         }
       },
-      "image": "Lars.webp"
+      "image": "Lars.webp",
+      "wikiUrl": "https://wavu.wiki/t/Lars"
     },
     {
       "id": 23,
@@ -965,7 +1009,8 @@
           "description": ""
         }
       },
-      "image": "Law.webp"
+      "image": "Law.webp",
+      "wikiUrl": "https://wavu.wiki/t/Law"
     },
     {
       "id": 24,
@@ -984,7 +1029,8 @@
           "description": ""
         }
       },
-      "image": "Lee.webp"
+      "image": "Lee.webp",
+      "wikiUrl": "https://wavu.wiki/t/Lee"
     },
     {
       "id": 25,
@@ -1007,7 +1053,8 @@
           "description": ""
         }
       },
-      "image": "Leo.webp"
+      "image": "Leo.webp",
+      "wikiUrl": "https://wavu.wiki/t/Leo"
     },
     {
       "id": 26,
@@ -1026,7 +1073,8 @@
           "description": ""
         }
       },
-      "image": "Leroy.webp"
+      "image": "Leroy.webp",
+      "wikiUrl": "https://wavu.wiki/t/Leroy"
     },
     {
       "id": 27,
@@ -1035,10 +1083,6 @@
         "CAT": {
           "name": "Cat",
           "description": "Enter with b+3+4"
-        },
-        "CH": {
-          "name": "",
-          "description": ""
         },
         "H.CAT": {
           "name": "",
@@ -1081,7 +1125,8 @@
           "description": ""
         }
       },
-      "image": "Lidia.webp"
+      "image": "Lidia.webp",
+      "wikiUrl": "https://wavu.wiki/t/Lidia"
     },
     {
       "id": 28,
@@ -1112,7 +1157,8 @@
           "description": ""
         }
       },
-      "image": "Lili.webp"
+      "image": "Lili.webp",
+      "wikiUrl": "https://wavu.wiki/t/Lili"
     },
     {
       "id": 29,
@@ -1135,7 +1181,8 @@
           "description": "Enter with b+3+4 (on wall contact)"
         }
       },
-      "image": "Miary Zo.webp"
+      "image": "Miary Zo.webp",
+      "wikiUrl": "https://wavu.wiki/t/Miary_Zo"
     },
     {
       "id": 30,
@@ -1186,7 +1233,8 @@
           "description": ""
         }
       },
-      "image": "Nina.webp"
+      "image": "Nina.webp",
+      "wikiUrl": "https://wavu.wiki/t/Nina"
     },
     {
       "id": 31,
@@ -1213,7 +1261,8 @@
           "description": "Enter with d+3+4"
         }
       },
-      "image": "Panda.webp"
+      "image": "Panda.webp",
+      "wikiUrl": "https://wavu.wiki/t/Panda"
     },
     {
       "id": 32,
@@ -1244,7 +1293,8 @@
           "description": "Enter with qcb"
         }
       },
-      "image": "Paul.webp"
+      "image": "Paul.webp",
+      "wikiUrl": "https://wavu.wiki/t/Paul"
     },
     {
       "id": 33,
@@ -1259,16 +1309,13 @@
           "description": "Enter with 3+4"
         }
       },
-      "image": "Raven.webp"
+      "image": "Raven.webp",
+      "wikiUrl": "https://wavu.wiki/t/Raven"
     },
     {
       "id": 34,
       "name": "Reina",
       "stances": {
-        "CH": {
-          "name": "",
-          "description": ""
-        },
         "H.WRA": {
           "name": "",
           "description": ""
@@ -1306,7 +1353,8 @@
           "description": "Enter with d+1+2"
         }
       },
-      "image": "Reina.webp"
+      "image": "Reina.webp",
+      "wikiUrl": "https://wavu.wiki/t/Reina"
     },
     {
       "id": 35,
@@ -1321,7 +1369,8 @@
           "description": "Enter with df+3+4"
         }
       },
-      "image": "Shaheen.webp"
+      "image": "Shaheen.webp",
+      "wikiUrl": "https://wavu.wiki/t/Shaheen"
     },
     {
       "id": 36,
@@ -1380,16 +1429,13 @@
           "description": ""
         }
       },
-      "image": "Steve.webp"
+      "image": "Steve.webp",
+      "wikiUrl": "https://wavu.wiki/t/Steve"
     },
     {
       "id": 37,
       "name": "Victor",
       "stances": {
-        "CH": {
-          "name": "",
-          "description": ""
-        },
         "H.FC": {
           "name": "",
           "description": ""
@@ -1415,7 +1461,8 @@
           "description": ""
         }
       },
-      "image": "Victor.webp"
+      "image": "Victor.webp",
+      "wikiUrl": "https://wavu.wiki/t/Victor"
     },
     {
       "id": 38,
@@ -1442,7 +1489,8 @@
           "description": ""
         }
       },
-      "image": "Xiaoyu.webp"
+      "image": "Xiaoyu.webp",
+      "wikiUrl": "https://wavu.wiki/t/Xiaoyu"
     },
     {
       "id": 39,
@@ -1509,7 +1557,8 @@
           "description": ""
         }
       },
-      "image": "Yoshimitsu.webp"
+      "image": "Yoshimitsu.webp",
+      "wikiUrl": "https://wavu.wiki/t/Yoshimitsu"
     },
     {
       "id": 40,
@@ -1536,7 +1585,8 @@
           "description": "Enter with d+1+2"
         }
       },
-      "image": "Zafina.webp"
+      "image": "Zafina.webp",
+      "wikiUrl": "https://wavu.wiki/t/Zafina"
     }
   ],
   "credits": [

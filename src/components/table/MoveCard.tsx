@@ -1,6 +1,6 @@
 import React from "react";
 import { Move, type Command } from "@/types/Move";
-import type { ColumnConfig } from "@/contexts/UserSettingsContext";
+import type { ColumnConfig } from "@/contexts/TableConfigContext";
 import type { PropertyInfo } from "@/contexts/GameContext";
 import { MoveTableCell } from "./MoveTableCell";
 

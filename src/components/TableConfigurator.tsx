@@ -2,7 +2,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useTableConfig } from "@/contexts/UserSettingsContext";
+import { useTableConfig } from "@/contexts/TableConfigContext";
 import {
   DndContext,
   DragEndEvent,
@@ -26,13 +26,14 @@ import {
   restrictToVerticalAxis,
 } from "@dnd-kit/modifiers";
 import { GripVertical } from "lucide-react";
+import type { ColumnId } from "@/lib/columns";
 
 export const TableConfigurator: React.FC = () => {
   const { columnConfigs, setColumnConfigs, restoreDefaults } = useTableConfig();
 
   // Local ordered id-list that drives dnd-kit's SortableContext. Seeded from
   // the persisted column config; kept in sync with it by the effect below.
-  const [ids, setIds] = React.useState<string[]>(() =>
+  const [ids, setIds] = React.useState<ColumnId[]>(() =>
     columnConfigs.toSorted((a, b) => a.order - b.order).map((c) => c.id),
   );
 
@@ -73,8 +74,8 @@ export const TableConfigurator: React.FC = () => {
     if (!over) {
       return;
     }
-    const oldIndex = ids.indexOf(String(active.id));
-    const newIndex = ids.indexOf(String(over.id));
+    const oldIndex = ids.indexOf(String(active.id) as ColumnId);
+    const newIndex = ids.indexOf(String(over.id) as ColumnId);
     if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
       const moved = arrayMove(ids, oldIndex, newIndex);
       setIds(moved);
@@ -88,7 +89,7 @@ export const TableConfigurator: React.FC = () => {
     }
   };
 
-  const onToggleVisible = (id: string, value: boolean) => {
+  const onToggleVisible = (id: ColumnId, value: boolean) => {
     setColumnConfigs((prev) =>
       prev.map((c) => (c.id === id ? { ...c, visible: value } : c)),
     );
@@ -137,7 +138,7 @@ export const TableConfigurator: React.FC = () => {
 };
 
 const Row: React.FC<{
-  id: string;
+  id: ColumnId;
   label: string;
   checked: boolean;
   onCheckedChange: (v: boolean) => void;

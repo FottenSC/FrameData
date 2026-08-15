@@ -20,6 +20,7 @@ import sys
 import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+from urllib.parse import quote
 
 import requests
 
@@ -38,6 +39,11 @@ USER_AGENT = (
     "FrameDataFactory/2.0 (+https://github.com/FottenSC/FrameData)"
 )
 
+AVAILABLE_COLUMNS = [
+    "character", "stance", "command", "rawCommand", "hitLevel", "impact",
+    "damage", "block", "hit", "counterHit", "properties", "notes",
+]
+
 CARGO_FIELDS = [
     "_pageName=page",
     "id", "num", "name", "input", "parent",
@@ -51,6 +57,7 @@ CARGO_FIELDS = [
 # anything matching `<UPPERCASE>.<rest>` is treated as a stance — but this
 # table seeds Game.json's stance dictionary with friendly names.
 SHARED_STANCES: Dict[str, Tuple[str, str]] = {
+    "CH":            ("Counter Hit",           "Move requires a counter hit."),
     "WS":            ("While Standing",        "Move performed while rising from a crouch."),
     "FC":            ("Full Crouch",           "Move performed while crouching."),
     "BT":            ("Back Turned",           "Character is facing away from the opponent."),
@@ -72,9 +79,12 @@ SHARED_STANCES: Dict[str, Tuple[str, str]] = {
     # the brackets, throws like `Back throw` are full-line stance
     # descriptors with no button command following.
     "Back to wall":  ("Back to wall",          ""),
+    "2 steps or more": ("2 steps or more",      ""),
     "Left throw":    ("Left throw",            ""),
     "Right throw":   ("Right throw",           ""),
     "Back throw":    ("Back throw",            ""),
+    "Left Side Throw": ("Left Side Throw",      ""),
+    "Right Side Throw": ("Right Side Throw",    ""),
 }
 
 # Note keywords -> Properties tag list. Order matters — earlier entries take
@@ -598,6 +608,12 @@ def convert_to_universal(raw_command: str) -> str:
 # the Stance column as just "Back to wall".
 _PAREN_META_PREFIX_RE = re.compile(r"^\(([^)]+)\)\.")
 
+# Conditions are independent from the stance that follows them. In inputs
+# such as `CH.WS.2,2`, CH is the counter-hit requirement and WS is the
+# while-standing stance; the general stance regex would otherwise greedily
+# combine them into a single `CH.WS` code.
+_CONDITION_PREFIX_RE = re.compile(r"^(CH)\.")
+
 # Wavu authors throw notation as a free-text label rather than an
 # input. Same canonical labels appear in several syntactic positions:
 #
@@ -608,13 +624,24 @@ _PAREN_META_PREFIX_RE = re.compile(r"^\(([^)]+)\)\.")
 #
 # We normalise case so author-edited names in Game.json map cleanly to
 # one code regardless of which casing the move row uses.
-_CANONICAL_MULTIWORD_STANCES = ("Back throw", "Left throw", "Right throw")
+_CANONICAL_MULTIWORD_STANCES = (
+    "Back throw",
+    "Left throw",
+    "Right throw",
+    "2 steps or more",
+    "Left Side Throw",
+    "Right Side Throw",
+)
 _MULTIWORD_LOOKUP: Dict[str, str] = {
     s.lower(): s for s in _CANONICAL_MULTIWORD_STANCES
 }
 _MULTIWORD_ALT_RE = "|".join(re.escape(s) for s in _CANONICAL_MULTIWORD_STANCES)
 _MULTIWORD_FULL_RE = re.compile(rf"^({_MULTIWORD_ALT_RE})$", re.IGNORECASE)
 _MULTIWORD_WRAPPED_RE = re.compile(rf"^\(({_MULTIWORD_ALT_RE})\)$", re.IGNORECASE)
+_MULTIWORD_WRAPPED_PREFIX_RE = re.compile(
+    rf"^\(({_MULTIWORD_ALT_RE})\)[\s.]+",
+    re.IGNORECASE,
+)
 _MULTIWORD_PREFIX_RE = re.compile(
     rf"^({_MULTIWORD_ALT_RE})[\s.]+",
     re.IGNORECASE,
@@ -695,6 +722,11 @@ def parse_command(raw_command: str) -> Tuple[List[List[List[Dict[str, object]]]]
                 stances.append(_PAREN_PREFIX_NORMALIZE.get(label.lower(), label))
                 s = s[m.end():]
                 continue
+            m = _CONDITION_PREFIX_RE.match(s)
+            if m:
+                stances.append(m.group(1))
+                s = s[m.end():]
+                continue
             m = _STANCE_PREFIX_RE.match(s)
             if m:
                 stances.append(m.group(1))
@@ -744,11 +776,14 @@ _WS_DOTTED_RE = re.compile(r"\bws\.")
 _WS_BARE_RE = re.compile(r"\bws(?=[0-9])")
 _SS_DOTTED_RE = re.compile(r"\bss\.")
 _SS_BARE_RE = re.compile(r"\bss(?=[0-9])")
+_WR_DOTTED_RE = re.compile(r"\bwr\.")
+_WR_BARE_RE = re.compile(r"\bwr(?=[0-9])")
 # Wavu's heat-prefix shorthand: `hFC.` (`hWS.`, `hSS.`, …) means
 # `H.<STANCE>.` — heat enabling a stance move. The leading `h` is
 # always lowercase; the rest is uppercase. Anchor on uppercase to avoid
 # matching arbitrary lowercase words like `host.` or `hint.`.
 _LOWERCASE_HEAT_RE = re.compile(r"\bh([A-Z][A-Z0-9]*)\.")
+_CH_SPACE_PREFIX_RE = re.compile(r"^CH\s+(?=\S)")
 
 
 def _normalize_input_string(s: str) -> str:
@@ -757,13 +792,16 @@ def _normalize_input_string(s: str) -> str:
     Currently:
       * ``ws1`` / ``ws.1`` → ``WS.1`` (lowercase shorthand → canonical).
       * ``ss2`` / ``ss.2`` → ``SS.2`` (sidestep shorthand).
+      * ``wr4`` / ``wr.4`` → ``WR.4`` (while-running shorthand).
       * ``hFC.1``           → ``H.FC.1`` (heat-prefix shorthand; same
         substitution covers any ``h<UPPER>.`` form).
+      * ``CH b+1``          → ``CH.b+1`` (counter-hit condition prefix).
       * ``CLK(Two spins).`` → ``CLK2.`` (and any future `<code>(detail)`
         translations registered in ``_STANCE_VARIANT_TRANSLATIONS``).
     """
     if not s:
         return s
+    s = _CH_SPACE_PREFIX_RE.sub("CH.", s)
     for src, dst in _STANCE_VARIANT_TRANSLATIONS.items():
         s = s.replace(src, dst)
     s = _LOWERCASE_HEAT_RE.sub(r"H.\1.", s)
@@ -771,6 +809,8 @@ def _normalize_input_string(s: str) -> str:
     s = _WS_BARE_RE.sub("WS.", s)
     s = _SS_DOTTED_RE.sub("SS.", s)
     s = _SS_BARE_RE.sub("SS.", s)
+    s = _WR_DOTTED_RE.sub("WR.", s)
+    s = _WR_BARE_RE.sub("WR.", s)
     return s
 
 
@@ -841,7 +881,10 @@ def row_to_move(row: Dict[str, Any], by_id: Dict[str, Dict[str, Any]],
     # `(Back Throw)`-wrapped variants are still handled inside
     # parse_command — those have no residue.
     extra_stances: List[str] = []
-    multi_match = _MULTIWORD_PREFIX_RE.match(parse_input)
+    multi_match = (
+        _MULTIWORD_WRAPPED_PREFIX_RE.match(parse_input)
+        or _MULTIWORD_PREFIX_RE.match(parse_input)
+    )
     if multi_match:
         canonical = _canonicalize_multiword_stance(multi_match.group(1))
         if canonical:
@@ -999,6 +1042,7 @@ def build_game_json(records: List[Dict[str, Any]],
             }
 
         entry: Dict[str, Any] = {"id": cid, "name": name, "stances": stance_dict}
+        entry["wikiUrl"] = f"{WAVU_BASE}/t/{quote(name.replace(' ', '_'), safe='_-')}"
         if existing_char.get("image"):
             entry["image"] = existing_char["image"]
         chars_manifest.append(entry)
@@ -1042,6 +1086,7 @@ def build_game_json(records: List[Dict[str, Any]],
         }
 
     game_json = {
+        "availableColumns": AVAILABLE_COLUMNS,
         "properties": properties,
         "stances": game_stances,
         "hitLevels": hit_levels,

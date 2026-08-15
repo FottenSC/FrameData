@@ -5,6 +5,7 @@ import type {
   PropertyInfo,
   StanceInfo,
 } from "../contexts/GameContext";
+import type { ColumnId } from "@/lib/columns";
 
 // Default field configs shared if a game doesn't override.
 //
@@ -12,15 +13,31 @@ import type {
 // compatibility, but the UI presents them as outcome Properties. The
 // `block`/`hit`/`counterHit` fields remain numeric frame-advantage filters.
 export const defaultFields: FieldConfig[] = [
-  { id: "input", label: "Stance + Command", type: "text" },
-  { id: "stance", label: "Stance", type: "text" },
-  { id: "command", label: "Command", type: "text" },
-  { id: "hitLevel", label: "Hit Level", type: "text" },
-  { id: "impact", label: "Impact", type: "number" },
-  { id: "damage", label: "Damage", type: "number" },
+  {
+    id: "input",
+    label: "Stance + Command",
+    requiredColumn: "command",
+    type: "text",
+  },
+  { id: "stance", label: "Stance", requiredColumn: "stance", type: "text" },
+  {
+    id: "command",
+    label: "Command",
+    requiredColumn: "command",
+    type: "text",
+  },
+  {
+    id: "hitLevel",
+    label: "Hit Level",
+    requiredColumn: "hitLevel",
+    type: "text",
+  },
+  { id: "impact", label: "Impact", requiredColumn: "impact", type: "number" },
+  { id: "damage", label: "Damage", requiredColumn: "damage", type: "number" },
   {
     id: "block",
     label: "Block",
+    requiredColumn: "block",
     description:
       "Numeric frame advantage when blocked. Example: Less Than -9 finds moves that are -10 or worse.",
     type: "number",
@@ -28,6 +45,7 @@ export const defaultFields: FieldConfig[] = [
   {
     id: "blockTags",
     label: "Block Properties",
+    requiredColumn: "block",
     description:
       "Properties applied on block. Example: Any of KND finds moves that knock down when blocked.",
     type: "text",
@@ -35,6 +53,7 @@ export const defaultFields: FieldConfig[] = [
   {
     id: "hit",
     label: "Hit",
+    requiredColumn: "hit",
     description:
       "Numeric frame advantage on a normal hit. Example: Greater Than 0 finds moves that leave you plus.",
     type: "number",
@@ -42,6 +61,7 @@ export const defaultFields: FieldConfig[] = [
   {
     id: "hitTags",
     label: "Hit Properties",
+    requiredColumn: "hit",
     description:
       "Properties applied on a normal hit. Example: Any of LNC finds moves that launch.",
     type: "text",
@@ -49,6 +69,7 @@ export const defaultFields: FieldConfig[] = [
   {
     id: "counterHit",
     label: "Counter Hit",
+    requiredColumn: "counterHit",
     description:
       "Numeric frame advantage on counter hit. Example: Greater Than 9 finds moves that give at least +10.",
     type: "number",
@@ -56,14 +77,30 @@ export const defaultFields: FieldConfig[] = [
   {
     id: "counterHitTags",
     label: "Counter Hit Properties",
+    requiredColumn: "counterHit",
     description:
       "Properties applied on counter hit. Example: Any of KND finds moves that knock down.",
     type: "text",
   },
-  { id: "guardBurst", label: "Guard Burst", type: "number" },
-  { id: "properties", label: "Properties", type: "text" },
-  { id: "notes", label: "Notes", type: "text" },
-  { id: "character", label: "Character", type: "text" },
+  {
+    id: "guardBurst",
+    label: "Guard Burst",
+    requiredColumn: "guardBurst",
+    type: "number",
+  },
+  {
+    id: "properties",
+    label: "Properties",
+    requiredColumn: "properties",
+    type: "text",
+  },
+  { id: "notes", label: "Notes", requiredColumn: "notes", type: "text" },
+  {
+    id: "character",
+    label: "Character",
+    requiredColumn: "character",
+    type: "text",
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -136,6 +173,7 @@ function buildCharacterOptions(
  */
 export function getGameFilterConfig(
   gameId: string,
+  availableColumns: readonly ColumnId[],
   hitLevels: Record<string, HitLevelInfo> = {},
   gameStances: Record<string, StanceInfo> = {},
   characterStances: Record<number, Record<string, StanceInfo>> = {},
@@ -299,40 +337,47 @@ export function getGameFilterConfig(
     allowedOperators: MULTI_SELECT_OPS,
   });
 
-  const fields = defaultFields.map((f) => {
-    switch (f.id) {
-      case "input":
-        // The Stance + Command column is also the quick-search target.
-        // quickContains is listed first so it's the default when a fresh
-        // filter row is seeded against this field; the standard text ops
-        // stay available via the operator dropdown for power users.
-        return {
-          ...f,
-          allowedOperators: [
-            "quickContains",
-            "contains",
-            "startsWith",
-            "equals",
-            "notEquals",
-          ],
-        };
-      case "hitLevel":
-        return hitLevelOptions.length > 0 ? withOptions(f, hitLevelOptions) : f;
-      case "stance":
-        return stanceOptions.length > 0 ? withOptions(f, stanceOptions) : f;
-      case "properties":
-      case "hitTags":
-      case "counterHitTags":
-      case "blockTags":
-        return propertyOptions.length > 0 ? withOptions(f, propertyOptions) : f;
-      case "character":
-        return characterOptions.length > 0
-          ? withOptions(f, characterOptions)
-          : f;
-      default:
-        return { ...f };
-    }
-  });
+  const available = new Set(availableColumns);
+  const fields = defaultFields
+    .filter((field) => available.has(field.requiredColumn))
+    .map((f) => {
+      switch (f.id) {
+        case "input":
+          // The Stance + Command column is also the quick-search target.
+          // quickContains is listed first so it's the default when a fresh
+          // filter row is seeded against this field; the standard text ops
+          // stay available via the operator dropdown for power users.
+          return {
+            ...f,
+            allowedOperators: [
+              "quickContains",
+              "contains",
+              "startsWith",
+              "equals",
+              "notEquals",
+            ],
+          };
+        case "hitLevel":
+          return hitLevelOptions.length > 0
+            ? withOptions(f, hitLevelOptions)
+            : f;
+        case "stance":
+          return stanceOptions.length > 0 ? withOptions(f, stanceOptions) : f;
+        case "properties":
+        case "hitTags":
+        case "counterHitTags":
+        case "blockTags":
+          return propertyOptions.length > 0
+            ? withOptions(f, propertyOptions)
+            : f;
+        case "character":
+          return characterOptions.length > 0
+            ? withOptions(f, characterOptions)
+            : f;
+        default:
+          return { ...f };
+      }
+    });
 
   const config: GameFilterConfig = {
     fields,

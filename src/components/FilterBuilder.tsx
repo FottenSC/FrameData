@@ -949,7 +949,11 @@ const FilterRow: React.FC<BaseFilterProps & { filter: FilterCondition }> = ({
         <Combobox
           value={filter.field}
           onChange={(v) => v && onUpdateCondition(filter.id, "field", v)}
-          options={fields.map((f) => ({ label: f.label, value: f.id }))}
+          options={fields.map((f) => ({
+            label: f.label,
+            value: f.id,
+            description: f.description,
+          }))}
           placeholder="Field"
           className="w-[220px] focus-visible:ring-0 focus-visible:ring-offset-0"
           aria-label="Select field"

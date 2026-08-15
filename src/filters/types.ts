@@ -26,6 +26,7 @@ export interface FilterOperator {
 export interface FieldConfig {
   id: string; // e.g., 'impact', 'command'
   label: string; // UI label
+  description?: string; // Hover/help text, ideally with a concrete example
   type: FieldType;
   allowedOperators?: string[];
   // For enum fields, provide options for UI

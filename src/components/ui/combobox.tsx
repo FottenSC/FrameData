@@ -16,7 +16,11 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-export type ComboboxOption = { label: string; value: string };
+export type ComboboxOption = {
+  label: string;
+  value: string;
+  description?: string;
+};
 
 export function Combobox({
   value,
@@ -63,7 +67,12 @@ export function Combobox({
           variant={buttonVariant as any}
           role="combobox"
           aria-expanded={open}
-          aria-label={ariaLabel}
+          aria-label={
+            selected?.description
+              ? `${ariaLabel ?? placeholder}: ${selected.label}. ${selected.description}`
+              : ariaLabel
+          }
+          title={selected?.description}
           className={cn(
             "h-10 px-3 text-sm justify-between w-[200px]",
             className,
@@ -87,6 +96,12 @@ export function Combobox({
                   key={opt.value}
                   value={opt.label}
                   onSelect={() => onSelect(opt.value)}
+                  aria-label={
+                    opt.description
+                      ? `${opt.label}. ${opt.description}`
+                      : opt.label
+                  }
+                  title={opt.description}
                 >
                   <Check
                     className={cn(

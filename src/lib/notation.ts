@@ -291,6 +291,7 @@ export const LEGACY_STYLE_ID_MAP: Record<string, string> = {
 // every move. WeakMap keys are the object identities we ship in
 // NOTATION_STYLES, which are stable for the lifetime of the app.
 const regexCache = new WeakMap<Record<string, string>, RegExp | null>();
+const canonicalDirectionSet: ReadonlySet<string> = new Set(NUMPAD_DIRECTIONS);
 
 function getRegexFor(replacements: Record<string, string>): RegExp | null {
   const cached = regexCache.get(replacements);
@@ -300,8 +301,17 @@ function getRegexFor(replacements: Record<string, string>): RegExp | null {
     regexCache.set(replacements, null);
     return null;
   }
-  // Longer keys first so "B+K" matches before "B".
-  const sorted = keys.toSorted((a, b) => b.length - a.length);
+  // Direction mappings always win over button/text mappings. Within each
+  // group, longer keys win so a compound such as "B+K" matches before "B".
+  // `String.replace` then advances through the original input and never
+  // re-scans replacement output, so an A -> 1 button mapping cannot feed the
+  // generated 1 back through the direction mapping in the same pass.
+  const sorted = keys.toSorted((a, b) => {
+    const aIsDirection = canonicalDirectionSet.has(a);
+    const bIsDirection = canonicalDirectionSet.has(b);
+    if (aIsDirection !== bIsDirection) return aIsDirection ? -1 : 1;
+    return b.length - a.length;
+  });
   const escaped = sorted.map((k) =>
     k.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"),
   );

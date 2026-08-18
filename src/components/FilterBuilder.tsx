@@ -303,14 +303,14 @@ const PRESETS: PresetSpec[] = [
     }),
   },
   {
-    label: "i10+",
-    title: "Fast pokes — impact 10 frames or faster",
+    label: "i12+",
+    title: "Fast pokes — impact 12 frames or faster",
     build: () => ({
-      id: uniqueId("preset-i10plus"),
+      id: uniqueId("preset-i12plus"),
       type: "condition",
       field: "impact",
       condition: "lessThan",
-      value: "10",
+      value: "12",
       value2: "",
     }),
   },
@@ -733,7 +733,7 @@ export const FilterBuilder: React.FC<FilterBuilderProps> = ({
 
       {/*
         Filter shortcuts row.
-            [▾ Advanced filters] | [Punishable] [i10+] [Plus on block] …
+            [▾ Advanced filters] | [Punishable] [i12+] [Plus on block] …
         The Advanced toggle reads as a real section header — h3
         typography, chevron+colour shift on hover — and sits at the
         START of the row so users scan it first ("here's the catch-all

@@ -39,7 +39,7 @@ export const defaultFields: FieldConfig[] = [
     label: "Block",
     requiredColumn: "block",
     description:
-      "Numeric frame advantage when blocked. Example: Less Than -9 finds moves that are -10 or worse.",
+      "Numeric frame advantage when blocked. Example: Less Than or Equals -10 finds moves that are -10 or worse.",
     type: "number",
   },
   {
@@ -55,7 +55,7 @@ export const defaultFields: FieldConfig[] = [
     label: "Hit",
     requiredColumn: "hit",
     description:
-      "Numeric frame advantage on a normal hit. Example: Greater Than 0 finds moves that leave you plus.",
+      "Numeric frame advantage on a normal hit. Example: Greater Than or Equals 1 finds moves that leave you plus.",
     type: "number",
   },
   {
@@ -71,7 +71,7 @@ export const defaultFields: FieldConfig[] = [
     label: "Counter Hit",
     requiredColumn: "counterHit",
     description:
-      "Numeric frame advantage on counter hit. Example: Greater Than 9 finds moves that give at least +10.",
+      "Numeric frame advantage on counter hit. Example: Greater Than or Equals 10 finds moves that give at least +10.",
     type: "number",
   },
   {

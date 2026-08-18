@@ -54,22 +54,22 @@ export const builtinOperators: FilterOperator[] = [
   },
   {
     id: "greaterThan",
-    label: "Greater Than",
+    label: "Greater Than or Equals",
     input: "single",
     appliesTo: ["number"],
     test: ({ fieldNumber, value }) => {
       const n = value != null ? Number(value) : NaN;
-      return fieldNumber != null && !isNaN(n) && fieldNumber > n;
+      return fieldNumber != null && !isNaN(n) && fieldNumber >= n;
     },
   },
   {
     id: "lessThan",
-    label: "Less Than",
+    label: "Less Than or Equals",
     input: "single",
     appliesTo: ["number"],
     test: ({ fieldNumber, value }) => {
       const n = value != null ? Number(value) : NaN;
-      return fieldNumber != null && !isNaN(n) && fieldNumber < n;
+      return fieldNumber != null && !isNaN(n) && fieldNumber <= n;
     },
   },
   {

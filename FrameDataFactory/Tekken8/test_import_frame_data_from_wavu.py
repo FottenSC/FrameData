@@ -48,6 +48,18 @@ class WavuImporterRegressionTests(unittest.TestCase):
         self.assertEqual(stances, ["CH", "WS"])
         self.assertEqual(command, [[[{"b": "B"}]], [[{"b": "B"}]]])
 
+    def test_chained_stance_prefixes_are_independent(self) -> None:
+        command, stances = parse_input_command("NSS.BT.d+1")
+
+        self.assertEqual(stances, ["NSS", "BT"])
+        self.assertEqual(command, [[[{"b": "2"}, {"b": "A"}]]])
+
+    def test_multiple_chained_stance_prefixes_are_all_preserved(self) -> None:
+        command, stances = parse_input_command("H.NSS.BT.d+1")
+
+        self.assertEqual(stances, ["H", "NSS", "BT"])
+        self.assertEqual(command, [[[{"b": "2"}, {"b": "A"}]]])
+
     def test_parenthetical_context_can_contain_a_comma(self) -> None:
         command, stances = parse_input_command(
             "(While down, facing up) 1+2+3+4"

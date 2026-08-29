@@ -296,10 +296,6 @@
           "name": "Destructive Form",
           "description": "Enter with d+1+2"
         },
-        "DES.BT": {
-          "name": "",
-          "description": ""
-        },
         "R": {
           "name": "",
           "description": ""
@@ -348,10 +344,6 @@
           "name": "",
           "description": ""
         },
-        "AIR.BAD": {
-          "name": "",
-          "description": ""
-        },
         "BAD": {
           "name": "Bad Jaguar",
           "description": "Enter with f+3+4"
@@ -369,10 +361,6 @@
           "description": ""
         },
         "FUFL": {
-          "name": "",
-          "description": ""
-        },
-        "H.FC": {
           "name": "",
           "description": ""
         },
@@ -400,10 +388,6 @@
           "name": "",
           "description": ""
         },
-        "H.FC": {
-          "name": "",
-          "description": ""
-        },
         "NWG": {
           "name": "",
           "description": ""
@@ -424,14 +408,6 @@
       "id": 5,
       "name": "Azucena",
       "stances": {
-        "H.FC": {
-          "name": "",
-          "description": ""
-        },
-        "H.LIB": {
-          "name": "",
-          "description": ""
-        },
         "LIB": {
           "name": "Libertador",
           "description": "Enter with f+3+4"
@@ -452,6 +428,10 @@
       "id": 6,
       "name": "Bryan",
       "stances": {
+        "P": {
+          "name": "",
+          "description": ""
+        },
         "R": {
           "name": "",
           "description": ""
@@ -464,17 +444,9 @@
           "name": "Snake Eyes",
           "description": "Enter with 1+3+4"
         },
-        "SNE.FC": {
-          "name": "",
-          "description": ""
-        },
         "SWA": {
           "name": "Sway",
           "description": "Enter with qcb"
-        },
-        "P": {
-          "name": "",
-          "description": ""
         }
       },
       "image": "Bryan.webp",
@@ -504,10 +476,6 @@
           "name": "Updraft",
           "description": "Enter with uf"
         },
-        "H.PHX": {
-          "name": "",
-          "description": ""
-        },
         "PHX": {
           "name": "Phoenix Shift",
           "description": "Enter with f+4"
@@ -531,10 +499,6 @@
         "FLY": {
           "name": "",
           "description": "Enter with 3+4"
-        },
-        "H.MCR": {
-          "name": "",
-          "description": ""
         },
         "MCR": {
           "name": "Mourning Crow",
@@ -584,11 +548,11 @@
           "name": "Bananeira",
           "description": "Enter with f+1+2"
         },
-        "MD1.HSP": {
+        "MD1": {
           "name": "",
           "description": ""
         },
-        "MD2.HSP": {
+        "MD2": {
           "name": "",
           "description": ""
         },
@@ -652,10 +616,6 @@
           "name": "Fujin",
           "description": "Enter with d+1+2"
         },
-        "H.FUJ": {
-          "name": "",
-          "description": ""
-        },
         "R": {
           "name": "",
           "description": ""
@@ -667,14 +627,6 @@
         "WAR": {
           "name": "Warrior Instinct",
           "description": "Enter with 1+4"
-        },
-        "WAR.FUJ": {
-          "name": "",
-          "description": ""
-        },
-        "WAR.RAI": {
-          "name": "",
-          "description": ""
         }
       },
       "image": "Heihachi.webp",
@@ -688,17 +640,13 @@
           "name": "",
           "description": ""
         },
-        "H.FC": {
-          "name": "",
-          "description": ""
-        },
-        "H.RFS": {
-          "name": "",
-          "description": ""
-        },
         "LFS": {
           "name": "Left Flamingo Stance",
           "description": "Enter with f+3"
+        },
+        "P": {
+          "name": "",
+          "description": ""
         },
         "R": {
           "name": "",
@@ -711,10 +659,6 @@
         "RFS": {
           "name": "Right Flamingo Stance",
           "description": "Enter with f,n,4"
-        },
-        "P": {
-          "name": "",
-          "description": ""
         }
       },
       "image": "Hwoarang.webp",
@@ -731,10 +675,6 @@
         "GMH": {
           "name": "Gamma Howl",
           "description": "Enter with 3+4"
-        },
-        "H.FC": {
-          "name": "",
-          "description": ""
         },
         "R": {
           "name": "",
@@ -776,14 +716,6 @@
           "name": "Genjitsu",
           "description": "Enter with f+3+4"
         },
-        "H.FC": {
-          "name": "",
-          "description": ""
-        },
-        "H.GEN": {
-          "name": "",
-          "description": ""
-        },
         "IZU": {
           "name": "Izumo",
           "description": "Enter with u+2"
@@ -808,27 +740,15 @@
           "name": "Devil Kazuya",
           "description": "Enter with While in Heat"
         },
-        "DVK.OTG": {
-          "name": "",
-          "description": ""
-        },
-        "DVK.SS": {
-          "name": "",
-          "description": ""
-        },
-        "H.FC": {
-          "name": "",
-          "description": ""
-        },
-        "R": {
-          "name": "",
-          "description": ""
-        },
         "even numbers frames": {
           "name": "",
           "description": ""
         },
         "odd numbers frames": {
+          "name": "",
+          "description": ""
+        },
+        "R": {
           "name": "",
           "description": ""
         }
@@ -876,7 +796,7 @@
           "name": "",
           "description": ""
         },
-        "H.FC": {
+        "FUFR": {
           "name": "",
           "description": ""
         },
@@ -960,19 +880,15 @@
           "name": "",
           "description": ""
         },
+        "UT": {
+          "name": "",
+          "description": ""
+        },
         "WALL": {
           "name": "",
           "description": ""
         },
         "WallBack": {
-          "name": "",
-          "description": ""
-        },
-        "FUFR": {
-          "name": "",
-          "description": ""
-        },
-        "UT": {
           "name": "",
           "description": ""
         }
@@ -984,10 +900,6 @@
       "id": 21,
       "name": "Kuma",
       "stances": {
-        "H.FC": {
-          "name": "",
-          "description": ""
-        },
         "HBS": {
           "name": "Hunting",
           "description": "Enter with 3+4"
@@ -1012,25 +924,13 @@
       "id": 22,
       "name": "Lars",
       "stances": {
+        "airborne": {
+          "name": "",
+          "description": ""
+        },
         "DEN": {
           "name": "Dynamic Entry",
           "description": "Enter with f+3"
-        },
-        "H.DEN": {
-          "name": "",
-          "description": ""
-        },
-        "H.FC": {
-          "name": "",
-          "description": ""
-        },
-        "H.LEN": {
-          "name": "",
-          "description": ""
-        },
-        "H.SS": {
-          "name": "",
-          "description": ""
         },
         "LEN": {
           "name": "Limited Entry",
@@ -1043,10 +943,6 @@
         "SEN": {
           "name": "Silent Entry",
           "description": "Enter with DEN.n,F"
-        },
-        "airborne": {
-          "name": "",
-          "description": ""
         }
       },
       "image": "Lars.webp",
@@ -1057,10 +953,6 @@
       "name": "Law",
       "stances": {
         "DSS": {
-          "name": "",
-          "description": ""
-        },
-        "H.FC": {
           "name": "",
           "description": ""
         },
@@ -1100,15 +992,11 @@
           "name": "Fo Bu",
           "description": "Enter with d+1+2"
         },
-        "H.FC": {
-          "name": "",
-          "description": ""
-        },
         "KNK": {
           "name": "Jin Ji Du Li",
           "description": "Enter with f+4"
         },
-        "R": {
+        "LTG": {
           "name": "",
           "description": ""
         },
@@ -1116,7 +1004,7 @@
           "name": "",
           "description": ""
         },
-        "LTG": {
+        "R": {
           "name": "",
           "description": ""
         }
@@ -1148,25 +1036,13 @@
       "id": 27,
       "name": "Lidia",
       "stances": {
+        "airborne": {
+          "name": "",
+          "description": ""
+        },
         "CAT": {
           "name": "Cat",
           "description": "Enter with b+3+4"
-        },
-        "H.CAT": {
-          "name": "",
-          "description": ""
-        },
-        "H.FC": {
-          "name": "",
-          "description": ""
-        },
-        "H.HRS": {
-          "name": "",
-          "description": ""
-        },
-        "H.WLF": {
-          "name": "",
-          "description": ""
         },
         "HAE": {
           "name": "Heaven and Earth",
@@ -1187,10 +1063,6 @@
         "WLF": {
           "name": "Stalking Wolf",
           "description": "Enter with HRS.F, CAT.F"
-        },
-        "airborne": {
-          "name": "",
-          "description": ""
         }
       },
       "image": "Lidia.webp",
@@ -1203,14 +1075,6 @@
         "DEW": {
           "name": "Dew Glide",
           "description": "Enter with qcf"
-        },
-        "H.BT": {
-          "name": "",
-          "description": ""
-        },
-        "H.RAB": {
-          "name": "",
-          "description": ""
         },
         "R": {
           "name": "",
@@ -1272,10 +1136,6 @@
           "name": "",
           "description": ""
         },
-        "H.FC": {
-          "name": "",
-          "description": ""
-        },
         "HHD": {
           "name": "",
           "description": ""
@@ -1308,10 +1168,6 @@
       "id": 31,
       "name": "Panda",
       "stances": {
-        "H.FC": {
-          "name": "",
-          "description": ""
-        },
         "HBS": {
           "name": "Hunting",
           "description": "Enter with 3+4"
@@ -1343,14 +1199,6 @@
         "DPD": {
           "name": "Deep Dive",
           "description": "Enter with qcf (or qcb), df"
-        },
-        "H.CS": {
-          "name": "",
-          "description": ""
-        },
-        "H.FC": {
-          "name": "",
-          "description": ""
         },
         "R": {
           "name": "",
@@ -1384,10 +1232,6 @@
       "id": 34,
       "name": "Reina",
       "stances": {
-        "H.WRA": {
-          "name": "",
-          "description": ""
-        },
         "R": {
           "name": "",
           "description": ""
@@ -1456,14 +1300,6 @@
           "name": "Flicker",
           "description": "Enter with b+3+4"
         },
-        "H.EXD": {
-          "name": "",
-          "description": ""
-        },
-        "H.LNH": {
-          "name": "",
-          "description": ""
-        },
         "LNH": {
           "name": "Lionheart",
           "description": "Enter with ub+3"
@@ -1500,19 +1336,11 @@
       "id": 37,
       "name": "Victor",
       "stances": {
-        "H.FC": {
-          "name": "",
-          "description": ""
-        },
-        "H.IAI": {
-          "name": "",
-          "description": ""
-        },
         "IAI": {
           "name": "Iai",
           "description": "Enter with 3+4"
         },
-        "IAI.P": {
+        "P": {
           "name": "",
           "description": ""
         },
@@ -1535,14 +1363,6 @@
         "AOP": {
           "name": "Phoenix",
           "description": "Enter with d+1+2"
-        },
-        "H.BT": {
-          "name": "",
-          "description": ""
-        },
-        "H.FC": {
-          "name": "",
-          "description": ""
         },
         "HYP": {
           "name": "Hypnotist",
@@ -1572,14 +1392,6 @@
           "name": "Flea",
           "description": "Enter with 1SS.d+1+2"
         },
-        "H.DGF": {
-          "name": "",
-          "description": ""
-        },
-        "H.FC": {
-          "name": "",
-          "description": ""
-        },
         "IND": {
           "name": "Indian Stance",
           "description": "Enter with d+3+4"
@@ -1595,22 +1407,6 @@
         "NSS": {
           "name": "Mutou no Kiwami / No Sword Stance",
           "description": "Enter with b+1+2"
-        },
-        "NSS.BT": {
-          "name": "",
-          "description": ""
-        },
-        "NSS.FC": {
-          "name": "",
-          "description": ""
-        },
-        "NSS.IND": {
-          "name": "",
-          "description": ""
-        },
-        "NSS.KIN": {
-          "name": "",
-          "description": ""
         },
         "R": {
           "name": "",
@@ -1632,7 +1428,7 @@
           "name": "Mantis",
           "description": "Enter with d+3+4"
         },
-        "ORB.SCR": {
+        "ORB": {
           "name": "",
           "description": ""
         },
@@ -1647,10 +1443,6 @@
         "TRT": {
           "name": "Tarantula",
           "description": "Enter with d+1+2"
-        },
-        "ORB": {
-          "name": "",
-          "description": ""
         }
       },
       "image": "Zafina.webp",

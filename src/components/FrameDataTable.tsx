@@ -90,6 +90,18 @@ export const FrameDataTable: React.FC = () => {
 
   const error = movesError ? (movesError as Error).message : null;
 
+  useEffect(() => {
+    document.title =
+      selectedCharacterId === -1
+        ? "All Characters"
+        : (characters.find((character) => character.id === selectedCharacterId)
+            ?.name ?? "Frame Data");
+
+    return () => {
+      document.title = "Frame Data";
+    };
+  }, [characters, selectedCharacterId]);
+
   // --- Sorting state ---
   const [sortColumn, setSortColumn] = useState<SortableColumn | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");

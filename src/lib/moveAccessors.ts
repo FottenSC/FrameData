@@ -35,8 +35,8 @@ import {
 } from "@/types/Move";
 import {
   expandMotionShorthand,
+  getDirectionSet,
   isMotionShorthand,
-  MOTION_SHORTHAND,
   translateCommand,
   translateToken,
   type NotationStyle,
@@ -86,91 +86,46 @@ export function expandCommand(cmd: Command | null): string[] {
 }
 
 /**
- * Like {@link expandCommand} but additionally produces expansions that
- * substitute each motion-shorthand token (qcf / qcb / hcf / hcb / dp) with
- * its component direction sequence, translated through the current style.
+ * Expand a command into exactly the textual forms represented by the active
+ * notation's renderer. OR-steps still produce one string per concrete branch.
  *
- * Why: a Tekken player thinking in shorthand types "qcf2" in the quick
- * search; a numpad player thinking in digits types "2361"; an FBUD
- * player types "d df f 2". All three should hit a row whose authored
- * command is `[["qcf"], ["B"]]` — so we expose a search token for each
- * rendering. Only shorthand tokens get expanded; plain tokens pass
- * through.
- *
- * The function is also bidirectional: rows whose data was authored as a
- * literal direction sequence (`[2, 3, 6, B]` rather than `[qcf, B]`) get
- * shorthand-collapsed variants emitted as well, so a user typing "qcfB"
- * still matches them. The collapse runs on the post-translation strings
- * by string-substituting each shorthand's expansion (rendered in the
- * active style) with its label.
- *
- * Return value is deduped; in the common no-shorthand case this is
- * exactly {@link expandCommand}.
+ * Motion shorthand follows the same rule as CommandRenderer: a style that
+ * recognises `qcf` renders and searches the literal shorthand; other styles
+ * render and search its translated component directions. No inactive or
+ * canonical notation aliases are added to the quick-search corpus.
  */
-export function expandCommandWithMotions(
+export function expandCommandForDisplaySearch(
   cmd: Command | null,
   style: NotationStyle | null | undefined,
 ): string[] {
   if (!cmd || cmd.length === 0) return [""];
 
-  // For each step, build the list of display variants every alternative
-  // should contribute. We flatten the buttons axis into a `+`-joined token
-  // here — motion shorthands like `qcf` are always single-button alts
-  // (compound `+` inputs aren't shorthands), so the join is a no-op for
-  // shorthand cases and produces the canonical `A+B` form for AND-presses.
-  // A plain token gives one variant (itself); a shorthand gives TWO —
-  // the shorthand label AND its expanded sequence rendered as a
-  // space-joined string. Cartesian-product those across steps.
-  const stepVariants = cmd.map((step) =>
-    step.flatMap((alt) => {
-      const tok = joinButtons(alt);
-      // Shorthand check looks at the bare button name — a held shorthand
-      // like `(qcf)` still has `b: "qcf"` and should expand the same way.
-      const single = alt.length === 1 ? alt[0] : null;
-      if (!single || !isMotionShorthand(single.b)) return [tok];
-      const expansion = expandMotionShorthand(single.b) ?? [];
-      const expandedInStyle = expansion
-        .map((t) => translateToken(t, style))
-        .join(" ");
-      return expandedInStyle ? [tok, expandedInStyle] : [tok];
-    }),
+  const directionSet = getDirectionSet(style);
+  const renderButtonForSearch = (button: CommandPress[number]): string => {
+    if (!isMotionShorthand(button.b) || directionSet.has(button.b)) {
+      return buttonToText(button);
+    }
+
+    const expansion = expandMotionShorthand(button.b) ?? [];
+    return expansion
+      .map((token) => {
+        const translated = translateToken(token, style);
+        return button.h ? `(${translated})` : translated;
+      })
+      .join(" ");
+  };
+
+  const stepAlternatives = cmd.map((step) =>
+    step.map((alt) => alt.map(renderButtonForSearch).join("+")),
   );
 
-  const combinations = stepVariants.reduce<string[]>(
-    (acc, variants) =>
+  return stepAlternatives.reduce<string[]>(
+    (acc, alternatives) =>
       acc.flatMap((prefix) =>
-        variants.map((v) => (prefix ? `${prefix} ${v}` : v)),
+        alternatives.map((value) => (prefix ? `${prefix} ${value}` : value)),
       ),
     [""],
   );
-
-  // Reverse-shorthand collapse: for each generated string, scan for the
-  // literal substring that each shorthand expands to (rendered in the
-  // active style — `2 3 6` in numpad, `D DF F` in FBUD, etc.) and emit a
-  // variant with that subsequence replaced by the shorthand label. Catches
-  // rows whose data was authored as separate direction steps rather than
-  // an atomic `qcf` token, so quick-search "qcfB" matches them too.
-  //
-  // String-replace is fine here: we're producing search tokens, not
-  // rendered output, so a slightly-weird collapse like `5 qcf B` still
-  // earns its keep by matching "qcfB" needles. We compile the per-style
-  // expansion strings once outside the per-row loop.
-  const expansionStringsForCollapse: Array<[label: string, str: string]> = [];
-  for (const [label, exp] of Object.entries(MOTION_SHORTHAND)) {
-    const expStr = exp.map((t) => translateToken(t, style)).join(" ");
-    if (expStr) expansionStringsForCollapse.push([label, expStr]);
-  }
-
-  const finalSet = new Set(combinations);
-  for (const s of combinations) {
-    for (const [label, expStr] of expansionStringsForCollapse) {
-      if (s.includes(expStr)) {
-        finalSet.add(s.replaceAll(expStr, label));
-      }
-    }
-  }
-
-  return [...finalSet];
 }
 
 /**
@@ -275,10 +230,8 @@ export function buildFieldAccessors(
       return null;
     }
 
-    const styleExpansions = expandCommandWithMotions(translated, style);
-    const universalExpansions = expandCommandWithMotions(m.command, null);
-    const merged = [...new Set([...styleExpansions, ...universalExpansions])];
-    const result = merged.length > 0 ? merged : null;
+    const displayExpansions = expandCommandForDisplaySearch(translated, style);
+    const result = displayExpansions.length > 0 ? displayExpansions : null;
     commandSearchTokensCache.set(m, result);
     return result;
   };
@@ -325,18 +278,10 @@ export function buildFieldAccessors(
       sortValue: (m) => formatCommandFlat(cmdInStyle(m)),
       sortType: "string",
       filterString: (m) => formatCommandFlat(cmdInStyle(m)),
-      // Token projection is every concrete expansion of the command (one
-      // string per OR-branch), PLUS — for rows that contain motion shorthand
-      // — each shorthand's numpad expansion. That way a quick-search for
-      // "qcf 2", "236 2" or "d df f 2" all hit the same move without the
-      // user needing to know which notation shape was authored on disk.
-      //
-      // We emit expansions in BOTH the active style AND the canonical
-      // universal form. That makes search bidirectional: a Tekken-FBUD user
-      // typing "236B" still hits a row even though every rendered token in
-      // FBUD is a letter, because the universal numpad form is in the
-      // search corpus regardless of display style. The only memory cost is
-      // a few extra strings per row; substring-search dedups naturally.
+      // Token projection follows the active renderer exactly: one concrete
+      // string per OR-branch, with motion shorthand either kept or expanded
+      // according to the selected notation. Inactive notation aliases are
+      // deliberately excluded so overlapping digits have one meaning.
       filterTokens: commandSearchTokens,
       exportValue: (m) => formatCommandFlat(cmdInStyle(m)) ?? "",
     },

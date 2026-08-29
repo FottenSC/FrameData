@@ -94,9 +94,9 @@ export const NUMPAD_DIRECTIONS: readonly string[] = [
 //     / universal / ABKG), the renderer expands the token into its component
 //     numpad directions inline, so `qcf 2` reads as "↓↘→ B".
 //
-// Search / filter is symmetric: `expandCommandWithMotions` yields both the
-// shorthand form and the expanded numpad sequence so users who think in
-// either convention find the same moves.
+// Quick search mirrors that presentation choice: shorthand is searchable only
+// when it is rendered literally; styles that expand it search the translated
+// component directions instead.
 
 /** Canonical shorthand → numpad expansion map. Keys are lowercased. */
 export const MOTION_SHORTHAND: Record<string, readonly string[]> = {

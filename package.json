@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "test": "vitest run",
     "build": "pnpm validate:data && tsc --noEmit && vite build && node scripts/check-performance-budget.mjs",
     "preview": "vite preview",
     "predeploy": "node update-timestamp-to-file.cjs && pnpm run build",
@@ -53,6 +54,7 @@
     "tailwindcss": "^4.1.18",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.9.3",
-    "vite": "^6.4.2"
+    "vite": "^6.4.2",
+    "vitest": "^3.2.4"
   }
 }

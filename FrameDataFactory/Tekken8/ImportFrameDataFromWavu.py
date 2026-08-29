@@ -507,7 +507,7 @@ _MOTION_SHORTHAND: frozenset = frozenset({"qcf", "qcb", "hcf", "hcb", "dp"})
 _PAREN_PREFIX_RE = re.compile(r"^(\([^)]*\))\.")           # `(Back to wall).`
 _STANCE_PAREN_RE = re.compile(r"^([A-Z][A-Za-z0-9]*\([^)]*\))\.")  # `CLK(Two spins).`
 _STANCE_PREFIX_RE = re.compile(
-    r"^([A-Z][A-Za-z0-9]*(?:\.[A-Z][A-Za-z0-9]*)?)\."
+    r"^([A-Z][A-Za-z0-9]*(?:\.[A-Z][A-Za-z0-9]*)*)\."
 )
 
 
@@ -759,18 +759,12 @@ def parse_command(raw_command: str) -> Tuple[List[List[List[Dict[str, object]]]]
                 continue
             m = _STANCE_PREFIX_RE.match(s)
             if m:
-                stance = m.group(1)
-                # CH is a condition, not part of a character stance code.
-                # `SSH.CH.1` therefore means SSH + CH, just as `CH.WS.2`
-                # means CH + WS.
-                stance_parts = stance.split(".")
-                if "CH" in stance_parts:
-                    remaining = ".".join(p for p in stance_parts if p != "CH")
-                    if remaining:
-                        stances.append(remaining)
-                    stances.append("CH")
-                else:
-                    stances.append(stance)
+                # Every dot-delimited prefix is an independent requirement.
+                # `NSS.BT.d+1` means No Sword Stance + Back Turned, just as
+                # `H.DGF.1` means Heat + Dragonfly and `SSH.CH.1` means
+                # Silent Step + Counter Hit. Keeping these atomic lets the UI
+                # filter each stance independently and reuse shared metadata.
+                stances.extend(m.group(1).split("."))
                 s = s[m.end():]
                 continue
             break
